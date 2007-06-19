@@ -147,7 +147,7 @@ namespace SvnBridge.RequestReceiver
         }
 
         static int ReadHeader(byte[] data,
-                       TcpClientHttpRequest context)
+                              TcpClientHttpRequest context)
         {
             int lineStart = 0;
             int index = 0;

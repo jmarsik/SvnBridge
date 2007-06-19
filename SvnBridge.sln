@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeLibrary", "SvnFacadeLibrary\SvnBridgeLibrary.csproj", "{95E4E16B-0975-4705-B3A0-83700DE483C2}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridge", "SvnBridge\SvnBridge.csproj", "{22D15920-C064-457D-889B-F7A2E16F3E05}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TraceTCP", "Trace2\TraceTCP.csproj", "{8ED37441-BF40-4CE1-A514-27182894CE90}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22D15920-C064-457D-889B-F7A2E16F3E05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22D15920-C064-457D-889B-F7A2E16F3E05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22D15920-C064-457D-889B-F7A2E16F3E05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22D15920-C064-457D-889B-F7A2E16F3E05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ED37441-BF40-4CE1-A514-27182894CE90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ED37441-BF40-4CE1-A514-27182894CE90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ED37441-BF40-4CE1-A514-27182894CE90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ED37441-BF40-4CE1-A514-27182894CE90}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
