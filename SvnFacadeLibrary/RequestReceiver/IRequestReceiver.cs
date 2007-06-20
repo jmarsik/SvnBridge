@@ -1,6 +1,6 @@
 namespace SvnBridge.RequestReceiver
 {
-    public interface ITcpClientRequestReceiver
+    public interface IRequestReceiver
     {
         // Methods
 

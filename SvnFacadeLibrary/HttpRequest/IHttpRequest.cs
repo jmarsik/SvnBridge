@@ -7,21 +7,25 @@ namespace SvnBridge.Handlers
 {
     public interface IHttpRequest
     {
-        string HttpMethod { get; }
-        string Path { get; }
-        Stream InputStream { get; }
-        NameValueCollection Headers { get; }
-        int StatusCode { set; }
+        // Properties
+
+        Encoding ContentEncoding { set; }
         string ContentType { set; }
-        void Write(string output);
+        NetworkCredential Credentials { get; }
+        NameValueCollection Headers { get; }
+        string HttpMethod { get; }
+        Stream InputStream { get; }
         Stream OutputStream { get; }
+        string Path { get; }
+        bool SendChunked { set; }
+        int StatusCode { set; }
+
+        // Methods
 
         void AddHeader(string name,
                        string value);
 
         void RemoveHeader(string name);
-        Encoding ContentEncoding { set; }
-        NetworkCredential Credentials { get; }
-        bool SendChunked { set; }
+        void Write(string output);
     }
 }

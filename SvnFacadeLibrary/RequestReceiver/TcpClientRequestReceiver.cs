@@ -10,7 +10,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.RequestReceiver
 {
-    public class TcpClientRequestReceiver : ITcpClientRequestReceiver
+    public class TcpClientRequestReceiver : IRequestReceiver
     {
         // Fields
 
@@ -49,9 +49,12 @@ namespace SvnBridge.RequestReceiver
             listener = new TcpListener(IPAddress.Any, portNumber);
             listener.Start();
 
-            listenerThread = new Thread(ReceiveLoop);
+            listenerThread = new Thread(delegate()
+                                        {
+                                            ReceiveLoop(tfsServer);
+                                        });
             listenerThread.Name = "Listener *:" + portNumber + " to " + tfsServer;
-            listenerThread.Start(tfsServer);
+            listenerThread.Start();
         }
 
         public void Stop()
@@ -59,14 +62,13 @@ namespace SvnBridge.RequestReceiver
             if (running)
             {
                 running = false;
-                listenerThread.Join();
+                listenerThread.Join(15000); // Should be Join() but things might not be cleaned up
                 listener.Stop();
             }
         }
 
-        public void ReceiveLoop(object parameters)
+        public void ReceiveLoop(string tfsServer)
         {
-            string tfsServer = (string)parameters;
             List<Thread> workerThreads = new List<Thread>();
 
             while (running)
@@ -88,7 +90,7 @@ namespace SvnBridge.RequestReceiver
             }
 
             foreach (Thread workerThread in workerThreads)
-                workerThread.Join();
+                workerThread.Join(5000);
         }
 
         public void ReceiveRequest(TcpClient client,

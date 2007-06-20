@@ -12,7 +12,7 @@ namespace SvnBridge
 
         // Lifetime
 
-        public ToolTrayForm(ITcpClientRequestReceiver receiver)
+        public ToolTrayForm(IRequestReceiver receiver)
         {
             InitializeComponent();
             presenter = new ToolTrayPresenter(this, receiver);

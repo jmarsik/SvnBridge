@@ -70,10 +70,10 @@ namespace Tests.SvnBridge
         class TestableToolTrayPresenter : ToolTrayPresenter
         {
             public StubToolTrayView View;
-            public StubTcpClientRequestReceiver Receiver;
+            public StubRequestReceiver Receiver;
 
             TestableToolTrayPresenter(StubToolTrayView view,
-                                      StubTcpClientRequestReceiver receiver)
+                                      StubRequestReceiver receiver)
                 : base(view, receiver)
             {
                 View = view;
@@ -82,7 +82,7 @@ namespace Tests.SvnBridge
 
             public static TestableToolTrayPresenter Create()
             {
-                return new TestableToolTrayPresenter(new StubToolTrayView(), new StubTcpClientRequestReceiver());
+                return new TestableToolTrayPresenter(new StubToolTrayView(), new StubRequestReceiver());
             }
         }
 
@@ -101,26 +101,6 @@ namespace Tests.SvnBridge
             {
                 OnServerStopped_Called = true;
             }
-        }
-    }
-
-    class StubTcpClientRequestReceiver : ITcpClientRequestReceiver
-    {
-        public int Start_PortNumber;
-        public string Start_TfsServer;
-
-        public bool Stop_Called;
-
-        public void Start(int portNumber,
-                          string tfsServer)
-        {
-            Start_PortNumber = portNumber;
-            Start_TfsServer = tfsServer;
-        }
-
-        public void Stop()
-        {
-            Stop_Called = true;
         }
     }
 }

@@ -22,6 +22,7 @@ namespace SvnBridge.Handlers
             ISourceControlProvider sourceControlProvider = GetSourceControlProvider(context);
             WebDavService webDavService = new WebDavService(sourceControlProvider);
             CommandProcessor processor = new CommandProcessor(context, webDavService);
+
             if (String.Compare(context.HttpMethod, "propfind", true) == 0)
             {
                 processor.ProcessPropFindRequest();
@@ -64,7 +65,12 @@ namespace SvnBridge.Handlers
             }
             else
             {
-                throw new Exception("Unknown HTTP method '" + context.HttpMethod + "'.");
+                string result = "<html><head><title>405 Method Not Allowed</title></head><body><h1>The requested method is not supported.</h1></body></html>";
+
+                context.StatusCode = 405;
+                context.ContentType = "text/html";
+                context.AddHeader("Allow", "PROPFIND, REPORT, OPTIONS, MKACTIVITY, CHECKOUT, PROPPATCH, PUT, MERGE, DELETE, MKCOL");
+                context.Write(result);
             }
         }
     }

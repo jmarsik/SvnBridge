@@ -6,7 +6,7 @@ namespace SvnBridge
     {
         // Fields
 
-        ITcpClientRequestReceiver receiver;
+        IRequestReceiver receiver;
         IToolTrayView view;
         int currentPortNumber = 8081;
         string currentTfsServer = string.Empty;
@@ -14,7 +14,7 @@ namespace SvnBridge
         // Lifetime
 
         public ToolTrayPresenter(IToolTrayView view,
-                                 ITcpClientRequestReceiver receiver)
+                                 IRequestReceiver receiver)
         {
             this.receiver = receiver;
             this.view = view;
