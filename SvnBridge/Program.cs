@@ -39,6 +39,7 @@ namespace SvnBridge
                 tfsServer = settings.TfsServer;
             }
 
+            //ToolTrayForm toolTray = new ToolTrayForm(new HttpListenerRequestReceiver());
             ToolTrayForm toolTray = new ToolTrayForm(new TcpClientRequestReceiver());
             toolTray.Run(portNumber, tfsServer);
             Application.Run(toolTray);
