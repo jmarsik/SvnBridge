@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Protocol;
-using SvnBridge.RepositoryWebSvc;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
@@ -42,8 +42,8 @@ namespace SvnBridge.Handlers
                 {
                     output.Write("<S:add-file name=\"" + GetFileName(item.Name) + "\">\n");
                 }
-                output.Write("<D:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" + Helper.Encode(item.Name) + "</D:href></D:checked-in>\n");
-                output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + item.Revision.ToString() + "</S:set-prop>\n");
+                output.Write("<D:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></D:checked-in>\n");
+                output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + item.Revision + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + WebDavService.FormatDate(item.LastModifiedDate) + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:last-author\">" + item.Author + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:uuid\">" + WebDavService.RepositoryUuid + "</S:set-prop>\n");
@@ -111,8 +111,8 @@ namespace SvnBridge.Handlers
                         output.Write("<S:add-directory name=\"" + GetFileName(folder.Name) + "\" bc-url=\"/!svn/bc/1/" + folder.Name + "\">\n");
                     }
                 }
-                output.Write("<D:checked-in><D:href>/!svn/ver/" + folder.Revision.ToString() + "/" + Helper.Encode(folder.Name) + "</D:href></D:checked-in>\n");
-                output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + folder.Revision.ToString() + "</S:set-prop>\n");
+                output.Write("<D:checked-in><D:href>/!svn/ver/" + folder.Revision + "/" + Helper.Encode(folder.Name) + "</D:href></D:checked-in>\n");
+                output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + folder.Revision + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + WebDavService.FormatDate(folder.LastModifiedDate) + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:last-author\">" + folder.Author + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:uuid\">" + WebDavService.RepositoryUuid + "</S:set-prop>\n");
@@ -145,18 +145,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        string GetLocalPath(string sourcePath,
-                            string path)
-        {
-            if (path.StartsWith("/"))
-                path = path.Substring(1);
-
-            path = path.Replace('/', '\\');
-
-            return Path.Combine(sourcePath, path);
-        }
-
-        string GetFileName(string path)
+        static string GetFileName(string path)
         {
             int slashIndex = path.LastIndexOfAny(new char[] { '/', '\\' });
             return path.Substring(slashIndex + 1);
