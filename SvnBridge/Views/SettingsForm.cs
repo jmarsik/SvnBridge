@@ -48,11 +48,9 @@ namespace SvnBridge
                 return;
             }
 
-            bool validTfsUrl;
-
-            using (new WaitCursor(this))
-                validTfsUrl = Helper.IsValidTFSUrl(TfsServer);
-
+            this.Cursor = Cursors.WaitCursor;
+            bool validTfsUrl = Helper.IsValidTFSUrl(TfsServer);
+            this.Cursor = Cursors.Default;
             if (!validTfsUrl)
             {
                 MessageBox.Show("The TFS Server URL does not appear to a TFS server.", "SvnBridge", MessageBoxButtons.OK, MessageBoxIcon.Error);
