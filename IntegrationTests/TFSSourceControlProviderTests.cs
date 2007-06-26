@@ -26,17 +26,13 @@ namespace Tests
             testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             provider.MakeActivity(activityId);
             provider.MakeCollection(activityId, testPath);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
-
-            activityId = Guid.NewGuid().ToString();
+            Commit();
         }
 
         [TearDown]
         public void TearDown()
         {
-            provider.MakeActivity(activityId);
-            provider.DeleteItem(activityId, testPath);
+            DeleteItem(testPath, false);
             provider.MergeActivity(activityId);
             provider.DeleteActivity(activityId);
         }
@@ -44,10 +40,7 @@ namespace Tests
         [Test]
         public void TestCommitFolder()
         {
-            provider.MakeActivity(activityId);
-            provider.MakeCollection(activityId, testPath + "/TestFolder");
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFolder(testPath + "/TestFolder", true);
 
             Assert.IsTrue(provider.ItemExists(testPath + "/TestFolder"));
             Assert.AreEqual(ItemType.Folder, provider.GetItems(-1, testPath + "/TestFolder", Recursion.None).ItemType);
@@ -56,11 +49,8 @@ namespace Tests
         [Test]
         public void TestCommitFolderAndSubFolder()
         {
-            provider.MakeActivity(activityId);
-            provider.MakeCollection(activityId, testPath + "/TestFolder");
-            provider.MakeCollection(activityId, testPath + "/TestFolder/SubFolder");
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFolder(testPath + "/TestFolder", false);
+            CreateFolder(testPath + "/TestFolder/SubFolder", true);
 
             Assert.IsTrue(provider.ItemExists(testPath + "/TestFolder/SubFolder"));
             Assert.AreEqual(ItemType.Folder, provider.GetItems(-1, testPath + "/TestFolder/SubFolder", Recursion.None).ItemType);
@@ -71,10 +61,7 @@ namespace Tests
         {
             byte[] testFile = Encoding.Default.GetBytes("Test file contents");
 
-            provider.MakeActivity(activityId);
-            provider.WriteFile(activityId, testPath + "/TestFile.txt", testFile);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFile(testPath + "/TestFile.txt", testFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFile.txt");
             Assert.AreEqual(Encoding.Default.GetString(testFile), Encoding.Default.GetString(actual));
@@ -85,12 +72,9 @@ namespace Tests
         {
             byte[] testFile = Encoding.Default.GetBytes("Test file contents");
 
-            provider.MakeActivity(activityId);
-            provider.WriteFile(activityId, testPath + "/TestFile1.txt", testFile);
-            provider.WriteFile(activityId, testPath + "/TestFile2.txt", testFile);
-            provider.WriteFile(activityId, testPath + "/TestFile3.txt", testFile);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFile(testPath + "/TestFile1.txt", testFile, false);
+            CreateFile(testPath + "/TestFile2.txt", testFile, false);
+            CreateFile(testPath + "/TestFile3.txt", testFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFile1.txt");
             Assert.AreEqual(Encoding.Default.GetString(testFile), Encoding.Default.GetString(actual));
@@ -105,11 +89,8 @@ namespace Tests
         {
             byte[] testFile = Encoding.Default.GetBytes("Test file contents");
 
-            provider.MakeActivity(activityId);
-            provider.MakeCollection(activityId, testPath + "/TestFolder");
-            provider.WriteFile(activityId, testPath + "/TestFolder/TestFile.txt", testFile);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFolder(testPath + "/TestFolder", false);
+            CreateFile(testPath + "/TestFolder/TestFile.txt", testFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFolder/TestFile.txt");
             Assert.AreEqual(Encoding.Default.GetString(testFile), Encoding.Default.GetString(actual));
@@ -118,13 +99,10 @@ namespace Tests
         [Test]
         public void TestCommitUpdatedFile()
         {
-            CreateFile(testPath + "/TestFile.txt", "Test file contents");
+            CreateFile(testPath + "/TestFile.txt", "Test file contents", true);
             byte[] testUpdatedFile = Encoding.Default.GetBytes("Test file contents\r\nUpdated");
 
-            provider.MakeActivity(activityId);
-            provider.WriteFile(activityId, testPath + "/TestFile.txt", testUpdatedFile);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFile(testPath + "/TestFile.txt", testUpdatedFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFile.txt");
             Assert.AreEqual(Encoding.Default.GetString(testUpdatedFile), Encoding.Default.GetString(actual));
@@ -134,10 +112,7 @@ namespace Tests
         public void TestGetItemsReturnsIgnoreInfo()
         {
             string ignore = "*.bad\n";
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, testPath, "ignore", ignore);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            SetProperty(testPath, "ignore", ignore, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
 
@@ -149,10 +124,7 @@ namespace Tests
         {
             string ignore = "*.bad\n";
 
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, testPath, "ignore", ignore);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            SetProperty(testPath, "ignore", ignore, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
             Assert.AreEqual(ignore, item.Properties["ignore"]);
@@ -163,16 +135,9 @@ namespace Tests
         {
             string ignore1 = "*.bad\n";
             string ignore2 = "*.good\n";
+            SetProperty(testPath, "ignore", ignore1, true);
 
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, testPath, "ignore", ignore1);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
-
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, testPath, "ignore", ignore2);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            SetProperty(testPath, "ignore", ignore2, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
             Assert.AreEqual(ignore2, item.Properties["ignore"]);
@@ -182,12 +147,9 @@ namespace Tests
         public void TestDeleteFile()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Test file contents");
+            CreateFile(path, "Test file contents", true);
 
-            provider.MakeActivity(activityId);
-            provider.DeleteItem(activityId, path);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            DeleteItem(path, true);
 
             Assert.IsFalse(provider.ItemExists(path));
         }
@@ -196,12 +158,9 @@ namespace Tests
         public void TestDeleteFolder()
         {
             string path = testPath + "/TestFolder";
-            CreateFolder(path);
+            CreateFolder(path, true);
 
-            provider.MakeActivity(activityId);
-            provider.DeleteItem(activityId, path);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            DeleteItem(path, true);
 
             Assert.IsFalse(provider.ItemExists(path));
         }
@@ -210,7 +169,7 @@ namespace Tests
         public void TestGetLog()
         {
             int versionFrom = provider.GetLatestVersion();
-            CreateFile(testPath + "/TestFile.txt", "Fun text");
+            CreateFile(testPath + "/TestFile.txt", "Fun text", true);
             int versionTo = provider.GetLatestVersion();
 
             LogItem logItem = provider.GetLog(testPath, versionFrom, versionTo, Recursion.Full, Int32.MaxValue);
@@ -222,7 +181,7 @@ namespace Tests
         public void TestGetChangedItemsWithOneNewFile()
         {
             int versionFrom = provider.GetLatestVersion();
-            CreateFile(testPath + "/TestFile.txt", "Fun text");
+            CreateFile(testPath + "/TestFile.txt", "Fun text", true);
             int versionTo = provider.GetLatestVersion();
 
             UpdateReportData reportData = new UpdateReportData();
@@ -237,9 +196,9 @@ namespace Tests
         public void TestGetChangedItemsWithDeletedFile()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Test file contents");
+            CreateFile(path, "Test file contents", true);
             int versionFrom = provider.GetLatestVersion();
-            DeleteItem(path);
+            DeleteItem(path, true);
             int versionTo = provider.GetLatestVersion();
 
             UpdateReportData reportData = new UpdateReportData();
@@ -253,9 +212,9 @@ namespace Tests
         public void TestGetChangedItemsWithDeletedFolder()
         {
             string path = testPath + "/Test Folder";
-            CreateFolder(path);
+            CreateFolder(path, true);
             int versionFrom = provider.GetLatestVersion();
-            DeleteItem(path);
+            DeleteItem(path, true);
             int versionTo = provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
 
@@ -269,10 +228,10 @@ namespace Tests
         public void TestGetChangedItemsWithSameFileUpdatedTwice()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text");
+            CreateFile(path, "Fun text", true);
             int versionFrom = provider.GetLatestVersion();
-            UpdateFile(path, "Fun text 2");
-            UpdateFile(path, "Fun text 3");
+            UpdateFile(path, "Fun text 2", true);
+            UpdateFile(path, "Fun text 3", true);
             int versionTo = provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
 
@@ -288,11 +247,8 @@ namespace Tests
         {
             string mimeType = "application/octet-stream";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text");
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, path, "mime-type", mimeType);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFile(path, "Fun text", true);
+            SetProperty(path, "mime-type", mimeType, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
 
@@ -304,12 +260,9 @@ namespace Tests
         {
             string mimeType = "application/octet-stream";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text");
+            CreateFile(path, "Fun text", true);
 
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, path, "mime-type", mimeType);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            SetProperty(path, "mime-type", mimeType, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
             Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
@@ -321,17 +274,10 @@ namespace Tests
             string mimeType1 = "application/octet-stream1";
             string mimeType2 = "application/octet-stream2";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text");
+            CreateFile(path, "Fun text", true);
+            SetProperty(path, "mime-type", mimeType1, true);
 
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, path, "mime-type", mimeType1);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
-
-            provider.MakeActivity(activityId);
-            provider.SetProperty(activityId, path, "mime-type", mimeType2);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            SetProperty(path, "mime-type", mimeType2, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
             Assert.AreEqual(mimeType2, item.Items[0].Properties["mime-type"]);
@@ -341,9 +287,9 @@ namespace Tests
         public void TestGetChangedItemsDoesNotReturnItemIfInLocalEntriesList()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text");
+            CreateFile(path, "Fun text", true);
             int versionFrom = provider.GetLatestVersion();
-            UpdateFile(path, "Fun text 2");
+            UpdateFile(path, "Fun text 2", true);
             int versionTo = provider.GetLatestVersion();
 
             UpdateReportData reportData = new UpdateReportData();
@@ -361,9 +307,9 @@ namespace Tests
         public void TestGetChangedItemsDoesNotReturnDeletedItemIfInLocalState()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text");
+            CreateFile(path, "Fun text", true);
             int versionFrom = provider.GetLatestVersion();
-            DeleteItem(path);
+            DeleteItem(path, true);
             int versionTo = provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
             reportData.Missing = new List<string>();
@@ -375,13 +321,28 @@ namespace Tests
         }
 
         [Test]
+        public void TestGetChangedItemsWithNewFileInNewFolderHasCorrectPaths()
+        {
+            int versionFrom = provider.GetLatestVersion();
+            CreateFolder(testPath + "/New Folder", false);
+            CreateFile(testPath + "/New Folder/New File.txt", "Fun text", true);
+            int versionTo = provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(testPath.Substring(1) + "/New Folder", folder.Items[0].Name);
+            Assert.AreEqual(1, ((FolderMetaData)folder.Items[0]).Items.Count);
+            Assert.AreEqual(testPath.Substring(1) + "/New Folder/New File.txt", ((FolderMetaData)folder.Items[0]).Items[0].Name);
+        }
+
+        [Test]
         public void CommitWithNoItemsReturnsLatestChangeset()
         {
             int startVersion = provider.GetLatestVersion();
 
-            provider.MakeActivity(activityId);
             MergeActivityResponse response = provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
 
             int endVersion = provider.GetLatestVersion();
             Assert.AreEqual(startVersion, response.Version);
@@ -389,49 +350,66 @@ namespace Tests
         }
 
         void UpdateFile(string path,
-                        string fileData)
+                        string fileData,
+                        bool commit)
         {
             byte[] data = Encoding.Default.GetBytes(fileData);
-            string activityId = Guid.NewGuid().ToString();
-            provider.MakeActivity(activityId);
             provider.WriteFile(activityId, path, data);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            if (commit)
+                Commit();
         }
 
         void CreateFile(string path,
-                        string fileData)
+                        string fileData,
+                        bool commit)
         {
             byte[] data = Encoding.Default.GetBytes(fileData);
-            string activityId = Guid.NewGuid().ToString();
-            provider.MakeActivity(activityId);
-            provider.WriteFile(activityId, path, data);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            CreateFile(path, data, commit);
         }
 
-        void DeleteItem(string path)
+        void CreateFile(string path,
+                        byte[] fileData,
+                        bool commit)
         {
-            string activityId = Guid.NewGuid().ToString();
+            provider.WriteFile(activityId, path, fileData);
+            if (commit)
+                Commit();
+        }
+
+        void Commit()
+        {
+            provider.MergeActivity(activityId);
+            provider.DeleteActivity(activityId);
             provider.MakeActivity(activityId);
+        }
+
+        void DeleteItem(string path,
+                        bool commit)
+        {
             provider.DeleteItem(activityId, path);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            if (commit)
+                Commit();
         }
 
-        void CreateFolder(string path)
+        void CreateFolder(string path,
+                        bool commit)
         {
-            string activityId = Guid.NewGuid().ToString();
-            provider.MakeActivity(activityId);
             provider.MakeCollection(activityId, path);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            if (commit)
+                Commit();
         }
 
         byte[] ReadFile(string path)
         {
             ItemMetaData item = provider.GetItems(-1, path, Recursion.None);
             return provider.ReadFile(item);
+        }
+
+        void SetProperty(string path, string name, string value, bool commit)
+        {
+            provider.SetProperty(activityId, path, name, value);
+            if (commit)
+                Commit();
         }
     }
 }
