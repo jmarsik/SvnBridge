@@ -1,4 +1,5 @@
-using System;
+using System.Net;
+using CodePlex.TfsLibrary;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
@@ -23,54 +24,71 @@ namespace SvnBridge.Handlers
             WebDavService webDavService = new WebDavService(sourceControlProvider);
             CommandProcessor processor = new CommandProcessor(context, webDavService);
 
-            if (String.Compare(context.HttpMethod, "propfind", true) == 0)
+            try
             {
-                processor.ProcessPropFindRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "report", true) == 0)
-            {
-                processor.ProcessReportRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "options", true) == 0)
-            {
-                processor.ProcessOptionsRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "mkactivity", true) == 0)
-            {
-                processor.ProcessMkActivityRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "checkout", true) == 0)
-            {
-                processor.ProcessCheckoutRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "proppatch", true) == 0)
-            {
-                processor.ProcessPropPatchRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "put", true) == 0)
-            {
-                processor.ProcessPutRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "merge", true) == 0)
-            {
-                processor.ProcessMergeRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "delete", true) == 0)
-            {
-                processor.ProcessDeleteRequest();
-            }
-            else if (String.Compare(context.HttpMethod, "mkcol", true) == 0)
-            {
-                processor.ProcessMkColRequest();
-            }
-            else
-            {
-                string result = "<html><head><title>405 Method Not Allowed</title></head><body><h1>The requested method is not supported.</h1></body></html>";
+                // TODO: Make this a dispatch table
+                switch (context.HttpMethod.ToLowerInvariant())
+                {
+                    case "propfind":
+                        processor.ProcessPropFindRequest();
+                        break;
 
-                context.StatusCode = 405;
-                context.ContentType = "text/html";
-                context.AddHeader("Allow", "PROPFIND, REPORT, OPTIONS, MKACTIVITY, CHECKOUT, PROPPATCH, PUT, MERGE, DELETE, MKCOL");
-                context.Write(result);
+                    case "report":
+                        processor.ProcessReportRequest();
+                        break;
+
+                    case "options":
+                        processor.ProcessOptionsRequest();
+                        break;
+
+                    case "mkactivity":
+                        processor.ProcessMkActivityRequest();
+                        break;
+
+                    case "checkout":
+                        processor.ProcessCheckoutRequest();
+                        break;
+
+                    case "proppatch":
+                        processor.ProcessPropPatchRequest();
+                        break;
+
+                    case "put":
+                        processor.ProcessPutRequest();
+                        break;
+
+                    case "merge":
+                        processor.ProcessMergeRequest();
+                        break;
+
+                    case "delete":
+                        processor.ProcessDeleteRequest();
+                        break;
+
+                    case "mkcol":
+                        processor.ProcessMkColRequest();
+                        break;
+
+                    default:
+                        context.StatusCode = 405;
+                        context.ContentType = "text/html";
+                        context.AddHeader("Allow", "PROPFIND, REPORT, OPTIONS, MKACTIVITY, CHECKOUT, PROPPATCH, PUT, MERGE, DELETE, MKCOL");
+                        context.Write("<html><head><title>405 Method Not Allowed</title></head><body><h1>The requested method is not supported.</h1></body></html>");
+                        break;
+                }
+            }
+            catch (WebException ex)
+            {
+                HttpWebResponse response = ex.Response as HttpWebResponse;
+
+                if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
+                    processor.SendUnauthorizedResponse();
+                else
+                    throw;
+            }
+            catch (NetworkAccessDeniedException)
+            {
+                processor.SendUnauthorizedResponse();
             }
         }
     }

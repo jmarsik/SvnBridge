@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
+using CodePlex.TfsLibrary;
+using CodePlex.TfsLibrary.ObjectModel;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
-using SvnBridge.RepositoryWebSvc;
-using SvnBridge.TfsLibrary;
 
 namespace Tests
 {
@@ -626,48 +628,29 @@ namespace Tests
         [Test]
         public void Test14()
         {
-            Changeset[] logResults = new Changeset[] { new Changeset(), new Changeset(), new Changeset(), new Changeset(), new Changeset() };
-            logResults[0].cset = 5395;
-            logResults[0].cmtr = "jwanagel";
-            logResults[0].date = DateTime.Parse("2007-05-16T05:21:26.302105Z");
-            logResults[0].Comment = "Deleted a file";
-            logResults[0].Changes = new Change[] { new Change() };
-            logResults[0].Changes[0].Item = new Item();
-            logResults[0].Changes[0].Item.item = "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt";
-            logResults[0].Changes[0].type = ChangeType.Delete;
-            logResults[1].cset = 5394;
-            logResults[1].cmtr = "jwanagel";
-            logResults[1].date = DateTime.Parse("2007-05-16T04:37:37.958355Z");
-            logResults[1].Comment = "Added another line";
-            logResults[1].Changes = new Change[] { new Change() };
-            logResults[1].Changes[0].Item = new Item();
-            logResults[1].Changes[0].Item.item = "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt";
-            logResults[1].Changes[0].type = ChangeType.Edit;
-            logResults[2].cset = 5393;
-            logResults[2].cmtr = "jwanagel";
-            logResults[2].date = DateTime.Parse("2007-05-16T04:17:42.098980Z");
-            logResults[2].Comment = "Updated a file";
-            logResults[2].Changes = new Change[] { new Change() };
-            logResults[2].Changes[0].Item = new Item();
-            logResults[2].Changes[0].Item.item = "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt";
-            logResults[2].Changes[0].type = ChangeType.Edit;
-            logResults[3].cset = 5392;
-            logResults[3].cmtr = "jwanagel";
-            logResults[3].date = DateTime.Parse("2007-05-16T04:16:43.911480Z");
-            logResults[3].Comment = "Added new file";
-            logResults[3].Changes = new Change[] { new Change() };
-            logResults[3].Changes[0].Item = new Item();
-            logResults[3].Changes[0].Item.item = "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt";
-            logResults[3].Changes[0].type = ChangeType.Add;
-            logResults[4].cset = 5390;
-            logResults[4].cmtr = "jwanagel";
-            logResults[4].date = DateTime.Parse("2007-05-14T00:05:54.910225Z");
-            logResults[4].Comment = "Adding New Folder 5";
-            logResults[4].Changes = new Change[] { new Change() };
-            logResults[4].Changes[0].Item = new Item();
-            logResults[4].Changes[0].Item.item = "$/Spikes/SvnFacade/trunk/New Folder 5";
-            logResults[4].Changes[0].type = ChangeType.Add;
-            mock.Attach(provider.GetLog, logResults);
+            List<SourceItemHistory> histories = new List<SourceItemHistory>();
+
+            SourceItemHistory history1 = new SourceItemHistory(5395, "jwanagel", DateTime.Parse("2007-05-16T05:21:26.302105Z"), "Deleted a file");
+            history1.Changes.Add(MakeChange(ChangeType.Delete, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            histories.Add(history1);
+
+            SourceItemHistory history2 = new SourceItemHistory(5394, "jwanagel", DateTime.Parse("2007-05-16T04:37:37.958355Z"), "Added another line");
+            history2.Changes.Add(MakeChange(ChangeType.Edit, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            histories.Add(history2);
+
+            SourceItemHistory history3 = new SourceItemHistory(5393, "jwanagel", DateTime.Parse("2007-05-16T04:17:42.098980Z"), "Updated a file");
+            history3.Changes.Add(MakeChange(ChangeType.Edit, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            histories.Add(history3);
+
+            SourceItemHistory history4 = new SourceItemHistory(5392, "jwanagel", DateTime.Parse("2007-05-16T04:16:43.911480Z"), "Added new file");
+            history4.Changes.Add(MakeChange(ChangeType.Add, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            histories.Add(history4);
+
+            SourceItemHistory history5 = new SourceItemHistory(5390, "jwanagel", DateTime.Parse("2007-05-14T00:05:54.910225Z"), "Adding New Folder 5");
+            history5.Changes.Add(MakeChange(ChangeType.Add, "$/Spikes/SvnFacade/trunk/New Folder 5"));
+            histories.Add(history5);
+
+            mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/Spikes/SvnFacade/trunk", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5465/Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
@@ -737,6 +720,15 @@ namespace Tests
             string actual = ProcessRequest(request, expected);
 
             Assert.AreEqual(expected, actual);
+        }
+
+        static SourceItemChange MakeChange(ChangeType changeType,
+                                           string serverPath)
+        {
+            SourceItemChange result = new SourceItemChange();
+            result.Item = SourceItem.FromRemoteItem(0, ItemType.Folder, serverPath, 0, 0, DateTime.Now, null);
+            result.ChangeType = changeType;
+            return result;
         }
     }
 }

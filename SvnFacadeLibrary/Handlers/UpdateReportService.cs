@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Protocol;
-using SvnBridge.RepositoryWebSvc;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 

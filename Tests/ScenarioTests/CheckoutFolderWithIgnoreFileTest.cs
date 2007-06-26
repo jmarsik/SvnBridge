@@ -1,7 +1,7 @@
 using System;
+using CodePlex.TfsLibrary;
 using NUnit.Framework;
 using SvnBridge.SourceControl;
-using SvnBridge.TfsLibrary;
 
 namespace Tests
 {

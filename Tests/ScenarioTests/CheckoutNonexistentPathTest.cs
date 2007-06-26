@@ -1,5 +1,5 @@
+using CodePlex.TfsLibrary;
 using NUnit.Framework;
-using SvnBridge.TfsLibrary;
 
 namespace Tests
 {

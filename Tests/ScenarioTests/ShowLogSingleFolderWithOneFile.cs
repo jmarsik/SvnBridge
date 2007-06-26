@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
+using CodePlex.TfsLibrary;
+using CodePlex.TfsLibrary.ObjectModel;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
-using SvnBridge.RepositoryWebSvc;
-using SvnBridge.TfsLibrary;
 
 namespace Tests
 {
@@ -626,22 +628,26 @@ namespace Tests
         [Test]
         public void Test14()
         {
-            Changeset[] logResults = new Changeset[] { new Changeset() };
-            logResults[0].cset = 5385;
-            logResults[0].cmtr = "jwanagel";
-            logResults[0].date = DateTime.Parse("2007-04-09T03:54:04.385945Z");
-            logResults[0].Comment = "Added another folder and two files";
-            logResults[0].Changes = new Change[] { new Change(), new Change(), new Change() };
-            logResults[0].Changes[0].Item = new Item();
-            logResults[0].Changes[0].Item.item = "$/Spikes/SvnFacade/trunk/New Folder";
-            logResults[0].Changes[0].type = ChangeType.Add;
-            logResults[0].Changes[1].Item = new Item();
-            logResults[0].Changes[1].Item.item = "$/Spikes/SvnFacade/trunk/Test1.txt";
-            logResults[0].Changes[1].type = ChangeType.Add;
-            logResults[0].Changes[2].Item = new Item();
-            logResults[0].Changes[2].Item.item = "$/Spikes/SvnFacade/trunk/New Folder/Test2.txt";
-            logResults[0].Changes[2].type = ChangeType.Add;
-            mock.Attach(provider.GetLog, logResults);
+            SourceItemChange change1 = new SourceItemChange();
+            change1.Item = SourceItem.FromRemoteItem(0, ItemType.Folder, "$/Spikes/SvnFacade/trunk/New Folder", 0, 0, DateTime.Now, null);
+            change1.ChangeType = ChangeType.Add;
+
+            SourceItemChange change2 = new SourceItemChange();
+            change2.Item = SourceItem.FromRemoteItem(0, ItemType.File, "$/Spikes/SvnFacade/trunk/Test1.txt", 0, 0, DateTime.Now, null);
+            change2.ChangeType = ChangeType.Add;
+
+            SourceItemChange change3 = new SourceItemChange();
+            change3.Item = SourceItem.FromRemoteItem(0, ItemType.File, "$/Spikes/SvnFacade/trunk/New Folder/Test2.txt", 0, 0, DateTime.Now, null);
+            change3.ChangeType = ChangeType.Add;
+            
+            List<SourceItemHistory> histories = new List<SourceItemHistory>();
+            SourceItemHistory history = new SourceItemHistory(5385, "jwanagel", DateTime.Parse("2007-04-09T03:54:04.385945Z"), "Added another folder and two files");
+            history.Changes.Add(change1);
+            history.Changes.Add(change2);
+            history.Changes.Add(change3);
+            histories.Add(history);
+
+            mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/Spikes/SvnFacade/trunk", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5465/Spikes/SvnFacade/trunk/New%20Folder HTTP/1.1\r\n" +

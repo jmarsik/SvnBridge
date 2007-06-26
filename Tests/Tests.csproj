@@ -1,0 +1,130 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tests</RootNamespace>
+    <AssemblyName>Tests</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AttachFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\AttachFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="CodePlex.TfsLibrary, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\CodePlex.TfsLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.2.10.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assert\Assert.cs" />
+    <Compile Include="Assert\AssertActualExpectedException.cs" />
+    <Compile Include="Assert\AssertException.cs" />
+    <Compile Include="Assert\ContainsException.cs" />
+    <Compile Include="Assert\DoesNotContainException.cs" />
+    <Compile Include="Assert\EmptyException.cs" />
+    <Compile Include="Assert\EqualException.cs" />
+    <Compile Include="Assert\FalseException.cs" />
+    <Compile Include="Assert\InRangeException.cs" />
+    <Compile Include="Assert\IsTypeException.cs" />
+    <Compile Include="Assert\NotEmptyException.cs" />
+    <Compile Include="Assert\NotEqualException.cs" />
+    <Compile Include="Assert\NotNullException.cs" />
+    <Compile Include="Assert\NotSameException.cs" />
+    <Compile Include="Assert\NullException.cs" />
+    <Compile Include="Assert\SameException.cs" />
+    <Compile Include="Assert\ThrowsException.cs" />
+    <Compile Include="Assert\TrueException.cs" />
+    <Compile Include="FileNodeTests.cs" />
+    <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
+    <Compile Include="RequestReceiver\TcpClientRequestReceiverTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutEmptyFolderTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutFolderWithBinaryFileTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutFolderWithEmptyFileTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutFolderWithIgnoreFileTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutFolderWithOneFileTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutNonexistentPathTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutOldRevisionTest.cs" />
+    <Compile Include="ScenarioTests\CommitDeleteFileTest.cs" />
+    <Compile Include="ScenarioTests\CommitDeleteFolderTest.cs" />
+    <Compile Include="ScenarioTests\CommitDeleteOfAlreadyDeletedFileTest.cs" />
+    <Compile Include="ScenarioTests\CommitFileThatWasCheckedOutAnonymouslyTest.cs" />
+    <Compile Include="ScenarioTests\CommitIgnoreFileTest.cs" />
+    <Compile Include="ScenarioTests\CommitNewBinaryFileTest.cs" />
+    <Compile Include="ScenarioTests\CommitNewEmptyFileTest.cs" />
+    <Compile Include="ScenarioTests\CommitNewFolderTest.cs" />
+    <Compile Include="DeleteTests.cs" />
+    <Compile Include="MkActivityTests.cs" />
+    <Compile Include="MkColTests.cs" />
+    <Compile Include="Infrastructure\MockContext.cs" />
+    <Compile Include="PropFindTests.cs" />
+    <Compile Include="Infrastructure\MyMocks.cs" />
+    <Compile Include="ScenarioTests\CommitNewFileTest.cs" />
+    <Compile Include="Infrastructure\StubSourceControlProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Infrastructure\WebDavServiceTestsBase.cs" />
+    <Compile Include="ScenarioTests\CommitUpdatedFileTest.cs" />
+    <Compile Include="ScenarioTests\CommitUpdatedFileThatIsOutOfDateTest.cs" />
+    <Compile Include="ScenarioTests\ShowLogSingleFolderWithAddEditDelete.cs" />
+    <Compile Include="ScenarioTests\ShowLogSingleFolderWithOneFile.cs" />
+    <Compile Include="ScenarioTests\UpdateAfterCommitFileDeleteTest.cs" />
+    <Compile Include="ScenarioTests\UpdateAfterCommitNewFolderTest.cs" />
+    <Compile Include="ScenarioTests\UpdateOneFileTest.cs" />
+    <Compile Include="ScenarioTests\UpdateWithDeletedFileTest.cs" />
+    <Compile Include="ScenarioTests\UpdateWithDeletedFolderTest.cs" />
+    <Compile Include="ScenarioTests\UpdateWithNewFileTest.cs" />
+    <Compile Include="ScenarioTests\UpdateWithNoNewItems.cs" />
+    <Compile Include="Stubs\StubRequestReceiver.cs" />
+    <Compile Include="SvnBridge\ToolTrayPresenterTest.cs" />
+    <Compile Include="WebDavServiceTests.cs" />
+    <Compile Include="XmlEncodeTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SvnBridge\SvnBridge.csproj">
+      <Project>{22D15920-C064-457D-889B-F7A2E16F3E05}</Project>
+      <Name>SvnBridge</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SvnFacadeLibrary\SvnBridgeLibrary.csproj">
+      <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
+      <Name>SvnBridgeLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

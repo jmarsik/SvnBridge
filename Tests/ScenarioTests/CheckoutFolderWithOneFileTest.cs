@@ -1,9 +1,9 @@
 using System;
 using System.Text;
+using CodePlex.TfsLibrary;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
-using SvnBridge.RepositoryWebSvc;
 using SvnBridge.SourceControl;
-using SvnBridge.TfsLibrary;
 
 namespace Tests
 {
