@@ -384,10 +384,13 @@ namespace SvnBridge.Handlers
                         throw new Exception("Checksum mismatch with base file");
                     }
                 }
+
                 byte[] fileData = new byte[0];
+                int sourceDataStartIndex = 0;
                 foreach (SvnDiff diff in diffs)
                 {
-                    byte[] newData = SvnDiffEngine.ApplySvnDiff(diff, sourceData);
+                    byte[] newData = SvnDiffEngine.ApplySvnDiff(diff, sourceData, sourceDataStartIndex);
+                    sourceDataStartIndex += newData.Length;
                     Helper.ReDim(ref fileData, fileData.Length + newData.Length);
                     Array.Copy(newData, 0, fileData, fileData.Length - newData.Length, newData.Length);
                 }

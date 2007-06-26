@@ -149,5 +149,12 @@ namespace Tests
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
+
+        public delegate int StreamRead(byte[] buffer, int offset, int count);
+
+        public Results Attach(StreamRead method, Exception throwException)
+        {
+            return base.Attach((Delegate)method, throwException);
+        }
     }
 }

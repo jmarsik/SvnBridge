@@ -117,7 +117,15 @@ namespace SvnBridge.RequestReceiver
                 do
                 {
                     byte[] buffer2 = new byte[32000];
-                    int count = stream.Read(buffer2, 0, buffer2.Length);
+                    int count = 0;
+                    try
+                    {
+                        count = stream.Read(buffer2, 0, buffer2.Length);
+                    }
+                    catch (IOException)
+                    {
+                        // Ignore failures caused by client canceling request
+                    }
                     if (count == 0)
                         return;
 
@@ -141,10 +149,23 @@ namespace SvnBridge.RequestReceiver
                 {
                     context.SetInputStream(inputStream);
                     inputStream.Position = bodyStart;
-                    handler.ProcessRequest(context);
+                    try
+                    {
+                        handler.ProcessRequest(context);
+                    }
+                    catch (IOException)
+                    {
+                        // Ignore failures caused by client canceling request
+                    }
                 }
-
-                context.GetOutputStream().Flush();
+                try
+                {
+                    context.GetOutputStream().Flush();
+                }
+                catch (IOException)
+                {
+                    // Ignore failures caused by client canceling request
+                }
             }
         }
 

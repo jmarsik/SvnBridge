@@ -6,7 +6,8 @@ namespace SvnBridge.Utility
     public class SvnDiffEngine
     {
         public static byte[] ApplySvnDiff(SvnDiff svnDiff,
-                                          byte[] source)
+                                          byte[] source,
+                                          int sourceDataStartIndex)
         {
             const int BUF_SIZE = 1000;
             byte[] buffer = new byte[BUF_SIZE];
@@ -31,7 +32,7 @@ namespace SvnBridge.Utility
                             {
                                 Helper.ReDim(ref buffer, buffer.Length + BUF_SIZE);
                             }
-                            buffer[index] = source[(int)instruction.Offset + i];
+                            buffer[index] = source[(int)instruction.Offset + sourceDataStartIndex + i];
                             index++;
                         }
                     }
