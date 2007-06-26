@@ -21,21 +21,18 @@ namespace SvnBridge.Utility
             List<SvnDiff> diffs = new List<SvnDiff>();
             while (reader.PeekChar() != -1)
             {
-                SvnDiff txDelta = new SvnDiff();
+                SvnDiff diff = new SvnDiff();
 
-                txDelta.SourceViewOffset = ReadInt(reader);
-                txDelta.SourceViewLength = ReadInt(reader);
-                txDelta.TargetViewLength = ReadInt(reader);
-                txDelta.InstructionSectionLength = ReadInt(reader);
-                txDelta.DataSectionLength = ReadInt(reader);
+                diff.SourceViewOffset = ReadInt(reader);
+                diff.SourceViewLength = ReadInt(reader);
+                diff.TargetViewLength = ReadInt(reader);
+                int instructionSectionLength = (int)ReadInt(reader);
+                int dataSectionLength = (int)ReadInt(reader);
 
-                byte[] instructionSectionBytes = reader.ReadBytes((int)txDelta.InstructionSectionLength);
-                byte[] dataSectionBytes = reader.ReadBytes((int)txDelta.DataSectionLength);
+                diff.InstructionSectionBytes = reader.ReadBytes(instructionSectionLength);
+                diff.DataSectionBytes = reader.ReadBytes(dataSectionLength);
 
-                txDelta.InstructionSectionBytes = instructionSectionBytes;
-                txDelta.DataSectionBytes = dataSectionBytes;
-
-                diffs.Add(txDelta);
+                diffs.Add(diff);
             }
             return diffs.ToArray();
         }
@@ -63,8 +60,8 @@ namespace SvnBridge.Utility
                 WriteInt(writer, svnDiff.SourceViewOffset, out bytesWritten);
                 WriteInt(writer, svnDiff.SourceViewLength, out bytesWritten);
                 WriteInt(writer, svnDiff.TargetViewLength, out bytesWritten);
-                WriteInt(writer, svnDiff.InstructionSectionLength, out bytesWritten);
-                WriteInt(writer, svnDiff.DataSectionLength, out bytesWritten);
+                WriteInt(writer, (ulong)svnDiff.InstructionSectionBytes.Length, out bytesWritten);
+                WriteInt(writer, (ulong)svnDiff.DataSectionBytes.Length, out bytesWritten);
 
                 writer.Write(svnDiff.InstructionSectionBytes);
                 writer.Write(svnDiff.DataSectionBytes);

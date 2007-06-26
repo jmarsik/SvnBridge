@@ -106,6 +106,7 @@
     <Compile Include="ScenarioTests\UpdateWithNoNewItems.cs" />
     <Compile Include="Stubs\StubRequestReceiver.cs" />
     <Compile Include="SvnBridge\ToolTrayPresenterTest.cs" />
+    <Compile Include="Utility\SvnDiffEngineTests.cs" />
     <Compile Include="WebDavServiceTests.cs" />
     <Compile Include="XmlEncodeTests.cs" />
   </ItemGroup>
