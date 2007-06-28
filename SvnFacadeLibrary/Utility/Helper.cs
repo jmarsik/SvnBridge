@@ -142,24 +142,41 @@ namespace SvnBridge.Utility
             return sb.ToString();
         }
 
-        static readonly string[] DECODED = new string[] { "%", " " };
-        static readonly string[] ENCODED = new string[] { "%25", "%20" };
+        static readonly string[] DECODED = new string[] { "%", " ", "&" };
+        static readonly string[] ENCODED = new string[] { "%25", "%20", "&amp;" };
 
         public static string Encode(string value)
         {
             for (int i = 0; i < DECODED.Length; i++)
-            {
                 value = value.Replace(DECODED[i], ENCODED[i]);
-            }
+
             return value;
         }
 
         public static string Decode(string value)
         {
             for (int i = ENCODED.Length - 1; i >= 0; i--)
-            {
                 value = value.Replace(ENCODED[i], DECODED[i]);
-            }
+
+            return value;
+        }
+
+        static readonly string[] DECODED_B = new string[] { "&" };
+        static readonly string[] ENCODED_B = new string[] { "&amp;" };
+
+        public static string EncodeB(string value)
+        {
+            for (int i = 0; i < DECODED_B.Length; i++)
+                value = value.Replace(DECODED_B[i], ENCODED_B[i]);
+
+            return value;
+        }
+
+        public static string DecodeB(string value)
+        {
+            for (int i = ENCODED_B.Length - 1; i >= 0; i--)
+                value = value.Replace(ENCODED_B[i], DECODED_B[i]);
+
             return value;
         }
     }

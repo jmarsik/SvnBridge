@@ -7,19 +7,35 @@ namespace Tests
     public class XmlEncodeTests
     {
         [Test]
-        public void VerifyDecodeCorrectlyDecodesSpaces()
+        public void VerifyDecodeCorrectlyDecodesSpecialCharacters()
         {
-            string result = Helper.Decode("Test%20With%20Space");
+            string result = Helper.Decode("%20%25&amp;");
 
-            Assert.AreEqual("Test With Space", result);
+            Assert.AreEqual(" %&", result);
         }
 
         [Test]
-        public void VerifyDecodeCorrectlyDecodesPercentage()
+        public void VerifyEncodeCorrectlyEncodesSpecialCharacters()
         {
-            string result = Helper.Decode("Test%25With%25Percentages");
+            string result = Helper.Encode(" %&");
 
-            Assert.AreEqual("Test%With%Percentages", result);
+            Assert.AreEqual("%20%25&amp;", result);
+        }
+
+        [Test]
+        public void VerifyDecodeBCorrectlyDecodesSpecialCharacters()
+        {
+            string result = Helper.Decode("&amp;");
+
+            Assert.AreEqual("&", result);
+        }
+
+        [Test]
+        public void VerifyEncodeBCorrectlyEncodesSpecialCharacters()
+        {
+            string result = Helper.Encode("&");
+
+            Assert.AreEqual("&amp;", result);
         }
 
         [Test]

@@ -438,8 +438,13 @@ namespace SvnBridge.SourceControl
                 }
                 else
                 {
-                    string folderName = item.Name.Substring(0, item.Name.LastIndexOf('/')).ToLower();
-                    string filename = item.Name.Substring(item.Name.LastIndexOf('/') + 1);
+                    string folderName = "";
+                    string filename = item.Name;
+                    if (item.Name.IndexOf('/') != -1)
+                    {
+                        folderName = item.Name.Substring(0, item.Name.LastIndexOf('/')).ToLower();
+                        filename = item.Name.Substring(folderName.Length + 1);
+                    }
                     if (filename == ".svnbridge")
                     {
                         FolderProperties folderProperties = Helper.DeserializeXml<FolderProperties>(ReadFile(item));

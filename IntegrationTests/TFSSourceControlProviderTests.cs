@@ -247,7 +247,7 @@ namespace Tests
         {
             string mimeType = "application/octet-stream";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", true);
+            CreateFile(path, "Fun text", false);
             SetProperty(path, "mime-type", mimeType, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
@@ -274,7 +274,7 @@ namespace Tests
             string mimeType1 = "application/octet-stream1";
             string mimeType2 = "application/octet-stream2";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", true);
+            CreateFile(path, "Fun text", false);
             SetProperty(path, "mime-type", mimeType1, true);
 
             SetProperty(path, "mime-type", mimeType2, true);
@@ -347,6 +347,12 @@ namespace Tests
             int endVersion = provider.GetLatestVersion();
             Assert.AreEqual(startVersion, response.Version);
             Assert.AreEqual(startVersion, endVersion);
+        }
+
+        [Test]
+        public void TestGetItemsForRootSucceeds()
+        {
+            FolderMetaData item = (FolderMetaData)provider.GetItems(-1, "", Recursion.OneLevel);
         }
 
         void UpdateFile(string path,

@@ -104,11 +104,11 @@ namespace SvnBridge.Handlers
                     }
                     if (existingFolder)
                     {
-                        output.Write("<S:open-directory name=\"" + GetFileName(folder.Name) + "\" rev=\"" + updateReportRequest.Entries[0].Rev + "\">\n");
+                        output.Write("<S:open-directory name=\"" + Helper.EncodeB(GetFileName(folder.Name)) + "\" rev=\"" + updateReportRequest.Entries[0].Rev + "\">\n");
                     }
                     else
                     {
-                        output.Write("<S:add-directory name=\"" + GetFileName(folder.Name) + "\" bc-url=\"/!svn/bc/1/" + folder.Name + "\">\n");
+                        output.Write("<S:add-directory name=\"" + Helper.EncodeB(GetFileName(folder.Name)) + "\" bc-url=\"/!svn/bc/" + folder.Revision + "/" + Helper.EncodeB(folder.Name) + "\">\n");
                     }
                 }
                 output.Write("<D:checked-in><D:href>/!svn/ver/" + folder.Revision.ToString() + "/" + Helper.Encode(folder.Name) + "</D:href></D:checked-in>\n");

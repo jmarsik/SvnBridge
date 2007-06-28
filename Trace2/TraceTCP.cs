@@ -38,16 +38,9 @@ namespace Trace
 
             File.WriteAllText(@"c:\Tests.txt", "");
             WriteTestLogLine("using System;");
-            WriteTestLogLine("using System.Collections.Generic;");
-            WriteTestLogLine("using System.Text;");
+            WriteTestLogLine("using CodePlex.TfsLibrary;");
             WriteTestLogLine("using NUnit.Framework;");
-            WriteTestLogLine("using SvnBridge.RequestReceiver;");
-            WriteTestLogLine("using System.IO;");
-            WriteTestLogLine("using Tests.Infrastructure;");
-            WriteTestLogLine("using SvnBridge.TfsLibrary;");
-            WriteTestLogLine("using SvnBridge.Utility;");
             WriteTestLogLine("using SvnBridge.SourceControl;");
-            WriteTestLogLine("using SvnBridge.RepositoryWebSvc;");
 
             WriteTestLogLine("");
             WriteTestLogLine("namespace Tests");

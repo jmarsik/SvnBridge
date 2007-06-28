@@ -69,12 +69,14 @@
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
     <Compile Include="RequestReceiver\TcpClientRequestReceiverTest.cs" />
     <Compile Include="ScenarioTests\CheckoutEmptyFolderTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutFolderWithAmpersandInNameTest.cs" />
     <Compile Include="ScenarioTests\CheckoutFolderWithBinaryFileTest.cs" />
     <Compile Include="ScenarioTests\CheckoutFolderWithEmptyFileTest.cs" />
     <Compile Include="ScenarioTests\CheckoutFolderWithIgnoreFileTest.cs" />
     <Compile Include="ScenarioTests\CheckoutFolderWithOneFileTest.cs" />
     <Compile Include="ScenarioTests\CheckoutNonexistentPathTest.cs" />
     <Compile Include="ScenarioTests\CheckoutOldRevisionTest.cs" />
+    <Compile Include="ScenarioTests\CheckoutRootFolderTest.cs" />
     <Compile Include="ScenarioTests\CommitDeleteFileTest.cs" />
     <Compile Include="ScenarioTests\CommitDeleteFolderTest.cs" />
     <Compile Include="ScenarioTests\CommitDeleteOfAlreadyDeletedFileTest.cs" />

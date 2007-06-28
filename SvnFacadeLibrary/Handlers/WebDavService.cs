@@ -86,8 +86,8 @@ namespace SvnBridge.Handlers
             {
                 if (path.StartsWith("/!svn/bc/"))
                 {
-                    int version = int.Parse(path.Substring(9, path.IndexOf('/', 9) - 9));
-                    if (!sourceControlProvider.ItemExists(Helper.Decode(path.Substring(path.IndexOf('/', 9))), version))
+                    string version = path.Split('/')[3];
+                    if (!sourceControlProvider.ItemExists(Helper.Decode(path.Substring(9 + version.Length)), int.Parse(version)))
                     {
                         throw new FileNotFoundException();
                     }
