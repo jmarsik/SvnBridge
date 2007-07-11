@@ -509,77 +509,43 @@ namespace SvnBridge.SourceControl
             FolderMetaData root = (FolderMetaData)GetItems(versionTo, path, Recursion.None);
             if (versionFrom != versionTo)
             {
-                LogItem logItem = GetLog(path, versionFrom + 1, versionTo, Recursion.Full, Int32.MaxValue);
-
-                foreach (SourceItemHistory history in logItem.History)
+                if (root == null && reportData.UpdateTarget != null)
                 {
-                    foreach (SourceItemChange change in history.Changes)
-                    {
-                        string[] nameParts = change.Item.RemoteName.Substring(2 + path.Length).Split('/');
-                        string changePath = change.Item.RemoteName.Substring(1);
-                        if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit))
-                        {
-                            if ((!clientExistingFiles.ContainsKey(changePath)) || (clientExistingFiles[changePath] < change.Item.RemoteChangesetId))
-                            {
-                                string folderName = path.Substring(1);
-                                FolderMetaData folder = root;
-                                for (int i = 0; i < nameParts.Length; i++)
-                                {
-                                    folderName += "/" + nameParts[i];
-                                    ItemMetaData item = FindItem(folder, folderName);
-                                    if (item == null)
-                                    {
-                                        if ((i == nameParts.Length - 1) && (change.Item.ItemType == ItemType.File))
-                                            item = GetItems(versionTo, change.Item.RemoteName.Substring(2), Recursion.None);
-                                        else
-                                            item = GetItems(versionTo, folderName, Recursion.None);
+                    root = new FolderMetaData();
+                    DeleteMetaData deletedFile = new DeleteMetaData();
+                    deletedFile.Name = reportData.UpdateTarget;
+                    deletedFile.ItemType = ItemType.File;
+                    root.Items.Add(deletedFile);
+                }
+                else
+                {
+                    LogItem logItem = GetLog(path, versionFrom + 1, versionTo, Recursion.Full, Int32.MaxValue);
 
-                                        folder.Items.Add(item);
-                                    }
-                                    if (i != nameParts.Length - 1)
-                                    {
-                                        folder = (FolderMetaData)item;
-                                    }
-                                }
-                            }
-                        }
-                        else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
+                    foreach (SourceItemHistory history in logItem.History)
+                    {
+                        foreach (SourceItemChange change in history.Changes)
                         {
-                            if (!clientDeletedFiles.ContainsKey(changePath))
+                            string[] nameParts = change.Item.RemoteName.Substring(2 + path.Length).Split('/');
+                            string changePath = change.Item.RemoteName.Substring(1);
+                            if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit))
                             {
-                                string folderName = path.Substring(1);
-                                FolderMetaData folder = root;
-                                for (int i = 0; i < nameParts.Length; i++)
+                                if ((!clientExistingFiles.ContainsKey(changePath)) || (clientExistingFiles[changePath] < change.Item.RemoteChangesetId))
                                 {
-                                    folderName += "/" + nameParts[i];
-                                    ItemMetaData item = FindItem(folder, nameParts[i]);
-                                    if (item == null)
+                                    string folderName = path.Substring(1);
+                                    FolderMetaData folder = root;
+                                    for (int i = 0; i < nameParts.Length; i++)
                                     {
-                                        if (i == nameParts.Length - 1)
+                                        folderName += "/" + nameParts[i];
+                                        ItemMetaData item = FindItem(folder, folderName);
+                                        if (item == null)
                                         {
-                                            if (change.Item.ItemType == ItemType.File)
-                                            {
-                                                item = new DeleteMetaData();
-                                                item.ItemType = ItemType.File;
-                                            }
+                                            if ((i == nameParts.Length - 1) && (change.Item.ItemType == ItemType.File))
+                                                item = GetItems(versionTo, change.Item.RemoteName.Substring(2), Recursion.None);
                                             else
-                                            {
-                                                item = new DeleteFolderMetaData();
-                                                item.ItemType = ItemType.Folder;
-                                            }
-                                            item.Name = change.Item.RemoteName.Substring(2);
+                                                item = GetItems(versionTo, folderName, Recursion.None);
+
+                                            folder.Items.Add(item);
                                         }
-                                        else
-                                        {
-                                            item = GetItems(versionTo, folderName, Recursion.None);
-                                            if (item == null)
-                                            {
-                                                item = new DeleteFolderMetaData();
-                                                item.ItemType = ItemType.Folder;
-                                                item.Name = folderName;
-                                            }
-                                        }
-                                        folder.Items.Add(item);
                                         if (i != nameParts.Length - 1)
                                         {
                                             folder = (FolderMetaData)item;
@@ -587,10 +553,55 @@ namespace SvnBridge.SourceControl
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            throw new Exception("Unrecognized change type " + change.ChangeType);
+                            else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
+                            {
+                                if (!clientDeletedFiles.ContainsKey(changePath))
+                                {
+                                    string folderName = path.Substring(1);
+                                    FolderMetaData folder = root;
+                                    for (int i = 0; i < nameParts.Length; i++)
+                                    {
+                                        folderName += "/" + nameParts[i];
+                                        ItemMetaData item = FindItem(folder, nameParts[i]);
+                                        if (item == null)
+                                        {
+                                            if (i == nameParts.Length - 1)
+                                            {
+                                                if (change.Item.ItemType == ItemType.File)
+                                                {
+                                                    item = new DeleteMetaData();
+                                                    item.ItemType = ItemType.File;
+                                                }
+                                                else
+                                                {
+                                                    item = new DeleteFolderMetaData();
+                                                    item.ItemType = ItemType.Folder;
+                                                }
+                                                item.Name = change.Item.RemoteName.Substring(2);
+                                            }
+                                            else
+                                            {
+                                                item = GetItems(versionTo, folderName, Recursion.None);
+                                                if (item == null)
+                                                {
+                                                    item = new DeleteFolderMetaData();
+                                                    item.ItemType = ItemType.Folder;
+                                                    item.Name = folderName;
+                                                }
+                                            }
+                                            folder.Items.Add(item);
+                                            if (i != nameParts.Length - 1)
+                                            {
+                                                folder = (FolderMetaData)item;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                throw new Exception("Unrecognized change type " + change.ChangeType);
+                            }
                         }
                     }
                 }

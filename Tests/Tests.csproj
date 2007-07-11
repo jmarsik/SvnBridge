@@ -101,6 +101,7 @@
     <Compile Include="ScenarioTests\ShowLogSingleFolderWithOneFile.cs" />
     <Compile Include="ScenarioTests\UpdateAfterCommitFileDeleteTest.cs" />
     <Compile Include="ScenarioTests\UpdateAfterCommitNewFolderTest.cs" />
+    <Compile Include="ScenarioTests\UpdateOfDeletedFileTest.cs" />
     <Compile Include="ScenarioTests\UpdateOneFileTest.cs" />
     <Compile Include="ScenarioTests\UpdateWithDeletedFileTest.cs" />
     <Compile Include="ScenarioTests\UpdateWithDeletedFolderTest.cs" />

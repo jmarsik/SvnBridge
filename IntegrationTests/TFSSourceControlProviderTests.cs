@@ -355,6 +355,24 @@ namespace Tests
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, "", Recursion.OneLevel);
         }
 
+        [Test]
+        public void TestGetChangedItemsForADeletedFileReturnsCorrectResult()
+        {
+            CreateFolder(testPath + "/New Folder", false);
+            CreateFile(testPath + "/New Folder/New File.txt", "Fun text", true);
+            int versionFrom = provider.GetLatestVersion();
+            DeleteItem(testPath + "/New Folder", true);
+            int versionTo = provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.UpdateTarget = "New File.txt";
+
+            FolderMetaData folder = provider.GetChangedItems(testPath + "/New Folder", versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual("New File.txt", folder.Items[0].Name);
+            Assert.AreEqual(typeof(DeleteMetaData), folder.Items[0].GetType());
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)

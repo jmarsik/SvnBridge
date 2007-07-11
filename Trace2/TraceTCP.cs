@@ -41,6 +41,7 @@ namespace Trace
             WriteTestLogLine("using CodePlex.TfsLibrary;");
             WriteTestLogLine("using NUnit.Framework;");
             WriteTestLogLine("using SvnBridge.SourceControl;");
+            WriteTestLogLine("using CodePlex.TfsLibrary.RepositoryWebSvc;");
 
             WriteTestLogLine("");
             WriteTestLogLine("namespace Tests");
