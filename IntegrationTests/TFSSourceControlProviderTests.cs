@@ -373,6 +373,29 @@ namespace Tests
             Assert.AreEqual(typeof(DeleteMetaData), folder.Items[0].GetType());
         }
 
+        [Test]
+        public void TestGetChangedItemsReturnsNothingWhenClientStateContainsDeletedItem()
+        {
+            CreateFolder(testPath + "/New Folder", true);
+            int versionFrom = provider.GetLatestVersion();
+            DeleteItem(testPath + "/New Folder", true);
+            CreateFolder(testPath + "/New Folder", true);
+            int versionTo = provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            EntryData entry = new EntryData();
+            reportData.Entries = new List<EntryData>();
+            entry.Rev = versionFrom.ToString();
+            reportData.Entries.Add(entry);
+            entry = new EntryData();
+            entry.path = "New Folder";
+            entry.Rev = versionTo.ToString();
+            reportData.Entries.Add(entry);
+
+            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)

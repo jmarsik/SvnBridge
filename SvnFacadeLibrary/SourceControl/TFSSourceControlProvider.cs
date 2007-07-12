@@ -529,7 +529,7 @@ namespace SvnBridge.SourceControl
                             string changePath = change.Item.RemoteName.Substring(1);
                             if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit))
                             {
-                                if ((!clientExistingFiles.ContainsKey(changePath)) || (clientExistingFiles[changePath] < change.Item.RemoteChangesetId))
+                                if (!IsChangeAlreadyCurrentInClientState(change, clientExistingFiles, clientDeletedFiles))
                                 {
                                     string folderName = path.Substring(1);
                                     FolderMetaData folder = root;
@@ -555,7 +555,7 @@ namespace SvnBridge.SourceControl
                             }
                             else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
                             {
-                                if (!clientDeletedFiles.ContainsKey(changePath))
+                                if (!IsChangeAlreadyCurrentInClientState(change, clientExistingFiles, clientDeletedFiles))
                                 {
                                     string folderName = path.Substring(1);
                                     FolderMetaData folder = root;
@@ -608,6 +608,28 @@ namespace SvnBridge.SourceControl
             }
 
             return root;
+        }
+
+        private bool IsChangeAlreadyCurrentInClientState(SourceItemChange change,
+            Dictionary<string, int> clientExistingFiles, Dictionary<string, string> clientDeletedFiles)
+        {
+            string changePath = change.Item.RemoteName.Substring(1);
+            if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) ||
+                ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit))
+            {
+                if ((clientExistingFiles.ContainsKey(changePath)) && (clientExistingFiles[changePath] >= change.Item.RemoteChangesetId))
+                {
+                    return true;
+                }
+            }
+            else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
+            {
+                if (clientDeletedFiles.ContainsKey(changePath) || (clientExistingFiles.ContainsKey(changePath) && (clientExistingFiles[changePath] >= change.Item.RemoteChangesetId)))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public bool ItemExists(string path)
