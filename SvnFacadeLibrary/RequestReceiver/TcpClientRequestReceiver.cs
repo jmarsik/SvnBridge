@@ -12,13 +12,9 @@ namespace SvnBridge.RequestReceiver
 {
     public class TcpClientRequestReceiver : IRequestReceiver
     {
-        // Fields
-
         TcpListener listener;
         Thread listenerThread;
         bool running = false;
-
-        // Methods
 
         protected virtual RequestHandler GetRequestHandler(string tfsServer)
         {
@@ -62,7 +58,7 @@ namespace SvnBridge.RequestReceiver
             if (running)
             {
                 running = false;
-                listenerThread.Join(15000); // Should be Join() but things might not be cleaned up
+                listenerThread.Join();
                 listener.Stop();
             }
         }
@@ -80,17 +76,14 @@ namespace SvnBridge.RequestReceiver
                                                      {
                                                          ReceiveRequest(client, tfsServer);
                                                      });
+                    workerThread.IsBackground = true;
                     workerThreads.Add(workerThread);
                     IPEndPoint endPoint = (IPEndPoint)client.Client.RemoteEndPoint;
                     workerThread.Name = "Worker request from " + endPoint.Address + ":" + endPoint.Port;
                     workerThread.Start();
                 }
-
                 Thread.Sleep(100);
             }
-
-            foreach (Thread workerThread in workerThreads)
-                workerThread.Join(5000);
         }
 
         public void ReceiveRequest(TcpClient client,
