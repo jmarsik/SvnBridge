@@ -4,7 +4,7 @@ namespace SvnBridge.Handlers
 {
     public class IISRequestReceiver : IHttpHandler
     {
-        RequestHandler _handler = new RequestHandler(null);
+        IRequestDispatcher _dispatcher = RequestDispatcherFactory.Create(null);
 
         public bool IsReusable
         {
@@ -13,7 +13,7 @@ namespace SvnBridge.Handlers
 
         public void ProcessRequest(HttpContext context)
         {
-            _handler.ProcessRequest(new IISHttpRequest(context));
+            _dispatcher.Dispatch(new IISHttpRequest(context));
         }
     }
 }

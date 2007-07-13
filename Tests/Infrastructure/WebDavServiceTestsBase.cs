@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -14,7 +15,6 @@ namespace Tests
 {
     public abstract class WebDavServiceTestsBase
     {
-        protected RequestHandler requestHandler;
         protected MyMocks mock = new MyMocks();
         protected StubSourceControlProvider provider;
         protected MockContext context;
@@ -29,10 +29,16 @@ namespace Tests
         public virtual void Setup()
         {
             provider = mock.CreateObject<StubSourceControlProvider>();
-            requestHandler = new TestableRequestHandler(provider);
+            SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             service = new WebDavService(provider);
             context = new MockContext();
-            receiver = new TestableTcpClientRequestReceiver(requestHandler);
+            receiver = new TestableTcpClientRequestReceiver();
+        }
+
+        [TearDown]
+        public virtual void TearDown()
+        {
+            SourceControlProviderFactory.CreateDelegate = null;
         }
 
         protected Stream GetStream()
@@ -217,20 +223,8 @@ namespace Tests
 
     class TestableTcpClientRequestReceiver : TcpClientRequestReceiver
     {
-        RequestHandler requestHandler;
         public int keepAliveMax = 100;
         public int[] chunks = null;
-
-        public TestableTcpClientRequestReceiver(RequestHandler requestHandler)
-            : base()
-        {
-            this.requestHandler = requestHandler;
-        }
-
-        protected override RequestHandler GetRequestHandler(string tfsServer)
-        {
-            return requestHandler;
-        }
 
         protected override int GetMaxKeepAliveConnections()
         {
@@ -243,22 +237,6 @@ namespace Tests
             TestableTcpClientRequestReceiverStream newStream = new TestableTcpClientRequestReceiverStream(context, stream, GetMaxKeepAliveConnections());
             newStream.SetChunks(chunks);
             return newStream;
-        }
-    }
-
-    class TestableRequestHandler : RequestHandler
-    {
-        ISourceControlProvider sourceControlProvider;
-
-        public TestableRequestHandler(ISourceControlProvider sourceControlProvider)
-            : base(null)
-        {
-            this.sourceControlProvider = sourceControlProvider;
-        }
-
-        protected override ISourceControlProvider GetSourceControlProvider(IHttpRequest context)
-        {
-            return sourceControlProvider;
         }
     }
 }

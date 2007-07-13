@@ -23,7 +23,7 @@ namespace SvnBridge.RequestReceiver
         public static void ReceiveLoop(object parameters)
         {
             string tfsServer = (string)parameters;
-            RequestHandler handler = new RequestHandler(tfsServer);
+            IRequestDispatcher dispatcher = RequestDispatcherFactory.Create(tfsServer);
 
             while (true)
             {
@@ -31,7 +31,7 @@ namespace SvnBridge.RequestReceiver
 
                 try
                 {
-                    handler.ProcessRequest(new HttpListenerHttpRequest(context));
+                    dispatcher.Dispatch(new HttpListenerHttpRequest(context));
                 }
                 finally
                 {

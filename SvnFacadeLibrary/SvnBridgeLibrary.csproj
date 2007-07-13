@@ -41,13 +41,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\CheckOutHandler.cs" />
+    <Compile Include="Handlers\DeleteHandler.cs" />
+    <Compile Include="Handlers\IRequestDispatcher.cs" />
+    <Compile Include="Handlers\MergeHandler.cs" />
+    <Compile Include="Handlers\MkActivityHandler.cs" />
+    <Compile Include="Handlers\MkColHandler.cs" />
+    <Compile Include="Handlers\OptionsHandler.cs" />
+    <Compile Include="Handlers\PropFindHandler.cs" />
+    <Compile Include="Handlers\PropPatchHandler.cs" />
+    <Compile Include="Handlers\PutHandler.cs" />
+    <Compile Include="Handlers\ReportHandler.cs" />
+    <Compile Include="Handlers\RequestDispatcherFactory.cs" />
+    <Compile Include="Handlers\RequestHandlerBase.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
     <Compile Include="HttpRequest\HttpListenerHttpRequest.cs" />
     <Compile Include="HttpRequest\IHttpRequest.cs" />
     <Compile Include="HttpRequest\IISHttpRequest.cs" />
-    <Compile Include="Handlers\RequestHandler.cs" />
-    <Compile Include="Handlers\CommandProcessor.cs" />
     <Compile Include="Handlers\UpdateReportService.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -106,10 +117,13 @@
     <Compile Include="SourceControl\MergeActivityResponse.cs" />
     <Compile Include="SourceControl\MergeActivityResponseItem.cs" />
     <Compile Include="SourceControl\Recursion.cs" />
+    <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
     <Compile Include="SourceControl\TFSSourceControlProvider.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utility\Clock.cs" />
+    <Compile Include="Handlers\RequestDispatcher.cs" />
+    <Compile Include="Handlers\IRequestHandler.cs" />
     <Compile Include="Utility\SvnDiff.cs" />
     <Compile Include="Utility\SvnDiffEngine.cs" />
     <Compile Include="Utility\SvnDiffInstruction.cs" />

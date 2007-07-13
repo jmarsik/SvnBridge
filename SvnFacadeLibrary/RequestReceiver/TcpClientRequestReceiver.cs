@@ -16,9 +16,9 @@ namespace SvnBridge.RequestReceiver
         Thread listenerThread;
         bool running = false;
 
-        protected virtual RequestHandler GetRequestHandler(string tfsServer)
+        protected virtual IRequestDispatcher GetRequestDispatcher(string tfsServer)
         {
-            return new RequestHandler(tfsServer);
+            return RequestDispatcherFactory.Create(tfsServer);
         }
 
         protected virtual int GetMaxKeepAliveConnections()
@@ -98,7 +98,7 @@ namespace SvnBridge.RequestReceiver
         public void ProcessRequest(string tfsServer,
                                    Stream stream)
         {
-            RequestHandler handler = GetRequestHandler(tfsServer);
+            IRequestDispatcher dispatcher = GetRequestDispatcher(tfsServer);
 
             while (true)
             {
@@ -144,20 +144,12 @@ namespace SvnBridge.RequestReceiver
                     inputStream.Position = bodyStart;
                     try
                     {
-                        handler.ProcessRequest(context);
+                        dispatcher.Dispatch(context);
                     }
                     catch (IOException)
                     {
                         // Ignore failures caused by client canceling request
                     }
-                }
-                try
-                {
-                    context.GetOutputStream().Flush();
-                }
-                catch (IOException)
-                {
-                    // Ignore failures caused by client canceling request
                 }
             }
         }
