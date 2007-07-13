@@ -6,6 +6,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
+using SvnBridge.Exceptions;
 
 namespace Tests
 {
@@ -394,6 +395,14 @@ namespace Tests
             FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
 
             Assert.AreEqual(0, folder.Items.Count);
+        }
+
+        [Test, ExpectedException(typeof(FolderAlreadyExistsException))]
+        public void TestAddFolderThatAlreadyExistsThrowsException()
+        {
+            CreateFolder(testPath + "/New Folder", true);
+
+            provider.MakeCollection(activityId, testPath + "/New Folder");
         }
 
         void UpdateFile(string path,

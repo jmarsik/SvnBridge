@@ -8,6 +8,7 @@ using CodePlex.TfsLibrary.Utility;
 using SvnBridge.Protocol;
 using SvnBridge.Utility;
 using ChangeType=CodePlex.TfsLibrary.RepositoryWebSvc.ChangeType;
+using SvnBridge.Exceptions;
 
 namespace SvnBridge.SourceControl
 {
@@ -214,6 +215,9 @@ namespace SvnBridge.SourceControl
         public void MakeCollection(string activityId,
                                    string path)
         {
+            if (ItemExists(path))
+                throw new FolderAlreadyExistsException();
+
             ItemMetaData item;
             string existingPath = path.Substring(1);
             do

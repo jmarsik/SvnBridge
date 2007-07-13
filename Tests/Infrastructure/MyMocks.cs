@@ -10,11 +10,8 @@ namespace Tests
 {
     public class MyMocks : MockFramework
     {
-        public delegate bool ItemExists(string path,
-                                        int version);
-
-        public Results Attach(ItemExists method,
-                              bool returnValue)
+        public delegate bool ItemExists(string path, int version);
+        public Results Attach(ItemExists method, bool returnValue)
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
@@ -61,12 +58,16 @@ namespace Tests
             return base.Attach((Delegate)method, throwException);
         }
 
-        public delegate void MakeCollection(string activityId,
-                                            string path);
+        public delegate void MakeCollection(string activityId, string path);
 
         public Results Attach(MakeCollection method)
         {
             return base.Attach((Delegate)method);
+        }
+
+        public Results Attach(MakeCollection method, Exception throwException)
+        {
+            return base.Attach((Delegate)method, throwException);
         }
 
         public delegate MergeActivityResponse MergeActivity(string activityId);

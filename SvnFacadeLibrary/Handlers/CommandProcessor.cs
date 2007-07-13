@@ -239,23 +239,41 @@ namespace SvnBridge.Handlers
 
         public void ProcessMkColRequest()
         {
-            _webDavService.MkCol(_context.Path, _context.Headers["Host"]);
-
             string path = Helper.Decode(_context.Path);
             string server = _context.Headers["Host"].Split(':')[0];
             string port = _context.Headers["Host"].Split(':')[1];
-            SetResponseSettings("text/html", Encoding.UTF8, 201);
-            _context.AddHeader("Location", "http://" + _context.Headers["Host"] + path);
-            string response = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
-                              "<html><head>\n" +
-                              "<title>201 Created</title>\n" +
-                              "</head><body>\n" +
-                              "<h1>Created</h1>\n" +
-                              "<p>Collection " + path + " has been created.</p>\n" +
-                              "<hr />\n" +
-                              "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " + port + "</address>\n" +
-                              "</body></html>\n";
-            _context.Write(response);
+            try
+            {
+                _webDavService.MkCol(_context.Path, _context.Headers["Host"]);
+                SetResponseSettings("text/html", Encoding.UTF8, 201);
+                _context.AddHeader("Location", "http://" + _context.Headers["Host"] + path);
+                string response = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
+                                  "<html><head>\n" +
+                                  "<title>201 Created</title>\n" +
+                                  "</head><body>\n" +
+                                  "<h1>Created</h1>\n" +
+                                  "<p>Collection " + path + " has been created.</p>\n" +
+                                  "<hr />\n" +
+                                  "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " + port + "</address>\n" +
+                                  "</body></html>\n";
+                _context.Write(response);
+            }
+            catch (FolderAlreadyExistsException)
+            {
+                SetResponseSettings("text/html; charset=iso-8859-1", Encoding.UTF8, 405);
+                _context.AddHeader("Allow", "TRACE");
+                string response =
+                    "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
+                    "<html><head>\n" +
+                    "<title>405 Method Not Allowed</title>\n" +
+                    "</head><body>\n" +
+                    "<h1>Method Not Allowed</h1>\n" +
+                    "<p>The requested method MKCOL is not allowed for the URL " + path + ".</p>\n" +
+                    "<hr>\n" +
+                    "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " + port + "</address>\n" +
+                    "</body></html>\n";
+                _context.Write(response);
+            }
         }
 
         public void SendUnauthorizedResponse()

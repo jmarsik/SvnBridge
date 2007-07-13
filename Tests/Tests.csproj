@@ -77,6 +77,7 @@
     <Compile Include="ScenarioTests\CheckoutNonexistentPathTest.cs" />
     <Compile Include="ScenarioTests\CheckoutOldRevisionTest.cs" />
     <Compile Include="ScenarioTests\CheckoutRootFolderTest.cs" />
+    <Compile Include="ScenarioTests\CommitAddFolderThatAlreadyExistsTest.cs" />
     <Compile Include="ScenarioTests\CommitDeleteFileTest.cs" />
     <Compile Include="ScenarioTests\CommitDeleteFolderTest.cs" />
     <Compile Include="ScenarioTests\CommitDeleteOfAlreadyDeletedFileTest.cs" />
