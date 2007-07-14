@@ -1,4 +1,5 @@
 using System.Text;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
@@ -9,8 +10,10 @@ namespace SvnBridge.Handlers
             get { return "options"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+            
             SetResponseSettings(request, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
             request.AddHeader("DAV", "1,2");
             request.AddHeader("DAV", "version-control,checkout,working-resource");

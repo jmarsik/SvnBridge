@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text;
 using SvnBridge.Protocol;
+using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
@@ -12,8 +13,10 @@ namespace SvnBridge.Handlers
             get { return "proppatch"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+
             PropertyUpdateData data = Helper.DeserializeXml<PropertyUpdateData>(request.InputStream);
             
             SetResponseSettings(request, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 207);

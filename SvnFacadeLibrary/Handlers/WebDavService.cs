@@ -498,16 +498,6 @@ namespace SvnBridge.Handlers
             return true;
         }
 
-        public string MkCol(string path,
-                            string host)
-        {
-            Match m = Regex.Match(path, @"//!svn/wrk/([a-zA-Z0-9\-]+)/?");
-            string folderPath = path.Substring(m.Groups[0].Value.Length - 1);
-            string activityId = m.Groups[1].Value;
-            sourceControlProvider.MakeCollection(activityId, Helper.Decode(folderPath));
-            return "http://" + host + path;
-        }
-
         public static string FormatDate(DateTime date)
         {
             string result = date.ToUniversalTime().ToString("o");

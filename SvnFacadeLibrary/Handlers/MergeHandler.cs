@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text;
 using SvnBridge.Protocol;
+using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
@@ -12,8 +13,10 @@ namespace SvnBridge.Handlers
             get { return "merge"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+            
             MergeData data = Helper.DeserializeXml<MergeData>(request.InputStream);
 
             SetResponseSettings(request, "text/xml", Encoding.UTF8, 200);

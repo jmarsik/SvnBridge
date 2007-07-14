@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using SvnBridge.Protocol;
+using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
@@ -15,8 +16,10 @@ namespace SvnBridge.Handlers
             get { return "report"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+
             using (XmlReader reader = XmlReader.Create(request.InputStream, Helper.InitializeNewXmlReaderSettings()))
             {
                 reader.MoveToContent();

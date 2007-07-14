@@ -1,4 +1,5 @@
 using System.Text;
+using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
@@ -10,8 +11,10 @@ namespace SvnBridge.Handlers
             get { return "put"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+            
             webDavService.Put(request.Path, request.InputStream, request.Headers["X-SVN-Base-Fulltext-MD5"], request.Headers["X-SVN-Result-Fulltext-MD5"]);
 
             string server = request.Headers["Host"].Split(':')[0];

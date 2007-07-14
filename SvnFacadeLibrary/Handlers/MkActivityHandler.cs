@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
@@ -11,8 +12,10 @@ namespace SvnBridge.Handlers
             get { return "mkactivity"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+            
             webDavService.MkActivity(request.Path);
 
             string server = request.Headers["Host"].Split(':')[0];

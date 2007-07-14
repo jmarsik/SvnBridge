@@ -1,6 +1,7 @@
 using System.Text;
 using SvnBridge.Exceptions;
 using SvnBridge.Protocol;
+using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
@@ -12,8 +13,10 @@ namespace SvnBridge.Handlers
             get { return "checkout"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+            
             CheckoutData data = Helper.DeserializeXml<CheckoutData>(request.InputStream);
 
             try

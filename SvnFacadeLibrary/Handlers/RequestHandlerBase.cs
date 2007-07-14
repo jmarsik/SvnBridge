@@ -5,19 +5,23 @@ namespace SvnBridge.Handlers
 {
     public abstract class RequestHandlerBase : IRequestHandler
     {   
+        // Properties
+        
         public abstract string Method { get; }
+
+        // Methods
 
         public void Handle(IHttpRequest request, string tfsServer)
         {
-            ISourceControlProvider scp = SourceControlProviderFactory.Create(tfsServer, request.Credentials);
-            WebDavService webDavService = new WebDavService(scp);
+            ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsServer, request.Credentials);
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
 
-            Handle(request, webDavService);
+            Handle(request, sourceControlProvider);
 
             request.OutputStream.Flush();
         }
 
-        protected abstract void Handle(IHttpRequest request, WebDavService webDavService);
+        protected abstract void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider);
 
         protected static void SendChunked(IHttpRequest request)
         {

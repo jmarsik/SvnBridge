@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
@@ -11,8 +12,10 @@ namespace SvnBridge.Handlers
             get { return "delete"; }
         }
 
-        protected override void Handle(IHttpRequest request, WebDavService webDavService)
+        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
         {
+            WebDavService webDavService = new WebDavService(sourceControlProvider);
+            
             bool fileDeleted = webDavService.Delete(request.Path);
 
             if (fileDeleted)
