@@ -1,4 +1,4 @@
-namespace SvnBridge
+namespace SvnBridge.Views.Gui
 {
     partial class SettingsForm
     {
@@ -89,6 +89,7 @@ namespace SvnBridge
             this.cancelButton.TabIndex = 5;
             this.cancelButton.Text = "&Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.OnCancelButtonClicked);
             // 
             // label3
             // 
@@ -135,4 +136,3 @@ namespace SvnBridge
         private System.Windows.Forms.Label label3;
     }
 }
-

@@ -2,10 +2,10 @@ namespace SvnBridge.RequestReceiver
 {
     public interface IRequestReceiver
     {
-        // Methods
+        int Port { get; set; }
+        string TfsServerUrl { get; set; }
 
-        void Start(int portNumber,
-                   string tfsServer);
+        void Start();
 
         void Stop();
     }

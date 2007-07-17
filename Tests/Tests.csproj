@@ -7,7 +7,7 @@
     <ProjectGuid>{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tests</RootNamespace>
+    <RootNamespace>SvnBridge</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -67,6 +67,7 @@
     <Compile Include="Assert\TrueException.cs" />
     <Compile Include="FileNodeTests.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
+    <Compile Include="Presenters\SettingsViewPresenterTests.cs" />
     <Compile Include="RequestReceiver\TcpClientRequestReceiverTest.cs" />
     <Compile Include="ScenarioTests\CheckoutEmptyFolderTest.cs" />
     <Compile Include="ScenarioTests\CheckoutFolderWithAmpersandInNameTest.cs" />
@@ -108,8 +109,11 @@
     <Compile Include="ScenarioTests\UpdateWithDeletedFolderTest.cs" />
     <Compile Include="ScenarioTests\UpdateWithNewFileTest.cs" />
     <Compile Include="ScenarioTests\UpdateWithNoNewItems.cs" />
+    <Compile Include="StartOptionsTests.cs" />
+    <Compile Include="Stubs\StubListenerView.cs" />
     <Compile Include="Stubs\StubRequestReceiver.cs" />
-    <Compile Include="SvnBridge\ToolTrayPresenterTest.cs" />
+    <Compile Include="Presenters\ListenerViewPresenterTests.cs" />
+    <Compile Include="Stubs\StubSettingsView.cs" />
     <Compile Include="Utility\SvnDiffEngineTests.cs" />
     <Compile Include="WebDavServiceTests.cs" />
     <Compile Include="XmlEncodeTests.cs" />

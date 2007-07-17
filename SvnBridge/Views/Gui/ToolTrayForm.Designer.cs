@@ -1,4 +1,4 @@
-namespace SvnBridge
+namespace SvnBridge.Views.Gui
 {
     partial class ToolTrayForm
     {

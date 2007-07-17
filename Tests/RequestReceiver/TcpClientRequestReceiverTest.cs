@@ -14,9 +14,11 @@ namespace Tests.RequestReceiver
         {
             TcpClientRequestReceiver receiver = new TcpClientRequestReceiver();
 
+            receiver.Port = 8081;
+            receiver.TfsServerUrl = "not valid";
             Assert.Throws<UriFormatException>(delegate
                                               {
-                                                  receiver.Start(8081, "not valid");
+                                                  receiver.Start();
                                               });
         }
 

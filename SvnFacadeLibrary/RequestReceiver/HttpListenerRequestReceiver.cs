@@ -6,23 +6,42 @@ namespace SvnBridge.RequestReceiver
 {
     public class HttpListenerRequestReceiver : IRequestReceiver
     {
-        static HttpListener listener;
+        private static HttpListener listener;
+        private int port;
+        private string tfsServerUrl;
 
-        public void Start(int portNumber,
-                          string tfsServer)
+        #region IRequestReceiver Members
+
+        public void Start()
         {
             listener = new HttpListener();
-            listener.Prefixes.Add("http://*:" + portNumber + "/");
+            listener.Prefixes.Add("http://*:" + Port + "/");
             listener.Start();
             Thread requestProcessor = new Thread(ReceiveLoop);
-            requestProcessor.Start(tfsServer);
+            requestProcessor.Start(tfsServerUrl);
         }
 
-        public void Stop() {}
+        public int Port
+        {
+            get { return port; }
+            set { port = value; }
+        }
+
+        public string TfsServerUrl
+        {
+            get { return tfsServerUrl; }
+            set { tfsServerUrl = value; }
+        }
+
+        public void Stop()
+        {
+        }
+
+        #endregion
 
         public static void ReceiveLoop(object parameters)
         {
-            string tfsServer = (string)parameters;
+            string tfsServer = (string) parameters;
             IRequestDispatcher dispatcher = RequestDispatcherFactory.Create(tfsServer);
 
             while (true)

@@ -12,9 +12,55 @@ namespace SvnBridge.RequestReceiver
 {
     public class TcpClientRequestReceiver : IRequestReceiver
     {
-        TcpListener listener;
-        Thread listenerThread;
-        bool running = false;
+        private TcpListener listener;
+        private Thread listenerThread;
+
+        private int port;
+        private bool running = false;
+        private string tfsServerUrl;
+
+        #region IRequestReceiver Members
+
+        public int Port
+        {
+            get { return port; }
+            set { port = value; }
+        }
+
+        public string TfsServerUrl
+        {
+            get { return tfsServerUrl; }
+            set { tfsServerUrl = value; }
+        }
+
+        public void Start()
+        {
+            if (running)
+                throw new InvalidOperationException("Listener is already running!");
+
+            new Uri(TfsServerUrl);
+
+            running = true;
+
+            listener = new TcpListener(IPAddress.Any, Port);
+            listener.Start();
+
+            listenerThread = new Thread(delegate() { ReceiveLoop(TfsServerUrl); });
+            listenerThread.Name = "Listener *:" + Port + " to " + TfsServerUrl;
+            listenerThread.Start();
+        }
+
+        public void Stop()
+        {
+            if (running)
+            {
+                running = false;
+                listenerThread.Join();
+                listener.Stop();
+            }
+        }
+
+        #endregion
 
         protected virtual IRequestDispatcher GetRequestDispatcher(string tfsServer)
         {
@@ -32,37 +78,6 @@ namespace SvnBridge.RequestReceiver
             return new TcpClientRequestReceiverStream(context, stream, GetMaxKeepAliveConnections());
         }
 
-        public void Start(int portNumber,
-                          string tfsServer)
-        {
-            if (running)
-                throw new InvalidOperationException("Listener is already running!");
-
-            new Uri(tfsServer);
-
-            running = true;
-
-            listener = new TcpListener(IPAddress.Any, portNumber);
-            listener.Start();
-
-            listenerThread = new Thread(delegate()
-                                        {
-                                            ReceiveLoop(tfsServer);
-                                        });
-            listenerThread.Name = "Listener *:" + portNumber + " to " + tfsServer;
-            listenerThread.Start();
-        }
-
-        public void Stop()
-        {
-            if (running)
-            {
-                running = false;
-                listenerThread.Join();
-                listener.Stop();
-            }
-        }
-
         public void ReceiveLoop(string tfsServer)
         {
             List<Thread> workerThreads = new List<Thread>();
@@ -72,13 +87,10 @@ namespace SvnBridge.RequestReceiver
                 if (listener.Pending())
                 {
                     TcpClient client = listener.AcceptTcpClient();
-                    Thread workerThread = new Thread(delegate()
-                                                     {
-                                                         ReceiveRequest(client, tfsServer);
-                                                     });
+                    Thread workerThread = new Thread(delegate() { ReceiveRequest(client, tfsServer); });
                     workerThread.IsBackground = true;
                     workerThreads.Add(workerThread);
-                    IPEndPoint endPoint = (IPEndPoint)client.Client.RemoteEndPoint;
+                    IPEndPoint endPoint = (IPEndPoint) client.Client.RemoteEndPoint;
                     workerThread.Name = "Worker request from " + endPoint.Address + ":" + endPoint.Port;
                     workerThread.Start();
                 }
@@ -104,8 +116,8 @@ namespace SvnBridge.RequestReceiver
             {
                 bool finishedLoadingRequest = false;
                 byte[] buffer = new byte[0];
-                TcpClientHttpRequest context = null;
-                int bodyStart = 0;
+                TcpClientHttpRequest context;
+                int bodyStart;
 
                 do
                 {
@@ -135,8 +147,7 @@ namespace SvnBridge.RequestReceiver
 
                     if (bodyStart + contentLength == buffer.Length)
                         finishedLoadingRequest = true;
-                }
-                while (finishedLoadingRequest == false);
+                } while (finishedLoadingRequest == false);
 
                 using (MemoryStream inputStream = new MemoryStream(buffer))
                 {
@@ -154,8 +165,8 @@ namespace SvnBridge.RequestReceiver
             }
         }
 
-        static int ReadHeader(byte[] data,
-                              TcpClientHttpRequest context)
+        private static int ReadHeader(byte[] data,
+                                      TcpClientHttpRequest context)
         {
             int lineStart = 0;
             int index = 0;

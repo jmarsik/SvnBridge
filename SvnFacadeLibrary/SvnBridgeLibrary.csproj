@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\IRequestDispatcher.cs" />
@@ -60,6 +61,8 @@
     <Compile Include="HttpRequest\IHttpRequest.cs" />
     <Compile Include="HttpRequest\IISHttpRequest.cs" />
     <Compile Include="Handlers\UpdateReportService.cs" />
+    <Compile Include="Presenters\ListenerViewPresenter.cs" />
+    <Compile Include="Presenters\SettingsViewPresenter.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -105,6 +108,7 @@
     <Compile Include="Protocol\UpdateReportData.cs" />
     <Compile Include="Protocol\UpdateReportResponseData.cs" />
     <Compile Include="RequestReceiver\IRequestReceiver.cs" />
+    <Compile Include="RequestReceiver\ListenerFactory.cs" />
     <Compile Include="RequestReceiver\TcpClientRequestReceiver.cs" />
     <Compile Include="RequestReceiver\TcpClientRequestReceiverStream.cs" />
     <Compile Include="SourceControl\DeleteFolderMetaData.cs" />
@@ -121,6 +125,7 @@
     <Compile Include="SourceControl\TFSSourceControlProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="StartOptions.cs" />
     <Compile Include="Utility\Clock.cs" />
     <Compile Include="Handlers\RequestDispatcher.cs" />
     <Compile Include="Handlers\IRequestHandler.cs" />
@@ -129,6 +134,8 @@
     <Compile Include="Utility\SvnDiffInstruction.cs" />
     <Compile Include="Utility\SvnDiffParser.cs" />
     <Compile Include="Utility\Helper.cs" />
+    <Compile Include="Views\IListenerView.cs" />
+    <Compile Include="Views\ISettingsView.cs" />
     <Compile Include="WebDav.cs" />
   </ItemGroup>
   <ItemGroup>
