@@ -99,10 +99,12 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual FolderMetaData GetChangedItems(string path,
-                                                      int versionFrom,
-                                                      int VersionTo,
-                                                      UpdateReportData reportData)
+        public virtual FolderMetaData GetChangedItems(string path, int versionFrom, int VersionTo, UpdateReportData reportData)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public virtual void CopyItem(string activityId, string path, string targetPath)
         {
             throw new Exception("The method or operation is not implemented.");
         }

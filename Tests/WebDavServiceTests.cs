@@ -87,6 +87,7 @@ namespace Tests
             StubSourceControlProvider provider = mock.CreateObject<StubSourceControlProvider>();
             WebDavService service = new WebDavService(provider);
             Results result = mock.Attach(provider.ItemExists, true);
+            mock.Attach(provider.IsDirectory, true);
             MemoryStream outputStream = new MemoryStream();
             string propfind = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
             MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes(propfind));

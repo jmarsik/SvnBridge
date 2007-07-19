@@ -33,6 +33,7 @@ namespace SvnBridge.SourceControl
         {
             public string Comment;
             public List<ActivityItem> MergeList = new List<ActivityItem>();
+            public List<string> DeletedItems = new List<string>();
             public Dictionary<string, Dictionary<string, string>> FolderProperties = new Dictionary<string, Dictionary<string, string>>();
             public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
         }
@@ -42,8 +43,7 @@ namespace SvnBridge.SourceControl
             public string Path;
             public ItemType FileType;
 
-            public ActivityItem(string path,
-                                ItemType fileType)
+            public ActivityItem(string path, ItemType fileType)
             {
                 Path = path;
                 FileType = fileType;
@@ -171,14 +171,12 @@ namespace SvnBridge.SourceControl
             updates2.Add(LocalUpdate.FromLocal(item.Id,
                                                LOCAL_PREFIX + activityId + localPath.Substring(0, localPath.LastIndexOf('\\')),
                                                item.Revision));
-            // BUG: Should not be item.Revision!
 
             item = GetItems(-1, path.Substring(1), Recursion.None);
             if (item != null)
                 updates2.Add(LocalUpdate.FromLocal(item.Id,
                                                    LOCAL_PREFIX + activityId + localPath,
                                                    item.Revision));
-            // BUG: Should not be item.Revision!
 
             sourceControlSvc.UpdateLocalVersions(serverUrl, credentials, activityId, updates2);
 
@@ -194,8 +192,40 @@ namespace SvnBridge.SourceControl
             activities[activityId].MergeList.Add(new ActivityItem(SERVER_PATH + path, ItemType.File));
         }
 
+        public void CopyItem(string activityId, string path, string targetPath)
+        {
+            string localPath = LOCAL_PREFIX + activityId + path.Replace('/', '\\');
+            string localTargetPath = LOCAL_PREFIX + activityId + targetPath.Replace('/', '\\');
+
+            ItemMetaData item = GetItems(-1, path, Recursion.None);
+            List<LocalUpdate> updates = new List<LocalUpdate>();
+            updates.Add(LocalUpdate.FromLocal(item.Id, localPath, item.Revision));
+            sourceControlSvc.UpdateLocalVersions(serverUrl, credentials, activityId, updates);
+
+            bool copyIsRename = false;
+            if (activities[activityId].DeletedItems.Contains(path))
+            {
+                copyIsRename = true;
+                activities[activityId].DeletedItems.Remove(path);
+            }
+
+            List<PendRequest> pendRequests = new List<PendRequest>();
+            if (copyIsRename)
+                pendRequests.Add(PendRequest.Rename(localPath, localTargetPath));
+            else
+                pendRequests.Add(PendRequest.Copy(localPath, localTargetPath));
+
+            sourceControlSvc.PendChanges(serverUrl, credentials, activityId, pendRequests);
+            activities[activityId].MergeList.Add(new ActivityItem(SERVER_PATH + targetPath, item.ItemType));
+        }
+
         public void DeleteItem(string activityId,
                                string path)
+        {
+            activities[activityId].DeletedItems.Add(path);
+        }
+
+        private void ProcessDeleteItem(string activityId, string path)
         {
             string localPath = LOCAL_PREFIX + activityId + path.Replace('/', '\\');
 
@@ -203,7 +233,6 @@ namespace SvnBridge.SourceControl
             List<LocalUpdate> updates2 = new List<LocalUpdate>();
             updates2.Add(LocalUpdate.FromLocal(item.Id, localPath, item.Revision));
             sourceControlSvc.UpdateLocalVersions(serverUrl, credentials, activityId, updates2);
-            // BUG: Should not be item.Revision!
 
             List<PendRequest> pendRequests = new List<PendRequest>();
             pendRequests.Add(PendRequest.Delete(localPath));
@@ -231,7 +260,6 @@ namespace SvnBridge.SourceControl
 
             List<LocalUpdate> updates2 = new List<LocalUpdate>();
             updates2.Add(LocalUpdate.FromLocal(item.Id, LOCAL_PREFIX + localPath.Substring(0, localPath.LastIndexOf('\\')), item.Revision));
-            // BUG: Should not be item.Revision!
 
             sourceControlSvc.UpdateLocalVersions(serverUrl, credentials, activityId, updates2);
 
@@ -331,6 +359,9 @@ namespace SvnBridge.SourceControl
 
         public MergeActivityResponse MergeActivity(string activityId)
         {
+            foreach (string path in activities[activityId].DeletedItems)
+                ProcessDeleteItem(activityId, path);
+
             UpdateProperties(activityId);
             List<string> commitServerList = new List<string>();
             foreach (ActivityItem item in activities[activityId].MergeList)

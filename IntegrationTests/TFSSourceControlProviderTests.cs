@@ -405,6 +405,56 @@ namespace Tests
             provider.MakeCollection(activityId, testPath + "/New Folder");
         }
 
+        [Test]
+        public void TestRenameFile()
+        {
+            CreateFile(testPath + "/Fun.txt", "Fun text", true);
+
+            provider.DeleteItem(activityId, testPath + "/Fun.txt");
+            provider.CopyItem(activityId, testPath + "/Fun.txt", testPath + "/FunRename.txt");
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/FunRename.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+        }
+
+        [Test]
+        public void TestRenameFolder()
+        {
+            CreateFolder(testPath + "/Fun", true);
+
+            provider.DeleteItem(activityId, testPath + "/Fun");
+            provider.CopyItem(activityId, testPath + "/Fun", testPath + "/FunRename");
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/FunRename", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+        }
+
+        [Test]
+        public void TestBranchFile()
+        {
+            CreateFile(testPath + "/Fun.txt", "Fun text", true);
+
+            provider.CopyItem(activityId, testPath + "/Fun.txt", testPath + "/FunBranch.txt");
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/FunBranch.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Branch, log.History[0].Changes[0].ChangeType & ChangeType.Branch);
+        }
+
+        [Test]
+        public void TestBranchFolder()
+        {
+            CreateFolder(testPath + "/Fun", true);
+
+            provider.CopyItem(activityId, testPath + "/Fun", testPath + "/FunBranch");
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/FunBranch", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Branch, log.History[0].Changes[0].ChangeType & ChangeType.Branch);
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)

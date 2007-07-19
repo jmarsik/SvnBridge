@@ -157,5 +157,8 @@ namespace Tests
         {
             return base.Attach((Delegate)method, throwException);
         }
+
+        public delegate void CopyItem(string activityId, string path, string targetPath);
+        public Results Attach(CopyItem method) { return base.Attach((Delegate)method); }
     }
 }

@@ -144,6 +144,7 @@ namespace Tests
         public void Test4()
         {
             mock.Attach(provider.ItemExists, true);
+            mock.Attach(provider.IsDirectory, true);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%204 HTTP/1.1\r\n" +

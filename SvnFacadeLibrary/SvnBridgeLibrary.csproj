@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
+    <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\IRequestDispatcher.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />

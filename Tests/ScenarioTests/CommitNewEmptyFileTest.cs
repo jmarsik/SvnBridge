@@ -144,6 +144,7 @@ namespace Tests
         public void Test4()
         {
             mock.Attach(provider.ItemExists, true);
+            mock.Attach(provider.IsDirectory, true);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%207 HTTP/1.1\r\n" +
@@ -316,6 +317,7 @@ namespace Tests
         public void Test8()
         {
             mock.Attach(provider.ItemExists, true);
+            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Revision = 5468;
             mock.Attach(provider.GetItems, item);

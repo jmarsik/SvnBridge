@@ -21,6 +21,7 @@ namespace SvnBridge.Handlers
                 dispatcher = createDelegate(serverUrl);
 
             dispatcher.RegisterHandler<CheckOutHandler>();
+            dispatcher.RegisterHandler<CopyHandler>();
             dispatcher.RegisterHandler<DeleteHandler>();
             dispatcher.RegisterHandler<MergeHandler>();
             dispatcher.RegisterHandler<MkActivityHandler>();

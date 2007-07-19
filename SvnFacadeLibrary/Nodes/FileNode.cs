@@ -26,7 +26,7 @@ namespace SvnBridge.Nodes
         public string Href()
         {
             string href = path;
-            if ((href.Length == 0) || (href[href.Length - 1] != '/'))
+            if (sourceControlProvider.IsDirectory(-1, Helper.Decode(path)) && !href.EndsWith("/"))
                 href += "/";
 
             return href;
@@ -64,7 +64,7 @@ namespace SvnBridge.Nodes
             }
             else
             {
-                return "<lp1:resourcetype></lp1:resourcetype>";
+                return "<lp1:resourcetype/>";
             }
         }
 

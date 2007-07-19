@@ -97,6 +97,7 @@
     <Compile Include="Infrastructure\StubSourceControlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\WebDavServiceTestsBase.cs" />
+    <Compile Include="ScenarioTests\CommitRenamedFileTest.cs" />
     <Compile Include="ScenarioTests\CommitUpdatedFileTest.cs" />
     <Compile Include="ScenarioTests\CommitUpdatedFileThatIsOutOfDateTest.cs" />
     <Compile Include="ScenarioTests\ShowLogSingleFolderWithAddEditDelete.cs" />
