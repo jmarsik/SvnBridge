@@ -364,7 +364,7 @@ namespace SvnBridge.Handlers
             sourceControlProvider.MakeActivity(activityId);
         }
 
-        public void Put(string path,
+        public bool Put(string path,
                         Stream inputStream,
                         string baseHash,
                         string resultHash)
@@ -372,12 +372,13 @@ namespace SvnBridge.Handlers
             string activityId = path.Substring(11, path.IndexOf('/', 11) - 11);
             string serverPath = Helper.Decode(path.Substring(11 + activityId.Length));
             SvnDiff[] diffs = SvnDiffParser.ParseSvnDiff(inputStream);
+            byte[] fileData = new byte[0];
             if (diffs.Length > 0)
             {
-                ItemMetaData item = sourceControlProvider.GetItems(-1, serverPath, Recursion.None);
                 byte[] sourceData = new byte[0];
-                if (item != null)
+                if (baseHash != null)
                 {
+                    ItemMetaData item = sourceControlProvider.GetItems(-1, serverPath, Recursion.None);
                     sourceData = sourceControlProvider.ReadFile(item);
                     if (Helper.GetMd5Checksum(sourceData) != baseHash)
                     {
@@ -385,7 +386,6 @@ namespace SvnBridge.Handlers
                     }
                 }
 
-                byte[] fileData = new byte[0];
                 int sourceDataStartIndex = 0;
                 foreach (SvnDiff diff in diffs)
                 {
@@ -398,12 +398,8 @@ namespace SvnBridge.Handlers
                 {
                     throw new Exception("Checksum mismatch with new file");
                 }
-                sourceControlProvider.WriteFile(activityId, serverPath, fileData);
             }
-            else
-            {
-                sourceControlProvider.WriteFile(activityId, serverPath, new byte[0]);
-            }
+            return sourceControlProvider.WriteFile(activityId, serverPath, fileData);
         }
 
         public string CheckOut(CheckoutData request,

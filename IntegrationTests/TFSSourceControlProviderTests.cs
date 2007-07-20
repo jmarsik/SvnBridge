@@ -62,10 +62,11 @@ namespace Tests
         {
             byte[] testFile = Encoding.Default.GetBytes("Test file contents");
 
-            CreateFile(testPath + "/TestFile.txt", testFile, true);
+            bool created = WriteFile(testPath + "/TestFile.txt", testFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFile.txt");
             Assert.AreEqual(Encoding.Default.GetString(testFile), Encoding.Default.GetString(actual));
+            Assert.AreEqual(true, created);
         }
 
         [Test]
@@ -73,9 +74,9 @@ namespace Tests
         {
             byte[] testFile = Encoding.Default.GetBytes("Test file contents");
 
-            CreateFile(testPath + "/TestFile1.txt", testFile, false);
-            CreateFile(testPath + "/TestFile2.txt", testFile, false);
-            CreateFile(testPath + "/TestFile3.txt", testFile, true);
+            WriteFile(testPath + "/TestFile1.txt", testFile, false);
+            WriteFile(testPath + "/TestFile2.txt", testFile, false);
+            WriteFile(testPath + "/TestFile3.txt", testFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFile1.txt");
             Assert.AreEqual(Encoding.Default.GetString(testFile), Encoding.Default.GetString(actual));
@@ -91,7 +92,7 @@ namespace Tests
             byte[] testFile = Encoding.Default.GetBytes("Test file contents");
 
             CreateFolder(testPath + "/TestFolder", false);
-            CreateFile(testPath + "/TestFolder/TestFile.txt", testFile, true);
+            WriteFile(testPath + "/TestFolder/TestFile.txt", testFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFolder/TestFile.txt");
             Assert.AreEqual(Encoding.Default.GetString(testFile), Encoding.Default.GetString(actual));
@@ -100,13 +101,14 @@ namespace Tests
         [Test]
         public void TestCommitUpdatedFile()
         {
-            CreateFile(testPath + "/TestFile.txt", "Test file contents", true);
-            byte[] testUpdatedFile = Encoding.Default.GetBytes("Test file contents\r\nUpdated");
+            WriteFile(testPath + "/TestFile.txt", "Test file contents", true);
+            string testUpdatedFile = "Test file contents\r\nUpdated";
 
-            CreateFile(testPath + "/TestFile.txt", testUpdatedFile, true);
+            bool created = WriteFile(testPath + "/TestFile.txt", testUpdatedFile, true);
 
             byte[] actual = ReadFile(testPath + "/TestFile.txt");
-            Assert.AreEqual(Encoding.Default.GetString(testUpdatedFile), Encoding.Default.GetString(actual));
+            Assert.AreEqual(testUpdatedFile, Encoding.Default.GetString(actual));
+            Assert.AreEqual(false, created);
         }
 
         [Test]
@@ -148,7 +150,7 @@ namespace Tests
         public void TestDeleteFile()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Test file contents", true);
+            WriteFile(path, "Test file contents", true);
 
             DeleteItem(path, true);
 
@@ -170,7 +172,7 @@ namespace Tests
         public void TestGetLog()
         {
             int versionFrom = provider.GetLatestVersion();
-            CreateFile(testPath + "/TestFile.txt", "Fun text", true);
+            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
             int versionTo = provider.GetLatestVersion();
 
             LogItem logItem = provider.GetLog(testPath, versionFrom, versionTo, Recursion.Full, Int32.MaxValue);
@@ -182,7 +184,7 @@ namespace Tests
         public void TestGetChangedItemsWithOneNewFile()
         {
             int versionFrom = provider.GetLatestVersion();
-            CreateFile(testPath + "/TestFile.txt", "Fun text", true);
+            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
             int versionTo = provider.GetLatestVersion();
 
             UpdateReportData reportData = new UpdateReportData();
@@ -197,7 +199,7 @@ namespace Tests
         public void TestGetChangedItemsWithDeletedFile()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Test file contents", true);
+            WriteFile(path, "Test file contents", true);
             int versionFrom = provider.GetLatestVersion();
             DeleteItem(path, true);
             int versionTo = provider.GetLatestVersion();
@@ -229,7 +231,7 @@ namespace Tests
         public void TestGetChangedItemsWithSameFileUpdatedTwice()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", true);
+            WriteFile(path, "Fun text", true);
             int versionFrom = provider.GetLatestVersion();
             UpdateFile(path, "Fun text 2", true);
             UpdateFile(path, "Fun text 3", true);
@@ -248,7 +250,7 @@ namespace Tests
         {
             string mimeType = "application/octet-stream";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", false);
+            WriteFile(path, "Fun text", false);
             SetProperty(path, "mime-type", mimeType, true);
 
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
@@ -261,7 +263,7 @@ namespace Tests
         {
             string mimeType = "application/octet-stream";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", true);
+            WriteFile(path, "Fun text", true);
 
             SetProperty(path, "mime-type", mimeType, true);
 
@@ -275,7 +277,7 @@ namespace Tests
             string mimeType1 = "application/octet-stream1";
             string mimeType2 = "application/octet-stream2";
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", false);
+            WriteFile(path, "Fun text", false);
             SetProperty(path, "mime-type", mimeType1, true);
 
             SetProperty(path, "mime-type", mimeType2, true);
@@ -288,7 +290,7 @@ namespace Tests
         public void TestGetChangedItemsDoesNotReturnItemIfInLocalEntriesList()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", true);
+            WriteFile(path, "Fun text", true);
             int versionFrom = provider.GetLatestVersion();
             UpdateFile(path, "Fun text 2", true);
             int versionTo = provider.GetLatestVersion();
@@ -308,7 +310,7 @@ namespace Tests
         public void TestGetChangedItemsDoesNotReturnDeletedItemIfInLocalState()
         {
             string path = testPath + "/TestFile.txt";
-            CreateFile(path, "Fun text", true);
+            WriteFile(path, "Fun text", true);
             int versionFrom = provider.GetLatestVersion();
             DeleteItem(path, true);
             int versionTo = provider.GetLatestVersion();
@@ -326,7 +328,7 @@ namespace Tests
         {
             int versionFrom = provider.GetLatestVersion();
             CreateFolder(testPath + "/New Folder", false);
-            CreateFile(testPath + "/New Folder/New File.txt", "Fun text", true);
+            WriteFile(testPath + "/New Folder/New File.txt", "Fun text", true);
             int versionTo = provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
 
@@ -360,7 +362,7 @@ namespace Tests
         public void TestGetChangedItemsForADeletedFileReturnsCorrectResult()
         {
             CreateFolder(testPath + "/New Folder", false);
-            CreateFile(testPath + "/New Folder/New File.txt", "Fun text", true);
+            WriteFile(testPath + "/New Folder/New File.txt", "Fun text", true);
             int versionFrom = provider.GetLatestVersion();
             DeleteItem(testPath + "/New Folder", true);
             int versionTo = provider.GetLatestVersion();
@@ -408,10 +410,23 @@ namespace Tests
         [Test]
         public void TestRenameFile()
         {
-            CreateFile(testPath + "/Fun.txt", "Fun text", true);
+            WriteFile(testPath + "/Fun.txt", "Fun text", true);
 
             provider.DeleteItem(activityId, testPath + "/Fun.txt");
             provider.CopyItem(activityId, testPath + "/Fun.txt", testPath + "/FunRename.txt");
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/FunRename.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+        }
+
+        [Test]
+        public void TestRenameFileWithCopyBeforeDelete()
+        {
+            WriteFile(testPath + "/Fun.txt", "Fun text", true);
+
+            provider.CopyItem(activityId, testPath + "/Fun.txt", testPath + "/FunRename.txt");
+            provider.DeleteItem(activityId, testPath + "/Fun.txt");
             Commit();
 
             LogItem log = provider.GetLog(testPath + "/FunRename.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
@@ -434,7 +449,7 @@ namespace Tests
         [Test]
         public void TestBranchFile()
         {
-            CreateFile(testPath + "/Fun.txt", "Fun text", true);
+            WriteFile(testPath + "/Fun.txt", "Fun text", true);
 
             provider.CopyItem(activityId, testPath + "/Fun.txt", testPath + "/FunBranch.txt");
             Commit();
@@ -455,6 +470,24 @@ namespace Tests
             Assert.AreEqual(ChangeType.Branch, log.History[0].Changes[0].ChangeType & ChangeType.Branch);
         }
 
+        [Test]
+        public void TestRenameAndEditFile()
+        {
+            WriteFile(testPath + "/Fun.txt", "Fun text", true);
+
+            provider.CopyItem(activityId, testPath + "/Fun.txt", testPath + "/FunRename.txt");
+            provider.DeleteItem(activityId, testPath + "/Fun.txt");
+            byte[] updatedText = Encoding.Default.GetBytes("Test file contents");
+            bool created = provider.WriteFile(activityId, testPath + "/FunRename.txt", updatedText);
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/FunRename.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
+            byte[] actualUpdatedText = ReadFile(testPath + "/FunRename.txt");
+            Assert.AreEqual(Encoding.Default.GetString(updatedText), Encoding.Default.GetString(actualUpdatedText));
+            Assert.AreEqual(false, created);
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)
@@ -465,21 +498,22 @@ namespace Tests
                 Commit();
         }
 
-        void CreateFile(string path,
+        bool WriteFile(string path,
                         string fileData,
                         bool commit)
         {
             byte[] data = Encoding.Default.GetBytes(fileData);
-            CreateFile(path, data, commit);
+            return WriteFile(path, data, commit);
         }
 
-        void CreateFile(string path,
+        bool WriteFile(string path,
                         byte[] fileData,
                         bool commit)
         {
-            provider.WriteFile(activityId, path, fileData);
+            bool created = provider.WriteFile(activityId, path, fileData);
             if (commit)
                 Commit();
+            return created;
         }
 
         void Commit()

@@ -450,7 +450,7 @@ namespace Tests
         public void Test11()
         {
             mock.Attach(provider.GetItems, null);
-            mock.Attach(provider.WriteFile);
+            mock.Attach(provider.WriteFile, true);
 
             string request =
                 "PUT //!svn/wrk/208d5649-1590-0247-a7d6-831b1e447dbf/Spikes/SvnFacade/trunk/New%20Folder%2010/banner_top_project.jpg HTTP/1.1\r\n" +

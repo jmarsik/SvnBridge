@@ -109,13 +109,10 @@ namespace Tests
             return base.Attach((Delegate)method);
         }
 
-        public delegate void WriteFileToActivity(string activityId,
-                                                 string path,
-                                                 byte[] fileData);
-
-        public Results Attach(WriteFileToActivity method)
+        public delegate bool WriteFile(string activityId, string path, byte[] fileData);
+        public Results Attach(WriteFile method, bool returnValue)
         {
-            return base.Attach((Delegate)method);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public delegate LogItem GetLog(string path,

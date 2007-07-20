@@ -403,7 +403,7 @@ namespace Tests
             ItemMetaData item = new ItemMetaData();
             mock.Attach(provider.GetItems, item);
             mock.Attach(provider.ReadFile, Encoding.Default.GetBytes("Fun text\r\nMore"));
-            mock.Attach(provider.WriteFile);
+            mock.Attach(provider.WriteFile, false);
 
             string request =
                 "PUT //!svn/wrk/c59fa648-d006-554a-ad31-6de1e409bd8f/Spikes/SvnFacade/trunk/Test3.txt HTTP/1.1\r\n" +

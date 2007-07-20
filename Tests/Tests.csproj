@@ -66,6 +66,7 @@
     <Compile Include="Assert\ThrowsException.cs" />
     <Compile Include="Assert\TrueException.cs" />
     <Compile Include="FileNodeTests.cs" />
+    <Compile Include="Handlers\CopyHandlerTests.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
     <Compile Include="Presenters\SettingsViewPresenterTests.cs" />
     <Compile Include="RequestReceiver\TcpClientRequestReceiverTest.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Infrastructure\StubSourceControlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\WebDavServiceTestsBase.cs" />
+    <Compile Include="ScenarioTests\CommitRenamedAndEditedFileTest.cs" />
     <Compile Include="ScenarioTests\CommitRenamedFileTest.cs" />
     <Compile Include="ScenarioTests\CommitUpdatedFileTest.cs" />
     <Compile Include="ScenarioTests\CommitUpdatedFileThatIsOutOfDateTest.cs" />

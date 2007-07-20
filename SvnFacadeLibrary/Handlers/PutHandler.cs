@@ -15,12 +15,12 @@ namespace SvnBridge.Handlers
         {
             WebDavService webDavService = new WebDavService(sourceControlProvider);
             
-            webDavService.Put(request.Path, request.InputStream, request.Headers["X-SVN-Base-Fulltext-MD5"], request.Headers["X-SVN-Result-Fulltext-MD5"]);
+            bool created = webDavService.Put(request.Path, request.InputStream, request.Headers["X-SVN-Base-Fulltext-MD5"], request.Headers["X-SVN-Result-Fulltext-MD5"]);
 
             string server = request.Headers["Host"].Split(':')[0];
             string port = request.Headers["Host"].Split(':')[1];
             
-            if (request.Headers["X-SVN-Base-Fulltext-MD5"] == null)
+            if (created)
             {
                 SetResponseSettings(request, "text/html", Encoding.UTF8, 201);
                 

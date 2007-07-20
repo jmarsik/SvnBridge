@@ -56,7 +56,21 @@ namespace Trace
 
         public static void WriteTestLog(string log)
         {
-            File.AppendAllText(@"c:\Tests.txt", log);
+            bool retry = false;
+            do
+            {
+                retry = false;
+                try
+                {
+                    File.AppendAllText(@"c:\Tests.txt", log);
+                }
+                catch
+                {
+                    System.Threading.Thread.Sleep(100);
+                    retry = true;
+                }
+            }
+            while (retry);
         }
 
         public static void WriteTestLogLine(string log)
@@ -108,20 +122,33 @@ namespace Trace
             copyOutput.Join();
         }
 
-        public static void WriteLog(byte[] buffer,
-                                    int count)
+        public static void WriteLog(byte[] buffer, int count)
         {
-            //string data = Encoding.UTF8.GetString(buffer, 0, count);
-            using (FileStream stream = File.OpenWrite("c:\\output1.txt"))
+            bool retry;
+            do
             {
-                stream.Position = stream.Length;
-                //byte[] start = Encoding.UTF8.GetBytes("++");
-                //stream.Write(start, 0, start.Length);
-                stream.Write(buffer, 0, count);
-                //byte[] end = Encoding.UTF8.GetBytes("--");
-                //stream.Write(end, 0, end.Length);
+                retry = false;
+                try
+                {
+                    //string data = Encoding.UTF8.GetString(buffer, 0, count);
+                    using (FileStream stream = File.OpenWrite("c:\\output1.txt"))
+                    {
+                        stream.Position = stream.Length;
+                        //byte[] start = Encoding.UTF8.GetBytes("++");
+                        //stream.Write(start, 0, start.Length);
+                        stream.Write(buffer, 0, count);
+                        //byte[] end = Encoding.UTF8.GetBytes("--");
+                        //stream.Write(end, 0, end.Length);
+                    }
+                    //System.Diagnostics.Debug.Write(data);
+                }
+                catch
+                {
+                    retry = true;
+                    System.Threading.Thread.Sleep(100);
+                }
             }
-            //System.Diagnostics.Debug.Write(data);
+            while (retry);
         }
 
         public static void CopyStream(object parameters)

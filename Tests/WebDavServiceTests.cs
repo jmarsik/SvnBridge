@@ -57,7 +57,7 @@ namespace Tests
             MyMocks mock = new MyMocks();
             StubSourceControlProvider provider = mock.CreateObject<StubSourceControlProvider>();
             WebDavService service = new WebDavService(provider);
-            Results result = mock.Attach(provider.WriteFile);
+            Results result = mock.Attach(provider.WriteFile, false);
             byte[] data = Encoding.Default.GetBytes("SVN\0");
             MemoryStream stream = new MemoryStream(data);
 

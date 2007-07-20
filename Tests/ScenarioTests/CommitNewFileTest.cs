@@ -450,7 +450,7 @@ namespace Tests
         public void Test11()
         {
             mock.Attach(provider.GetItems, null);
-            mock.Attach(provider.WriteFile);
+            mock.Attach(provider.WriteFile, true);
 
             string request =
                 "PUT //!svn/wrk/ea5fa891-18f0-4742-b275-e2e314a58f84/Spikes/SvnFacade/trunk/Test4.txt HTTP/1.1\r\n" +

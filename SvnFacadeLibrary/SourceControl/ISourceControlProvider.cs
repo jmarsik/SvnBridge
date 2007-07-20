@@ -21,6 +21,6 @@ namespace SvnBridge.SourceControl
         byte[] ReadFile(ItemMetaData item);
         void SetActivityComment(string activityId, string comment);
         void SetProperty(string activityId, string path, string property, string value);
-        void WriteFile(string activityId, string path, byte[] fileData);
+        bool WriteFile(string activityId, string path, byte[] fileData);
     }
 }
