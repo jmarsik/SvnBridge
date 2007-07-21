@@ -320,6 +320,7 @@ namespace Tests
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
             FolderMetaData item = new FolderMetaData();
+            item.Name = "";
             item.Revision = 5514;
             mock.Attach(provider.GetItems, item);
 

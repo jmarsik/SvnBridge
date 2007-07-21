@@ -20,7 +20,7 @@ namespace SvnBridge.Nodes
             Match m = Regex.Match(path, @"/!svn/bc/(\d+)/?");
             version = int.Parse(m.Groups[1].Value);
             filePath = path.Substring(m.Groups[0].Value.Length);
-            node = new FileNode(vccPath, filePath, sourceControlProvider, repositoryUuid);
+            node = new FileNode(vccPath, filePath, sourceControlProvider, repositoryUuid, version);
         }
 
         public string Href()

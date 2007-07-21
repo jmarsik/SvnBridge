@@ -65,6 +65,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
@@ -206,6 +209,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
@@ -303,6 +309,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /!svn/bc/5393/Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
@@ -352,6 +361,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
@@ -451,6 +463,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
@@ -592,6 +607,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +

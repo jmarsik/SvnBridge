@@ -488,6 +488,22 @@ namespace Tests
             Assert.AreEqual(false, created);
         }
 
+        [Test]
+        public void TestCommitOfMoveFileOutOfFolderAndDeleteFolder()
+        {
+            CreateFolder(testPath + "/TestFolder", false);
+            bool created = WriteFile(testPath + "/TestFolder/TestFile.txt", "Test file contents", true);
+
+            provider.CopyItem(activityId, testPath + "/TestFolder/TestFile.txt", testPath + "/FunFile.txt");
+            provider.DeleteItem(activityId, testPath + "/TestFolder/TestFile.txt");
+            provider.DeleteItem(activityId, testPath + "/TestFolder");
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/FunFile.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+            Assert.IsNull(provider.GetItems(-1, testPath + "/TestFolder", Recursion.None));
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)

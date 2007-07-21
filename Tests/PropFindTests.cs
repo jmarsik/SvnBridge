@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using SvnBridge.Protocol;
 using Assert=CodePlex.NUnitExtensions.Assert;
+using SvnBridge.SourceControl;
 
 namespace Tests
 {
@@ -11,6 +12,9 @@ namespace Tests
         public void VerifyPropFindOfFolderWithSpaceInNameReturnsDecodedSpaceInBaselineRelativePathProperty()
         {
             mock.Attach(provider.ItemExists, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Folder With Spaces";
+            mock.Attach(provider.GetItems, item);
             mock.Attach(provider.IsDirectory, true);
             string path = "/Folder%20With%20Spaces";
             string xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";

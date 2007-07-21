@@ -11,16 +11,25 @@ namespace SvnBridge.Nodes
         string path;
         ISourceControlProvider sourceControlProvider;
         string repositoryUuid;
+        int version;
 
         public FileNode(string vccPath,
                         string path,
                         ISourceControlProvider sourceControlProvider,
                         string repositoryUuid)
+            : this(vccPath, path, sourceControlProvider, repositoryUuid, -1) { }
+
+            public FileNode(string vccPath,
+                        string path,
+                        ISourceControlProvider sourceControlProvider,
+                        string repositoryUuid,
+                        int version)
         {
             this.vccPath = vccPath;
             this.path = path;
             this.sourceControlProvider = sourceControlProvider;
             this.repositoryUuid = repositoryUuid;
+            this.version = version;
         }
 
         public string Href()
@@ -77,8 +86,11 @@ namespace SvnBridge.Nodes
                 brl = brl.Substring(0, brl.Length - 1);
 
             brl = Helper.Decode(brl);
-            if (brl.Length >0)
-                return "<lp2:baseline-relative-path>" + brl + "</lp2:baseline-relative-path>";
+            if (brl.Length > 0)
+            {
+                ItemMetaData item = sourceControlProvider.GetItems(version, Helper.Decode(path), Recursion.None);
+                return "<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>";
+            }
             else
                 return "<lp2:baseline-relative-path/>";
         }
@@ -90,8 +102,8 @@ namespace SvnBridge.Nodes
 
         string GetCheckedIn(XmlElement property)
         {
-            int version = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None).Revision;
-            return "<lp1:checked-in><D:href>/!svn/ver/" + version.ToString() + path + "</D:href></lp1:checked-in>";
+            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
+            return "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>";
         }
     }
 }

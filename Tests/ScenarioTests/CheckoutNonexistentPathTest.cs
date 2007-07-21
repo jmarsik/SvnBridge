@@ -1,5 +1,6 @@
 using CodePlex.TfsLibrary;
 using NUnit.Framework;
+using SvnBridge.SourceControl;
 
 namespace Tests
 {
@@ -106,6 +107,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade HTTP/1.1\r\n" +
@@ -286,6 +290,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade HTTP/1.1\r\n" +
@@ -466,6 +473,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade HTTP/1.1\r\n" +
@@ -646,6 +656,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade HTTP/1.1\r\n" +
@@ -880,6 +893,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade HTTP/1.1\r\n" +
@@ -1060,6 +1076,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade HTTP/1.1\r\n" +
@@ -1240,6 +1259,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade HTTP/1.1\r\n" +
@@ -1419,6 +1441,9 @@ namespace Tests
         public void Test32()
         {
             mock.Attach(provider.ItemExists, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade";
+            mock.Attach(provider.GetItems, item);
             mock.Attach(provider.IsDirectory, true);
 
             string request =

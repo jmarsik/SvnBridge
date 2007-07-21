@@ -319,6 +319,7 @@ namespace Tests
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
+            item.Name = "";
             item.Revision = 5519;
             mock.Attach(provider.GetItems, item);
 
@@ -480,6 +481,9 @@ namespace Tests
         {
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, false);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Fun.txt";
+            mock.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Fun.txt HTTP/1.1\r\n" +

@@ -107,6 +107,9 @@ namespace Tests
             WebDavService service = new WebDavService(provider);
             Results result = mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Test Project";
+            mock.Attach(provider.GetItems, item);
             MemoryStream outputStream = new MemoryStream();
             string propfind = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes(propfind));

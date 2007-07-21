@@ -34,6 +34,7 @@ namespace SvnBridge.SourceControl
             public string Comment;
             public List<ActivityItem> MergeList = new List<ActivityItem>();
             public List<string> DeletedItems = new List<string>();
+            public List<string> PostCommitDeletedItems = new List<string>();
             public List<CopyAction> CopiedItems = new List<CopyAction>();
             public Dictionary<string, Dictionary<string, string>> FolderProperties = new Dictionary<string, Dictionary<string, string>>();
             public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
@@ -282,7 +283,18 @@ namespace SvnBridge.SourceControl
 
         public void DeleteItem(string activityId, string path)
         {
-            _activities[activityId].DeletedItems.Add(path);
+            bool postCommitDelete = false;
+            foreach (CopyAction copy in _activities[activityId].CopiedItems)
+            {
+                if (copy.Path.StartsWith(path + "/"))
+                {
+                    _activities[activityId].PostCommitDeletedItems.Add(path);
+                    postCommitDelete = true;
+                }
+            }
+
+            if (!postCommitDelete)
+                _activities[activityId].DeletedItems.Add(path);
         }
 
         private void ProcessDeleteItem(string activityId, string path)
@@ -299,8 +311,7 @@ namespace SvnBridge.SourceControl
             _activities[activityId].MergeList.Add(new ActivityItem(SERVER_PATH + path, item.ItemType));
         }
 
-        public void MakeCollection(string activityId,
-                                   string path)
+        public void MakeCollection(string activityId, string path)
         {
             if (ItemExists(path))
                 throw new FolderAlreadyExistsException();
@@ -429,6 +440,17 @@ namespace SvnBridge.SourceControl
                 changesetId = _sourceControlSvc.Commit(_serverUrl, _credentials, activityId, _activities[activityId].Comment, commitServerList);
             else
                 changesetId = GetLatestVersion();
+
+            if (_activities[activityId].PostCommitDeletedItems.Count > 0)
+            {
+                commitServerList.Clear();
+                foreach (string path in _activities[activityId].PostCommitDeletedItems)
+                {
+                    ProcessDeleteItem(activityId, path);
+                    commitServerList.Add(SERVER_PATH + path);
+                }
+                changesetId = _sourceControlSvc.Commit(_serverUrl, _credentials, activityId, _activities[activityId].Comment, commitServerList);
+            }
 
             MergeActivityResponse mergeResponse = new MergeActivityResponse(changesetId, DateTime.Now, "unknown");
             foreach (ActivityItem item in _activities[activityId].MergeList)

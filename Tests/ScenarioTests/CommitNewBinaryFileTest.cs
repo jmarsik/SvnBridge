@@ -319,6 +319,7 @@ namespace Tests
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
+            item.Name = "Spikes/SvnFacade/trunk/New Folder 10";
             item.Revision = 5476;
             mock.Attach(provider.GetItems, item);
 
