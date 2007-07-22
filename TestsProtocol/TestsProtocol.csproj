@@ -28,12 +28,64 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AttachFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\AttachFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="CodePlex.TfsLibrary, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\CodePlex.TfsLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.2.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckoutEmptyFolderTest.cs" />
+    <Compile Include="CheckoutFolderWithAmpersandInNameTest.cs" />
+    <Compile Include="CheckoutFolderWithBinaryFileTest.cs" />
+    <Compile Include="CheckoutFolderWithEmptyFileTest.cs" />
+    <Compile Include="CheckoutFolderWithIgnoreFileTest.cs" />
+    <Compile Include="CheckoutFolderWithOneFileTest.cs" />
+    <Compile Include="CheckoutNonexistentPathTest.cs" />
+    <Compile Include="CheckoutOldRevisionTest.cs" />
+    <Compile Include="CheckoutRootFolderTest.cs" />
+    <Compile Include="CommitAddFolderThatAlreadyExistsTest.cs" />
+    <Compile Include="CommitDeleteFileTest.cs" />
+    <Compile Include="CommitDeleteFolderTest.cs" />
+    <Compile Include="CommitDeleteOfAlreadyDeletedFileTest.cs" />
+    <Compile Include="CommitFileThatWasCheckedOutAnonymouslyTest.cs" />
+    <Compile Include="CommitIgnoreFileTest.cs" />
+    <Compile Include="CommitNewBinaryFileTest.cs" />
+    <Compile Include="CommitNewEmptyFileTest.cs" />
+    <Compile Include="CommitNewFileTest.cs" />
+    <Compile Include="CommitNewFolderTest.cs" />
+    <Compile Include="CommitRenamedAndEditedFileTest.cs" />
+    <Compile Include="CommitRenamedFileTest.cs" />
+    <Compile Include="CommitUpdatedFileTest.cs" />
+    <Compile Include="CommitUpdatedFileThatIsOutOfDateTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShowLogSingleFolderWithAddEditDelete.cs" />
+    <Compile Include="ShowLogSingleFolderWithOneFile.cs" />
+    <Compile Include="UpdateAfterCommitFileDeleteTest.cs" />
+    <Compile Include="UpdateAfterCommitNewFolderTest.cs" />
+    <Compile Include="UpdateOfDeletedFileTest.cs" />
+    <Compile Include="UpdateOneFileTest.cs" />
+    <Compile Include="UpdateWithDeletedFileTest.cs" />
+    <Compile Include="UpdateWithDeletedFolderTest.cs" />
+    <Compile Include="UpdateWithNewFileTest.cs" />
+    <Compile Include="UpdateWithNoNewItems.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SvnFacadeLibrary\SvnBridgeLibrary.csproj">
+      <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
+      <Name>SvnBridgeLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tests\TestsUnit.csproj">
+      <Project>{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}</Project>
+      <Name>TestsUnit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
