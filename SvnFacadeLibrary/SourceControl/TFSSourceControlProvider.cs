@@ -14,20 +14,14 @@ namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlProvider : ISourceControlProvider
     {
-        // Constants
-
         const string SERVER_PATH = "$/";
         const string LOCAL_PREFIX = @"C:\";
-
-        // Fields
 
         static Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
         ICredentials _credentials;
         string _serverUrl;
         SourceControlService _sourceControlSvc;
         WebTransferService _webTransferSvc;
-
-        // Lifetime
 
         class Activity
         {
@@ -36,8 +30,11 @@ namespace SvnBridge.SourceControl
             public List<string> DeletedItems = new List<string>();
             public List<string> PostCommitDeletedItems = new List<string>();
             public List<CopyAction> CopiedItems = new List<CopyAction>();
-            public Dictionary<string, Dictionary<string, string>> FolderProperties = new Dictionary<string, Dictionary<string, string>>();
-            public Dictionary<string, Dictionary<string, Dictionary<string, string>>> FileProperties = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
+            public List<string> FolderWithUpdatedProperties = new List<string>();
+            public Dictionary<string, Dictionary<string, string>> AddedFolderProperties = new Dictionary<string, Dictionary<string, string>>();
+            public Dictionary<string, Dictionary<string, string>> AddedFileProperties = new Dictionary<string, Dictionary<string, string>>();
+            public Dictionary<string, List<string>> RemovedFolderProperties = new Dictionary<string, List<string>>();
+            public Dictionary<string, List<string>> RemovedFileProperties = new Dictionary<string, List<string>>();
         }
 
         class CopyAction
@@ -140,25 +137,25 @@ namespace SvnBridge.SourceControl
             switch (property)
             {
                 case "ignore":
-                    if (!activity.FolderProperties.ContainsKey(path))
-                        activity.FolderProperties[path] = new Dictionary<string, string>();
+                    if (!activity.FolderWithUpdatedProperties.Contains(path))
+                        activity.FolderWithUpdatedProperties.Add(path);
 
-                    activity.FolderProperties[path][property] = value;
+                    if (!activity.AddedFolderProperties.ContainsKey(path))
+                        activity.AddedFolderProperties[path] = new Dictionary<string, string>();
+
+                    activity.AddedFolderProperties[path][property] = value;
                     break;
 
                 case "mime-type":
-                    string folder = path.Substring(0, path.LastIndexOf('/'));
+                    string folder = GetFolderName(path);
 
-                    if (!activity.FileProperties.ContainsKey(folder))
-                        activity.FileProperties[folder] = new Dictionary<string, Dictionary<string, string>>();
+                    if (!activity.FolderWithUpdatedProperties.Contains(folder))
+                        activity.FolderWithUpdatedProperties.Add(folder);
 
-                    if (!activity.FileProperties[folder].ContainsKey(path))
-                        activity.FileProperties[folder][path] = new Dictionary<string, string>();
+                    if (!activity.AddedFileProperties.ContainsKey(path))
+                        activity.AddedFileProperties[path] = new Dictionary<string, string>();
 
-                    if (!activity.FolderProperties.ContainsKey(path))
-                        activity.FolderProperties[folder] = new Dictionary<string, string>();
-
-                    activity.FileProperties[folder][path][property] = value;
+                    activity.AddedFileProperties[path][property] = value;
                     break;
 
                 default:
@@ -299,16 +296,39 @@ namespace SvnBridge.SourceControl
 
         private void ProcessDeleteItem(string activityId, string path)
         {
+            Activity activity = _activities[activityId];
             string localPath = GetLocalPath(activityId, path);
 
             ItemMetaData item = GetItems(-1, path, Recursion.None);
             UpdateLocalVersion(activityId, item, localPath);
 
+            if (item.ItemType != ItemType.Folder)
+            {
+                string folder = GetFolderName(path);
+                FolderProperties properties = ReadPropertiesFile(folder);
+
+                foreach (FileProperties fileProperties in properties.FileProperties)
+                    if (fileProperties.Path == path)
+                        foreach (Property property in fileProperties.Properties)
+                        {
+                            if (!activity.RemovedFileProperties.ContainsKey(path))
+                                activity.RemovedFileProperties[path] = new List<string>();
+
+                            if (!activity.RemovedFileProperties[path].Contains(property.Name))
+                            {
+                                if (!activity.FolderWithUpdatedProperties.Contains(folder))
+                                    activity.FolderWithUpdatedProperties.Add(folder);
+
+                                activity.RemovedFileProperties[path].Add(property.Name);
+                            }
+                        }
+            }
+
             List<PendRequest> pendRequests = new List<PendRequest>();
             pendRequests.Add(PendRequest.Delete(localPath));
             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
 
-            _activities[activityId].MergeList.Add(new ActivityItem(SERVER_PATH + path, item.ItemType));
+            activity.MergeList.Add(new ActivityItem(SERVER_PATH + path, item.ItemType));
         }
 
         public void MakeCollection(string activityId, string path)
@@ -376,49 +396,87 @@ namespace SvnBridge.SourceControl
             }
         }
 
+        private FolderProperties ReadPropertiesFile(string folder)
+        {
+            string path = folder + "/.svnbridge";
+            FolderProperties properties = new FolderProperties();
+            ItemMetaData item = GetItems(-1, path, Recursion.None);
+            if (item != null)
+            {
+                properties = Helper.DeserializeXml<FolderProperties>(ReadFile(item));
+            }
+            return properties;
+        }
+
         void UpdateProperties(string activityId)
         {
             Activity activity = _activities[activityId];
 
-            foreach (KeyValuePair<string, Dictionary<string, string>> folderProperties in activity.FolderProperties)
+            foreach (string folder in activity.FolderWithUpdatedProperties)
             {
-                string path = folderProperties.Key + "/.svnbridge";
-                FolderProperties existingProperties = new FolderProperties();
-                ItemMetaData item = GetItems(-1, path, Recursion.None);
+                string path = folder + "/.svnbridge";
+                FolderProperties existingProperties = ReadPropertiesFile(folder);
 
-                if (item != null)
+                foreach (KeyValuePair<string, Dictionary<string, string>> folderWithNewProperties in activity.AddedFolderProperties)
                 {
-                    byte[] properties = ReadFile(item);
-                    existingProperties = Helper.DeserializeXml<FolderProperties>(properties);
-                }
-
-                foreach (KeyValuePair<string, string> newProperty in folderProperties.Value)
-                {
-                    bool found = false;
-
-                    foreach (Property existingProperty in existingProperties.Properties)
-                        if (newProperty.Key == existingProperty.Name)
-                        {
-                            existingProperty.Value = newProperty.Value;
-                            found = true;
-                        }
-
-                    if (!found)
+                    if (folderWithNewProperties.Key == folder)
                     {
-                        Property addProperty = new Property();
-                        addProperty.Name = newProperty.Key;
-                        addProperty.Value = newProperty.Value;
-                        existingProperties.Properties.Add(addProperty);
+                        foreach (KeyValuePair<string, string> newFolderProperty in folderWithNewProperties.Value)
+                        {
+                            bool found = false;
+
+                            foreach (Property existingProperty in existingProperties.Properties)
+                                if (newFolderProperty.Key == existingProperty.Name)
+                                {
+                                    existingProperty.Value = newFolderProperty.Value;
+                                    found = true;
+                                }
+
+                            if (!found)
+                            {
+                                Property addProperty = new Property();
+                                addProperty.Name = newFolderProperty.Key;
+                                addProperty.Value = newFolderProperty.Value;
+                                existingProperties.Properties.Add(addProperty);
+                            }
+                        }
                     }
                 }
 
-                if (activity.FileProperties.ContainsKey(folderProperties.Key))
-                    foreach (KeyValuePair<string, Dictionary<string, string>> fileProperties in activity.FileProperties[folderProperties.Key])
-                        foreach (KeyValuePair<string, string> fileProperty in fileProperties.Value)
-                            UpdateFileProperty(existingProperties, fileProperties.Key, fileProperty.Key, fileProperty.Value);
+                foreach (KeyValuePair<string, List<string>> folderWithRemovedProperties in activity.RemovedFolderProperties)
+                    if (folderWithRemovedProperties.Key == folder)
+                        foreach (string removedFolderProperty in folderWithRemovedProperties.Value)
+                            for (int i = existingProperties.Properties.Count-1; i >= 0; i--)
+                                if (removedFolderProperty == existingProperties.Properties[i].Name)
+                                    existingProperties.Properties.RemoveAt(i);
+
+                foreach (KeyValuePair<string, Dictionary<string, string>> fileWithNewProperties in activity.AddedFileProperties)
+                {
+                    if (GetFolderName(fileWithNewProperties.Key) == folder)
+                    {
+                        foreach (KeyValuePair<string, string> newFileProperty in fileWithNewProperties.Value)
+                        {
+                            UpdateFileProperty(existingProperties, fileWithNewProperties.Key, newFileProperty.Key, newFileProperty.Value);
+                        }
+                    }
+                }
+
+                foreach (KeyValuePair<string, List<string>> fileWithRemovedProperties in activity.RemovedFileProperties)
+                    if (GetFolderName(fileWithRemovedProperties.Key) == folder)
+                        foreach (string removedFileProperty in fileWithRemovedProperties.Value)
+                            foreach (FileProperties fileProperties in existingProperties.FileProperties)
+                                if (fileProperties.Path == fileWithRemovedProperties.Key)
+                                    for (int i = fileProperties.Properties.Count-1; i >= 0; i--)
+                                        if (fileProperties.Properties[i].Name == removedFileProperty)
+                                            fileProperties.Properties.RemoveAt(i);
 
                 WriteFile(activityId, path, Helper.SerializeXml(existingProperties));
             }
+        }
+
+        private string GetFolderName(string path)
+        {
+            return path.Substring(0, path.LastIndexOf('/'));
         }
 
         public MergeActivityResponse MergeActivity(string activityId)
@@ -430,6 +488,7 @@ namespace SvnBridge.SourceControl
                 ProcessDeleteItem(activityId, path);
 
             UpdateProperties(activityId);
+
             List<string> commitServerList = new List<string>();
             foreach (ActivityItem item in _activities[activityId].MergeList)
             {

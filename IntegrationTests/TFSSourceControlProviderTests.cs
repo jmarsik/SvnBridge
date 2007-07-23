@@ -504,6 +504,19 @@ namespace Tests
             Assert.IsNull(provider.GetItems(-1, testPath + "/TestFolder", Recursion.None));
         }
 
+        [Test]
+        public void TestDeleteFileAlsoDeletesPropertiesOnFile()
+        {
+            string mimeType = "application/octet-stream";
+            string path = testPath + "/TestFile.txt";
+            WriteFile(path, "Fun text", false);
+            SetProperty(path, "mime-type", mimeType, true);
+
+            DeleteItem(testPath + "/TestFile.txt", true);
+
+            FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)
