@@ -37,6 +37,16 @@ namespace SvnBridge.Views.Gui
                 return;
             }
 
+            if (Helper.IsPortInUse(int.Parse(txtPortNumber.Text)))
+            {
+                MessageBox.Show(
+                    "The port number appears to already be in use. Please choose a different port.",
+                    "SvnBridge", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtPortNumber.Focus();
+                txtPortNumber.SelectAll();
+                return;
+            }
+
             if (!Helper.IsValidUrl(txtTFSServer.Text))
             {
                 MessageBox.Show("The TFS Server URL does not appear to be valid.", "SvnBridge", MessageBoxButtons.OK,

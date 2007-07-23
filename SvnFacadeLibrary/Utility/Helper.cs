@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Net.Sockets;
 
 namespace SvnBridge.Utility
 {
@@ -56,6 +57,22 @@ namespace SvnBridge.Utility
         public static bool IsValidPort(int port)
         {
             return (port >= 1 && port <= 65535);
+        }
+
+        public static bool IsPortInUse(int port)
+        {
+            bool inUse = false;
+            TcpListener listener = new TcpListener(IPAddress.Any, port);
+            try
+            {
+                listener.Start();
+            }
+            catch (SocketException)
+            {
+                inUse = true;
+            }
+            listener.Stop();
+            return inUse;
         }
 
         public static bool IsValidTFSUrl(string url)
