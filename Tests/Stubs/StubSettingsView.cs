@@ -16,6 +16,7 @@ namespace SvnBridge.Stubs
         public SettingsViewPresenter Presenter
         {
             set { Set_Presenter = value; }
+            get { return Set_Presenter; }
         }
 
         public void Show()

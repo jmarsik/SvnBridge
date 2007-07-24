@@ -32,7 +32,7 @@ namespace SvnBridge.Presenters
 
             settingsViewPresenter.Show();
 
-            if (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsServerUrl))
+            if ((!settingsViewPresenter.Cancelled) && (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsServerUrl)))
             {
                 ApplyNewSettings(settingsViewPresenter.Port, settingsViewPresenter.TfsServerUrl);
             }

@@ -144,5 +144,25 @@ namespace SvnBridge.Presenters
             Assert.True(stubListener.Stop_Called);
             Assert.True(stubListener.Start_Called);
         }
+
+        [Test]
+        public void TestCancelChangeSettingsDoesntStopListener()
+        {
+            stubListener.Get_Port = 8081;
+            stubListener.Get_TfsServerUrl = "http://foo";
+            ListenerViewPresenter presenter = CreatePresenter();
+            StubSettingsView stubSettingsView = new StubSettingsView();
+            stubSettingsView.Show_Delegate =
+                delegate
+                {
+                    stubSettingsView.Set_Presenter.Port = 8082;
+                    stubSettingsView.Set_Presenter.TfsServerUrl = "http://foo";
+                    stubSettingsView.Presenter.Cancelled = true;
+                };
+
+            presenter.ChangeSettings(stubSettingsView);
+
+            Assert.False(stubListener.Stop_Called);
+        }
     }
 }
