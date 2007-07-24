@@ -178,13 +178,14 @@ namespace SvnBridge.Utility
             return value;
         }
 
-        static readonly string[] DECODED_B = new string[] { "&" };
-        static readonly string[] ENCODED_B = new string[] { "&amp;" };
+        static readonly string[] DECODED_B = new string[] { "&", "<", ">" };
+        static readonly string[] ENCODED_B = new string[] { "&amp;", "&lt;", "&gt;" };
 
         public static string EncodeB(string value)
         {
-            for (int i = 0; i < DECODED_B.Length; i++)
-                value = value.Replace(DECODED_B[i], ENCODED_B[i]);
+            if (value != null)
+                for (int i = 0; i < DECODED_B.Length; i++)
+                    value = value.Replace(DECODED_B[i], ENCODED_B[i]);
 
             return value;
         }

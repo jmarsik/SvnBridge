@@ -309,9 +309,7 @@ namespace SvnBridge.Handlers
             output.Write("</S:update-report>\n");
         }
 
-        public void LogReport(LogReportData logreport,
-                              string path,
-                              StreamWriter output)
+        public void LogReport(LogReportData logreport, string path, StreamWriter output)
         {
             string serverPath = path.Substring(9);
             serverPath = serverPath.Substring(serverPath.IndexOf('/'));
@@ -326,7 +324,7 @@ namespace SvnBridge.Handlers
                 output.Write("<D:version-name>" + history.ChangeSetID + "</D:version-name>\n");
                 output.Write("<D:creator-displayname>" + history.Username + "</D:creator-displayname>\n");
                 output.Write("<S:date>" + FormatDate(history.CommitDateTime) + "</S:date>\n");
-                output.Write("<D:comment>" + history.Comment + "</D:comment>\n");
+                output.Write("<D:comment>" + Helper.EncodeB(history.Comment) + "</D:comment>\n");
 
                 foreach (SourceItemChange change in history.Changes)
                 {

@@ -68,6 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowLogSingleFolderWithAddEditDelete.cs" />
     <Compile Include="ShowLogSingleFolderWithOneFile.cs" />
+    <Compile Include="ShowLogWithSpecialCharactersInComments.cs" />
     <Compile Include="UpdateAfterCommitFileDeleteTest.cs" />
     <Compile Include="UpdateAfterCommitNewFolderTest.cs" />
     <Compile Include="UpdateAfterCommitRenamedFile.cs" />

@@ -1,15 +1,15 @@
 using System;
-using System.Collections.Generic;
 using CodePlex.TfsLibrary;
-using CodePlex.TfsLibrary.ObjectModel;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using SvnBridge.SourceControl;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
+using CodePlex.TfsLibrary.ObjectModel;
+using System.Collections.Generic;
 
 namespace Tests
 {
     [TestFixture]
-    public class ShowLogSingleFolderWithAddEditDeleteTest : WebDavServiceTestsBase
+    public class ShowLogWithSpecialCharactersInCommentsTest : WebDavServiceTestsBase
     {
         [Test]
         public void Test1()
@@ -17,7 +17,7 @@ namespace Tests
             mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
+                "PROPFIND /newFolder2 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Keep-Alive: \r\n" +
@@ -33,7 +33,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 401 Authorization Required\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:51 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:48 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "WWW-Authenticate: Basic realm=\"CodePlex Subversion Repository\"\r\n" +
                 "Content-Length: 493\r\n" +
@@ -67,11 +67,11 @@ namespace Tests
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
-            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.Name = "newFolder2";
             mock.Attach(provider.GetItems, item);
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
+                "PROPFIND /newFolder2 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Keep-Alive: \r\n" +
@@ -88,9 +88,9 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:51 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:51 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 732\r\n" +
+                "Content-Length: 678\r\n" +
                 "Keep-Alive: timeout=15, max=99\r\n" +
                 "Connection: Keep-Alive\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -98,12 +98,12 @@ namespace Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/Spikes/SvnFacade/trunk/New%20Folder%205/</D:href>\n" +
+                "<D:href>/newFolder2/</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
                 "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
                 "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n" +
-                "<lp2:baseline-relative-path>Spikes/SvnFacade/trunk/New Folder 5</lp2:baseline-relative-path>\n" +
+                "<lp2:baseline-relative-path>newFolder2</lp2:baseline-relative-path>\n" +
                 "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
@@ -119,7 +119,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.GetLatestVersion, 5465);
+            mock.Attach(provider.GetLatestVersion, 5527);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -138,7 +138,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:51 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 383\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -149,7 +149,7 @@ namespace Tests
                 "<D:href>/!svn/vcc/default</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:checked-in><D:href>/!svn/bln/5465</D:href></lp1:checked-in>\n" +
+                "<lp1:checked-in><D:href>/!svn/bln/5527</D:href></lp1:checked-in>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -165,7 +165,7 @@ namespace Tests
         public void Test4()
         {
             string request =
-                "PROPFIND /!svn/bln/5465 HTTP/1.1\r\n" +
+                "PROPFIND /!svn/bln/5527 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Connection: TE\r\n" +
@@ -181,7 +181,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:51 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 440\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -189,11 +189,11 @@ namespace Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/!svn/bln/5465</D:href>\n" +
+                "<D:href>/!svn/bln/5527</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:baseline-collection><D:href>/!svn/bc/5465/</D:href></lp1:baseline-collection>\n" +
-                "<lp1:version-name>5465</lp1:version-name>\n" +
+                "<lp1:baseline-collection><D:href>/!svn/bc/5527/</D:href></lp1:baseline-collection>\n" +
+                "<lp1:version-name>5527</lp1:version-name>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -211,11 +211,11 @@ namespace Tests
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
-            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.Name = "newFolder2";
             mock.Attach(provider.GetItems, item);
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
+                "PROPFIND /newFolder2 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Connection: TE\r\n" +
@@ -231,20 +231,20 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:51 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 732\r\n" +
+                "Content-Length: 678\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
                 "\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/Spikes/SvnFacade/trunk/New%20Folder%205/</D:href>\n" +
+                "<D:href>/newFolder2/</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
                 "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
                 "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n" +
-                "<lp2:baseline-relative-path>Spikes/SvnFacade/trunk/New Folder 5</lp2:baseline-relative-path>\n" +
+                "<lp2:baseline-relative-path>newFolder2</lp2:baseline-relative-path>\n" +
                 "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
@@ -260,7 +260,7 @@ namespace Tests
         [Test]
         public void Test6()
         {
-            mock.Attach(provider.GetLatestVersion, 5465);
+            mock.Attach(provider.GetLatestVersion, 5527);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -279,7 +279,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:52 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 383\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -290,7 +290,7 @@ namespace Tests
                 "<D:href>/!svn/vcc/default</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:checked-in><D:href>/!svn/bln/5465</D:href></lp1:checked-in>\n" +
+                "<lp1:checked-in><D:href>/!svn/bln/5527</D:href></lp1:checked-in>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -306,7 +306,7 @@ namespace Tests
         public void Test7()
         {
             string request =
-                "PROPFIND /!svn/bln/5465 HTTP/1.1\r\n" +
+                "PROPFIND /!svn/bln/5527 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Connection: TE\r\n" +
@@ -322,7 +322,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:52 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 440\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -330,11 +330,11 @@ namespace Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/!svn/bln/5465</D:href>\n" +
+                "<D:href>/!svn/bln/5527</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:baseline-collection><D:href>/!svn/bc/5465/</D:href></lp1:baseline-collection>\n" +
-                "<lp1:version-name>5465</lp1:version-name>\n" +
+                "<lp1:baseline-collection><D:href>/!svn/bc/5527/</D:href></lp1:baseline-collection>\n" +
+                "<lp1:version-name>5527</lp1:version-name>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -352,7 +352,7 @@ namespace Tests
             mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
+                "PROPFIND /newFolder2 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Keep-Alive: \r\n" +
@@ -368,7 +368,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 401 Authorization Required\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:52 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "WWW-Authenticate: Basic realm=\"CodePlex Subversion Repository\"\r\n" +
                 "Content-Length: 493\r\n" +
@@ -402,11 +402,11 @@ namespace Tests
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
-            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.Name = "newFolder2";
             mock.Attach(provider.GetItems, item);
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
+                "PROPFIND /newFolder2 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Keep-Alive: \r\n" +
@@ -423,9 +423,9 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:52 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 732\r\n" +
+                "Content-Length: 678\r\n" +
                 "Keep-Alive: timeout=15, max=99\r\n" +
                 "Connection: Keep-Alive\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -433,12 +433,12 @@ namespace Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/Spikes/SvnFacade/trunk/New%20Folder%205/</D:href>\n" +
+                "<D:href>/newFolder2/</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
                 "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
                 "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n" +
-                "<lp2:baseline-relative-path>Spikes/SvnFacade/trunk/New Folder 5</lp2:baseline-relative-path>\n" +
+                "<lp2:baseline-relative-path>newFolder2</lp2:baseline-relative-path>\n" +
                 "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
@@ -454,7 +454,7 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.GetLatestVersion, 5465);
+            mock.Attach(provider.GetLatestVersion, 5527);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -473,7 +473,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:52 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 383\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -484,7 +484,7 @@ namespace Tests
                 "<D:href>/!svn/vcc/default</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:checked-in><D:href>/!svn/bln/5465</D:href></lp1:checked-in>\n" +
+                "<lp1:checked-in><D:href>/!svn/bln/5527</D:href></lp1:checked-in>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -500,7 +500,7 @@ namespace Tests
         public void Test11()
         {
             string request =
-                "PROPFIND /!svn/bln/5465 HTTP/1.1\r\n" +
+                "PROPFIND /!svn/bln/5527 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Connection: TE\r\n" +
@@ -516,7 +516,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:52 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 440\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -524,11 +524,11 @@ namespace Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/!svn/bln/5465</D:href>\n" +
+                "<D:href>/!svn/bln/5527</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:baseline-collection><D:href>/!svn/bc/5465/</D:href></lp1:baseline-collection>\n" +
-                "<lp1:version-name>5465</lp1:version-name>\n" +
+                "<lp1:baseline-collection><D:href>/!svn/bc/5527/</D:href></lp1:baseline-collection>\n" +
+                "<lp1:version-name>5527</lp1:version-name>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -546,11 +546,11 @@ namespace Tests
             mock.Attach(provider.ItemExists, true);
             mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
-            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.Name = "newFolder2";
             mock.Attach(provider.GetItems, item);
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
+                "PROPFIND /newFolder2 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Connection: TE\r\n" +
@@ -566,20 +566,20 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:53 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 732\r\n" +
+                "Content-Length: 678\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
                 "\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/Spikes/SvnFacade/trunk/New%20Folder%205/</D:href>\n" +
+                "<D:href>/newFolder2/</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
                 "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
                 "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n" +
-                "<lp2:baseline-relative-path>Spikes/SvnFacade/trunk/New Folder 5</lp2:baseline-relative-path>\n" +
+                "<lp2:baseline-relative-path>newFolder2</lp2:baseline-relative-path>\n" +
                 "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
@@ -603,7 +603,7 @@ namespace Tests
                 "TE: trailers\r\n" +
                 "Content-Length: 148\r\n" +
                 "Content-Type: text/xml\r\n" +
-                "Label: 5465\r\n" +
+                "Label: 5527\r\n" +
                 "Depth: 0\r\n" +
                 "Accept-Encoding: gzip\r\n" +
                 "Accept-Encoding: gzip\r\n" +
@@ -613,7 +613,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:53 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:54 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Vary: Label\r\n" +
                 "Content-Length: 440\r\n" +
@@ -622,11 +622,11 @@ namespace Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/!svn/bln/5465</D:href>\n" +
+                "<D:href>/!svn/bln/5527</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:baseline-collection><D:href>/!svn/bc/5465/</D:href></lp1:baseline-collection>\n" +
-                "<lp1:version-name>5465</lp1:version-name>\n" +
+                "<lp1:baseline-collection><D:href>/!svn/bc/5527/</D:href></lp1:baseline-collection>\n" +
+                "<lp1:version-name>5527</lp1:version-name>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -642,31 +642,58 @@ namespace Tests
         public void Test14()
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
-
-            SourceItemHistory history1 = new SourceItemHistory(5395, "jwanagel", DateTime.Parse("2007-05-16T05:21:26.302105Z"), "Deleted a file");
-            history1.Changes.Add(MakeChange(ChangeType.Delete, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            string comment = "*bold*\n" +
+                "_italics_\n" +
+                "+underline+\n" +
+                "\n" +
+                "[file:Book1.xlsx]\n" +
+                "\n" +
+                "[url:http://codeplexlab/]\n" +
+                "\n" +
+                "<script language=’javascript’>alert(‘hi’);</script>\n" +
+                "\n" +
+                "// links to a specific thread\n" +
+                "[thread:425]\n" +
+                "[thread:Friendly Text|425]\n" +
+                "\n" +
+                "// links to a specific release\n" +
+                "[release:1037]\n" +
+                "[release:Friendly Text|1037]\n" +
+                "\n" +
+                "[Discussion: 426]\n" +
+                "[Discussion:Friendly Name|426]\n" +
+                "\n" +
+                "[workitem:778]\n" +
+                "[workitem:Friendly Name to work item|778]\n" +
+                "\n" +
+                "! Heading 1 \n" +
+                "!! Heading 2\n" +
+                "!!! Heading 3\n" +
+                "!!!! Heading 4\n" +
+                "!!!!! Heading 5\n" +
+                "!!!!!! Heading 6\n" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "Source Code Mark up\n" +
+                "\n" +
+                "\n" +
+                "// multi-line\n" +
+                "{{ \n" +
+                "public static void Main()\n" +
+                "{ \n" +
+                "// code goes here \n" +
+                "}\n" +
+                "}}\n" +
+                "";
+            SourceItemHistory history1 = new SourceItemHistory(5527, "jwanagel", DateTime.Parse("2007-07-24T05:18:15.864583Z"), comment);
+            history1.Changes.Add(MakeChange(ChangeType.Add, "$/newFolder2"));
             histories.Add(history1);
 
-            SourceItemHistory history2 = new SourceItemHistory(5394, "jwanagel", DateTime.Parse("2007-05-16T04:37:37.958355Z"), "Added another line");
-            history2.Changes.Add(MakeChange(ChangeType.Edit, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
-            histories.Add(history2);
-
-            SourceItemHistory history3 = new SourceItemHistory(5393, "jwanagel", DateTime.Parse("2007-05-16T04:17:42.098980Z"), "Updated a file");
-            history3.Changes.Add(MakeChange(ChangeType.Edit, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
-            histories.Add(history3);
-
-            SourceItemHistory history4 = new SourceItemHistory(5392, "jwanagel", DateTime.Parse("2007-05-16T04:16:43.911480Z"), "Added new file");
-            history4.Changes.Add(MakeChange(ChangeType.Add, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
-            histories.Add(history4);
-
-            SourceItemHistory history5 = new SourceItemHistory(5390, "jwanagel", DateTime.Parse("2007-05-14T00:05:54.910225Z"), "Adding New Folder 5");
-            history5.Changes.Add(MakeChange(ChangeType.Add, "$/Spikes/SvnFacade/trunk/New Folder 5"));
-            histories.Add(history5);
-
-            mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/Spikes/SvnFacade/trunk", histories.ToArray()));
+            mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder2", histories.ToArray()));
 
             string request =
-                "REPORT /!svn/bc/5465/Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +
+                "REPORT /!svn/bc/5527/newFolder2 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +
                 "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
                 "Connection: TE\r\n" +
@@ -677,59 +704,73 @@ namespace Tests
                 "Accept-Encoding: gzip\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
                 "\r\n" +
-                "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5465</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
+                "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5527</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
 
             string expected =
                 "HTTP/1.1 200 OK\r\n" +
-                "Date: Mon, 11 Jun 2007 23:14:53 GMT\r\n" +
+                "Date: Tue, 24 Jul 2007 05:18:54 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Transfer-Encoding: chunked\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
                 "\r\n" +
-                "5eb\r\n" +
+                "397\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<S:log-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
                 "<S:log-item>\n" +
-                "<D:version-name>5395</D:version-name>\n" +
+                "<D:version-name>5527</D:version-name>\n" +
                 "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
-                "<S:date>2007-05-16T05:21:26.302105Z</S:date>\n" +
-                "<D:comment>Deleted a file</D:comment>\n" +
-                "<S:deleted-path>/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt</S:deleted-path>\n" +
-                "</S:log-item>\n" +
-                "<S:log-item>\n" +
-                "<D:version-name>5394</D:version-name>\n" +
-                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
-                "<S:date>2007-05-16T04:37:37.958355Z</S:date>\n" +
-                "<D:comment>Added another line</D:comment>\n" +
-                "<S:modified-path>/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt</S:modified-path>\n" +
-                "</S:log-item>\n" +
-                "<S:log-item>\n" +
-                "<D:version-name>5393</D:version-name>\n" +
-                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
-                "<S:date>2007-05-16T04:17:42.098980Z</S:date>\n" +
-                "<D:comment>Updated a file</D:comment>\n" +
-                "<S:modified-path>/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt</S:modified-path>\n" +
-                "</S:log-item>\n" +
-                "<S:log-item>\n" +
-                "<D:version-name>5392</D:version-name>\n" +
-                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
-                "<S:date>2007-05-16T04:16:43.911480Z</S:date>\n" +
-                "<D:comment>Added new file</D:comment>\n" +
-                "<S:added-path>/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt</S:added-path>\n" +
-                "</S:log-item>\n" +
-                "<S:log-item>\n" +
-                "<D:version-name>5390</D:version-name>\n" +
-                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
-                "<S:date>2007-05-14T00:05:54.910225Z</S:date>\n" +
-                "<D:comment>Adding New Folder 5</D:comment>\n" +
-                "<S:added-path>/Spikes/SvnFacade/trunk/New Folder 5</S:added-path>\n" +
+                "<S:date>2007-07-24T05:18:15.864583Z</S:date>\n" +
+                "<D:comment>*bold*\n" +
+                "_italics_\n" +
+                "+underline+\n" +
+                "\n" +
+                "[file:Book1.xlsx]\n" +
+                "\n" +
+                "[url:http://codeplexlab/]\n" +
+                "\n" +
+                "&lt;script language=’javascript’&gt;alert(‘hi’);&lt;/script&gt;\n" +
+                "\n" +
+                "// links to a specific thread\n" +
+                "[thread:425]\n" +
+                "[thread:Friendly Text|425]\n" +
+                "\n" +
+                "// links to a specific release\n" +
+                "[release:1037]\n" +
+                "[release:Friendly Text|1037]\n" +
+                "\n" +
+                "[Discussion: 426]\n" +
+                "[Discussion:Friendly Name|426]\n" +
+                "\n" +
+                "[workitem:778]\n" +
+                "[workitem:Friendly Name to work item|778]\n" +
+                "\n" +
+                "! Heading 1 \n" +
+                "!! Heading 2\n" +
+                "!!! Heading 3\n" +
+                "!!!! Heading 4\n" +
+                "!!!!! Heading 5\n" +
+                "!!!!!! Heading 6\n" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "Source Code Mark up\n" +
+                "\n" +
+                "\n" +
+                "// multi-line\n" +
+                "{{ \n" +
+                "public static void Main()\n" +
+                "{ \n" +
+                "// code goes here \n" +
+                "}\n" +
+                "}}\n" +
+                "</D:comment>\n" +
+                "<S:added-path>/newFolder2</S:added-path>\n" +
                 "</S:log-item>\n" +
                 "</S:log-report>\n" +
                 "\r\n" +
                 "0\r\n" +
                 "\r\n";
 
-            SetChunks(new int[] { 0x5eb });
             string actual = ProcessRequest(request, expected);
 
             Assert.AreEqual(expected, actual);

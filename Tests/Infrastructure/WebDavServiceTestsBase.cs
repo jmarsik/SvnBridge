@@ -10,6 +10,8 @@ using SvnBridge.RequestReceiver;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 using Tests.Infrastructure;
+using CodePlex.TfsLibrary.ObjectModel;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace Tests
 {
@@ -54,6 +56,14 @@ namespace Tests
             {
                 result[i] = (byte)data[i];
             }
+            return result;
+        }
+
+        protected SourceItemChange MakeChange(ChangeType changeType, string serverPath)
+        {
+            SourceItemChange result = new SourceItemChange();
+            result.Item = SourceItem.FromRemoteItem(0, ItemType.Folder, serverPath, 0, 0, DateTime.Now, null);
+            result.ChangeType = changeType;
             return result;
         }
 
