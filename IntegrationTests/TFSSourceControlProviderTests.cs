@@ -517,6 +517,25 @@ namespace Tests
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, testPath, Recursion.OneLevel);
         }
 
+        [Test]
+        public void TestGetChangedItemsWithRenamedFile()
+        {
+            WriteFile(testPath + "/Fun.txt", "Fun text", true);
+            int versionFrom = provider.GetLatestVersion();
+            MoveItem(testPath + "/Fun.txt", testPath + "/FunRename.txt", true);
+            int versionTo = provider.GetLatestVersion();
+
+            UpdateReportData reportData = new UpdateReportData();
+            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(testPath.Substring(1), folder.Name);
+            Assert.AreEqual(2, folder.Items.Count);
+            Assert.AreEqual(testPath.Substring(1) + "/Fun.txt", folder.Items[0].Name);
+            Assert.IsTrue(folder.Items[0] is DeleteMetaData);
+            Assert.AreEqual(testPath.Substring(1) + "/FunRename.txt", folder.Items[1].Name);
+            Assert.IsTrue(folder.Items[1] is ItemMetaData);
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)
@@ -556,6 +575,21 @@ namespace Tests
                         bool commit)
         {
             provider.DeleteItem(activityId, path);
+            if (commit)
+                Commit();
+        }
+
+        void CopyItem(string path, string newPath, bool commit)
+        {
+            provider.CopyItem(activityId, path, newPath);
+            if (commit)
+                Commit();
+        }
+
+        void MoveItem(string path, string newPath, bool commit)
+        {
+            DeleteItem(path, false);
+            CopyItem(testPath + "/Fun.txt", testPath + "/FunRename.txt", false);
             if (commit)
                 Commit();
         }

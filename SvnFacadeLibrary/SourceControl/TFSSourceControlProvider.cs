@@ -556,9 +556,7 @@ namespace SvnBridge.SourceControl
             return _sourceControlSvc.QueryLog(_serverUrl, _credentials, serverPath, changesetFrom, changesetTo, recursionType, maxCount);
         }
 
-        public ItemMetaData GetItems(int version,
-                                     string path,
-                                     Recursion recursion)
+        public ItemMetaData GetItems(int version, string path, Recursion recursion)
         {
             Dictionary<string, FolderProperties> properties = new Dictionary<string, FolderProperties>();
             RecursionType recursionType = RecursionType.None;
@@ -583,23 +581,7 @@ namespace SvnBridge.SourceControl
             ItemMetaData firstItem = null;
             for (int i = 0; i < items.Length; i++)
             {
-                ItemMetaData item;
-                if (items[i].ItemType == ItemType.Folder)
-                {
-                    item = new FolderMetaData();
-                    item.ItemType = ItemType.Folder;
-                }
-                else
-                {
-                    item = new ItemMetaData();
-                    item.ItemType = ItemType.File;
-                }
-                item.Id = items[i].ItemId;
-                item.Name = items[i].RemoteName.Substring(2);
-                item.Author = "unknown";
-                item.LastModifiedDate = items[i].RemoteDate;
-                item.Revision = items[i].RemoteChangesetId;
-                item.DownloadUrl = items[i].DownloadUrl;
+                ItemMetaData item = ConvertSourceItem(items[i]);
                 if (item.ItemType == ItemType.Folder)
                 {
                     folders[item.Name.ToLower()] = (FolderMetaData)item;
@@ -630,6 +612,28 @@ namespace SvnBridge.SourceControl
             }
             SetProperties(folders, properties);
             return firstItem;
+        }
+
+        private ItemMetaData ConvertSourceItem(SourceItem sourceItem)
+        {
+            ItemMetaData item;
+            if (sourceItem.ItemType == ItemType.Folder)
+            {
+                item = new FolderMetaData();
+                item.ItemType = ItemType.Folder;
+            }
+            else
+            {
+                item = new ItemMetaData();
+                item.ItemType = ItemType.File;
+            }
+            item.Id = sourceItem.ItemId;
+            item.Name = sourceItem.RemoteName.Substring(2);
+            item.Author = "unknown";
+            item.LastModifiedDate = sourceItem.RemoteDate;
+            item.Revision = sourceItem.RemoteChangesetId;
+            item.DownloadUrl = sourceItem.DownloadUrl;
+            return item;
         }
 
         static void SetProperties(Dictionary<string, FolderMetaData> folders,
@@ -703,72 +707,21 @@ namespace SvnBridge.SourceControl
                             {
                                 if (!IsChangeAlreadyCurrentInClientState(change, clientExistingFiles, clientDeletedFiles))
                                 {
-                                    string folderName = path.Substring(1);
-                                    FolderMetaData folder = root;
-                                    for (int i = 0; i < nameParts.Length; i++)
-                                    {
-                                        folderName += "/" + nameParts[i];
-                                        ItemMetaData item = FindItem(folder, folderName);
-                                        if (item == null)
-                                        {
-                                            if ((i == nameParts.Length - 1) && (change.Item.ItemType == ItemType.File))
-                                                item = GetItems(versionTo, change.Item.RemoteName.Substring(2), Recursion.None);
-                                            else
-                                                item = GetItems(versionTo, folderName, Recursion.None);
-
-                                            folder.Items.Add(item);
-                                        }
-                                        if (i != nameParts.Length - 1)
-                                        {
-                                            folder = (FolderMetaData)item;
-                                        }
-                                    }
+                                    ProcessAddedFile(path, change, root, versionTo);
                                 }
                             }
                             else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
                             {
                                 if (!IsChangeAlreadyCurrentInClientState(change, clientExistingFiles, clientDeletedFiles))
                                 {
-                                    string folderName = path.Substring(1);
-                                    FolderMetaData folder = root;
-                                    for (int i = 0; i < nameParts.Length; i++)
-                                    {
-                                        folderName += "/" + nameParts[i];
-                                        ItemMetaData item = FindItem(folder, nameParts[i]);
-                                        if (item == null)
-                                        {
-                                            if (i == nameParts.Length - 1)
-                                            {
-                                                if (change.Item.ItemType == ItemType.File)
-                                                {
-                                                    item = new DeleteMetaData();
-                                                    item.ItemType = ItemType.File;
-                                                }
-                                                else
-                                                {
-                                                    item = new DeleteFolderMetaData();
-                                                    item.ItemType = ItemType.Folder;
-                                                }
-                                                item.Name = change.Item.RemoteName.Substring(2);
-                                            }
-                                            else
-                                            {
-                                                item = GetItems(versionTo, folderName, Recursion.None);
-                                                if (item == null)
-                                                {
-                                                    item = new DeleteFolderMetaData();
-                                                    item.ItemType = ItemType.Folder;
-                                                    item.Name = folderName;
-                                                }
-                                            }
-                                            folder.Items.Add(item);
-                                            if (i != nameParts.Length - 1)
-                                            {
-                                                folder = (FolderMetaData)item;
-                                            }
-                                        }
-                                    }
+                                    ProcessDeletedFile(path, change.Item.RemoteName, change, root, versionTo);
                                 }
+                            }
+                            else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
+                            {
+                                ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
+                                ProcessDeletedFile(path, "$/" + oldItem.Name, change, root, versionTo);
+                                ProcessAddedFile(path, change, root, versionTo);
                             }
                             else
                             {
@@ -780,6 +733,83 @@ namespace SvnBridge.SourceControl
             }
 
             return root;
+        }
+
+        private void ProcessDeletedFile(string path, string remoteName, SourceItemChange change, FolderMetaData root, int versionTo)
+        {
+            string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
+            string changePath = remoteName.Substring(1);
+            string folderName = path.Substring(1);
+            FolderMetaData folder = root;
+            for (int i = 0; i < nameParts.Length; i++)
+            {
+                folderName += "/" + nameParts[i];
+                ItemMetaData item = FindItem(folder, nameParts[i]);
+                if (item == null)
+                {
+                    if (i == nameParts.Length - 1)
+                    {
+                        if (change.Item.ItemType == ItemType.File)
+                        {
+                            item = new DeleteMetaData();
+                            item.ItemType = ItemType.File;
+                        }
+                        else
+                        {
+                            item = new DeleteFolderMetaData();
+                            item.ItemType = ItemType.Folder;
+                        }
+                        item.Name = remoteName.Substring(2);
+                    }
+                    else
+                    {
+                        item = GetItems(versionTo, folderName, Recursion.None);
+                        if (item == null)
+                        {
+                            item = new DeleteFolderMetaData();
+                            item.ItemType = ItemType.Folder;
+                            item.Name = folderName;
+                        }
+                    }
+                    folder.Items.Add(item);
+                    if (i != nameParts.Length - 1)
+                    {
+                        folder = (FolderMetaData)item;
+                    }
+                }
+            }
+        }
+
+        private void ProcessAddedFile(string path, SourceItemChange change, FolderMetaData root, int versionTo)
+        {
+            string[] nameParts = change.Item.RemoteName.Substring(2 + path.Length).Split('/');
+            string changePath = change.Item.RemoteName.Substring(1);
+            string folderName = path.Substring(1);
+            FolderMetaData folder = root;
+            for (int i = 0; i < nameParts.Length; i++)
+            {
+                folderName += "/" + nameParts[i];
+                ItemMetaData item = FindItem(folder, folderName);
+                if (item == null)
+                {
+                    if ((i == nameParts.Length - 1) && (change.Item.ItemType == ItemType.File))
+                        item = GetItems(versionTo, change.Item.RemoteName.Substring(2), Recursion.None);
+                    else
+                        item = GetItems(versionTo, folderName, Recursion.None);
+
+                    folder.Items.Add(item);
+                }
+                if (i != nameParts.Length - 1)
+                {
+                    folder = (FolderMetaData)item;
+                }
+            }
+        }
+
+        private ItemMetaData GetItem(int version, int itemId)
+        {
+            SourceItem[] items = _sourceControlSvc.QueryItems(_serverUrl, _credentials, new int[] { itemId }, version);
+            return ConvertSourceItem(items[0]);
         }
 
         private bool IsChangeAlreadyCurrentInClientState(SourceItemChange change,
