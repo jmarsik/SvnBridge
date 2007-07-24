@@ -115,14 +115,9 @@ namespace Tests
             return base.Attach((Delegate)method, (object)returnValue);
         }
 
-        public delegate LogItem GetLog(string path,
-                                       int versionFrom,
-                                       int versionTo,
-                                       Recursion recursion,
-                                       int maxCount);
+        public delegate LogItem GetLog(string path, int versionFrom, int versionTo, Recursion recursion, int maxCount);
 
-        public Results Attach(GetLog method,
-                              LogItem returnValue)
+        public Results Attach(GetLog method, LogItem returnValue)
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }

@@ -334,6 +334,12 @@ namespace SvnBridge.Handlers
                         output.Write("<S:modified-path>" + change.Item.RemoteName.Substring(1) + "</S:modified-path>\n");
                     else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
                         output.Write("<S:deleted-path>" + change.Item.RemoteName.Substring(1) + "</S:deleted-path>\n");
+                    else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
+                    {
+                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
+                        output.Write("<S:added-path copyfrom-path=\"" + renamedItem.OriginalRemoteName.Substring(1) + "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">" + change.Item.RemoteName.Substring(1) + "</S:added-path>\n");
+                        output.Write("<S:deleted-path>" + renamedItem.OriginalRemoteName.Substring(1) + "</S:deleted-path>\n");
+                    }
                     else
                         throw new InvalidOperationException("Unrecognized change type " + change.ChangeType);
                 }

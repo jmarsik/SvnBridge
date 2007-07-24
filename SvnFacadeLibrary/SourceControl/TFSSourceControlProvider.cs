@@ -535,6 +535,7 @@ namespace SvnBridge.SourceControl
                               int versionTo,
                               Recursion recursion,
                               int maxCount)
+//                              bool getOriginalNames)
         {
             string serverPath = SERVER_PATH + path.Substring(1);
             RecursionType recursionType = RecursionType.None;
@@ -553,7 +554,18 @@ namespace SvnBridge.SourceControl
             ChangesetVersionSpec changesetTo = new ChangesetVersionSpec();
             changesetTo.cs = versionTo;
 
-            return _sourceControlSvc.QueryLog(_serverUrl, _credentials, serverPath, changesetFrom, changesetTo, recursionType, maxCount);
+            LogItem logItem = _sourceControlSvc.QueryLog(_serverUrl, _credentials, serverPath, changesetFrom, changesetTo, recursionType, maxCount);
+
+            foreach (SourceItemHistory history in logItem.History)
+                foreach (SourceItemChange change in history.Changes)
+                    if (true)
+                        if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
+                        {
+                            ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
+                            change.Item = new RenamedSourceItem(change.Item, SERVER_PATH + oldItem.Name, oldItem.Revision);
+                        }
+
+            return logItem;
         }
 
         public ItemMetaData GetItems(int version, string path, Recursion recursion)

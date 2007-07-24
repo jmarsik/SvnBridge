@@ -536,6 +536,21 @@ namespace Tests
             Assert.IsTrue(folder.Items[1] is ItemMetaData);
         }
 
+        [Test]
+        public void TestGetLogReturnsOriginalNameAndRevisionForRenamedItems()
+        {
+            WriteFile(testPath + "/Fun.txt", "Fun text", true);
+            int versionFrom = provider.GetLatestVersion();
+            MoveItem(testPath + "/Fun.txt", testPath + "/FunRename.txt", true);
+            int versionTo = provider.GetLatestVersion();
+
+            LogItem logItem = provider.GetLog(testPath + "/FunRename.txt", versionFrom, versionTo, Recursion.None, 1);
+
+            Assert.AreEqual(testPath + "/Fun.txt", ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRemoteName.Substring(1));
+            Assert.AreEqual(versionFrom, ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRevision);
+            Assert.AreEqual(testPath + "/FunRename.txt", logItem.History[0].Changes[0].Item.RemoteName.Substring(1));
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)

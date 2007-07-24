@@ -61,10 +61,12 @@ namespace Tests
 
         protected SourceItemChange MakeChange(ChangeType changeType, string serverPath)
         {
-            SourceItemChange result = new SourceItemChange();
-            result.Item = SourceItem.FromRemoteItem(0, ItemType.Folder, serverPath, 0, 0, DateTime.Now, null);
-            result.ChangeType = changeType;
-            return result;
+            return TestHelper.MakeChange(changeType, serverPath);
+        }
+
+        protected SourceItemChange MakeChange(ChangeType changeType, string serverPath, string originalPath, int originalRevision)
+        {
+            return TestHelper.MakeChange(changeType, serverPath, originalPath, originalRevision);
         }
 
         protected void SetChunks(int[] chunks)

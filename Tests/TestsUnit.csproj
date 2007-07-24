@@ -67,7 +67,9 @@
     <Compile Include="Assert\TrueException.cs" />
     <Compile Include="FileNodeTests.cs" />
     <Compile Include="Handlers\CopyHandlerTests.cs" />
+    <Compile Include="Handlers\ReportLogHandlerTests.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
+    <Compile Include="Infrastructure\TestHelper.cs" />
     <Compile Include="Presenters\SettingsViewPresenterTests.cs" />
     <Compile Include="RequestReceiver\TcpClientRequestReceiverTest.cs" />
     <Compile Include="DeleteTests.cs" />

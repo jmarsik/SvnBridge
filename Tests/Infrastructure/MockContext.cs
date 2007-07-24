@@ -86,6 +86,7 @@ namespace Tests
         public Encoding ContentEncoding
         {
             set { _encoding = value; }
+            get { return _encoding; }
         }
 
         public NetworkCredential Credentials
@@ -121,6 +122,7 @@ namespace Tests
         public bool SendChunked
         {
             set { _sendChunked = value; }
+            get { return _sendChunked; }
         }
 
         public void RemoveHeader(string name)
