@@ -12,14 +12,14 @@ namespace SvnBridge.Presenters
         [SetUp]
         public void SetUp()
         {
-            stubListener = new StubRequestReceiver();
+            stubListener = new StubListener();
             stubView = new StubListenerView();
         }
 
         #endregion
 
         private StubListenerView stubView;
-        private StubRequestReceiver stubListener;
+        private StubListener stubListener;
 
         private ListenerViewPresenter CreatePresenter()
         {
@@ -116,8 +116,8 @@ namespace SvnBridge.Presenters
             stubSettingsView.Show_Delegate = 
                 delegate
                 {
-                    stubSettingsView.Set_Presenter.Port = 8081;
-                    stubSettingsView.Set_Presenter.TfsServerUrl = "http://foo";
+                    stubSettingsView.Presenter.Port = 8081;
+                    stubSettingsView.Presenter.TfsServerUrl = "http://foo";
                 };
             
             presenter.ChangeSettings(stubSettingsView);
@@ -135,8 +135,8 @@ namespace SvnBridge.Presenters
             stubSettingsView.Show_Delegate =
                 delegate
                 {
-                    stubSettingsView.Set_Presenter.Port = 8082;
-                    stubSettingsView.Set_Presenter.TfsServerUrl = "http://foo";
+                    stubSettingsView.Presenter.Port = 8082;
+                    stubSettingsView.Presenter.TfsServerUrl = "http://foo";
                 };
             
             presenter.ChangeSettings(stubSettingsView);
@@ -155,8 +155,8 @@ namespace SvnBridge.Presenters
             stubSettingsView.Show_Delegate =
                 delegate
                 {
-                    stubSettingsView.Set_Presenter.Port = 8082;
-                    stubSettingsView.Set_Presenter.TfsServerUrl = "http://foo";
+                    stubSettingsView.Presenter.Port = 8082;
+                    stubSettingsView.Presenter.TfsServerUrl = "http://foo";
                     stubSettingsView.Presenter.Cancelled = true;
                 };
 

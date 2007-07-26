@@ -1,33 +1,39 @@
 using System.Text;
 using SvnBridge.Exceptions;
+using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    public class CheckOutHandler : RequestHandlerBase
+    public class CheckOutHandler : HttpContextHandlerBase
     {
-        public override string Method
+        public override string MethodToHandle
         {
             get { return "checkout"; }
         }
 
-        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
+            IHttpRequest request = context.Request;
+            IHttpResponse response = context.Response;
+
+            string path = GetPath(request);
+
             WebDavService webDavService = new WebDavService(sourceControlProvider);
-            
+
             CheckoutData data = Helper.DeserializeXml<CheckoutData>(request.InputStream);
 
             try
             {
-                string location = webDavService.CheckOut(data, request.Path, request.Headers["Host"]);
+                string location = webDavService.CheckOut(data, path, request.Headers["Host"]);
                 string server = request.Headers["Host"].Split(':')[0];
                 string port = request.Headers["Host"].Split(':')[1];
-                SetResponseSettings(request, "text/html", Encoding.UTF8, 201);
-                request.AddHeader("Cache-Control", "no-cache");
-                request.AddHeader("Location", "http://" + request.Headers["Host"] + location);
-                string response =
+                SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
+                response.Headers.Add("Cache-Control", "no-cache");
+                response.Headers.Add("Location", "http://" + request.Headers["Host"] + location);
+                string responseContent =
                     "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
                     "<html><head>\n" +
                     "<title>201 Created</title>\n" +
@@ -37,12 +43,12 @@ namespace SvnBridge.Handlers
                     "<hr />\n" +
                     "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " + port + "</address>\n" +
                     "</body></html>\n";
-                request.Write(response);
+                WriteToResponse(response, responseContent);
             }
             catch (ConflictException)
             {
-                SetResponseSettings(request, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 409);
-                string response =
+                SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 409);
+                string responseContent =
                     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                     "<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n" +
                     "<C:error/>\n" +
@@ -50,7 +56,7 @@ namespace SvnBridge.Handlers
                     "The version resource does not correspond to the resource within the transaction.  Either the requested version resource is out of date (needs to be updated), or the requested version resource is newer than the transaction root (restart the commit).\n" +
                     "</m:human-readable>\n" +
                     "</D:error>\n";
-                request.Write(response);
+                WriteToResponse(response, responseContent);
             }
         }
     }

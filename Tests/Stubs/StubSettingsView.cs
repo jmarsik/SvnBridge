@@ -5,18 +5,18 @@ namespace SvnBridge.Stubs
 {
     public class StubSettingsView : ISettingsView
     {
-        internal delegate void ShowDelegate();
-        
-        internal SettingsViewPresenter Set_Presenter;
-        internal bool Show_Called;
-        internal ShowDelegate Show_Delegate;
+        public delegate void ShowDelegate();
+
+        public SettingsViewPresenter PresenterProperty;
+        public bool Show_Called;
+        public ShowDelegate Show_Delegate;
 
         #region ISettingsView Members
 
         public SettingsViewPresenter Presenter
         {
-            set { Set_Presenter = value; }
-            get { return Set_Presenter; }
+            set { PresenterProperty = value; }
+            get { return PresenterProperty; }
         }
 
         public void Show()

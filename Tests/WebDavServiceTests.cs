@@ -1,11 +1,16 @@
+using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 using Attach;
 using NUnit.Framework;
+using SvnBridge;
 using SvnBridge.Handlers;
+using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
+using SvnBridge.Stubs;
 
 namespace Tests
 {
@@ -37,18 +42,23 @@ namespace Tests
         public void VerifyMkColDecodesPathWhenCallingSourceControlProvider()
         {
             Results results = mock.Attach(sourceControlProvider.MakeCollection);
-            TcpClientHttpRequest request = new TcpClientHttpRequest();
-            request.SetHttpMethod("mkcol");
-            request.SetPath("//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Folder%20With%20Spaces");
+            StubHttpContext context = new StubHttpContext();
+            StubHttpRequest request = new StubHttpRequest();
+            request.Headers = new NameValueCollection();
+            context.Request = request;
+            StubHttpResponse response = new StubHttpResponse();
+            response.Headers = new HttpResponseHeaderCollection();
+            response.OutputStream = new MemoryStream(Constants.BufferSize);
+            context.Response = response;
+            request.HttpMethod = "mkcol";
+            request.Url = new Uri("htt://localhost:8081//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Folder%20With%20Spaces");
             request.Headers.Add("Host", "localhost:8081");
-            MemoryStream outputStream = new MemoryStream();
-            request.SetOutputStream(outputStream);
+            HttpContextDispatcher dispatcher = new HttpContextDispatcher();
+            dispatcher.TfsServerUrl = "http://foo";
 
-            RequestDispatcherFactory.Create(null).Dispatch(request);
+            dispatcher.Dispatch(context);
 
             Assert.AreEqual("/Folder With Spaces", results.Parameters[1]);
-
-            outputStream.Dispose();
         }
 
         [Test]

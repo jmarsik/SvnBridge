@@ -45,7 +45,6 @@
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
-    <Compile Include="Handlers\IRequestDispatcher.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />
     <Compile Include="Handlers\MkActivityHandler.cs" />
     <Compile Include="Handlers\MkColHandler.cs" />
@@ -54,14 +53,23 @@
     <Compile Include="Handlers\PropPatchHandler.cs" />
     <Compile Include="Handlers\PutHandler.cs" />
     <Compile Include="Handlers\ReportHandler.cs" />
-    <Compile Include="Handlers\RequestDispatcherFactory.cs" />
-    <Compile Include="Handlers\RequestHandlerBase.cs" />
+    <Compile Include="Handlers\HttpContextHandlerBase.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
-    <Compile Include="HttpRequest\HttpListenerHttpRequest.cs" />
-    <Compile Include="HttpRequest\IHttpRequest.cs" />
-    <Compile Include="HttpRequest\IISHttpRequest.cs" />
     <Compile Include="Handlers\UpdateReportService.cs" />
+    <Compile Include="Net\HttpContext.cs" />
+    <Compile Include="Net\HttpContextDispatcher.cs" />
+    <Compile Include="Net\HttpRequest.cs" />
+    <Compile Include="Net\HttpResponse.cs" />
+    <Compile Include="Net\HttpResponseHeaderCollection.cs" />
+    <Compile Include="Net\HttpResponseStream.cs" />
+    <Compile Include="Net\IHttpContext.cs" />
+    <Compile Include="Net\IHttpContextHandler.cs" />
+    <Compile Include="Net\IHttpRequest.cs" />
+    <Compile Include="Net\IHttpResponse.cs" />
+    <Compile Include="Net\IListener.cs" />
+    <Compile Include="Net\Listener.cs" />
+    <Compile Include="Net\ListenerFactory.cs" />
     <Compile Include="Presenters\ListenerViewPresenter.cs" />
     <Compile Include="Presenters\SettingsViewPresenter.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -69,10 +77,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="RequestReceiver\HttpListenerRequestReceiver.cs" />
-    <Compile Include="RequestReceiver\IISRequestReceiver.cs" />
     <Compile Include="Handlers\WebDavService.cs" />
-    <Compile Include="HttpRequest\TcpClientHttpRequest.cs" />
     <Compile Include="Nodes\BcFileNode.cs" />
     <Compile Include="Nodes\FileNode.cs" />
     <Compile Include="Nodes\INode.cs" />
@@ -108,10 +113,6 @@
     <Compile Include="Protocol\UpdatedSetData.cs" />
     <Compile Include="Protocol\UpdateReportData.cs" />
     <Compile Include="Protocol\UpdateReportResponseData.cs" />
-    <Compile Include="RequestReceiver\IRequestReceiver.cs" />
-    <Compile Include="RequestReceiver\ListenerFactory.cs" />
-    <Compile Include="RequestReceiver\TcpClientRequestReceiver.cs" />
-    <Compile Include="RequestReceiver\TcpClientRequestReceiverStream.cs" />
     <Compile Include="SourceControl\DeleteFolderMetaData.cs" />
     <Compile Include="SourceControl\DeleteMetaData.cs" />
     <Compile Include="SourceControl\FolderMetaData.cs" />
@@ -129,8 +130,6 @@
     </Compile>
     <Compile Include="StartOptions.cs" />
     <Compile Include="Utility\Clock.cs" />
-    <Compile Include="Handlers\RequestDispatcher.cs" />
-    <Compile Include="Handlers\IRequestHandler.cs" />
     <Compile Include="Utility\SvnDiff.cs" />
     <Compile Include="Utility\SvnDiffEngine.cs" />
     <Compile Include="Utility\SvnDiffInstruction.cs" />

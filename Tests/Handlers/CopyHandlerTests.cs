@@ -1,39 +1,53 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using Tests;
+using System.Collections.Specialized;
 using System.IO;
-using SvnBridge.SourceControl;
-using System.Net;
+using System.Text;
 using Attach;
+using NUnit.Framework;
+using SvnBridge.Net;
+using SvnBridge.SourceControl;
+using SvnBridge.Stubs;
+using Tests;
 
 namespace SvnBridge.Handlers
 {
     [TestFixture]
     public class CopyHandlerTests
     {
-        protected MyMocks mock = new MyMocks();
-        protected StubSourceControlProvider provider;
-        protected MockContext context;
-        protected CopyHandler handler;
+        #region Setup/Teardown
 
         [SetUp]
         public virtual void Setup()
         {
             provider = mock.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            context = new MockContext();
+            context = new StubHttpContext();
+            request = new StubHttpRequest();
+            request.Headers = new NameValueCollection();
+            context.Request = request;
+            response = new StubHttpResponse();
+            response.Headers = new HttpResponseHeaderCollection();
+            response.OutputStream = new MemoryStream(Constants.BufferSize);
+            context.Response = response;
             handler = new CopyHandler();
         }
+
+        #endregion
+
+        protected MyMocks mock = new MyMocks();
+        protected StubSourceControlProvider provider;
+        protected StubHttpContext context;
+        protected StubHttpRequest request;
+        protected StubHttpResponse response;
+        protected CopyHandler handler;
 
         [Test]
         public void VerifyHandleProducesCorrectOutput()
         {
             Results r = mock.Attach(provider.CopyItem);
-            context.Path = "/!svn/bc/5522/File.txt";
-            context.Headers["Host"] = "localhost:8082";
-            context.Headers["Destination"] = "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt";
+            request.Url = new Uri("http://localhost:8082/!svn/bc/5522/File.txt");
+            request.Headers["Host"] = "localhost:8082";
+            request.Headers["Destination"] = "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt";
 
             handler.Handle(context, "http://tfsserver");
 
@@ -47,9 +61,9 @@ namespace SvnBridge.Handlers
                 "<hr />\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)context.OutputStream).ToArray()));
-            Assert.AreEqual("text/html", context.ContentType);
-            Assert.AreEqual("http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt", context.ResponseHeaders["Location"]);
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.AreEqual("text/html", response.ContentType);
+            Assert.AreEqual("http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt", response.Headers["Location"]);
             Assert.AreEqual(1, r.CalledCount);
             Assert.AreEqual("cdfcf93f-8649-5e44-a8ec-b3f40e10e907", r.Parameters[0]);
             Assert.AreEqual("/File.txt", r.Parameters[1]);

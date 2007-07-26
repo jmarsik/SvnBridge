@@ -1,33 +1,39 @@
 using System.IO;
 using System.Text;
+using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    public class MergeHandler : RequestHandlerBase
+    public class MergeHandler : HttpContextHandlerBase
     {
-        public override string Method
+        public override string MethodToHandle
         {
             get { return "merge"; }
         }
 
-        protected override void Handle(IHttpRequest request, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
+            IHttpRequest request = context.Request;
+            IHttpResponse response = context.Response;
+
+            string path = GetPath(request);
+
             WebDavService webDavService = new WebDavService(sourceControlProvider);
-            
+
             MergeData data = Helper.DeserializeXml<MergeData>(request.InputStream);
 
-            SetResponseSettings(request, "text/xml", Encoding.UTF8, 200);
+            SetResponseSettings(response, "text/xml", Encoding.UTF8, 200);
 
-            request.AddHeader("Cache-Control", "no-cache");
-            
-            SendChunked(request);
-            
-            using (StreamWriter output = new StreamWriter(request.OutputStream))
+            response.Headers.Add("Cache-Control", "no-cache");
+
+            response.SendChunked = true;
+
+            using (StreamWriter output = new StreamWriter(response.OutputStream))
             {
-                webDavService.Merge(data, request.Path, output);
+                webDavService.Merge(data, path, output);
             }
         }
     }

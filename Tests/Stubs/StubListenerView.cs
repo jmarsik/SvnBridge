@@ -8,10 +8,10 @@ namespace SvnBridge.Stubs
 {
     public class StubListenerView : IListenerView
     {
-        internal ListenerViewPresenter Set_Presenter;
-        internal bool OnListenerStarted_Called;
-        internal bool OnListenerStopped_Called;
-        internal bool Show_Called;
+        public ListenerViewPresenter Set_Presenter;
+        public bool OnListenerStarted_Called;
+        public bool OnListenerStopped_Called;
+        public bool Show_Called;
 
         public ListenerViewPresenter Presenter
         {

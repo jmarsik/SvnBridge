@@ -2,14 +2,15 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using NUnit.Framework;
+using SvnBridge;
 using SvnBridge.Handlers;
-using SvnBridge.RequestReceiver;
+using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
-using Tests.Infrastructure;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 
@@ -17,24 +18,19 @@ namespace Tests
 {
     public abstract class WebDavServiceTestsBase
     {
+        protected HttpContextDispatcher HttpDispatcher;
         protected MyMocks mock = new MyMocks();
-        protected StubSourceControlProvider provider;
-        protected MockContext context;
         protected WebDavService service;
-        protected TcpClientRequestReceiver receiver;
-        protected string actual;
-
-        MemoryStream stream;
-        StreamWriter writer;
+        protected StubSourceControlProvider provider;
 
         [SetUp]
         public virtual void Setup()
         {
             provider = mock.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
+            HttpDispatcher = new HttpContextDispatcher();
+            HttpDispatcher.TfsServerUrl = "http://foo";
             service = new WebDavService(provider);
-            context = new MockContext();
-            receiver = new TestableTcpClientRequestReceiver();
         }
 
         [TearDown]
@@ -43,13 +39,7 @@ namespace Tests
             SourceControlProviderFactory.CreateDelegate = null;
         }
 
-        protected Stream GetStream()
-        {
-            stream = new TestableOutputStream();
-            return stream;
-        }
-
-        protected byte[] GetBytes(string data)
+        protected static byte[] GetBytes(string data)
         {
             byte[] result = new byte[data.Length];
             for (int i = 0; i < data.Length; i++)
@@ -59,70 +49,87 @@ namespace Tests
             return result;
         }
 
-        protected SourceItemChange MakeChange(ChangeType changeType, string serverPath)
+        protected static SourceItemChange MakeChange(ChangeType changeType, string serverPath)
         {
             return TestHelper.MakeChange(changeType, serverPath);
         }
 
-        protected SourceItemChange MakeChange(ChangeType changeType, string serverPath, string originalPath, int originalRevision)
+        protected static SourceItemChange MakeChange(ChangeType changeType, string serverPath, string originalPath, int originalRevision)
         {
             return TestHelper.MakeChange(changeType, serverPath, originalPath, originalRevision);
         }
 
         protected void SetChunks(int[] chunks)
         {
-            ((TestableTcpClientRequestReceiver)receiver).chunks = chunks;
         }
 
         protected string ProcessRequest(string request,
-                                        string expected)
+                                        ref string expected)
         {
-            string time = expected.Substring(expected.IndexOf("Date:") + 6);
-            time = time.Substring(0, time.IndexOf("\r\n"));
-            Clock.FreezeTime(DateTime.Parse(time));
+            MemoryStream HttpStream = new MemoryStream(1024 * 64);
 
-            if (expected.IndexOf("Keep-Alive:") > -1)
+            byte[] requestBuffer = GetBytes(request);
+            HttpStream.Write(requestBuffer, 0, requestBuffer.Length);
+
+            long responseStart = HttpStream.Position;
+            HttpStream.Position = 0;
+
+            HttpContext context = new HttpContext(HttpStream);
+            HttpDispatcher.Dispatch(context);
+            context.Response.Close();
+
+            HttpStream.Position = responseStart;
+            byte[] responseBuffer = new byte[Constants.BufferSize];
+            int responseLength = HttpStream.Read(responseBuffer, 0, responseBuffer.Length);
+
+            string response = Encoding.UTF8.GetString(responseBuffer, 0, responseLength);
+
+            expected = expected.Replace("Keep-Alive: timeout=15, max=99", "Keep-Alive: timeout=15, max=100");
+
+            expected = RemoveDate(expected);
+            response = RemoveDate(response);
+
+            expected = RemoveChunkedEncoding(expected);
+            response = RemoveChunkedEncoding(response);
+
+            return response;
+        }
+
+        private static string RemoveDate(string value)
+        {
+            int startIndex = value.IndexOf("Date:");
+            if (startIndex > 0)
             {
-                string keepAliveMax = expected.Substring(expected.IndexOf("Keep-Alive:") + 28);
-                keepAliveMax = keepAliveMax.Substring(0, keepAliveMax.IndexOf("\r\n"));
-                ((TestableTcpClientRequestReceiver)receiver).keepAliveMax = int.Parse(keepAliveMax);
+                int endIndex = value.IndexOf("\r\n", startIndex);
+                return value.Remove(startIndex, endIndex - startIndex + 2);
+            }
+            else
+                return value;
+        }
+
+        private static string RemoveChunkedEncoding(string value)
+        {
+            string result = value;
+
+            int bodyStart = value.IndexOf("\r\n\r\n") + 4;
+
+            Regex regex = new Regex("^[0-9a-f]+\r\n", RegexOptions.Multiline);
+            Match match = regex.Match(result, bodyStart);
+            while (match.Length > 0)
+            {
+                result = result.Remove(match.Index, match.Length);
+                match = regex.Match(result, bodyStart);
             }
 
-            ReadWriteMemoryStream stream = new ReadWriteMemoryStream();
-            stream.SetInput(GetBytes(request));
-            receiver.ProcessRequest(null, stream);
-            return Encoding.UTF8.GetString(stream.GetOutput());
-        }
-
-        protected string ReadStream()
-        {
-            stream.Position = 0;
-            StreamReader reader = new StreamReader(stream);
-            return reader.ReadToEnd();
-        }
-
-        protected StreamWriter GetWriter()
-        {
-            stream = new MemoryStream();
-            writer = new StreamWriter(stream);
-            return writer;
-        }
-
-        protected string ReadWriter()
-        {
-            writer.Flush();
-            stream.Position = 0;
-            StreamReader reader = new StreamReader(stream);
-            return reader.ReadToEnd();
-        }
-
-        protected string GetResults()
-        {
-            context.OutputStream.Position = 0;
-            using (StreamReader reader = new StreamReader(context.OutputStream))
+            regex = new Regex("\r\n", RegexOptions.Multiline);
+            match = regex.Match(result, bodyStart);
+            while (match.Length > 0)
             {
-                return reader.ReadToEnd();
+                result = result.Remove(match.Index, match.Length);
+                match = regex.Match(result, bodyStart);
             }
+
+            return result;
         }
 
         protected T DeserializeRequest<T>(string xml)
@@ -130,8 +137,7 @@ namespace Tests
             return Helper.DeserializeXml<T>(xml);
         }
 
-        protected string SerializeResponse<T>(T response,
-                                              XmlSerializerNamespaces ns)
+        protected string SerializeResponse<T>(T response, XmlSerializerNamespaces ns)
         {
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.CloseOutput = false;
@@ -142,113 +148,6 @@ namespace Tests
             serializer.Serialize(writer, response, ns);
             writer.Flush();
             return xml.ToString();
-        }
-    }
-
-    class TestableTcpClientRequestReceiverStream : TcpClientRequestReceiverStream
-    {
-        byte[] _data = null;
-        int[] _chunks = null;
-        int _chunkIndex = 0;
-
-        public TestableTcpClientRequestReceiverStream(TcpClientHttpRequest context,
-                                                      Stream output,
-                                                      int maxKeepAliveConnections)
-            : base(context, output, maxKeepAliveConnections) {}
-
-        public void SetChunks(int[] chunks)
-        {
-            _chunks = chunks;
-        }
-
-        public override void Flush()
-        {
-            if (!_finished)
-            {
-                WriteHeader();
-                if (_context.GetSendChunked())
-                {
-                    byte[] chunkFooter;
-                    if (_data != null && _data.Length > 0)
-                    {
-                        byte[] chunkHeader = Encoding.UTF8.GetBytes(string.Format("{0:x}", _data.Length) + "\r\n");
-                        chunkFooter = Encoding.UTF8.GetBytes("\r\n");
-                        _output.Write(chunkHeader, 0, chunkHeader.Length);
-                        _output.Write(_data, 0, _data.Length);
-                        _output.Write(chunkFooter, 0, chunkFooter.Length);
-                    }
-                    chunkFooter = Encoding.UTF8.GetBytes("0\r\n\r\n");
-                    _output.Write(chunkFooter, 0, chunkFooter.Length);
-                }
-                else
-                {
-                    byte[] response = _stream.ToArray();
-                    _output.Write(response, 0, response.Length);
-                }
-                _finished = true;
-            }
-        }
-
-        public override void Write(byte[] buffer,
-                                   int offset,
-                                   int count)
-        {
-            if (_context.GetSendChunked() && _chunks != null)
-            {
-                if (_data == null)
-                {
-                    byte[] newData = new byte[count];
-                    Array.Copy(buffer, offset, newData, 0, count);
-                    _data = newData;
-                }
-                else
-                {
-                    byte[] newData = new byte[_data.Length + count];
-                    Array.Copy(_data, 0, newData, 0, _data.Length);
-                    Array.Copy(buffer, offset, newData, _data.Length, count);
-                    _data = newData;
-                }
-                if (_chunkIndex >= _chunks.Length)
-                {
-                    base.Write(_data, 0, _data.Length);
-                    _data = null;
-                    _chunkIndex++;
-                }
-                else
-                {
-                    if (_data.Length >= _chunks[_chunkIndex])
-                    {
-                        base.Write(_data, 0, _chunks[_chunkIndex]);
-                        byte[] newData = new byte[_data.Length - _chunks[_chunkIndex]];
-                        Array.Copy(_data, _chunks[_chunkIndex], newData, 0, newData.Length);
-                        _data = newData;
-                        _chunkIndex++;
-                    }
-                }
-            }
-            else
-            {
-                base.Write(buffer, offset, count);
-            }
-        }
-    }
-
-    class TestableTcpClientRequestReceiver : TcpClientRequestReceiver
-    {
-        public int keepAliveMax = 100;
-        public int[] chunks = null;
-
-        protected override int GetMaxKeepAliveConnections()
-        {
-            return keepAliveMax;
-        }
-
-        protected override Stream GetStream(TcpClientHttpRequest context,
-                                            Stream stream)
-        {
-            TestableTcpClientRequestReceiverStream newStream = new TestableTcpClientRequestReceiverStream(context, stream, GetMaxKeepAliveConnections());
-            newStream.SetChunks(chunks);
-            return newStream;
         }
     }
 }

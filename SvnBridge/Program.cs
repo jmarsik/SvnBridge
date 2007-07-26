@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using SvnBridge.Net;
 using SvnBridge.Presenters;
-using SvnBridge.RequestReceiver;
 using SvnBridge.Views;
 using SvnBridge.Views.Console;
 using SvnBridge.Views.Gui;
@@ -29,9 +29,11 @@ namespace SvnBridge
                 return;
             }
 
-            IRequestReceiver listener = ListenerFactory.Create();
-            listener.Port = startOptions.Port;
-            listener.TfsServerUrl = startOptions.TfsServerUrl;
+            IListener listener = ListenerFactory.Create();
+            if (startOptions.Port > 0)
+                listener.Port = startOptions.Port;
+            if (!String.IsNullOrEmpty(startOptions.TfsServerUrl))
+                listener.TfsServerUrl = startOptions.TfsServerUrl;
 
             if (startOptions.DisplayGui)
                 RunWithGui(listener);
@@ -47,12 +49,12 @@ namespace SvnBridge
                 Console.WriteLine(message);
         }
 
-        private static void RunWithConsole(IRequestReceiver listener)
+        private static void RunWithConsole(IListener listener)
         {
             PrepareView(listener, new ConsoleListenerView(), new ConsoleSettingsView());
         }
 
-        private static void RunWithGui(IRequestReceiver listener)
+        private static void RunWithGui(IListener listener)
         {
             NativeMethods.FreeConsole();
             
@@ -67,7 +69,7 @@ namespace SvnBridge
                 listenerView.Close();
         }
 
-        private static bool PrepareView(IRequestReceiver listener, IListenerView listenerView, ISettingsView settingsView)
+        private static bool PrepareView(IListener listener, IListenerView listenerView, ISettingsView settingsView)
         {
             ListenerViewPresenter listenerViewPresenter = new ListenerViewPresenter(listenerView, listener);
             SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView);

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 using NUnit.Framework;
+using SvnBridge.Net;
+using SvnBridge.Stubs;
 using Tests;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.SourceControl;
@@ -16,7 +19,9 @@ namespace SvnBridge.Handlers
     {
         protected MyMocks mock = new MyMocks();
         protected StubSourceControlProvider provider;
-        protected MockContext context;
+        protected StubHttpContext context;
+        protected StubHttpRequest request;
+        protected StubHttpResponse response;
         protected ReportHandler handler;
 
         [SetUp]
@@ -24,7 +29,14 @@ namespace SvnBridge.Handlers
         {
             provider = mock.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            context = new MockContext();
+            context = new StubHttpContext();
+            request = new StubHttpRequest();
+            request.Headers = new NameValueCollection();
+            context.Request = request;
+            response = new StubHttpResponse();
+            response.Headers = new HttpResponseHeaderCollection();
+            response.OutputStream = new MemoryStream(Constants.BufferSize);
+            context.Response = response;
             handler = new ReportHandler();
         }
 
@@ -36,9 +48,9 @@ namespace SvnBridge.Handlers
             history1.Changes.Add(TestHelper.MakeChange(ChangeType.Rename, "$/newFolder3/NewFileRename.txt", "$/newFolder3/NewFile.txt", 5530));
             histories.Add(history1);
             Results r = mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder2", histories.ToArray()));
-            context.Path = "/!svn/bc/5522/File.txt";
-            string request = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5531</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
-            context.InputStream = new MemoryStream(Encoding.Default.GetBytes(request));
+            request.Url = new Uri("http://localhost:8082/!svn/bc/5522/File.txt");
+            string requestBody = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5531</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
+            request.InputStream = new MemoryStream(Encoding.Default.GetBytes(requestBody));
 
             handler.Handle(context, "http://tfsserver");
 
@@ -55,11 +67,11 @@ namespace SvnBridge.Handlers
                 "</S:log-item>\n" +
                 "</S:log-report>\n";
 
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)context.OutputStream).ToArray()));
-            Assert.AreEqual("text/xml; charset=\"utf-8\"", context.ContentType);
-            Assert.AreEqual(Encoding.UTF8, context.ContentEncoding);
-            Assert.AreEqual(200, context.StatusCode);
-            Assert.IsTrue(context.SendChunked);
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+            Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
+            Assert.AreEqual(Encoding.UTF8, response.ContentEncoding);
+            Assert.AreEqual(200, response.StatusCode);
+            Assert.IsTrue(response.SendChunked);
             Assert.AreEqual("/File.txt", r.Parameters[0]);
             Assert.AreEqual(1, r.Parameters[1]);
             Assert.AreEqual(5531, r.Parameters[2]);

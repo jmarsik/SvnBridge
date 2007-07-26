@@ -52,7 +52,7 @@ namespace Tests
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -95,7 +95,7 @@ namespace Tests
                 "<D:options-response xmlns:D=\"DAV:\">\n" +
                 "<D:activity-collection-set><D:href>/!svn/act/</D:href></D:activity-collection-set></D:options-response>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -134,7 +134,7 @@ namespace Tests
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -180,7 +180,7 @@ namespace Tests
                 "</D:response>\n" +
                 "</D:multistatus>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -225,7 +225,7 @@ namespace Tests
                 "</D:response>\n" +
                 "</D:multistatus>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -263,7 +263,7 @@ namespace Tests
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -307,7 +307,7 @@ namespace Tests
                 "</D:response>\n" +
                 "</D:multistatus>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -357,7 +357,7 @@ namespace Tests
                 "</D:response>\n" +
                 "</D:multistatus>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -399,7 +399,7 @@ namespace Tests
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -436,7 +436,7 @@ namespace Tests
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -492,7 +492,7 @@ namespace Tests
                 "0\r\n" +
                 "\r\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -519,7 +519,7 @@ namespace Tests
                 "Content-Type: text/plain\r\n" +
                 "\r\n";
 
-            string actual = ProcessRequest(request, expected);
+            string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
         }

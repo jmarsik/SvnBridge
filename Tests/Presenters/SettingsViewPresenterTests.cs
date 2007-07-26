@@ -31,7 +31,7 @@ namespace SvnBridge.Presenters
             stubView.Show_Delegate =
                 delegate
                 {
-                    stubView.Set_Presenter.Cancelled = true;
+                    stubView.Presenter.Cancelled = true;
                 };
             SettingsViewPresenter presenter = CreatePresenter();
 
@@ -47,7 +47,7 @@ namespace SvnBridge.Presenters
             stubView.Show_Delegate =
                 delegate
                 {
-                    stubView.Set_Presenter.Port = 8081;
+                    stubView.Presenter.Port = 8081;
                 };
             SettingsViewPresenter presenter = CreatePresenter();
 
@@ -63,7 +63,7 @@ namespace SvnBridge.Presenters
             stubView.Show_Delegate =
                 delegate
                 {
-                    stubView.Set_Presenter.TfsServerUrl = "http://foo";
+                    stubView.Presenter.TfsServerUrl = "http://foo";
                 };
             SettingsViewPresenter presenter = CreatePresenter();
 
@@ -77,7 +77,7 @@ namespace SvnBridge.Presenters
         {
             SettingsViewPresenter presenter = CreatePresenter();
 
-            Assert.Equal(stubView.Set_Presenter, presenter);
+            Assert.Equal(stubView.Presenter, presenter);
         }
 
         private SettingsViewPresenter CreatePresenter()

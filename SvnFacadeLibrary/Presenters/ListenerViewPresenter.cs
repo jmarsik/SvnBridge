@@ -1,14 +1,14 @@
-using SvnBridge.RequestReceiver;
+using SvnBridge.Net;
 using SvnBridge.Views;
 
 namespace SvnBridge.Presenters
 {
     public class ListenerViewPresenter
     {
-        private readonly IRequestReceiver listener;
+        private readonly IListener listener;
         private readonly IListenerView view;
 
-        public ListenerViewPresenter(IListenerView view, IRequestReceiver listener)
+        public ListenerViewPresenter(IListenerView view, IListener listener)
         {
             this.listener = listener;
             this.view = view;
