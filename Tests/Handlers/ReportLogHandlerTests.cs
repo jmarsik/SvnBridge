@@ -11,6 +11,7 @@ using SvnBridge.SourceControl;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using System.IO;
 using Attach;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
@@ -77,6 +78,44 @@ namespace SvnBridge.Handlers
             Assert.AreEqual(5531, r.Parameters[2]);
             Assert.AreEqual(Recursion.Full, r.Parameters[3]);
             Assert.AreEqual(100, r.Parameters[4]);
+        }
+
+        [Test]
+        public void VerifyHandleEncodesFilenamesWithSpecialCharacters()
+        {
+            List<SourceItemHistory> histories = new List<SourceItemHistory>();
+            SourceItemHistory history1 = new SourceItemHistory(5532, "jwanagel", DateTime.Parse("2007-07-25T00:13:14.466022Z"), "1234");
+            history1.Changes.Add(TestHelper.MakeChange(ChangeType.Add, "$/newFolder4"));
+            history1.Changes.Add(TestHelper.MakeChange(ChangeType.Add, "$/newFolder4/A!@#$%^&()~`_-+={[}];',.txt"));
+            history1.Changes.Add(TestHelper.MakeChange(ChangeType.Edit, "$/newFolder4/B!@#$%^&()~`_-+={[}];',.txt"));
+            history1.Changes.Add(TestHelper.MakeChange(ChangeType.Delete, "$/newFolder4/C!@#$%^&()~`_-+={[}];',.txt"));
+            history1.Changes.Add(TestHelper.MakeChange(ChangeType.Rename, "$/newFolder4/E!@#$%^&()~`_-+={[}];',.txt", "$/newFolder4/D!@#$%^&()~`_-+={[}];',.txt", 5531));
+            histories.Add(history1);
+            Results r = mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder4", histories.ToArray()));
+            request.Url = new Uri("http://localhost:8082/!svn/bc/5532/newFolder4");
+            string requestBody = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5532</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
+            request.InputStream = new MemoryStream(Encoding.Default.GetBytes(requestBody));
+
+            handler.Handle(context, "http://tfsserver");
+
+            string expected =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<S:log-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
+                "<S:log-item>\n" +
+                "<D:version-name>5532</D:version-name>\n" +
+                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
+                "<S:date>2007-07-25T00:13:14.466022Z</S:date>\n" +
+                "<D:comment>1234</D:comment>\n" +
+                "<S:added-path>/newFolder4</S:added-path>\n" +
+                "<S:added-path>/newFolder4/A!@#$%^&amp;()~`_-+={[}];',.txt</S:added-path>\n" +
+                "<S:modified-path>/newFolder4/B!@#$%^&amp;()~`_-+={[}];',.txt</S:modified-path>\n" +
+                "<S:deleted-path>/newFolder4/C!@#$%^&amp;()~`_-+={[}];',.txt</S:deleted-path>\n" +
+                "<S:added-path copyfrom-path=\"/newFolder4/D!@#$%^&amp;()~`_-+={[}];',.txt\" copyfrom-rev=\"5531\">/newFolder4/E!@#$%^&amp;()~`_-+={[}];',.txt</S:added-path>\n" +
+                "<S:deleted-path>/newFolder4/D!@#$%^&amp;()~`_-+={[}];',.txt</S:deleted-path>\n" +
+                "</S:log-item>\n" +
+                "</S:log-report>\n";
+
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
         }
     }
 }
