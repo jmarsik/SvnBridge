@@ -11,33 +11,8 @@ using SvnBridge.Exceptions;
 namespace Tests
 {
     [TestFixture]
-    public class TFSSourceControlProviderTests
+    public class TFSSourceControlProviderTests : TFSSourceControlProviderTestsBase
     {
-        const string SERVER_NAME = "http://codeplex-tfs2:8080";
-        const string PROJECT_NAME = "Test05011252";
-        string activityId;
-        string testPath;
-        TFSSourceControlProvider provider;
-
-        [SetUp]
-        public void SetUp()
-        {
-            provider = new TFSSourceControlProvider(SERVER_NAME, null);
-            activityId = Guid.NewGuid().ToString();
-            testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            provider.MakeActivity(activityId);
-            provider.MakeCollection(activityId, testPath);
-            Commit();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            DeleteItem(testPath, false);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
-        }
-
         [Test]
         public void TestCommitFolder()
         {
@@ -181,71 +156,6 @@ namespace Tests
         }
 
         [Test]
-        public void TestGetChangedItemsWithOneNewFile()
-        {
-            int versionFrom = provider.GetLatestVersion();
-            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
-            int versionTo = provider.GetLatestVersion();
-
-            UpdateReportData reportData = new UpdateReportData();
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(testPath.Substring(1), folder.Name);
-            Assert.AreEqual(testPath.Substring(1) + "/TestFile.txt", folder.Items[0].Name);
-            Assert.IsNotNull(folder.Items[0].DownloadUrl);
-        }
-
-        [Test]
-        public void TestGetChangedItemsWithDeletedFile()
-        {
-            string path = testPath + "/TestFile.txt";
-            WriteFile(path, "Test file contents", true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(path, true);
-            int versionTo = provider.GetLatestVersion();
-
-            UpdateReportData reportData = new UpdateReportData();
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.IsTrue(folder.Items[0] is DeleteMetaData);
-            Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
-        }
-
-        [Test]
-        public void TestGetChangedItemsWithDeletedFolder()
-        {
-            string path = testPath + "/Test Folder";
-            CreateFolder(path, true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(path, true);
-            int versionTo = provider.GetLatestVersion();
-            UpdateReportData reportData = new UpdateReportData();
-
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.IsTrue(folder.Items[0] is DeleteFolderMetaData);
-            Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
-        }
-
-        [Test]
-        public void TestGetChangedItemsWithSameFileUpdatedTwice()
-        {
-            string path = testPath + "/TestFile.txt";
-            WriteFile(path, "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            UpdateFile(path, "Fun text 2", true);
-            UpdateFile(path, "Fun text 3", true);
-            int versionTo = provider.GetLatestVersion();
-            UpdateReportData reportData = new UpdateReportData();
-
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(1, folder.Items.Count);
-            Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
-            Assert.AreEqual("Fun text 3", Encoding.Default.GetString(ReadFile(path)));
-        }
-
-        [Test]
         public void TestGetItemsReturnsMimeTypeInfo()
         {
             string mimeType = "application/octet-stream";
@@ -287,60 +197,6 @@ namespace Tests
         }
 
         [Test]
-        public void TestGetChangedItemsDoesNotReturnItemIfInLocalEntriesList()
-        {
-            string path = testPath + "/TestFile.txt";
-            WriteFile(path, "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            UpdateFile(path, "Fun text 2", true);
-            int versionTo = provider.GetLatestVersion();
-
-            UpdateReportData reportData = new UpdateReportData();
-            reportData.Entries = new List<EntryData>();
-            EntryData entry = new EntryData();
-            entry.Rev = versionTo.ToString();
-            entry.path = "TestFile.txt";
-            reportData.Entries.Add(entry);
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(0, folder.Items.Count);
-        }
-
-        [Test]
-        public void TestGetChangedItemsDoesNotReturnDeletedItemIfInLocalState()
-        {
-            string path = testPath + "/TestFile.txt";
-            WriteFile(path, "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(path, true);
-            int versionTo = provider.GetLatestVersion();
-            UpdateReportData reportData = new UpdateReportData();
-            reportData.Missing = new List<string>();
-            reportData.Missing.Add("TestFile.txt");
-
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(0, folder.Items.Count);
-        }
-
-        [Test]
-        public void TestGetChangedItemsWithNewFileInNewFolderHasCorrectPaths()
-        {
-            int versionFrom = provider.GetLatestVersion();
-            CreateFolder(testPath + "/New Folder", false);
-            WriteFile(testPath + "/New Folder/New File.txt", "Fun text", true);
-            int versionTo = provider.GetLatestVersion();
-            UpdateReportData reportData = new UpdateReportData();
-
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(1, folder.Items.Count);
-            Assert.AreEqual(testPath.Substring(1) + "/New Folder", folder.Items[0].Name);
-            Assert.AreEqual(1, ((FolderMetaData)folder.Items[0]).Items.Count);
-            Assert.AreEqual(testPath.Substring(1) + "/New Folder/New File.txt", ((FolderMetaData)folder.Items[0]).Items[0].Name);
-        }
-
-        [Test]
         public void CommitWithNoItemsReturnsLatestChangeset()
         {
             int startVersion = provider.GetLatestVersion();
@@ -356,47 +212,6 @@ namespace Tests
         public void TestGetItemsForRootSucceeds()
         {
             FolderMetaData item = (FolderMetaData)provider.GetItems(-1, "", Recursion.OneLevel);
-        }
-
-        [Test]
-        public void TestGetChangedItemsForADeletedFileReturnsCorrectResult()
-        {
-            CreateFolder(testPath + "/New Folder", false);
-            WriteFile(testPath + "/New Folder/New File.txt", "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(testPath + "/New Folder", true);
-            int versionTo = provider.GetLatestVersion();
-            UpdateReportData reportData = new UpdateReportData();
-            reportData.UpdateTarget = "New File.txt";
-
-            FolderMetaData folder = provider.GetChangedItems(testPath + "/New Folder", versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(1, folder.Items.Count);
-            Assert.AreEqual("New File.txt", folder.Items[0].Name);
-            Assert.AreEqual(typeof(DeleteMetaData), folder.Items[0].GetType());
-        }
-
-        [Test]
-        public void TestGetChangedItemsReturnsNothingWhenClientStateContainsDeletedItem()
-        {
-            CreateFolder(testPath + "/New Folder", true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(testPath + "/New Folder", true);
-            CreateFolder(testPath + "/New Folder", true);
-            int versionTo = provider.GetLatestVersion();
-            UpdateReportData reportData = new UpdateReportData();
-            EntryData entry = new EntryData();
-            reportData.Entries = new List<EntryData>();
-            entry.Rev = versionFrom.ToString();
-            reportData.Entries.Add(entry);
-            entry = new EntryData();
-            entry.path = "New Folder";
-            entry.Rev = versionTo.ToString();
-            reportData.Entries.Add(entry);
-
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(0, folder.Items.Count);
         }
 
         [Test, ExpectedException(typeof(FolderAlreadyExistsException))]
@@ -518,25 +333,6 @@ namespace Tests
         }
 
         [Test]
-        public void TestGetChangedItemsWithRenamedFile()
-        {
-            WriteFile(testPath + "/Fun.txt", "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            MoveItem(testPath + "/Fun.txt", testPath + "/FunRename.txt", true);
-            int versionTo = provider.GetLatestVersion();
-
-            UpdateReportData reportData = new UpdateReportData();
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(testPath.Substring(1), folder.Name);
-            Assert.AreEqual(2, folder.Items.Count);
-            Assert.AreEqual(testPath.Substring(1) + "/Fun.txt", folder.Items[0].Name);
-            Assert.IsTrue(folder.Items[0] is DeleteMetaData);
-            Assert.AreEqual(testPath.Substring(1) + "/FunRename.txt", folder.Items[1].Name);
-            Assert.IsTrue(folder.Items[1] is ItemMetaData);
-        }
-
-        [Test]
         public void TestGetLogReturnsOriginalNameAndRevisionForRenamedItems()
         {
             WriteFile(testPath + "/Fun.txt", "Fun text", true);
@@ -565,85 +361,6 @@ namespace Tests
 
             LogItem log = provider.GetLog(testPath + "/Protocol/Fun.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
-        }
-
-        void UpdateFile(string path,
-                        string fileData,
-                        bool commit)
-        {
-            byte[] data = Encoding.Default.GetBytes(fileData);
-            provider.WriteFile(activityId, path, data);
-            if (commit)
-                Commit();
-        }
-
-        bool WriteFile(string path,
-                        string fileData,
-                        bool commit)
-        {
-            byte[] data = Encoding.Default.GetBytes(fileData);
-            return WriteFile(path, data, commit);
-        }
-
-        bool WriteFile(string path,
-                        byte[] fileData,
-                        bool commit)
-        {
-            bool created = provider.WriteFile(activityId, path, fileData);
-            if (commit)
-                Commit();
-            return created;
-        }
-
-        void Commit()
-        {
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
-            provider.MakeActivity(activityId);
-        }
-
-        void DeleteItem(string path,
-                        bool commit)
-        {
-            provider.DeleteItem(activityId, path);
-            if (commit)
-                Commit();
-        }
-
-        void CopyItem(string path, string newPath, bool commit)
-        {
-            provider.CopyItem(activityId, path, newPath);
-            if (commit)
-                Commit();
-        }
-
-        void MoveItem(string path, string newPath, bool commit)
-        {
-            DeleteItem(path, false);
-            CopyItem(testPath + "/Fun.txt", testPath + "/FunRename.txt", false);
-            if (commit)
-                Commit();
-        }
-
-        void CreateFolder(string path,
-                        bool commit)
-        {
-            provider.MakeCollection(activityId, path);
-            if (commit)
-                Commit();
-        }
-
-        byte[] ReadFile(string path)
-        {
-            ItemMetaData item = provider.GetItems(-1, path, Recursion.None);
-            return provider.ReadFile(item);
-        }
-
-        void SetProperty(string path, string name, string value, bool commit)
-        {
-            provider.SetProperty(activityId, path, name, value);
-            if (commit)
-                Commit();
         }
     }
 }
