@@ -551,6 +551,22 @@ namespace Tests
             Assert.AreEqual(testPath + "/FunRename.txt", logItem.History[0].Changes[0].Item.RemoteName.Substring(1));
         }
 
+        [Test]
+        public void TestCommitOfMovedAndEditedFile()
+        {
+            CreateFolder(testPath + "/Nodes", false);
+            WriteFile(testPath + "/Nodes/Fun.txt", "filedata", false);
+            CreateFolder(testPath + "/Protocol", true);
+
+            WriteFile(testPath + "/Nodes/Fun.txt", "filedata2", false);
+            provider.DeleteItem(activityId, testPath + "/Nodes/Fun.txt");
+            provider.CopyItem(activityId, testPath + "/Nodes/Fun.txt", testPath + "/Protocol/Fun.txt");
+            Commit();
+
+            LogItem log = provider.GetLog(testPath + "/Protocol/Fun.txt", 1, provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
+        }
+
         void UpdateFile(string path,
                         string fileData,
                         bool commit)

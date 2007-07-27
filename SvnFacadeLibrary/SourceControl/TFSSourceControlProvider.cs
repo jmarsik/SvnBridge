@@ -255,6 +255,8 @@ namespace SvnBridge.SourceControl
 
         private void ProcessCopyItem(string activityId, string path, string targetPath)
         {
+            Activity activity = _activities[activityId];
+
             string localPath = GetLocalPath(activityId, path);
             string localTargetPath = GetLocalPath(activityId, targetPath);
 
@@ -262,10 +264,10 @@ namespace SvnBridge.SourceControl
             UpdateLocalVersion(activityId, item, localPath);
 
             bool copyIsRename = false;
-            if (_activities[activityId].DeletedItems.Contains(path))
+            if (activity.DeletedItems.Contains(path))
             {
                 copyIsRename = true;
-                _activities[activityId].DeletedItems.Remove(path);
+                activity.DeletedItems.Remove(path);
             }
 
             List<PendRequest> pendRequests = new List<PendRequest>();
@@ -274,8 +276,12 @@ namespace SvnBridge.SourceControl
             else
                 pendRequests.Add(PendRequest.Copy(localPath, localTargetPath));
 
+            for (int i = activity.MergeList.Count - 1; i >= 0; i--)
+                if (activity.MergeList[i].Path == SERVER_PATH + path)
+                    activity.MergeList.RemoveAt(i);
+
             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
-            _activities[activityId].MergeList.Add(new ActivityItem(SERVER_PATH + targetPath, item.ItemType));
+            activity.MergeList.Add(new ActivityItem(SERVER_PATH + targetPath, item.ItemType));
         }
 
         public void DeleteItem(string activityId, string path)
