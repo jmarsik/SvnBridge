@@ -129,7 +129,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="StartOptions.cs" />
-    <Compile Include="Utility\Clock.cs" />
     <Compile Include="Utility\SvnDiff.cs" />
     <Compile Include="Utility\SvnDiffEngine.cs" />
     <Compile Include="Utility\SvnDiffInstruction.cs" />

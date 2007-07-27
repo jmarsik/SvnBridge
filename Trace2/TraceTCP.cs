@@ -194,7 +194,7 @@ namespace Trace
                     if (direction == 1)
                     {
                         output.AppendLine("");
-                        output.AppendLine("            string actual = ProcessRequest(request, expected);");
+                        output.AppendLine("            string actual = ProcessRequest(request, ref expected);");
                         output.AppendLine("");
                         output.AppendLine("            Assert.AreEqual(expected, actual);");
                         output.AppendLine("        }");

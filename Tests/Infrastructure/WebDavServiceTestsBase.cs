@@ -59,12 +59,7 @@ namespace Tests
             return TestHelper.MakeChange(changeType, serverPath, originalPath, originalRevision);
         }
 
-        protected void SetChunks(int[] chunks)
-        {
-        }
-
-        protected string ProcessRequest(string request,
-                                        ref string expected)
+        protected string ProcessRequest(string request, ref string expected)
         {
             MemoryStream HttpStream = new MemoryStream(1024 * 64);
 

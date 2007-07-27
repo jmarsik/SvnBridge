@@ -140,7 +140,7 @@ namespace SvnBridge.Net
 
                 writer.WriteLine("HTTP/1.1 {0} {1}", response.StatusCode, statusCodeDescription);
 
-                writer.WriteLine("Date: {0}", Clock.GetDate().ToUniversalTime().ToString("R"));
+                writer.WriteLine("Date: {0}", DateTime.Now.ToUniversalTime().ToString("R"));
                 writer.WriteLine("Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2");
 
                 HttpResponseHeaderCollection headers = (HttpResponseHeaderCollection) response.Headers;

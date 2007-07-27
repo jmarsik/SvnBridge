@@ -1150,7 +1150,6 @@ namespace Tests
                 "0\r\n" +
                 "\r\n";
 
-            SetChunks(new int[] { 0x4fd });
             string actual = ProcessRequest(request, ref expected);
 
             Assert.AreEqual(expected, actual);
