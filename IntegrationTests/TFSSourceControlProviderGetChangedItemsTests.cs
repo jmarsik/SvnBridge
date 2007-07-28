@@ -11,31 +11,31 @@ namespace Tests
     public class TFSSourceControlProviderGetChangedItemsTests : TFSSourceControlProviderTestsBase
     {
         [Test]
-        public void TestGetChangedItemsWithOneNewFile()
+        public void TestGetChangedItemsWithAddedFile()
         {
-            int versionFrom = provider.GetLatestVersion();
-            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
-            int versionTo = provider.GetLatestVersion();
+            int versionFrom = _provider.GetLatestVersion();
+            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
+            int versionTo = _provider.GetLatestVersion();
 
             UpdateReportData reportData = new UpdateReportData();
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
-            Assert.AreEqual(testPath.Substring(1), folder.Name);
-            Assert.AreEqual(testPath.Substring(1) + "/TestFile.txt", folder.Items[0].Name);
+            Assert.AreEqual(_testPath.Substring(1), folder.Name);
+            Assert.AreEqual(_testPath.Substring(1) + "/TestFile.txt", folder.Items[0].Name);
             Assert.IsNotNull(folder.Items[0].DownloadUrl);
         }
 
         [Test]
         public void TestGetChangedItemsWithDeletedFile()
         {
-            string path = testPath + "/TestFile.txt";
+            string path = _testPath + "/TestFile.txt";
             WriteFile(path, "Test file contents", true);
-            int versionFrom = provider.GetLatestVersion();
+            int versionFrom = _provider.GetLatestVersion();
             DeleteItem(path, true);
-            int versionTo = provider.GetLatestVersion();
+            int versionTo = _provider.GetLatestVersion();
 
             UpdateReportData reportData = new UpdateReportData();
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.IsTrue(folder.Items[0] is DeleteMetaData);
             Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
@@ -44,31 +44,50 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithDeletedFolder()
         {
-            string path = testPath + "/Test Folder";
+            string path = _testPath + "/Test Folder";
             CreateFolder(path, true);
-            int versionFrom = provider.GetLatestVersion();
+            int versionFrom = _provider.GetLatestVersion();
             DeleteItem(path, true);
-            int versionTo = provider.GetLatestVersion();
+            int versionTo = _provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
 
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.IsTrue(folder.Items[0] is DeleteFolderMetaData);
             Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
         }
 
         [Test]
+        public void TestGetChangedItemsWithRenamedFile()
+        {
+            WriteFile(_testPath + "/Fun.txt", "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            MoveItem(_testPath + "/Fun.txt", _testPath + "/FunRename.txt", true);
+            int versionTo = _provider.GetLatestVersion();
+
+            UpdateReportData reportData = new UpdateReportData();
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(_testPath.Substring(1), folder.Name);
+            Assert.AreEqual(2, folder.Items.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Fun.txt", folder.Items[0].Name);
+            Assert.IsTrue(folder.Items[0] is DeleteMetaData);
+            Assert.AreEqual(_testPath.Substring(1) + "/FunRename.txt", folder.Items[1].Name);
+            Assert.IsTrue(folder.Items[1] is ItemMetaData);
+        }
+
+        [Test]
         public void TestGetChangedItemsWithSameFileUpdatedTwice()
         {
-            string path = testPath + "/TestFile.txt";
+            string path = _testPath + "/TestFile.txt";
             WriteFile(path, "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
+            int versionFrom = _provider.GetLatestVersion();
             UpdateFile(path, "Fun text 2", true);
             UpdateFile(path, "Fun text 3", true);
-            int versionTo = provider.GetLatestVersion();
+            int versionTo = _provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
 
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.AreEqual(1, folder.Items.Count);
             Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
@@ -76,71 +95,34 @@ namespace Tests
         }
 
         [Test]
-        public void TestGetChangedItemsDoesNotReturnItemIfInLocalEntriesList()
+        public void TestGetChangedItemsWithNewFileInNewFolderInSameChangeset()
         {
-            string path = testPath + "/TestFile.txt";
-            WriteFile(path, "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            UpdateFile(path, "Fun text 2", true);
-            int versionTo = provider.GetLatestVersion();
-
-            UpdateReportData reportData = new UpdateReportData();
-            reportData.Entries = new List<EntryData>();
-            EntryData entry = new EntryData();
-            entry.Rev = versionTo.ToString();
-            entry.path = "TestFile.txt";
-            reportData.Entries.Add(entry);
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(0, folder.Items.Count);
-        }
-
-        [Test]
-        public void TestGetChangedItemsDoesNotReturnDeletedItemIfInLocalState()
-        {
-            string path = testPath + "/TestFile.txt";
-            WriteFile(path, "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(path, true);
-            int versionTo = provider.GetLatestVersion();
-            UpdateReportData reportData = new UpdateReportData();
-            reportData.Missing = new List<string>();
-            reportData.Missing.Add("TestFile.txt");
-
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(0, folder.Items.Count);
-        }
-
-        [Test]
-        public void TestGetChangedItemsWithNewFileInNewFolderHasCorrectPaths()
-        {
-            int versionFrom = provider.GetLatestVersion();
-            CreateFolder(testPath + "/New Folder", false);
-            WriteFile(testPath + "/New Folder/New File.txt", "Fun text", true);
-            int versionTo = provider.GetLatestVersion();
+            int versionFrom = _provider.GetLatestVersion();
+            CreateFolder(_testPath + "/New Folder", false);
+            WriteFile(_testPath + "/New Folder/New File.txt", "Fun text", true);
+            int versionTo = _provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
 
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.AreEqual(1, folder.Items.Count);
-            Assert.AreEqual(testPath.Substring(1) + "/New Folder", folder.Items[0].Name);
+            Assert.AreEqual(_testPath.Substring(1) + "/New Folder", folder.Items[0].Name);
             Assert.AreEqual(1, ((FolderMetaData)folder.Items[0]).Items.Count);
-            Assert.AreEqual(testPath.Substring(1) + "/New Folder/New File.txt", ((FolderMetaData)folder.Items[0]).Items[0].Name);
+            Assert.AreEqual(_testPath.Substring(1) + "/New Folder/New File.txt", ((FolderMetaData)folder.Items[0]).Items[0].Name);
         }
 
         [Test]
-        public void TestGetChangedItemsForADeletedFileReturnsCorrectResult()
+        public void TestGetChangedItemsForFileThatWasDeleted()
         {
-            CreateFolder(testPath + "/New Folder", false);
-            WriteFile(testPath + "/New Folder/New File.txt", "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(testPath + "/New Folder", true);
-            int versionTo = provider.GetLatestVersion();
+            CreateFolder(_testPath + "/New Folder", false);
+            WriteFile(_testPath + "/New Folder/New File.txt", "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            DeleteItem(_testPath + "/New Folder", true);
+            int versionTo = _provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
             reportData.UpdateTarget = "New File.txt";
 
-            FolderMetaData folder = provider.GetChangedItems(testPath + "/New Folder", versionFrom, versionTo, reportData);
+            FolderMetaData folder = _provider.GetChangedItems(_testPath + "/New Folder", versionFrom, versionTo, reportData);
 
             Assert.AreEqual(1, folder.Items.Count);
             Assert.AreEqual("New File.txt", folder.Items[0].Name);
@@ -148,13 +130,72 @@ namespace Tests
         }
 
         [Test]
-        public void TestGetChangedItemsReturnsNothingWhenClientStateContainsDeletedItem()
+        public void TestGetChangedItemsWithAddedFileReturnsNothingWhenClientStateAlreadyCurrent()
         {
-            CreateFolder(testPath + "/New Folder", true);
-            int versionFrom = provider.GetLatestVersion();
-            DeleteItem(testPath + "/New Folder", true);
-            CreateFolder(testPath + "/New Folder", true);
-            int versionTo = provider.GetLatestVersion();
+            string path = _testPath + "/TestFile.txt";
+            WriteFile(path, "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            UpdateFile(path, "Fun text 2", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.Entries = new List<EntryData>();
+            EntryData entry = new EntryData();
+            entry.Rev = versionTo.ToString();
+            entry.path = "TestFile.txt";
+            reportData.Entries.Add(entry);
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithDeletedFileReturnsNothingWhenClientStateAlreadyCurrent()
+        {
+            string path = _testPath + "/TestFile.txt";
+            WriteFile(path, "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            DeleteItem(path, true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.Missing = new List<string>();
+            reportData.Missing.Add("TestFile.txt");
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithRenamedFileReturnsNothingWhenClientStateAlreadyCurrent()
+        {
+            CreateFolder(_testPath + "/Folder", false);
+            WriteFile(_testPath + "/Fun.txt", "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            MoveItem(_testPath + "/Fun.txt", _testPath + "/FunRenamed.txt", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.Missing = new List<string>();
+            reportData.Missing.Add("Fun.txt");
+            reportData.Entries = new List<EntryData>();
+            EntryData entry = new EntryData();
+            entry.Rev = versionTo.ToString();
+            entry.path = "FunRenamed.txt";
+            reportData.Entries.Add(entry);
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithDeletedAndReAddedItemReturnsNothingWhenClientStateAlreadyCurrent()
+        {
+            CreateFolder(_testPath + "/New Folder", true);
+            int versionFrom = _provider.GetLatestVersion();
+            DeleteItem(_testPath + "/New Folder", true);
+            CreateFolder(_testPath + "/New Folder", true);
+            int versionTo = _provider.GetLatestVersion();
             UpdateReportData reportData = new UpdateReportData();
             EntryData entry = new EntryData();
             reportData.Entries = new List<EntryData>();
@@ -165,28 +206,9 @@ namespace Tests
             entry.Rev = versionTo.ToString();
             reportData.Entries.Add(entry);
 
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.AreEqual(0, folder.Items.Count);
-        }
-
-        [Test]
-        public void TestGetChangedItemsWithRenamedFile()
-        {
-            WriteFile(testPath + "/Fun.txt", "Fun text", true);
-            int versionFrom = provider.GetLatestVersion();
-            MoveItem(testPath + "/Fun.txt", testPath + "/FunRename.txt", true);
-            int versionTo = provider.GetLatestVersion();
-
-            UpdateReportData reportData = new UpdateReportData();
-            FolderMetaData folder = provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
-
-            Assert.AreEqual(testPath.Substring(1), folder.Name);
-            Assert.AreEqual(2, folder.Items.Count);
-            Assert.AreEqual(testPath.Substring(1) + "/Fun.txt", folder.Items[0].Name);
-            Assert.IsTrue(folder.Items[0] is DeleteMetaData);
-            Assert.AreEqual(testPath.Substring(1) + "/FunRename.txt", folder.Items[1].Name);
-            Assert.IsTrue(folder.Items[1] is ItemMetaData);
         }
     }
 }

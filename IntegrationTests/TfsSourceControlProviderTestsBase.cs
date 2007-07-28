@@ -15,27 +15,27 @@ namespace Tests
     {
         const string SERVER_NAME = "http://codeplex-tfs2:8080";
         const string PROJECT_NAME = "Test05011252";
-        protected string activityId;
-        protected string testPath;
-        protected TFSSourceControlProvider provider;
+        protected string _activityId;
+        protected string _testPath;
+        protected TFSSourceControlProvider _provider;
 
         [SetUp]
         public void SetUp()
         {
-            provider = new TFSSourceControlProvider(SERVER_NAME, null);
-            activityId = Guid.NewGuid().ToString();
-            testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            provider.MakeActivity(activityId);
-            provider.MakeCollection(activityId, testPath);
+            _provider = new TFSSourceControlProvider(SERVER_NAME, null);
+            _activityId = Guid.NewGuid().ToString();
+            _testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            _provider.MakeActivity(_activityId);
+            _provider.MakeCollection(_activityId, _testPath);
             Commit();
         }
 
         [TearDown]
         public void TearDown()
         {
-            DeleteItem(testPath, false);
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
+            DeleteItem(_testPath, false);
+            _provider.MergeActivity(_activityId);
+            _provider.DeleteActivity(_activityId);
         }
 
         protected void UpdateFile(string path,
@@ -43,7 +43,7 @@ namespace Tests
                         bool commit)
         {
             byte[] data = Encoding.Default.GetBytes(fileData);
-            provider.WriteFile(activityId, path, data);
+            _provider.WriteFile(_activityId, path, data);
             if (commit)
                 Commit();
         }
@@ -60,7 +60,7 @@ namespace Tests
                         byte[] fileData,
                         bool commit)
         {
-            bool created = provider.WriteFile(activityId, path, fileData);
+            bool created = _provider.WriteFile(_activityId, path, fileData);
             if (commit)
                 Commit();
             return created;
@@ -68,30 +68,35 @@ namespace Tests
 
         protected void Commit()
         {
-            provider.MergeActivity(activityId);
-            provider.DeleteActivity(activityId);
-            provider.MakeActivity(activityId);
+            _provider.MergeActivity(_activityId);
+            _provider.DeleteActivity(_activityId);
+            _provider.MakeActivity(_activityId);
         }
 
         protected void DeleteItem(string path,
                         bool commit)
         {
-            provider.DeleteItem(activityId, path);
+            _provider.DeleteItem(_activityId, path);
             if (commit)
                 Commit();
         }
 
         protected void CopyItem(string path, string newPath, bool commit)
         {
-            provider.CopyItem(activityId, path, newPath);
+            _provider.CopyItem(_activityId, path, newPath);
             if (commit)
                 Commit();
+        }
+
+        protected void RenameItem(string path, string newPath, bool commit)
+        {
+            MoveItem(path, newPath, commit);
         }
 
         protected void MoveItem(string path, string newPath, bool commit)
         {
             DeleteItem(path, false);
-            CopyItem(testPath + "/Fun.txt", testPath + "/FunRename.txt", false);
+            CopyItem(path, newPath, false);
             if (commit)
                 Commit();
         }
@@ -99,20 +104,20 @@ namespace Tests
         protected void CreateFolder(string path,
                         bool commit)
         {
-            provider.MakeCollection(activityId, path);
+            _provider.MakeCollection(_activityId, path);
             if (commit)
                 Commit();
         }
 
         protected byte[] ReadFile(string path)
         {
-            ItemMetaData item = provider.GetItems(-1, path, Recursion.None);
-            return provider.ReadFile(item);
+            ItemMetaData item = _provider.GetItems(-1, path, Recursion.None);
+            return _provider.ReadFile(item);
         }
 
         protected void SetProperty(string path, string name, string value, bool commit)
         {
-            provider.SetProperty(activityId, path, name, value);
+            _provider.SetProperty(_activityId, path, name, value);
             if (commit)
                 Commit();
         }
