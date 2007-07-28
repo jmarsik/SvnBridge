@@ -91,7 +91,7 @@
     <Compile Include="Stubs\StubSettingsView.cs" />
     <Compile Include="Utility\SvnDiffEngineTests.cs" />
     <Compile Include="WebDavServiceTests.cs" />
-    <Compile Include="XmlEncodeTests.cs" />
+    <Compile Include="Utility\HelperTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SvnBridge\SvnBridge.csproj">
