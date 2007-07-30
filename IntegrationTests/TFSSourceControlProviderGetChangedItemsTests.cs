@@ -16,8 +16,8 @@ namespace Tests
             int versionFrom = _provider.GetLatestVersion();
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
             int versionTo = _provider.GetLatestVersion();
-
             UpdateReportData reportData = new UpdateReportData();
+
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.AreEqual(_testPath.Substring(1), folder.Name);
@@ -33,8 +33,8 @@ namespace Tests
             int versionFrom = _provider.GetLatestVersion();
             DeleteItem(path, true);
             int versionTo = _provider.GetLatestVersion();
-
             UpdateReportData reportData = new UpdateReportData();
+
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.IsTrue(folder.Items[0] is DeleteMetaData);
@@ -64,8 +64,8 @@ namespace Tests
             int versionFrom = _provider.GetLatestVersion();
             MoveItem(_testPath + "/Fun.txt", _testPath + "/FunRename.txt", true);
             int versionTo = _provider.GetLatestVersion();
-
             UpdateReportData reportData = new UpdateReportData();
+
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
 
             Assert.AreEqual(_testPath.Substring(1), folder.Name);
@@ -91,7 +91,7 @@ namespace Tests
 
             Assert.AreEqual(1, folder.Items.Count);
             Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
-            Assert.AreEqual("Fun text 3", Encoding.Default.GetString(ReadFile(path)));
+            Assert.AreEqual("Fun text 3", GetString(ReadFile(path)));
         }
 
         [Test]

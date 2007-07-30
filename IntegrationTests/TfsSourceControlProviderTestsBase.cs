@@ -121,5 +121,15 @@ namespace Tests
             if (commit)
                 Commit();
         }
+
+        protected string GetString(byte[] data)
+        {
+            return Encoding.Default.GetString(data);
+        }
+
+        protected byte[] GetBytes(string data)
+        {
+            return Encoding.Default.GetBytes(data);
+        }
     }
 }
