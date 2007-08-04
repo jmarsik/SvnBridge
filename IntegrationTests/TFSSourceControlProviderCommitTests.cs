@@ -293,20 +293,41 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitOfMovedAndEditedFile()
+        public void TestCommitMovedAndUpdatedFile()
         {
             CreateFolder(_testPath + "/Nodes", false);
             WriteFile(_testPath + "/Nodes/Fun.txt", "filedata", false);
             CreateFolder(_testPath + "/Protocol", true);
             byte[] fileData = GetBytes("filedata2");
 
-            bool created = _provider.WriteFile(_activityId, _testPath + "/Nodes/Fun.txt", fileData);
             _provider.DeleteItem(_activityId, _testPath + "/Nodes/Fun.txt");
             _provider.CopyItem(_activityId, _testPath + "/Nodes/Fun.txt", _testPath + "/Protocol/Fun.txt");
+            bool created = _provider.WriteFile(_activityId, _testPath + "/Protocol/Fun.txt", fileData);
             Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/Protocol/Fun.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
+            byte[] actualFileData = ReadFile(_testPath + "/Protocol/Fun.txt");
+            Assert.AreEqual(GetString(actualFileData), GetString(fileData));
+        }
+
+        [Test]
+        public void TestCommitMovedFolderWithUpdatedFile()
+        {
+            CreateFolder(_testPath + "/A", false);
+            WriteFile(_testPath + "/A/Test.txt", "filedata", false);
+            CreateFolder(_testPath + "/B", true);
+            byte[] fileData = GetBytes("filedata2");
+
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            _provider.CopyItem(_activityId, _testPath + "/A", _testPath + "/B/A");
+            bool created = _provider.WriteFile(_activityId, _testPath + "/B/A/Test.txt", fileData);
+            Commit();
+
+            LogItem log = _provider.GetLog(_testPath + "/B/A/Test.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
+            byte[] actualFileData = ReadFile(_testPath + "/B/A/Test.txt");
+            Assert.AreEqual(GetString(actualFileData), GetString(fileData));
         }
     }
 }

@@ -125,6 +125,7 @@
     <Compile Include="SourceControl\Recursion.cs" />
     <Compile Include="SourceControl\RenamedSourceItem.cs" />
     <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
+    <Compile Include="SourceControl\TFSSourceControlService.cs" />
     <Compile Include="SourceControl\TFSSourceControlProvider.cs">
       <SubType>Code</SubType>
     </Compile>

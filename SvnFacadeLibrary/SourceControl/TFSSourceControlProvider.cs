@@ -20,7 +20,7 @@ namespace SvnBridge.SourceControl
         static Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
         ICredentials _credentials;
         string _serverUrl;
-        SourceControlService _sourceControlSvc;
+        TFSSourceControlService _sourceControlSvc;
         WebTransferService _webTransferSvc;
 
         class Activity
@@ -104,7 +104,7 @@ namespace SvnBridge.SourceControl
             RegistrationService registrationSvc = new RegistrationService(registrationFactory);
 
             _webTransferSvc = new WebTransferService(fileSystem);
-            _sourceControlSvc = new SourceControlService(registrationSvc,
+            _sourceControlSvc = new TFSSourceControlService(registrationSvc,
                                                         new RepositoryWebSvcFactory(registrationFactory),
                                                         _webTransferSvc,
                                                         fileSystem);
@@ -172,6 +172,7 @@ namespace SvnBridge.SourceControl
                               string path,
                               byte[] fileData)
         {
+            Activity activity = _activities[activityId];
             ItemMetaData item;
             string existingPath = path.Substring(1);
 
@@ -183,77 +184,76 @@ namespace SvnBridge.SourceControl
             while (item == null);
 
             string localPath = GetLocalPath(activityId, path);
-            List<LocalUpdate> updates2 = new List<LocalUpdate>();
-            updates2.Add(LocalUpdate.FromLocal(item.Id,
+            List<LocalUpdate> updates = new List<LocalUpdate>();
+            updates.Add(LocalUpdate.FromLocal(item.Id,
                                                localPath.Substring(0, localPath.LastIndexOf('\\')),
                                                item.Revision));
 
             item = GetItems(-1, path.Substring(1), Recursion.None);
             if (item != null)
-                updates2.Add(LocalUpdate.FromLocal(item.Id,
+                updates.Add(LocalUpdate.FromLocal(item.Id,
                                                    localPath,
                                                    item.Revision));
 
-            _sourceControlSvc.UpdateLocalVersions(_serverUrl, _credentials, activityId, updates2);
+            _sourceControlSvc.UpdateLocalVersions(_serverUrl, _credentials, activityId, updates);
 
             List<PendRequest> pendRequests = new List<PendRequest>();
             
-            bool newFile;
-            if (item == null)
-            {
-                CopyAction copyAction = null;
-                foreach (CopyAction copy in _activities[activityId].CopiedItems)
-                    if (copy.TargetPath == path)
-                        copyAction = copy;
-
-                if (copyAction != null)
-                {
-                    _activities[activityId].DeletedItems.Remove(copyAction.Path);
-                    _activities[activityId].CopiedItems.Remove(copyAction);
-
-                    item = GetItems(-1, copyAction.Path, Recursion.None);
-                    string originalLocalPath = GetLocalPath(activityId, copyAction.Path);
-                    UpdateLocalVersion(activityId, item, originalLocalPath);
-
-                    pendRequests.Add(PendRequest.Rename(originalLocalPath, localPath));
-                    _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
-                    UpdateLocalVersion(activityId, item, localPath);
-
-                    pendRequests.Clear();
-                    pendRequests.Add(PendRequest.Edit(localPath));
-                    newFile = false;
-                }
-                else
-                {
-                    pendRequests.Add(PendRequest.AddFile(localPath, TfsUtil.CodePage_ANSI));
-                    newFile = true;
-                }
-            }
-            else
+            bool newFile = true;
+            bool addToMergeList = true;
+            if (item != null)
             {
                 pendRequests.Add(PendRequest.Edit(localPath));
                 newFile = false;
             }
+            else
+            {
+                ItemSpec spec = new ItemSpec();
+                spec.item = SERVER_PATH + path;
+                ExtendedItem[][] items = _sourceControlSvc.QueryItemsExtended(_serverUrl, _credentials, activityId, new ItemSpec[1] { spec }, DeletedState.NonDeleted, ItemType.Any);
+
+                if (items[0].Length == 0)
+                {
+                    pendRequests.Add(PendRequest.AddFile(localPath, TfsUtil.CodePage_ANSI));
+                }
+                else
+                {
+                    UpdateLocalVersion(activityId, items[0][0].itemid, items[0][0].latest, localPath);
+                    pendRequests.Add(PendRequest.Edit(localPath));
+                    newFile = false;
+                }
+                foreach (CopyAction copy in activity.CopiedItems)
+                    if (copy.TargetPath == path)
+                        addToMergeList = false;
+            }
+
             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
             _sourceControlSvc.UploadFileFromBytes(_serverUrl, _credentials, activityId, fileData, SERVER_PATH + path);
-            _activities[activityId].MergeList.Add(new ActivityItem(SERVER_PATH + path, ItemType.File));
+            if (addToMergeList)
+                activity.MergeList.Add(new ActivityItem(SERVER_PATH + path, ItemType.File));
 
             return newFile;
         }
 
         private void UpdateLocalVersion(string activityId, ItemMetaData item, string localPath)
         {
+            UpdateLocalVersion(activityId, item.Id, item.Revision, localPath);
+        }
+
+        private void UpdateLocalVersion(string activityId, int itemId, int itemRevision, string localPath)
+        {
             List<LocalUpdate> updates = new List<LocalUpdate>();
-            updates.Add(LocalUpdate.FromLocal(item.Id, localPath, item.Revision));
+            updates.Add(LocalUpdate.FromLocal(itemId, localPath, itemRevision));
             _sourceControlSvc.UpdateLocalVersions(_serverUrl, _credentials, activityId, updates);
         }
 
         public void CopyItem(string activityId, string path, string targetPath)
         {
             _activities[activityId].CopiedItems.Add(new CopyAction(path, targetPath));
+            ProcessCopyItem(activityId, path, targetPath, false);
         }
 
-        private void ProcessCopyItem(string activityId, string path, string targetPath)
+        private void ProcessCopyItem(string activityId, string path, string targetPath, bool forceRename)
         {
             Activity activity = _activities[activityId];
 
@@ -268,10 +268,11 @@ namespace SvnBridge.SourceControl
             {
                 copyIsRename = true;
                 activity.DeletedItems.Remove(path);
+                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + path });
             }
 
             List<PendRequest> pendRequests = new List<PendRequest>();
-            if (copyIsRename)
+            if (copyIsRename || forceRename)
                 pendRequests.Add(PendRequest.Rename(localPath, localTargetPath));
             else
                 pendRequests.Add(PendRequest.Copy(localPath, localTargetPath));
@@ -286,18 +287,39 @@ namespace SvnBridge.SourceControl
 
         public void DeleteItem(string activityId, string path)
         {
+            Activity activity = _activities[activityId];
             bool postCommitDelete = false;
-            foreach (CopyAction copy in _activities[activityId].CopiedItems)
+            foreach (CopyAction copy in activity.CopiedItems)
             {
                 if (copy.Path.StartsWith(path + "/"))
                 {
-                    _activities[activityId].PostCommitDeletedItems.Add(path);
+                    activity.PostCommitDeletedItems.Add(path);
                     postCommitDelete = true;
                 }
             }
 
             if (!postCommitDelete)
-                _activities[activityId].DeletedItems.Add(path);
+            {
+                bool deleteIsRename = false;
+                for (int i = activity.CopiedItems.Count - 1; i >= 0; i--)
+                {
+                    if (activity.CopiedItems[i].Path == path)
+                    {
+                        _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + activity.CopiedItems[i].TargetPath });
+                        for (int j = activity.MergeList.Count - 1; j >= 0; j--)
+                            if (activity.MergeList[j].Path == SERVER_PATH + activity.CopiedItems[j].TargetPath)
+                                activity.MergeList.RemoveAt(j);
+
+                        ProcessCopyItem(activityId, activity.CopiedItems[i].Path, activity.CopiedItems[i].TargetPath, true);
+                        deleteIsRename = true;
+                    }
+                }
+                if (!deleteIsRename)
+                {
+                    ProcessDeleteItem(activityId, path);
+                    activity.DeletedItems.Add(path);
+                }
+            }
         }
 
         private void ProcessDeleteItem(string activityId, string path)
@@ -487,12 +509,6 @@ namespace SvnBridge.SourceControl
 
         public MergeActivityResponse MergeActivity(string activityId)
         {
-            foreach (CopyAction copy in _activities[activityId].CopiedItems)
-                ProcessCopyItem(activityId, copy.Path, copy.TargetPath);
-
-            foreach (string path in _activities[activityId].DeletedItems)
-                ProcessDeleteItem(activityId, path);
-
             UpdateProperties(activityId);
 
             List<string> commitServerList = new List<string>();
