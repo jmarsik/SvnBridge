@@ -104,7 +104,7 @@ namespace SvnBridge.Net
 
         private static void ReadToBuffer(Stream stream, MemoryStream buffer)
         {
-            int originalPosition = (int) buffer.Length;
+            int originalPosition = (int) buffer.Position;
 
             byte[] bytes = new byte[Constants.BufferSize];
 
