@@ -562,6 +562,29 @@ namespace SvnBridge.SourceControl
                 activity.DeletedItems.Remove(path);
                 _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + path });
             }
+            if (!copyIsRename)
+            {
+                for (int i=activity.DeletedItems.Count-1; i >= 0; i--)
+                {
+                    if (path.StartsWith(activity.DeletedItems[i] + "/"))
+                    {
+                        copyIsRename = true;
+                        activity.PostCommitDeletedItems.Add(activity.DeletedItems[i]);
+                        _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + activity.DeletedItems[i] });
+                        for (int j = activity.MergeList.Count - 1; j >= 0; j--)
+                            if (activity.MergeList[j].Path == SERVER_PATH + activity.DeletedItems[i])
+                                activity.MergeList.RemoveAt(j);
+
+                        activity.DeletedItems.RemoveAt(i);
+                    }
+                }
+            }
+            if (!copyIsRename)
+            {
+                foreach (string deletedItem in activity.PostCommitDeletedItems)
+                    if (path.StartsWith(deletedItem + "/"))
+                        copyIsRename = true;
+            }
 
             List<PendRequest> pendRequests = new List<PendRequest>();
             if (copyIsRename || forceRename)

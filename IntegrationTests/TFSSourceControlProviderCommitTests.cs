@@ -329,5 +329,39 @@ namespace Tests
             byte[] actualFileData = ReadFile(_testPath + "/B/A/Test.txt");
             Assert.AreEqual(GetString(actualFileData), GetString(fileData));
         }
+
+        [Test]
+        public void TestCommitMovedFileFromDeletedFolder()
+        {
+            CreateFolder(_testPath + "/A", false);
+            WriteFile(_testPath + "/A/Test.txt", "filedata", true);
+
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            _provider.CopyItem(_activityId, _testPath + "/A/Test.txt", _testPath + "/Test.txt");
+            Commit();
+
+            LogItem log = _provider.GetLog(_testPath + "/Test.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+            Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+        }
+
+        [Test]
+        public void TestCommitMultipleMovedFilesFromDeletedFolder()
+        {
+            CreateFolder(_testPath + "/A", false);
+            WriteFile(_testPath + "/A/Test1.txt", "filedata", false);
+            WriteFile(_testPath + "/A/Test2.txt", "filedata", true);
+
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/Test1.txt");
+            _provider.CopyItem(_activityId, _testPath + "/A/Test2.txt", _testPath + "/Test2.txt");
+            Commit();
+
+            LogItem log = _provider.GetLog(_testPath + "/Test1.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+            log = _provider.GetLog(_testPath + "/Test2.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+            Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+        }
     }
 }
