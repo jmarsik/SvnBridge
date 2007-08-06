@@ -1,6 +1,8 @@
 using System.Text;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
+using System.IO;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
@@ -13,15 +15,24 @@ namespace SvnBridge.Handlers
 
             string path = GetPath(request);
 
-            WebDavService webDavService = new WebDavService(sourceControlProvider);
-
             SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
             response.Headers.Add("DAV", "1,2");
             response.Headers.Add("DAV", "version-control,checkout,working-resource");
             response.Headers.Add("DAV", "merge,baseline,activity,version-controlled-collection");
             response.Headers.Add("MS-Author-Via", "DAV");
             response.Headers.Add("Allow", "OPTIONS,GET,HEAD,POST,DELETE,TRACE,PROPFIND,PROPPATCH,COPY,MOVE,LOCK,UNLOCK,CHECKOUT");
-            webDavService.Options(path, response.OutputStream);
+            Options(sourceControlProvider, path, response.OutputStream);
+        }
+
+        private void Options(ISourceControlProvider sourceControlProvider, string path, Stream outputStream)
+        {
+            sourceControlProvider.ItemExists(Helper.Decode(path)); // Verify permissions to access
+            using (StreamWriter output = new StreamWriter(outputStream))
+            {
+                output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+                output.Write("<D:options-response xmlns:D=\"DAV:\">\n");
+                output.Write("<D:activity-collection-set><D:href>/!svn/act/</D:href></D:activity-collection-set></D:options-response>\n");
+            }
         }
     }
 }

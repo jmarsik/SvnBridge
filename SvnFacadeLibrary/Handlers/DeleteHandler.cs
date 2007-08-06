@@ -14,9 +14,7 @@ namespace SvnBridge.Handlers
 
             string path = GetPath(request);
 
-            WebDavService webDavService = new WebDavService(sourceControlProvider);
-
-            bool fileDeleted = webDavService.Delete(path);
+            bool fileDeleted = Delete(sourceControlProvider, path);
 
             if (fileDeleted)
             {
@@ -42,6 +40,26 @@ namespace SvnBridge.Handlers
 
                 WriteToResponse(response, responseContent);
             }
+        }
+
+        private bool Delete(ISourceControlProvider sourceControlProvider, string path)
+        {
+            if (path.StartsWith("/!svn/act/"))
+            {
+                string activityId = path.Substring(10);
+                sourceControlProvider.DeleteActivity(activityId);
+            }
+            else if (path.StartsWith("//!svn/wrk/"))
+            {
+                string activityId = path.Substring(11, path.IndexOf('/', 11) - 11);
+                string filePath = path.Substring(path.IndexOf('/', 11));
+                if (!sourceControlProvider.ItemExists(Helper.Decode(filePath)))
+                {
+                    return false;
+                }
+                sourceControlProvider.DeleteItem(activityId, Helper.Decode(filePath));
+            }
+            return true;
         }
     }
 }

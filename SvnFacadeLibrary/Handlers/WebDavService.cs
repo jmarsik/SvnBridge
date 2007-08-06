@@ -309,18 +309,6 @@ namespace SvnBridge.Handlers
             output.Write("</S:log-report>\n");
         }
 
-        public void Options(string path,
-                            Stream outputStream)
-        {
-            sourceControlProvider.ItemExists(Helper.Decode(path)); // Verify permissions to access
-            using (StreamWriter output = new StreamWriter(outputStream))
-            {
-                output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-                output.Write("<D:options-response xmlns:D=\"DAV:\">\n");
-                output.Write("<D:activity-collection-set><D:href>/!svn/act/</D:href></D:activity-collection-set></D:options-response>\n");
-            }
-        }
-
         public bool Put(string path,
                         Stream inputStream,
                         string baseHash,
@@ -429,26 +417,6 @@ namespace SvnBridge.Handlers
             }
             output.Write("</D:updated-set>\n");
             output.Write("</D:merge-response>\n");
-        }
-
-        public bool Delete(string path)
-        {
-            if (path.StartsWith("/!svn/act/"))
-            {
-                string activityId = path.Substring(10);
-                sourceControlProvider.DeleteActivity(activityId);
-            }
-            else if (path.StartsWith("//!svn/wrk/"))
-            {
-                string activityId = path.Substring(11, path.IndexOf('/', 11) - 11);
-                string filePath = path.Substring(path.IndexOf('/', 11));
-                if (!sourceControlProvider.ItemExists(Helper.Decode(filePath)))
-                {
-                    return false;
-                }
-                sourceControlProvider.DeleteItem(activityId, Helper.Decode(filePath));
-            }
-            return true;
         }
 
         public static string FormatDate(DateTime date)

@@ -77,20 +77,6 @@ namespace Tests
         }
 
         [Test]
-        public void VerifyOptionsDecodesPathWhenCallingSourceControlProvider()
-        {
-            MyMocks mock = new MyMocks();
-            StubSourceControlProvider provider = mock.CreateObject<StubSourceControlProvider>();
-            WebDavService service = new WebDavService(provider);
-            Results result = mock.Attach(provider.ItemExists, true);
-            MemoryStream outputStream = new MemoryStream();
-
-            service.Options("/Spikes/SvnFacade/trunk/New%20Folder%207", outputStream);
-
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", result.Parameters[0]);
-        }
-
-        [Test]
         public void VerifyPropFindDecodesPathWhenCallingSourceControlProvider()
         {
             MyMocks mock = new MyMocks();
@@ -129,20 +115,6 @@ namespace Tests
             service.PropFind(propfinddata, "/!svn/bc/3444/Test%20Project", "0", null, outputStream);
 
             Assert.AreEqual("/Test Project", result.Parameters[0]);
-        }
-
-        [Test]
-        public void VerifyDeleteDecodesPathWhenCallingSourceControlProvider()
-        {
-            MyMocks mock = new MyMocks();
-            StubSourceControlProvider provider = mock.CreateObject<StubSourceControlProvider>();
-            WebDavService service = new WebDavService(provider);
-            mock.Attach(provider.ItemExists, true);
-            Results result = mock.Attach(provider.DeleteItem);
-
-            service.Delete("//!svn/wrk/125c1a75-a7a6-104d-a661-54689d30dc99/Spikes/SvnFacade/trunk/New%20Folder%206");
-
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 6", result.Parameters[1]);
         }
     }
 }
