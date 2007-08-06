@@ -12,10 +12,8 @@ namespace SvnBridge.Handlers
             IHttpResponse response = context.Response;
 
             string path = GetPath(request);
-
-            WebDavService webDavService = new WebDavService(sourceControlProvider);
-
-            webDavService.MkActivity(path);
+            string activityId = path.Substring(10);
+            sourceControlProvider.MakeActivity(activityId);
 
             string server = request.Headers["Host"].Split(':')[0];
             string port = request.Headers["Host"].Split(':')[1];

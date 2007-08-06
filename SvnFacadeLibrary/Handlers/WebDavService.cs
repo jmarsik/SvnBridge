@@ -321,12 +321,6 @@ namespace SvnBridge.Handlers
             }
         }
 
-        public void MkActivity(string activityPath)
-        {
-            string activityId = activityPath.Substring(10);
-            sourceControlProvider.MakeActivity(activityId);
-        }
-
         public bool Put(string path,
                         Stream inputStream,
                         string baseHash,

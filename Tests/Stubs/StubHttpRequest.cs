@@ -44,7 +44,11 @@ namespace SvnBridge.Stubs
 
         public string Path
         {
-            set { url = new Uri(value); }
+            set
+            {
+                url = new Uri(value);
+                headers["Host"] = url.Authority;
+            }
         }
     }
 }
