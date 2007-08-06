@@ -8,48 +8,24 @@ using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using SvnBridge.Stubs;
 using Tests;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Handlers
 {
     [TestFixture]
-    public class CopyHandlerTests
+    public class CopyHandlerTests : HandlerTestsBase
     {
-        #region Setup/Teardown
-
-        [SetUp]
-        public virtual void Setup()
-        {
-            provider = mock.CreateObject<StubSourceControlProvider>();
-            SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            context = new StubHttpContext();
-            request = new StubHttpRequest();
-            request.Headers = new NameValueCollection();
-            context.Request = request;
-            response = new StubHttpResponse();
-            response.Headers = new HttpResponseHeaderCollection();
-            response.OutputStream = new MemoryStream(Constants.BufferSize);
-            context.Response = response;
-            handler = new CopyHandler();
-        }
-
-        #endregion
-
-        protected MyMocks mock = new MyMocks();
-        protected StubSourceControlProvider provider;
-        protected StubHttpContext context;
-        protected StubHttpRequest request;
-        protected StubHttpResponse response;
-        protected CopyHandler handler;
+        protected CopyHandler handler = new CopyHandler();
 
         [Test]
         public void VerifyHandleProducesCorrectOutput()
         {
             Results r = mock.Attach(provider.CopyItem);
-            request.Url = new Uri("http://localhost:8082/!svn/bc/5522/File.txt");
+            request.Path = "http://localhost:8082/!svn/bc/5522/File.txt";
             request.Headers["Host"] = "localhost:8082";
             request.Headers["Destination"] = "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt";
 
-            handler.Handle(context, "http://tfsserver");
+            handler.Handle(context, tfsServerUrl);
 
             string expected =
                 "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +

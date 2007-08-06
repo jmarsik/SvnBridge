@@ -2,6 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.IO;
 using SvnBridge.Net;
+using System.Text;
 
 namespace SvnBridge.Stubs
 {
@@ -11,8 +12,6 @@ namespace SvnBridge.Stubs
         private string httpMethod;
         private Stream inputStream;
         private Uri url;
-
-        #region IHttpRequest Members
 
         public NameValueCollection Headers
         {
@@ -24,6 +23,11 @@ namespace SvnBridge.Stubs
         {
             get { return httpMethod; }
             set { httpMethod = value; }
+        }
+
+        public string Input
+        {
+            set { inputStream = new MemoryStream(Encoding.Default.GetBytes(value)); }
         }
 
         public Stream InputStream
@@ -38,6 +42,9 @@ namespace SvnBridge.Stubs
             set { url = value; }
         }
 
-        #endregion
+        public string Path
+        {
+            set { url = new Uri(value); }
+        }
     }
 }

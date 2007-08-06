@@ -145,47 +145,6 @@ namespace SvnBridge.Handlers
             }
         }
 
-        public void PropPatch(PropertyUpdateData request,
-                              string path,
-                              StreamWriter output)
-        {
-            string activityId = path.Substring(11, path.Length - (path.Length - path.IndexOf('/', 11)) - 11);
-            switch (request.Set.Prop.Properties[0].LocalName)
-            {
-                case "log":
-                    sourceControlProvider.SetActivityComment(activityId, request.Set.Prop.Properties[0].InnerText);
-                    output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-                    output.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
-                    output.Write("<D:response>\n");
-                    output.Write("<D:href>" + path + "</D:href>\n");
-                    output.Write("<D:propstat>\n");
-                    output.Write("<D:prop>\n");
-                    output.Write("<ns1:log/>\r\n");
-                    output.Write("</D:prop>\n");
-                    output.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
-                    output.Write("</D:propstat>\n");
-                    output.Write("</D:response>\n");
-                    output.Write("</D:multistatus>\n");
-                    break;
-                default:
-                    string itemPath = Helper.Decode(path.Substring(path.IndexOf('/', 11)));
-                    sourceControlProvider.SetProperty(activityId, itemPath, request.Set.Prop.Properties[0].LocalName, request.Set.Prop.Properties[0].InnerText);
-                    output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-                    output.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns3=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns2=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
-                    output.Write("<D:response>\n");
-                    output.Write("<D:href>" + path + "</D:href>\n");
-                    output.Write("<D:propstat>\n");
-                    output.Write("<D:prop>\n");
-                    output.Write("<ns1:" + request.Set.Prop.Properties[0].LocalName + "/>\r\n");
-                    output.Write("</D:prop>\n");
-                    output.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
-                    output.Write("</D:propstat>\n");
-                    output.Write("</D:response>\n");
-                    output.Write("</D:multistatus>\n");
-                    break;
-            }
-        }
-
         private class LoadingQueue
         {
             public ItemMetaData[] Files = new ItemMetaData[3] { null, null, null };
