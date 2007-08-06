@@ -11,11 +11,6 @@ namespace SvnBridge.Handlers
 {
     public class ReportHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "report"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;

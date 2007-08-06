@@ -6,11 +6,6 @@ namespace SvnBridge.Handlers
 {
     public class CopyHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "copy"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;

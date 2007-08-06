@@ -7,12 +7,8 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    public abstract class HttpContextHandlerBase : IHttpContextHandler
+    public abstract class HttpContextHandlerBase
     {
-        #region IHttpContextHandler Members
-
-        public abstract string MethodToHandle { get; }
-
         public void Handle(IHttpContext context, string tfsServerUrl)
         {
             ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsServerUrl, GetCredential(context));
@@ -20,7 +16,7 @@ namespace SvnBridge.Handlers
             Handle(context, sourceControlProvider);
         }
 
-        #endregion
+        protected abstract void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider);
 
         private static NetworkCredential GetCredential(IHttpContext context)
         {
@@ -44,8 +40,6 @@ namespace SvnBridge.Handlers
 
             return credential;
         }
-
-        protected abstract void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider);
 
         protected static void SetResponseSettings(IHttpResponse response, string contentType, Encoding contentEncoding, int status)
         {

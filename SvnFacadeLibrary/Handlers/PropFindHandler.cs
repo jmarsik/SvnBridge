@@ -10,11 +10,6 @@ namespace SvnBridge.Handlers
 {
     public class PropFindHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "propfind"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;

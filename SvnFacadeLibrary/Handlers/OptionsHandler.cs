@@ -6,11 +6,6 @@ namespace SvnBridge.Handlers
 {
     public class OptionsHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "options"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;

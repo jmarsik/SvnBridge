@@ -9,11 +9,6 @@ namespace SvnBridge.Handlers
 {
     public class PropPatchHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "proppatch"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;

@@ -6,11 +6,6 @@ namespace SvnBridge.Handlers
 {
     public class MkActivityHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "mkactivity"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;

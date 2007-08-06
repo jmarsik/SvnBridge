@@ -9,24 +9,25 @@ namespace SvnBridge.Net
 {
     public class HttpContextDispatcher
     {
-        private readonly Dictionary<string, IHttpContextHandler> handlers;
         private string tfsServerUrl;
 
-        public HttpContextDispatcher()
+        public HttpContextHandlerBase GetHandler(string httpMethod)
         {
-            handlers = new Dictionary<string, IHttpContextHandler>();
-
-            RegisterHandler<CheckOutHandler>();
-            RegisterHandler<CopyHandler>();
-            RegisterHandler<DeleteHandler>();
-            RegisterHandler<MergeHandler>();
-            RegisterHandler<MkActivityHandler>();
-            RegisterHandler<MkColHandler>();
-            RegisterHandler<OptionsHandler>();
-            RegisterHandler<PropFindHandler>();
-            RegisterHandler<PropPatchHandler>();
-            RegisterHandler<PutHandler>();
-            RegisterHandler<ReportHandler>();
+            switch (httpMethod.ToLowerInvariant())
+            {
+                case "checkout": return new CheckOutHandler();
+                case "copy": return new CopyHandler();
+                case "delete": return new DeleteHandler();
+                case "merge": return new MergeHandler();
+                case "mkactivity": return new MkActivityHandler();
+                case "mkcol": return new MkColHandler();
+                case "options": return new OptionsHandler();
+                case "propfind": return new PropFindHandler();
+                case "proppatch": return new PropPatchHandler();
+                case "put": return new PutHandler();
+                case "report": return new ReportHandler();
+                default: return null;
+            }
         }
 
         public string TfsServerUrl
@@ -40,11 +41,9 @@ namespace SvnBridge.Net
             if (string.IsNullOrEmpty(TfsServerUrl))
                 throw new InvalidOperationException("A TFS server URL must be specified before connections can be dispatched.");
 
-            string httpMethod = connection.Request.HttpMethod.ToLowerInvariant();
+            HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
 
-            IHttpContextHandler handler;
-
-            if (handlers.TryGetValue(httpMethod, out handler))
+            if (handler != null)
             {
                 try
                 {
@@ -66,15 +65,6 @@ namespace SvnBridge.Net
             }
             else
                 SendUnsupportedMethodResponse(connection);
-        }
-
-        public void RegisterHandler<THandler>()
-            where THandler : IHttpContextHandler, new()
-        {
-            IHttpContextHandler handler = new THandler();
-
-            if (!handlers.ContainsKey(handler.MethodToHandle))
-                handlers.Add(handler.MethodToHandle, handler);
         }
 
         private static void SendUnauthorizedResponse(IHttpContext connection)

@@ -64,7 +64,6 @@
     <Compile Include="Net\HttpResponseHeaderCollection.cs" />
     <Compile Include="Net\HttpResponseStream.cs" />
     <Compile Include="Net\IHttpContext.cs" />
-    <Compile Include="Net\IHttpContextHandler.cs" />
     <Compile Include="Net\IHttpRequest.cs" />
     <Compile Include="Net\IHttpResponse.cs" />
     <Compile Include="Net\IListener.cs" />

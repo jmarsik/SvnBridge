@@ -7,11 +7,6 @@ namespace SvnBridge.Handlers
 {
     public class PutHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "put"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;

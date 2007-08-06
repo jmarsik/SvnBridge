@@ -9,11 +9,6 @@ namespace SvnBridge.Handlers
 {
     public class CheckOutHandler : HttpContextHandlerBase
     {
-        public override string MethodToHandle
-        {
-            get { return "checkout"; }
-        }
-
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
