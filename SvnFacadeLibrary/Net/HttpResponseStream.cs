@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using SvnBridge.Utility;
+using System.Collections.Specialized;
 
 namespace SvnBridge.Net
 {
@@ -143,17 +145,19 @@ namespace SvnBridge.Net
                 writer.WriteLine("Date: {0}", DateTime.Now.ToUniversalTime().ToString("R"));
                 writer.WriteLine("Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2");
 
-                HttpResponseHeaderCollection headers = (HttpResponseHeaderCollection) response.Headers;
+                List<KeyValuePair<string, string>> headers = response.Headers;
 
-                foreach (string name in headers.AllKeys)
+                string xPadHeader = null;
+
+                foreach (KeyValuePair<string, string> header in headers)
                 {
-                    if (name == "X-Pad")
-                        continue;
-
-                    foreach (string value in headers.GetDistinctValues(name))
+                    if (header.Key == "X-Pad")
                     {
-                        writer.WriteLine("{0}: {1}", name, value);
+                        xPadHeader = header.Value;
+                        continue;
                     }
+                    else
+                        writer.WriteLine("{0}: {1}", header.Key, header.Value);
                 }
 
                 if (!response.SendChunked)
@@ -173,7 +177,6 @@ namespace SvnBridge.Net
 
                 writer.WriteLine("Content-Type: {0}", response.ContentType);
 
-                string xPadHeader = headers.Get("X-Pad");
                 if (!String.IsNullOrEmpty(xPadHeader))
                     writer.WriteLine("X-Pad: {0}", xPadHeader);
 

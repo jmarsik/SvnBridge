@@ -30,7 +30,6 @@ namespace SvnBridge.Infrastructure
             request.Headers = new NameValueCollection();
             context.Request = request;
             response = new StubHttpResponse();
-            response.Headers = new HttpResponseHeaderCollection();
             response.OutputStream = new MemoryStream(Constants.BufferSize);
             context.Response = response;
             tfsServerUrl = "http://tfsserver";

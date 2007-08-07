@@ -44,7 +44,7 @@ namespace SvnBridge.Handlers
         {
             SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
 
-            response.Headers.Add("Location", "http://" + request.Headers["Host"] + path);
+            response.AppendHeader("Location", "http://" + request.Headers["Host"] + path);
 
             string responseContent = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
                                      "<html><head>\n" +
@@ -63,7 +63,7 @@ namespace SvnBridge.Handlers
         {
             SetResponseSettings(response, "text/html; charset=iso-8859-1", Encoding.UTF8, 405);
 
-            response.Headers.Add("Allow", "TRACE");
+            response.AppendHeader("Allow", "TRACE");
 
             string responseContent =
                 "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Text;
 using SvnBridge.Net;
 
@@ -10,12 +9,23 @@ namespace SvnBridge.Stubs
     public class StubHttpResponse : IHttpResponse
     {
         private Encoding contentEncoding;
-        private long contentLength64;
         private string contentType;
-        private WebHeaderCollection headers;
+        private readonly List<KeyValuePair<string, string>> headers;
         private Stream outputStream;
         private bool sendChunked;
         private int statusCode;
+
+        public StubHttpResponse()
+        {
+            headers = new List<KeyValuePair<string, string>>();
+        }
+
+        internal List<KeyValuePair<string, string>> Headers
+        {
+            get { return headers; }
+        }
+
+        #region IHttpResponse Members
 
         public Encoding ContentEncoding
         {
@@ -23,22 +33,10 @@ namespace SvnBridge.Stubs
             set { contentEncoding = value; }
         }
 
-        public long ContentLength64
-        {
-            get { return contentLength64; }
-            set { contentLength64 = value; }
-        }
-
         public string ContentType
         {
             get { return contentType; }
             set { contentType = value; }
-        }
-
-        public WebHeaderCollection Headers
-        {
-            get { return headers; }
-            set { headers = value; }
         }
 
         public Stream OutputStream
@@ -61,7 +59,12 @@ namespace SvnBridge.Stubs
 
         public void AppendHeader(string name, string value)
         {
-            throw new NotImplementedException();
+            headers.Add(new KeyValuePair<string, string>(name, value));
+        }
+
+        public void ClearHeaders()
+        {
+            headers.Clear();
         }
 
         public void Close()
@@ -69,11 +72,11 @@ namespace SvnBridge.Stubs
             throw new NotImplementedException();
         }
 
+        #endregion
+
         public void Write(string content)
         {
             byte[] buffer = contentEncoding.GetBytes(content);
-
-            ContentLength64 = buffer.Length;
 
             outputStream.Write(buffer, 0, buffer.Length);
         }

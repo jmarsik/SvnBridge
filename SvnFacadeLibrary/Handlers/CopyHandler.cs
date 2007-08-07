@@ -25,7 +25,7 @@ namespace SvnBridge.Handlers
             string targetPath = destination.Substring(destination.IndexOf('/', 12));
             sourceControlProvider.CopyItem(activityId, path, targetPath);
 
-            response.Headers.Add("Location", request.Headers["Destination"]);
+            response.AppendHeader("Location", request.Headers["Destination"]);
 
             string responseContent =
                 "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +

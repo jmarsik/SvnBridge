@@ -71,14 +71,12 @@ namespace SvnBridge.Net
         {
             IHttpResponse response = connection.Response;
 
+            response.ClearHeaders();
+
             response.StatusCode = (int) HttpStatusCode.Unauthorized;
             response.ContentType = "text/html; charset=iso-8859-1";
 
-            response.Headers.Remove("DAV");
-            response.Headers.Remove("MS-Author-Via");
-            response.Headers.Remove("Allow");
-
-            response.Headers.Add("WWW-Authenticate", "Basic realm=\"CodePlex Subversion Repository\"");
+            response.AppendHeader("WWW-Authenticate", "Basic realm=\"CodePlex Subversion Repository\"");
 
             string[] hostParts = connection.Request.Headers["Host"].Split(':');
             string server = hostParts[0];
@@ -102,7 +100,6 @@ namespace SvnBridge.Net
 
             byte[] buffer = Encoding.UTF8.GetBytes(content);
 
-            response.ContentLength64 = buffer.Length;
             response.OutputStream.Write(buffer, 0, buffer.Length);
         }
 
@@ -114,7 +111,7 @@ namespace SvnBridge.Net
 
             response.ContentType = "text/html";
 
-            response.Headers.Add("Allow", "PROPFIND, REPORT, OPTIONS, MKACTIVITY, CHECKOUT, PROPPATCH, PUT, MERGE, DELETE, MKCOL");
+            response.AppendHeader("Allow", "PROPFIND, REPORT, OPTIONS, MKACTIVITY, CHECKOUT, PROPPATCH, PUT, MERGE, DELETE, MKCOL");
 
             string content =
                 @"
@@ -129,7 +126,6 @@ namespace SvnBridge.Net
 
             byte[] buffer = Encoding.UTF8.GetBytes(content);
 
-            response.ContentLength64 = buffer.Length;
             response.OutputStream.Write(buffer, 0, buffer.Length);
         }
     }

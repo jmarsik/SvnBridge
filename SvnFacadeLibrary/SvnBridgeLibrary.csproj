@@ -61,7 +61,6 @@
     <Compile Include="Net\HttpContextDispatcher.cs" />
     <Compile Include="Net\HttpRequest.cs" />
     <Compile Include="Net\HttpResponse.cs" />
-    <Compile Include="Net\HttpResponseHeaderCollection.cs" />
     <Compile Include="Net\HttpResponseStream.cs" />
     <Compile Include="Net\IHttpContext.cs" />
     <Compile Include="Net\IHttpRequest.cs" />

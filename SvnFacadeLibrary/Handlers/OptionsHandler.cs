@@ -16,11 +16,11 @@ namespace SvnBridge.Handlers
             string path = GetPath(request);
 
             SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-            response.Headers.Add("DAV", "1,2");
-            response.Headers.Add("DAV", "version-control,checkout,working-resource");
-            response.Headers.Add("DAV", "merge,baseline,activity,version-controlled-collection");
-            response.Headers.Add("MS-Author-Via", "DAV");
-            response.Headers.Add("Allow", "OPTIONS,GET,HEAD,POST,DELETE,TRACE,PROPFIND,PROPPATCH,COPY,MOVE,LOCK,UNLOCK,CHECKOUT");
+            response.AppendHeader("DAV", "1,2");
+            response.AppendHeader("DAV", "version-control,checkout,working-resource");
+            response.AppendHeader("DAV", "merge,baseline,activity,version-controlled-collection");
+            response.AppendHeader("MS-Author-Via", "DAV");
+            response.AppendHeader("Allow", "OPTIONS,GET,HEAD,POST,DELETE,TRACE,PROPFIND,PROPPATCH,COPY,MOVE,LOCK,UNLOCK,CHECKOUT");
             Options(sourceControlProvider, path, response.OutputStream);
         }
 

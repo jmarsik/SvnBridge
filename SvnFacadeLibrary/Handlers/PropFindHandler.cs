@@ -27,7 +27,7 @@ namespace SvnBridge.Handlers
 
                 if (request.Headers["Label"] != null)
                 {
-                    response.Headers.Add("Vary", "Label");
+                    response.AppendHeader("Vary", "Label");
                 }
 
                 webDavService.PropFind(propfind, path, request.Headers["Depth"], request.Headers["Label"], response.OutputStream);

@@ -22,7 +22,7 @@ namespace SvnBridge.Handlers
 
             SetResponseSettings(response, "text/xml", Encoding.UTF8, 200);
 
-            response.Headers.Add("Cache-Control", "no-cache");
+            response.AppendHeader("Cache-Control", "no-cache");
 
             response.SendChunked = true;
 

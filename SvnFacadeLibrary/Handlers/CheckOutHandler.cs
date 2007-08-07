@@ -26,8 +26,8 @@ namespace SvnBridge.Handlers
                 string server = request.Headers["Host"].Split(':')[0];
                 string port = request.Headers["Host"].Split(':')[1];
                 SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
-                response.Headers.Add("Cache-Control", "no-cache");
-                response.Headers.Add("Location", "http://" + request.Headers["Host"] + location);
+                response.AppendHeader("Cache-Control", "no-cache");
+                response.AppendHeader("Location", "http://" + request.Headers["Host"] + location);
                 string responseContent =
                     "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
                     "<html><head>\n" +

@@ -1,30 +1,39 @@
+using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Text;
 
 namespace SvnBridge.Net
 {
     public class HttpResponse : IHttpResponse
     {
-        private readonly HttpResponseHeaderCollection headers;
+        private readonly List<KeyValuePair<string, string>> headers;
         private readonly HttpResponseStream outputStream;
         private Encoding contentEncoding;
-        private long? contentLength64;
         private string contentType;
         private bool sendChunked;
         private int statusCode;
 
         public HttpResponse(HttpRequest request, Stream stream)
         {
-            headers = new HttpResponseHeaderCollection();
+            headers = new List<KeyValuePair<string, string>>();
             outputStream = new HttpResponseStream(request, this, stream, 100);
+        }
+
+        internal List<KeyValuePair<string, string>> Headers
+        {
+            get { return headers; }
         }
 
         #region IHttpResponse Members
 
         public void AppendHeader(string name, string value)
         {
-            headers.Add(name, value);
+            headers.Add(new KeyValuePair<string, string>(name, value));
+        }
+
+        public void ClearHeaders()
+        {
+            headers.Clear();
         }
 
         public Encoding ContentEncoding
@@ -33,21 +42,10 @@ namespace SvnBridge.Net
             set { contentEncoding = value; }
         }
 
-        public long ContentLength64
-        {
-            get { return contentLength64.GetValueOrDefault(); }
-            set { contentLength64 = value; }
-        }
-
         public string ContentType
         {
             get { return contentType; }
             set { contentType = value; }
-        }
-
-        public WebHeaderCollection Headers
-        {
-            get { return headers; }
         }
 
         public Stream OutputStream
