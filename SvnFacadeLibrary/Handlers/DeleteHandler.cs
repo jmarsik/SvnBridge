@@ -22,9 +22,6 @@ namespace SvnBridge.Handlers
             }
             else
             {
-                string server = request.Headers["Host"].Split(':')[0];
-                string port = request.Headers["Host"].Split(':')[1];
-
                 SetResponseSettings(response, "text/html; charset=iso-8859-1", Encoding.UTF8, 404);
 
                 string responseContent =
@@ -35,7 +32,7 @@ namespace SvnBridge.Handlers
                     "<h1>Not Found</h1>\n" +
                     "<p>The requested URL " + Helper.Decode(path) + " was not found on this server.</p>\n" +
                     "<hr>\n" +
-                    "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " + port + "</address>\n" +
+                    "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " + request.Url.Port + "</address>\n" +
                     "</body></html>\n";
 
                 WriteToResponse(response, responseContent);

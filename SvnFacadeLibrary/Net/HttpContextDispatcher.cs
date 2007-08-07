@@ -69,6 +69,7 @@ namespace SvnBridge.Net
 
         private static void SendUnauthorizedResponse(IHttpContext connection)
         {
+            IHttpRequest request = connection.Request;
             IHttpResponse response = connection.Response;
 
             response.ClearHeaders();
@@ -77,10 +78,6 @@ namespace SvnBridge.Net
             response.ContentType = "text/html; charset=iso-8859-1";
 
             response.AppendHeader("WWW-Authenticate", "Basic realm=\"CodePlex Subversion Repository\"");
-
-            string[] hostParts = connection.Request.Headers["Host"].Split(':');
-            string server = hostParts[0];
-            string port = hostParts[1];
 
             string content = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
                              "<html><head>\n" +
@@ -94,7 +91,7 @@ namespace SvnBridge.Net
                              "browser doesn't understand how to supply\n" +
                              "the credentials required.</p>\n" +
                              "<hr>\n" +
-                             "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " + port +
+                             "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " + request.Url.Port +
                              "</address>\n" +
                              "</body></html>\n";
 

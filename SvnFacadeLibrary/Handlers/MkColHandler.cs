@@ -16,19 +16,15 @@ namespace SvnBridge.Handlers
 
             string path = Helper.Decode(GetPath(request));
 
-            string[] hostParts = request.Headers["Host"].Split(':');
-            string server = hostParts[0];
-            string port = hostParts[1];
-
             try
             {
                 MakeCollection(path, sourceControlProvider);
 
-                SendCreatedResponse(request, response, path, server, port);
+                SendCreatedResponse(request, response, path, request.Url.Host, request.Url.Port.ToString());
             }
             catch (FolderAlreadyExistsException)
             {
-                SendFailureResponse(response, path, server, port);
+                SendFailureResponse(response, path, request.Url.Host, request.Url.Port.ToString());
             }
         }
 
