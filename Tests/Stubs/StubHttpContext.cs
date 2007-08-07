@@ -7,7 +7,6 @@ namespace SvnBridge.Stubs
     {
         internal IHttpRequest RequestProperty;
         internal IHttpResponse ResponseProperty;
-        internal IPrincipal UserProperty;
 
         #region IConnection Members
 
@@ -21,12 +20,6 @@ namespace SvnBridge.Stubs
         {
             get { return ResponseProperty; }
             internal set { ResponseProperty = value; }
-        }
-
-        public IPrincipal User
-        {
-            get { return UserProperty; }
-            internal set { UserProperty = value; }
         }
 
         #endregion

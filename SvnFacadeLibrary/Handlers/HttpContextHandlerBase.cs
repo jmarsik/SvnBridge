@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -20,25 +21,28 @@ namespace SvnBridge.Handlers
 
         private static NetworkCredential GetCredential(IHttpContext context)
         {
-            NetworkCredential credential = null;
+            string authorizationHeader = context.Request.Headers["Authorization"];
 
-            if (context.User != null)
+            if (!string.IsNullOrEmpty(authorizationHeader))
             {
-                HttpListenerBasicIdentity identity = (HttpListenerBasicIdentity) context.User.Identity;
+                string encodedCredential = authorizationHeader.Substring(authorizationHeader.IndexOf(' ') + 1);
+                string credential = UTF8Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredential));
+                string[] credentialParts = credential.Split(':');
 
-                string username = identity.Name;
+                string username = credentialParts[0];
+                string password = credentialParts[1];
 
-                if (identity.Name.Contains(@"\"))
+                if (username.IndexOf('\\') >= 0)
                 {
                     string domain = username.Substring(0, username.IndexOf('\\'));
                     username = username.Substring(username.IndexOf('\\') + 1);
-                    credential = new NetworkCredential(username, identity.Password, domain);
+                    return new NetworkCredential(username, password, domain);
                 }
                 else
-                    credential = new NetworkCredential(username, identity.Password);
+                    return new NetworkCredential(username, password);
             }
-
-            return credential;
+            else
+                return null;
         }
 
         protected static void SetResponseSettings(IHttpResponse response, string contentType, Encoding contentEncoding, int status)
