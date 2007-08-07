@@ -19,7 +19,7 @@ namespace Tests
             string ignore = "*.bad\n";
             SetProperty(_testPath, "ignore", ignore, true);
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.OneLevel);
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
 
             Assert.AreEqual(ignore, item.Properties["ignore"]);
         }
@@ -44,7 +44,7 @@ namespace Tests
             WriteFile(path, "Fun text", false);
             SetProperty(path, "mime-type", mimeType, true);
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.OneLevel);
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
 
             Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
         }

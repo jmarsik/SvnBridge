@@ -123,7 +123,7 @@ namespace Tests
             _provider.SetProperty(_activityId, path, "mime-type", mimeType);
             Commit();
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.OneLevel);
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
         }
 
@@ -135,7 +135,7 @@ namespace Tests
             _provider.SetProperty(_activityId, _testPath, "ignore", ignore);
             Commit();
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.OneLevel);
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(ignore, item.Properties["ignore"]);
         }
 
@@ -151,7 +151,7 @@ namespace Tests
             _provider.SetProperty(_activityId, path, "mime-type", mimeType2);
             Commit();
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.OneLevel);
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(mimeType2, item.Items[0].Properties["mime-type"]);
         }
 
@@ -165,8 +165,70 @@ namespace Tests
             _provider.SetProperty(_activityId, _testPath, "ignore", ignore2);
             Commit();
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.OneLevel);
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(ignore2, item.Properties["ignore"]);
+        }
+
+        [Test]
+        public void TestCommitMultipleNewPropertiesOnMultipleFiles()
+        {
+            WriteFile(_testPath + "/TestFile1.txt", "Fun text", false);
+            WriteFile(_testPath + "/TestFile2.txt", "Fun text", true);
+
+            _provider.SetProperty(_activityId, _testPath + "/TestFile1.txt", "mime-type1", "mime1");
+            _provider.SetProperty(_activityId, _testPath + "/TestFile1.txt", "mime-type2", "mime2");
+            _provider.SetProperty(_activityId, _testPath + "/TestFile2.txt", "mime-type3", "mime3");
+            _provider.SetProperty(_activityId, _testPath + "/TestFile2.txt", "mime-type4", "mime4");
+            Commit();
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
+            Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
+            Assert.AreEqual("mime2", item.Items[0].Properties["mime-type2"]);
+            Assert.AreEqual("mime3", item.Items[1].Properties["mime-type3"]);
+            Assert.AreEqual("mime4", item.Items[1].Properties["mime-type4"]);
+        }
+
+        [Test]
+        public void TestCommitMultipleNewPropertiesOnMultipleFolders()
+        {
+            CreateFolder(_testPath + "/Folder1", false);
+            CreateFolder(_testPath + "/Folder2", true);
+
+            _provider.SetProperty(_activityId, _testPath + "/Folder1", "mime-type1", "mime1");
+            _provider.SetProperty(_activityId, _testPath + "/Folder1", "mime-type2", "mime2");
+            _provider.SetProperty(_activityId, _testPath + "/Folder2", "mime-type3", "mime3");
+            _provider.SetProperty(_activityId, _testPath + "/Folder2", "mime-type4", "mime4");
+            Commit();
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
+            Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
+            Assert.AreEqual("mime2", item.Items[0].Properties["mime-type2"]);
+            Assert.AreEqual("mime3", item.Items[1].Properties["mime-type3"]);
+            Assert.AreEqual("mime4", item.Items[1].Properties["mime-type4"]);
+        }
+
+        [Test]
+        public void TestCommitNewPropertyOnNewFolderInSameCommit()
+        {
+            _provider.MakeCollection(_activityId, _testPath + "/Folder1");
+            _provider.SetProperty(_activityId, _testPath + "/Folder1", "mime-type1", "mime1");
+            Commit();
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
+            Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
+        }
+
+        [Test]
+        public void TestCommitNewPropertyOnNewFileInSameCommit()
+        {
+            byte[] fileData = GetBytes("test");
+
+            _provider.WriteFile(_activityId, _testPath + "/TestFile1.txt", fileData);
+            _provider.SetProperty(_activityId, _testPath + "/TestFile1.txt", "mime-type1", "mime1");
+            Commit();
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
+            Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
         }
 
         [Test]
@@ -289,7 +351,7 @@ namespace Tests
             _provider.DeleteItem(_activityId, _testPath + "/TestFile.txt");
             Commit();
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.OneLevel);
+            ItemMetaData item = _provider.GetItems(-1, _testPath, Recursion.Full);
         }
 
         [Test]
