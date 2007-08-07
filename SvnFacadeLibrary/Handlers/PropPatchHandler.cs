@@ -26,7 +26,10 @@ namespace SvnBridge.Handlers
 
         private void PropPatch(ISourceControlProvider sourceControlProvider, PropertyUpdateData request, string path, StreamWriter output)
         {
-            string activityPath = path.Substring(path.IndexOf("/!svn/wbl/") + 10);
+            string activityPath = path.Substring(10);
+            if (activityPath.StartsWith("/"))
+                activityPath = activityPath.Substring(1);
+
             string activityId = activityPath.Split('/')[0];
             switch (request.Set.Prop.Properties[0].LocalName)
             {
@@ -46,7 +49,7 @@ namespace SvnBridge.Handlers
                     output.Write("</D:multistatus>\n");
                     break;
                 default:
-                    string itemPath = Helper.Decode(activityPath);
+                    string itemPath = Helper.Decode(activityPath.Substring(activityPath.IndexOf('/')));
                     sourceControlProvider.SetProperty(activityId, itemPath, request.Set.Prop.Properties[0].LocalName, request.Set.Prop.Properties[0].InnerText);
                     output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
                     output.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns3=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns2=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
