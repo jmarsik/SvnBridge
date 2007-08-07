@@ -78,11 +78,14 @@ namespace SvnBridge
             {
                 settingsViewPresenter.Show();
 
-                listener.Port = settingsViewPresenter.Port;
-                listener.TfsServerUrl = settingsViewPresenter.TfsServerUrl;
+                if (!settingsViewPresenter.Cancelled)
+                {
+                    listener.Port = settingsViewPresenter.Port;
+                    listener.TfsServerUrl = settingsViewPresenter.TfsServerUrl;
+                }
             }
 
-            if (settingsViewPresenter.Cancelled)
+            if (listener.Port == 0)
                 return false;
             else
             {
