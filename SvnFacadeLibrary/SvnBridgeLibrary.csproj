@@ -135,7 +135,7 @@
     <Compile Include="Utility\Helper.cs" />
     <Compile Include="Views\IListenerView.cs" />
     <Compile Include="Views\ISettingsView.cs" />
-    <Compile Include="WebDav.cs" />
+    <Compile Include="Protocol\WebDav.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">

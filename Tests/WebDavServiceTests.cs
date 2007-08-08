@@ -74,46 +74,5 @@ namespace Tests
 
             Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7/Empty File 2.txt", result.Parameters[1]);
         }
-
-        [Test]
-        public void VerifyPropFindDecodesPathWhenCallingSourceControlProvider()
-        {
-            MyMocks mock = new MyMocks();
-            StubSourceControlProvider provider = mock.CreateObject<StubSourceControlProvider>();
-            WebDavService service = new WebDavService(provider);
-            Results result = mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
-            MemoryStream outputStream = new MemoryStream();
-            string propfind = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
-            MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes(propfind));
-            XmlSerializer serializer = new XmlSerializer(typeof(PropFindData));
-            PropFindData propfinddata = (PropFindData)serializer.Deserialize(stream);
-
-            service.PropFind(propfinddata, "/Spikes/SvnFacade/trunk/New%20Folder%207", "0", null, outputStream);
-
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", result.Parameters[0]);
-        }
-
-        [Test]
-        public void VerifyPropFindDecodesSvnBcPathWhenCallingSourceControlProvider()
-        {
-            MyMocks mock = new MyMocks();
-            StubSourceControlProvider provider = mock.CreateObject<StubSourceControlProvider>();
-            WebDavService service = new WebDavService(provider);
-            Results result = mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
-            ItemMetaData item = new ItemMetaData();
-            item.Name = "Test Project";
-            mock.Attach(provider.GetItems, item);
-            MemoryStream outputStream = new MemoryStream();
-            string propfind = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
-            MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes(propfind));
-            XmlSerializer serializer = new XmlSerializer(typeof(PropFindData));
-            PropFindData propfinddata = (PropFindData)serializer.Deserialize(stream);
-
-            service.PropFind(propfinddata, "/!svn/bc/3444/Test%20Project", "0", null, outputStream);
-
-            Assert.AreEqual("/Test Project", result.Parameters[0]);
-        }
     }
 }

@@ -71,6 +71,7 @@
     <Compile Include="Handlers\MkActivityHandlerTests.cs" />
     <Compile Include="Handlers\MkColHandlerTests.cs" />
     <Compile Include="Handlers\OptionsHandlerTests.cs" />
+    <Compile Include="Handlers\PropFindHandlerTests.cs" />
     <Compile Include="Handlers\PropPatchHandlerTests.cs" />
     <Compile Include="Handlers\ReportLogHandlerTests.cs" />
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
@@ -83,7 +84,6 @@
     <Compile Include="Infrastructure\StubSourceControlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\WebDavServiceTestsBase.cs" />
-    <Compile Include="PropFindTests.cs" />
     <Compile Include="StartOptionsTests.cs" />
     <Compile Include="Stubs\StubHttpContext.cs" />
     <Compile Include="Stubs\StubHttpRequest.cs" />
