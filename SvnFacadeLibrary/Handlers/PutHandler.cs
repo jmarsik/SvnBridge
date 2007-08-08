@@ -2,6 +2,8 @@ using System.Text;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
+using System.IO;
+using System;
 
 namespace SvnBridge.Handlers
 {
@@ -13,10 +15,7 @@ namespace SvnBridge.Handlers
             IHttpResponse response = context.Response;
 
             string path = GetPath(request);
-
-            WebDavService webDavService = new WebDavService(sourceControlProvider);
-
-            bool created = webDavService.Put(path, request.InputStream, request.Headers["X-SVN-Base-Fulltext-MD5"], request.Headers["X-SVN-Result-Fulltext-MD5"]);
+            bool created = Put(sourceControlProvider, path, request.InputStream, request.Headers["X-SVN-Base-Fulltext-MD5"], request.Headers["X-SVN-Result-Fulltext-MD5"]);
 
             if (created)
             {
@@ -40,6 +39,41 @@ namespace SvnBridge.Handlers
             {
                 SetResponseSettings(response, "text/plain", Encoding.UTF8, 204);
             }
+        }
+
+        private bool Put(ISourceControlProvider sourceControlProvider, string path, Stream inputStream, string baseHash, string resultHash)
+        {
+            string activityId = path.Substring(11, path.IndexOf('/', 11) - 11);
+            string serverPath = Helper.Decode(path.Substring(11 + activityId.Length));
+            SvnDiff[] diffs = SvnDiffParser.ParseSvnDiff(inputStream);
+            byte[] fileData = new byte[0];
+            if (diffs.Length > 0)
+            {
+                byte[] sourceData = new byte[0];
+                if (baseHash != null)
+                {
+                    ItemMetaData item = sourceControlProvider.GetItems(-1, serverPath, Recursion.None);
+                    sourceData = sourceControlProvider.ReadFile(item);
+                    if (Helper.GetMd5Checksum(sourceData) != baseHash)
+                    {
+                        throw new Exception("Checksum mismatch with base file");
+                    }
+                }
+
+                int sourceDataStartIndex = 0;
+                foreach (SvnDiff diff in diffs)
+                {
+                    byte[] newData = SvnDiffEngine.ApplySvnDiff(diff, sourceData, sourceDataStartIndex);
+                    sourceDataStartIndex += newData.Length;
+                    Helper.ReDim(ref fileData, fileData.Length + newData.Length);
+                    Array.Copy(newData, 0, fileData, fileData.Length - newData.Length, newData.Length);
+                }
+                if (Helper.GetMd5Checksum(fileData) != resultHash)
+                {
+                    throw new Exception("Checksum mismatch with new file");
+                }
+            }
+            return sourceControlProvider.WriteFile(activityId, serverPath, fileData);
         }
     }
 }

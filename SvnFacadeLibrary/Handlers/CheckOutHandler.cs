@@ -15,14 +15,11 @@ namespace SvnBridge.Handlers
             IHttpResponse response = context.Response;
 
             string path = GetPath(request);
-
-            WebDavService webDavService = new WebDavService(sourceControlProvider);
-
             CheckoutData data = Helper.DeserializeXml<CheckoutData>(request.InputStream);
 
             try
             {
-                string location = webDavService.CheckOut(data, path, request.Headers["Host"]);
+                string location = CheckOut(sourceControlProvider, data, path, request.Headers["Host"]);
                 SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
                 response.AppendHeader("Cache-Control", "no-cache");
                 response.AppendHeader("Location", "http://" + request.Headers["Host"] + location);
@@ -51,6 +48,30 @@ namespace SvnBridge.Handlers
                     "</D:error>\n";
                 WriteToResponse(response, responseContent);
             }
+        }
+
+        private string CheckOut(ISourceControlProvider sourceControlProvider, CheckoutData request, string path, string host)
+        {
+            string location = null;
+            string activityId = request.ActivitySet.href.Split('/')[3];
+
+            switch (path.Split('/')[2])
+            {
+                case "bln":
+                    location = "//!svn/wbl/" + activityId + path.Substring(9);
+                    break;
+                case "ver":
+                    string itemPath = path.Substring(path.IndexOf('/', 10));
+                    int version = int.Parse(path.Split('/')[3]);
+                    location = "//!svn/wrk/" + activityId + itemPath;
+                    ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(itemPath), Recursion.None);
+                    if (item.Revision > version)
+                    {
+                        throw new ConflictException();
+                    }
+                    break;
+            }
+            return location;
         }
     }
 }

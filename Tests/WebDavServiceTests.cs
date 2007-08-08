@@ -59,20 +59,5 @@ namespace Tests
 
             Assert.AreEqual("/Folder With Spaces", results.Parameters[1]);
         }
-
-        [Test]
-        public void VerifyPutDecodesPathWhenCallingSourceControlProvider()
-        {
-            MyMocks mock = new MyMocks();
-            StubSourceControlProvider provider = mock.CreateObject<StubSourceControlProvider>();
-            WebDavService service = new WebDavService(provider);
-            Results result = mock.Attach(provider.WriteFile, false);
-            byte[] data = Encoding.Default.GetBytes("SVN\0");
-            MemoryStream stream = new MemoryStream(data);
-
-            service.Put("//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New%20Folder%207/Empty%20File%202.txt", stream, null, null);
-
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7/Empty File 2.txt", result.Parameters[1]);
-        }
     }
 }
