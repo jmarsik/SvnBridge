@@ -144,7 +144,7 @@ namespace SvnBridge.SourceControl
                     {
                         _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + activity.CopiedItems[i].TargetPath });
                         for (int j = activity.MergeList.Count - 1; j >= 0; j--)
-                            if (activity.MergeList[j].Path == SERVER_PATH + activity.CopiedItems[j].TargetPath)
+                            if (activity.MergeList[j].Path == SERVER_PATH + activity.CopiedItems[i].TargetPath)
                                 activity.MergeList.RemoveAt(j);
 
                         ProcessCopyItem(activityId, activity.CopiedItems[i].Path, activity.CopiedItems[i].TargetPath, true);

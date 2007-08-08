@@ -56,7 +56,7 @@
     <Compile Include="Handlers\HttpContextHandlerBase.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
-    <Compile Include="Handlers\UpdateReportService.cs" />
+    <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
     <Compile Include="Net\HttpContext.cs" />
     <Compile Include="Net\HttpContextDispatcher.cs" />
     <Compile Include="Net\HttpRequest.cs" />
@@ -75,11 +75,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Nodes\BcFileNode.cs" />
-    <Compile Include="Nodes\FileNode.cs" />
-    <Compile Include="Nodes\INode.cs" />
-    <Compile Include="Nodes\SvnBlnNode.cs" />
-    <Compile Include="Nodes\SvnVccDefaultNode.cs" />
+    <Compile Include="Handlers\PropFindHandler\BcFileNode.cs" />
+    <Compile Include="Handlers\PropFindHandler\FileNode.cs" />
+    <Compile Include="Handlers\PropFindHandler\INode.cs" />
+    <Compile Include="Handlers\PropFindHandler\SvnBlnNode.cs" />
+    <Compile Include="Handlers\PropFindHandler\SvnVccDefaultNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocol\ActivityCollectionSetData.cs" />
     <Compile Include="Protocol\ActivitySetData.cs" />
