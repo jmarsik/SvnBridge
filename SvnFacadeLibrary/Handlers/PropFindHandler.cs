@@ -121,7 +121,7 @@ namespace SvnBridge.Handlers
                     {
                         foreach (ItemMetaData item in folderInfo.Items)
                         {
-                            INode node = new BcFileNode(WebDavService.VccPath, item.Name, sourceControlProvider, WebDavService.RepositoryUuid);
+                            INode node = new BcFileNode(Constants.VccPath, item.Name, sourceControlProvider, Constants.RepositoryUuid);
                             ProcessPropFind(node, item.Name, propfind.Prop.Properties, output);
                         }
                     }
@@ -129,7 +129,7 @@ namespace SvnBridge.Handlers
                     {
                         foreach (ItemMetaData item in folderInfo.Items)
                         {
-                            INode node = new FileNode(WebDavService.VccPath, item.Name, sourceControlProvider, WebDavService.RepositoryUuid);
+                            INode node = new FileNode(Constants.VccPath, item.Name, sourceControlProvider, Constants.RepositoryUuid);
                             ProcessPropFind(node, item.Name, propfind.Prop.Properties, output);
                         }
                     }

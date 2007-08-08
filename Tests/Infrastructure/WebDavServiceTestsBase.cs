@@ -20,7 +20,6 @@ namespace Tests
     {
         protected HttpContextDispatcher HttpDispatcher;
         protected MyMocks mock = new MyMocks();
-        protected WebDavService service;
         protected StubSourceControlProvider provider;
 
         [SetUp]
@@ -30,7 +29,6 @@ namespace Tests
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             HttpDispatcher = new HttpContextDispatcher();
             HttpDispatcher.TfsServerUrl = "http://foo";
-            service = new WebDavService(provider);
         }
 
         [TearDown]

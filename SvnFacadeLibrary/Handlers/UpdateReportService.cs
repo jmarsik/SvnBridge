@@ -44,9 +44,9 @@ namespace SvnBridge.Handlers
                 }
                 output.Write("<D:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" + Helper.Encode(item.Name) + "</D:href></D:checked-in>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + item.Revision.ToString() + "</S:set-prop>\n");
-                output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + WebDavService.FormatDate(item.LastModifiedDate) + "</S:set-prop>\n");
+                output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + Helper.FormatDate(item.LastModifiedDate) + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:last-author\">" + item.Author + "</S:set-prop>\n");
-                output.Write("<S:set-prop name=\"svn:entry:uuid\">" + WebDavService.RepositoryUuid + "</S:set-prop>\n");
+                output.Write("<S:set-prop name=\"svn:entry:uuid\">" + Constants.RepositoryUuid + "</S:set-prop>\n");
                 foreach (KeyValuePair<string, string> property in item.Properties)
                 {
                     output.Write("<S:set-prop name=\"svn:" + property.Key + "\">" + property.Value + "</S:set-prop>\n");
@@ -115,9 +115,9 @@ namespace SvnBridge.Handlers
                 {
                     output.Write("<D:checked-in><D:href>/!svn/ver/" + folder.Revision.ToString() + "/" + Helper.Encode(folder.Name) + "</D:href></D:checked-in>\n");
                     output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + folder.Revision.ToString() + "</S:set-prop>\n");
-                    output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + WebDavService.FormatDate(folder.LastModifiedDate) + "</S:set-prop>\n");
+                    output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + Helper.FormatDate(folder.LastModifiedDate) + "</S:set-prop>\n");
                     output.Write("<S:set-prop name=\"svn:entry:last-author\">" + folder.Author + "</S:set-prop>\n");
-                    output.Write("<S:set-prop name=\"svn:entry:uuid\">" + WebDavService.RepositoryUuid + "</S:set-prop>\n");
+                    output.Write("<S:set-prop name=\"svn:entry:uuid\">" + Constants.RepositoryUuid + "</S:set-prop>\n");
                     foreach (KeyValuePair<string, string> property in folder.Properties)
                     {
                         output.Write("<S:set-prop name=\"svn:" + property.Key + "\">" + property.Value + "</S:set-prop>\n");

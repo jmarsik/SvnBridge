@@ -197,5 +197,11 @@ namespace SvnBridge.Utility
 
             return value;
         }
+
+        public static string FormatDate(DateTime date)
+        {
+            string result = date.ToUniversalTime().ToString("o");
+            return result.Remove(result.Length - 2, 1);
+        }
     }
 }

@@ -36,12 +36,12 @@ namespace SvnBridge.Handlers
             output.Write("<D:merge-response xmlns:D=\"DAV:\">\n");
             output.Write("<D:updated-set>\n");
             output.Write("<D:response>\n");
-            output.Write("<D:href>" + WebDavService.VccPath + "</D:href>\n");
+            output.Write("<D:href>" + Constants.VccPath + "</D:href>\n");
             output.Write("<D:propstat><D:prop>\n");
             output.Write("<D:resourcetype><D:baseline/></D:resourcetype>\n");
             output.Write("\n");
             output.Write("<D:version-name>" + mergeResponse.Version.ToString() + "</D:version-name>\n");
-            output.Write("<D:creationdate>" + WebDavService.FormatDate(mergeResponse.CreationDate) + "</D:creationdate>\n");
+            output.Write("<D:creationdate>" + Helper.FormatDate(mergeResponse.CreationDate) + "</D:creationdate>\n");
             output.Write("<D:creator-displayname>" + mergeResponse.Creator + "</D:creator-displayname>\n");
             output.Write("</D:prop>\n");
             output.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
