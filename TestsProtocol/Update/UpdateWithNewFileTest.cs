@@ -9,7 +9,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class UpdateWithNewFileTest : WebDavServiceTestsBase
+    public class UpdateWithNewFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

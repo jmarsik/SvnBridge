@@ -5,7 +5,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class CommitUpdatedFileThatIsOutOfDateTest : WebDavServiceTestsBase
+    public class CommitUpdatedFileThatIsOutOfDateTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

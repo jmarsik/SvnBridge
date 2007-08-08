@@ -7,7 +7,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class Tests : WebDavServiceTestsBase
+    public class Tests : ProtocolTestsBase
     {
         [Test]
         public void CommitNewBinaryFileTest()

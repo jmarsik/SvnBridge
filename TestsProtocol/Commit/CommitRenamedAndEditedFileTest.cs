@@ -8,7 +8,7 @@ using System.Text;
 namespace Tests
 {
     [TestFixture]
-    public class CommitRenamedAndEditedFileTest : WebDavServiceTestsBase
+    public class CommitRenamedAndEditedFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

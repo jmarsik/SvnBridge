@@ -8,7 +8,7 @@ using SvnBridge.Exceptions;
 namespace Tests
 {
     [TestFixture]
-    public class CommitAddFolderThatAlreadyExistsTest : WebDavServiceTestsBase
+    public class CommitAddFolderThatAlreadyExistsTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

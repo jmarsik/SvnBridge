@@ -7,7 +7,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 namespace Tests
 {
     [TestFixture]
-    public class UpdateOfDeletedFileTest : WebDavServiceTestsBase
+    public class UpdateOfDeletedFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

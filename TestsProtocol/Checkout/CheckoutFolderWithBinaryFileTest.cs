@@ -9,7 +9,7 @@ using SvnBridge.Utility;
 namespace Tests
 {
     [TestFixture]
-    public class CheckoutFolderWithBinaryFileTest : WebDavServiceTestsBase
+    public class CheckoutFolderWithBinaryFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

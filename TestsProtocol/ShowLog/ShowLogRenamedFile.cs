@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Tests
 {
     [TestFixture]
-    public class ShowLogRenamedFileTest : WebDavServiceTestsBase
+    public class ShowLogRenamedFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

@@ -8,7 +8,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class CommitFileThatWasCheckedOutAnonymouslyTest : WebDavServiceTestsBase
+    public class CommitFileThatWasCheckedOutAnonymouslyTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

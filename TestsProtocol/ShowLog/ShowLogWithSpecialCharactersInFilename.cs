@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Tests
 {
     [TestFixture]
-    public class ShowLogWithSpecialCharactersInFilename : WebDavServiceTestsBase
+    public class ShowLogWithSpecialCharactersInFilename : ProtocolTestsBase
     {
         [Test]
         public void Test1()

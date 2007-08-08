@@ -7,7 +7,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 namespace Tests
 {
     [TestFixture]
-    public class CheckoutFolderWithAmpersandInNameTest : WebDavServiceTestsBase
+    public class CheckoutFolderWithAmpersandInNameTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

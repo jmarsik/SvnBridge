@@ -9,7 +9,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class ShowLogSingleFolderWithOneFileTest : WebDavServiceTestsBase
+    public class ShowLogSingleFolderWithOneFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

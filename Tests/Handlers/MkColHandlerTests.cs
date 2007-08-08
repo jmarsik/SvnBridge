@@ -24,5 +24,16 @@ namespace SvnBridge.Handlers
             Assert.AreEqual("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
             Assert.AreEqual("/Spikes/SvnFacade/trunk/Empty", r.Parameters[1]);
         }
+
+        [Test]
+        public void VerifyPathIsDecodedWhenCallingSourceControlProvider()
+        {
+            Results r = mock.Attach(provider.MakeCollection);
+            request.Path = "http://localhost:8081//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Folder%20With%20Spaces";
+
+            handler.Handle(context, tfsServerUrl);
+
+            Assert.AreEqual("/Folder With Spaces", r.Parameters[1]);
+        }
     }
 }

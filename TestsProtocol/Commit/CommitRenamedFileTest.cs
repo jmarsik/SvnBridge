@@ -7,7 +7,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 namespace Tests
 {
     [TestFixture]
-    public class CommitRenamedFileTest : WebDavServiceTestsBase
+    public class CommitRenamedFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

@@ -16,7 +16,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace Tests
 {
-    public abstract class WebDavServiceTestsBase
+    public abstract class ProtocolTestsBase
     {
         protected HttpContextDispatcher HttpDispatcher;
         protected MyMocks mock = new MyMocks();

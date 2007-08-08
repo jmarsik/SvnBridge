@@ -6,7 +6,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class UpdateAfterCommitNewFolderTest : WebDavServiceTestsBase
+    public class UpdateAfterCommitNewFolderTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

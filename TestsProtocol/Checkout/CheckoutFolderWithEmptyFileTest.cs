@@ -7,7 +7,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class CheckoutFolderWithEmptyFileTest : WebDavServiceTestsBase
+    public class CheckoutFolderWithEmptyFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()

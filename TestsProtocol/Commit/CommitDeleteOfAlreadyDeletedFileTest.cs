@@ -6,7 +6,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class CommitDeleteOfAlreadyDeletedFileTest : WebDavServiceTestsBase
+    public class CommitDeleteOfAlreadyDeletedFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()
