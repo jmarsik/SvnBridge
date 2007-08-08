@@ -425,5 +425,25 @@ namespace Tests
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
         }
+
+        [Test]
+        public void TestCommitMoveMultipleFilesFromDeletedFolderIntoNewFolder()
+        {
+            CreateFolder(_testPath + "/A", false);
+            WriteFile(_testPath + "/A/Test1.txt", "filedata", false);
+            WriteFile(_testPath + "/A/Test2.txt", "filedata", true);
+
+            _provider.MakeCollection(_activityId, _testPath + "/B");
+            _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/B/Test1.txt");
+            _provider.CopyItem(_activityId, _testPath + "/A/Test2.txt", _testPath + "/B/Test2.txt");
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            Commit();
+
+            LogItem log1 = _provider.GetLog(_testPath + "/B/Test1.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[0].ChangeType);
+            LogItem log2 = _provider.GetLog(_testPath + "/B/Test2.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log2.History[0].Changes[0].ChangeType);
+            Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+        }
     }
 }

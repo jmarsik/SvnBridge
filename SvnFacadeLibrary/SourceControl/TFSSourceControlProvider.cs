@@ -41,11 +41,13 @@ namespace SvnBridge.SourceControl
         {
             public string Path;
             public string TargetPath;
+            public bool Rename;
 
-            public CopyAction(string path, string targetPath)
+            public CopyAction(string path, string targetPath, bool rename)
             {
                 Path = path;
                 TargetPath = targetPath;
+                Rename = rename;
             }
         }
 
@@ -112,8 +114,9 @@ namespace SvnBridge.SourceControl
 
         public void CopyItem(string activityId, string path, string targetPath)
         {
-            _activities[activityId].CopiedItems.Add(new CopyAction(path, targetPath));
-            ProcessCopyItem(activityId, path, targetPath, false);
+            CopyAction copyAction = new CopyAction(path, targetPath, false);
+            _activities[activityId].CopiedItems.Add(copyAction);
+            ProcessCopyItem(activityId, copyAction, false);
         }
 
         public void DeleteActivity(string activityId)
@@ -130,8 +133,20 @@ namespace SvnBridge.SourceControl
             {
                 if (copy.Path.StartsWith(path + "/"))
                 {
-                    activity.PostCommitDeletedItems.Add(path);
+                    if (!activity.PostCommitDeletedItems.Contains(path))
+                        activity.PostCommitDeletedItems.Add(path);
+
                     postCommitDelete = true;
+
+                    if (!copy.Rename)
+                    {
+                        _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + copy.TargetPath });
+                        for (int i = activity.MergeList.Count - 1; i >= 0; i--)
+                            if (activity.MergeList[i].Path == SERVER_PATH + copy.TargetPath)
+                                activity.MergeList.RemoveAt(i);
+
+                        ProcessCopyItem(activityId, copy, true);
+                    }
                 }
             }
 
@@ -147,7 +162,7 @@ namespace SvnBridge.SourceControl
                             if (activity.MergeList[j].Path == SERVER_PATH + activity.CopiedItems[i].TargetPath)
                                 activity.MergeList.RemoveAt(j);
 
-                        ProcessCopyItem(activityId, activity.CopiedItems[i].Path, activity.CopiedItems[i].TargetPath, true);
+                        ProcessCopyItem(activityId, activity.CopiedItems[i], true);
                         deleteIsRename = true;
                     }
                 }
@@ -517,28 +532,28 @@ namespace SvnBridge.SourceControl
             _sourceControlSvc.UpdateLocalVersions(_serverUrl, _credentials, activityId, updates);
         }
 
-        private void ProcessCopyItem(string activityId, string path, string targetPath, bool forceRename)
+        private void ProcessCopyItem(string activityId, CopyAction copyAction, bool forceRename)
         {
             Activity activity = _activities[activityId];
 
-            string localPath = GetLocalPath(activityId, path);
-            string localTargetPath = GetLocalPath(activityId, targetPath);
+            string localPath = GetLocalPath(activityId, copyAction.Path);
+            string localTargetPath = GetLocalPath(activityId, copyAction.TargetPath);
 
-            ItemMetaData item = GetItems(-1, path, Recursion.None);
+            ItemMetaData item = GetItems(-1, copyAction.Path, Recursion.None);
             UpdateLocalVersion(activityId, item, localPath);
 
             bool copyIsRename = false;
-            if (activity.DeletedItems.Contains(path))
+            if (activity.DeletedItems.Contains(copyAction.Path))
             {
                 copyIsRename = true;
-                activity.DeletedItems.Remove(path);
-                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + path });
+                activity.DeletedItems.Remove(copyAction.Path);
+                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + copyAction.Path });
             }
             if (!copyIsRename)
             {
                 for (int i=activity.DeletedItems.Count-1; i >= 0; i--)
                 {
-                    if (path.StartsWith(activity.DeletedItems[i] + "/"))
+                    if (copyAction.Path.StartsWith(activity.DeletedItems[i] + "/"))
                     {
                         copyIsRename = true;
                         activity.PostCommitDeletedItems.Add(activity.DeletedItems[i]);
@@ -554,22 +569,25 @@ namespace SvnBridge.SourceControl
             if (!copyIsRename)
             {
                 foreach (string deletedItem in activity.PostCommitDeletedItems)
-                    if (path.StartsWith(deletedItem + "/"))
+                    if (copyAction.Path.StartsWith(deletedItem + "/"))
                         copyIsRename = true;
             }
 
             List<PendRequest> pendRequests = new List<PendRequest>();
             if (copyIsRename || forceRename)
+            {
                 pendRequests.Add(PendRequest.Rename(localPath, localTargetPath));
+                copyAction.Rename = true;
+            }
             else
                 pendRequests.Add(PendRequest.Copy(localPath, localTargetPath));
 
             for (int i = activity.MergeList.Count - 1; i >= 0; i--)
-                if (activity.MergeList[i].Path == SERVER_PATH + path)
+                if (activity.MergeList[i].Path == SERVER_PATH + copyAction.Path)
                     activity.MergeList.RemoveAt(i);
 
             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
-            activity.MergeList.Add(new ActivityItem(SERVER_PATH + targetPath, item.ItemType));
+            activity.MergeList.Add(new ActivityItem(SERVER_PATH + copyAction.TargetPath, item.ItemType));
         }
 
         private string GetPropertiesFolderName(string path, ItemType itemType)
