@@ -73,6 +73,7 @@
     <Compile Include="ShowLog\ShowLogSingleFolderWithOneFile.cs" />
     <Compile Include="ShowLog\ShowLogWithSpecialCharactersInComments.cs" />
     <Compile Include="ShowLog\ShowLogWithSpecialCharactersInFilename.cs" />
+    <Compile Include="Update\UpdateAfterCommitDeleteFolder.cs" />
     <Compile Include="Update\UpdateAfterCommitFileDeleteTest.cs" />
     <Compile Include="Update\UpdateAfterCommitNewFolderTest.cs" />
     <Compile Include="Update\UpdateAfterCommitRenamedFile.cs" />

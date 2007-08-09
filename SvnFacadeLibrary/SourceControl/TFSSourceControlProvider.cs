@@ -850,6 +850,11 @@ namespace SvnBridge.SourceControl
             {
                 if (clientDeletedFiles.ContainsKey(changePath) || (clientExistingFiles.ContainsKey(changePath) && (clientExistingFiles[changePath] >= itemRevision)))
                     return true;
+
+                foreach (string clientDeletedFile in clientDeletedFiles.Keys)
+                    if (changePath.StartsWith(clientDeletedFile + "/"))
+                        return true;
+
             }
             return false;
         }

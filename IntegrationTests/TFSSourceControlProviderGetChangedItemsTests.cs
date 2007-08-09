@@ -150,6 +150,48 @@ namespace Tests
         }
 
         [Test]
+        public void TestGetChangedItemsWithDeletedFolderReturnsNothingWhenClientStateAlreadyCurrent()
+        {
+            string path = _testPath + "/FolderA";
+            CreateFolder(path, true);
+            int versionFrom = _provider.GetLatestVersion();
+            DeleteItem(path, true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.Entries = new List<EntryData>();
+            EntryData entry = new EntryData();
+            entry.Rev = versionFrom.ToString();
+            reportData.Entries.Add(entry);
+            reportData.Missing = new List<string>();
+            reportData.Missing.Add("FolderA");
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithDeletedFolderContainingFilesReturnsNothingWhenClientStateAlreadyCurrent()
+        {
+            CreateFolder(_testPath + "/FolderA", false);
+            WriteFile(_testPath + "/FolderA/Test1.txt", "filedata", true);
+            int versionFrom = _provider.GetLatestVersion();
+            DeleteItem(_testPath + "/FolderA", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.Entries = new List<EntryData>();
+            EntryData entry = new EntryData();
+            entry.Rev = versionFrom.ToString();
+            reportData.Entries.Add(entry);
+            reportData.Missing = new List<string>();
+            reportData.Missing.Add("FolderA");
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
+
+        [Test]
         public void TestGetChangedItemsWithDeletedFileReturnsNothingWhenClientStateAlreadyCurrent()
         {
             string path = _testPath + "/TestFile.txt";
