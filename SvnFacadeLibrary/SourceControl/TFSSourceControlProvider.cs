@@ -845,6 +845,10 @@ namespace SvnBridge.SourceControl
             {
                 if ((clientExistingFiles.ContainsKey(changePath)) && (clientExistingFiles[changePath] >= itemRevision))
                     return true;
+
+                foreach (string clientExistingFile in clientExistingFiles.Keys)
+                    if (changePath.StartsWith(clientExistingFile + "/") && (clientExistingFiles[clientExistingFile] >= itemRevision))
+                        return true;
             }
             else if ((changeType & ChangeType.Delete) == ChangeType.Delete)
             {
@@ -854,7 +858,6 @@ namespace SvnBridge.SourceControl
                 foreach (string clientDeletedFile in clientDeletedFiles.Keys)
                     if (changePath.StartsWith(clientDeletedFile + "/"))
                         return true;
-
             }
             return false;
         }

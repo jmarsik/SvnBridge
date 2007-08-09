@@ -150,6 +150,26 @@ namespace Tests
         }
 
         [Test]
+        public void TestGetChangedItemsWithNewFolderAndNewFileReturnsNothingWhenClientStateAlreadyCurrent()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            CreateFolder(_testPath + "/Folder1", false);
+            WriteFile(_testPath + "/Folder1/Test.txt", "filedata", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.Entries = new List<EntryData>();
+            reportData.Entries.Add(new EntryData());
+            reportData.Entries[0].Rev = versionFrom.ToString();
+            reportData.Entries.Add(new EntryData());
+            reportData.Entries[1].Rev = versionTo.ToString();
+            reportData.Entries[1].path = "Folder1";
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
+
+        [Test]
         public void TestGetChangedItemsWithDeletedFolderReturnsNothingWhenClientStateAlreadyCurrent()
         {
             string path = _testPath + "/FolderA";
