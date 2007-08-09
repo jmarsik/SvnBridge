@@ -81,6 +81,7 @@
     <Compile Include="Update\UpdateWithDeletedFileTest.cs" />
     <Compile Include="Update\UpdateWithDeletedFolderTest.cs" />
     <Compile Include="Update\UpdateWithNewFileTest.cs" />
+    <Compile Include="Update\UpdateWithNewProperty.cs" />
     <Compile Include="Update\UpdateWithNoNewItems.cs" />
   </ItemGroup>
   <ItemGroup>

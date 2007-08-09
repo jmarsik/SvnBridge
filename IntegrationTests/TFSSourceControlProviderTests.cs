@@ -14,17 +14,6 @@ namespace Tests
     public class TFSSourceControlProviderTests : TFSSourceControlProviderTestsBase
     {
         [Test]
-        public void TestGetItemsReturnsIgnoreInfo()
-        {
-            string ignore = "*.bad\n";
-            SetProperty(_testPath, "ignore", ignore, true);
-
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
-
-            Assert.AreEqual(ignore, item.Properties["ignore"]);
-        }
-
-        [Test]
         public void TestGetLog()
         {
             int versionFrom = _provider.GetLatestVersion();
@@ -34,25 +23,6 @@ namespace Tests
             LogItem logItem = _provider.GetLog(_testPath, versionFrom, versionTo, Recursion.Full, Int32.MaxValue);
 
             Assert.AreEqual(2, logItem.History.Length);
-        }
-
-        [Test]
-        public void TestGetItemsReturnsMimeTypeInfo()
-        {
-            string mimeType = "application/octet-stream";
-            string path = _testPath + "/TestFile.txt";
-            WriteFile(path, "Fun text", false);
-            SetProperty(path, "mime-type", mimeType, true);
-
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
-
-            Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
-        }
-
-        [Test]
-        public void TestGetItemsForRootSucceeds()
-        {
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, "", Recursion.OneLevel);
         }
 
         [Test, ExpectedException(typeof(FolderAlreadyExistsException))]

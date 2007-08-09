@@ -47,7 +47,7 @@ namespace Trace
             WriteTestLogLine("namespace Tests");
             WriteTestLogLine("{");
             WriteTestLogLine("    [TestFixture]");
-            WriteTestLogLine("    public class Tests : WebDavServiceTestsBase");
+            WriteTestLogLine("    public class Tests : ProtocolTestsBase");
             WriteTestLogLine("    {");
 
             Thread requestProcessor = new Thread(StartListening);

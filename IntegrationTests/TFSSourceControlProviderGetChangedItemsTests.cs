@@ -210,5 +210,73 @@ namespace Tests
 
             Assert.AreEqual(0, folder.Items.Count);
         }
+
+        [Test]
+        public void TestGetChangedItemsWithUpdatedFolderProperty()
+        {
+            CreateFolder(_testPath + "/Folder1", true);
+            int versionFrom = _provider.GetLatestVersion();
+            SetProperty(_testPath + "/Folder1", "prop1", "prop1value", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(1, folder.Items[0].Properties.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Folder1", folder.Items[0].Name);
+            Assert.AreEqual("prop1value", folder.Items[0].Properties["prop1"]);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithUpdatedFileProperty()
+        {
+            WriteFile(_testPath + "/Test1.txt", "filedata", true);
+            int versionFrom = _provider.GetLatestVersion();
+            SetProperty(_testPath + "/Test1.txt", "prop1", "prop1value", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(1, folder.Items[0].Properties.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Test1.txt", folder.Items[0].Name);
+            Assert.AreEqual("prop1value", folder.Items[0].Properties["prop1"]);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithAddedFileContainingProperty()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            WriteFile(_testPath + "/Test1.txt", "filedata", false);
+            SetProperty(_testPath + "/Test1.txt", "prop1", "prop1value", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(1, folder.Items[0].Properties.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Test1.txt", folder.Items[0].Name);
+            Assert.AreEqual("prop1value", folder.Items[0].Properties["prop1"]);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithAddedFolderContainingProperty()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            CreateFolder(_testPath + "/Folder1", false);
+            SetProperty(_testPath + "/Folder1", "prop1", "prop1value", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(1, folder.Items[0].Properties.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Folder1", folder.Items[0].Name);
+            Assert.AreEqual("prop1value", folder.Items[0].Properties["prop1"]);
+        }
     }
 }
