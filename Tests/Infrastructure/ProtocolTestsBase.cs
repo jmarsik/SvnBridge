@@ -67,7 +67,7 @@ namespace Tests
             long responseStart = HttpStream.Position;
             HttpStream.Position = 0;
 
-            HttpContext context = new HttpContext(HttpStream);
+            ListenerContext context = new ListenerContext(HttpStream);
             HttpDispatcher.Dispatch(context);
             context.Response.Close();
 

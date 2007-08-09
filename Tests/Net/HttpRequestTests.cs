@@ -22,7 +22,7 @@ namespace SvnBridge.Net
             Assert.DoesNotThrow(
                 delegate
                 {
-                    new HttpRequest(stream);
+                    new ListenerRequest(stream);
                 });
         }
 

@@ -30,6 +30,9 @@ namespace SvnBridge.Handlers
 
         private static void MakeCollection(string path, ISourceControlProvider sourceControlProvider)
         {
+            if (!path.StartsWith("//"))
+                path = "/" + path;
+            
             Match match = Regex.Match(path, @"//!svn/wrk/([a-zA-Z0-9\-]+)/?");
             string folderPath = path.Substring(match.Groups[0].Value.Length - 1);
             string activityId = match.Groups[1].Value;

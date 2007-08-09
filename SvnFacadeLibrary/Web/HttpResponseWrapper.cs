@@ -1,0 +1,65 @@
+using System.IO;
+using System.Text;
+using System.Web;
+using SvnBridge.Net;
+
+namespace SvnBridge.Web
+{
+    public class HttpResponseWrapper : IHttpResponse
+    {
+        private readonly HttpResponse response;
+
+        public HttpResponseWrapper(HttpResponse response)
+        {
+            this.response = response;
+        }
+
+        #region IHttpResponse Members
+
+        public Encoding ContentEncoding
+        {
+            get { return response.ContentEncoding; }
+            set { response.ContentEncoding = value; }
+        }
+
+        public string ContentType
+        {
+            get { return response.ContentType; }
+            set { response.ContentType = value; }
+        }
+
+        public Stream OutputStream
+        {
+            get { return response.OutputStream; }
+        }
+
+        public bool SendChunked
+        {
+            get { return false; }
+            set { }
+        }
+
+        public int StatusCode
+        {
+            get { return response.StatusCode; }
+            set { response.StatusCode = value; }
+        }
+
+        public void AppendHeader(string name, string value)
+        {
+            response.AppendHeader(name, value);
+        }
+
+        public void ClearHeaders()
+        {
+            response.ClearHeaders();
+        }
+
+        public void Close()
+        {
+            response.Close();
+        }
+
+        #endregion
+    }
+}

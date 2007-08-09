@@ -33,6 +33,7 @@
       <HintPath>..\References\CodePlex.TfsLibrary.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web" />
@@ -57,17 +58,17 @@
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
     <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
-    <Compile Include="Net\HttpContext.cs" />
+    <Compile Include="Net\ListenerContext.cs" />
     <Compile Include="Net\HttpContextDispatcher.cs" />
-    <Compile Include="Net\HttpRequest.cs" />
-    <Compile Include="Net\HttpResponse.cs" />
-    <Compile Include="Net\HttpResponseStream.cs" />
+    <Compile Include="Net\ListenerRequest.cs" />
+    <Compile Include="Net\ListenerResponse.cs" />
     <Compile Include="Net\IHttpContext.cs" />
     <Compile Include="Net\IHttpRequest.cs" />
     <Compile Include="Net\IHttpResponse.cs" />
     <Compile Include="Net\IListener.cs" />
     <Compile Include="Net\Listener.cs" />
     <Compile Include="Net\ListenerFactory.cs" />
+    <Compile Include="Net\ListenerResponseStream.cs" />
     <Compile Include="Presenters\ListenerViewPresenter.cs" />
     <Compile Include="Presenters\SettingsViewPresenter.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -135,6 +136,10 @@
     <Compile Include="Views\IListenerView.cs" />
     <Compile Include="Views\ISettingsView.cs" />
     <Compile Include="Protocol\WebDav.cs" />
+    <Compile Include="Web\HttpContextWrapper.cs" />
+    <Compile Include="Web\HttpRequestWrapper.cs" />
+    <Compile Include="Web\HttpResponseWrapper.cs" />
+    <Compile Include="Web\SvnBridgeHttpHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">

@@ -43,6 +43,9 @@ namespace SvnBridge.Handlers
 
         private bool Put(ISourceControlProvider sourceControlProvider, string path, Stream inputStream, string baseHash, string resultHash)
         {
+            if (!path.StartsWith("//"))
+                path = "/" + path;
+
             string activityId = path.Substring(11, path.IndexOf('/', 11) - 11);
             string serverPath = Helper.Decode(path.Substring(11 + activityId.Length));
             SvnDiff[] diffs = SvnDiffParser.ParseSvnDiff(inputStream);

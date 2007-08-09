@@ -108,7 +108,7 @@ namespace SvnBridge.Net
 
         private void Process(TcpClient tcpClient)
         {
-            IHttpContext connection = new HttpContext(tcpClient.GetStream());
+            IHttpContext connection = new ListenerContext(tcpClient.GetStream());
 
             dispatcher.Dispatch(connection);
 
