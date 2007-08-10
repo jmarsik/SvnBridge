@@ -69,7 +69,7 @@
           <AutoAssignPort>False</AutoAssignPort>
           <DevelopmentServerPort>3737</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8081</IISUrl>
+          <IISUrl>http://localhost</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
         </WebProjectProperties>
       </FlavorProperties>

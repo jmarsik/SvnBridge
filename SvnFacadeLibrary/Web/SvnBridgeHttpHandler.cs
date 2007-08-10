@@ -12,7 +12,7 @@ namespace SvnBridge.Web
         public SvnBridgeHttpHandler()
         {
             dispatcher = new HttpContextDispatcher();
-            dispatcher.TfsServerUrl = ConfigurationManager.AppSettings["TfsServerUrl"];
+            dispatcher.TfsServerUrl = ConfigurationManager.AppSettings["TfsUrl"];
         }
 
         #region IHttpHandler Members
