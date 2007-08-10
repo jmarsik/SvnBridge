@@ -465,5 +465,23 @@ namespace Tests
             Assert.AreEqual(ChangeType.Rename, log2.History[0].Changes[0].ChangeType);
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
         }
+
+        [Test]
+        public void TestCommitMovedAndUpdatedFileThenDeleteFolderThatContainedFile()
+        {
+            CreateFolder(_testPath + "/A", false);
+            CreateFolder(_testPath + "/B", false);
+            WriteFile(_testPath + "/A/Test1.txt", "filedata", true);
+
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/B/Test1.txt");
+            _provider.WriteFile(_activityId, _testPath + "/B/Test1.txt", GetBytes("filedata2"));
+            Commit();
+
+            LogItem log2 = _provider.GetLog(_testPath + "/B/Test1.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log2.History[0].Changes[0].ChangeType);
+            Assert.AreEqual("filedata2", GetString(ReadFile(_testPath + "/B/Test1.txt")));
+            Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+        }
     }
 }
