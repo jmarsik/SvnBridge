@@ -18,7 +18,7 @@ namespace SvnBridge.Handlers
             Results r = mock.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/Spikes/SvnFacade/trunk/New%20Folder%207";
 
-            handler.Handle(context, tfsServerUrl);
+            handler.Handle(context, tfsUrl);
 
             Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", r.Parameters[0]);
         }

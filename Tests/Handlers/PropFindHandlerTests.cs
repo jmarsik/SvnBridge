@@ -27,7 +27,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsServerUrl);
+            handler.Handle(context, tfsUrl);
             string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             string expected = "<lp2:baseline-relative-path>Folder With Spaces</lp2:baseline-relative-path>";
@@ -43,7 +43,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsServerUrl);
+            handler.Handle(context, tfsUrl);
 
             Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", r.Parameters[0]);
         }
@@ -60,7 +60,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsServerUrl);
+            handler.Handle(context, tfsUrl);
 
             Assert.AreEqual("/Test Project", r.Parameters[0]);
         }

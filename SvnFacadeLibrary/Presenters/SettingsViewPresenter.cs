@@ -6,7 +6,7 @@ namespace SvnBridge.Presenters
     {
         private bool cancelled;
         private int port;
-        private string tfsServerUrl;
+        private string tfsUrl;
         private readonly ISettingsView view;
         
         public SettingsViewPresenter(ISettingsView view)
@@ -28,10 +28,10 @@ namespace SvnBridge.Presenters
             set { port = value; }
         }
 
-        public string TfsServerUrl
+        public string TfsUrl
         {
-            get { return tfsServerUrl; }
-            set { tfsServerUrl = value; }
+            get { return tfsUrl; }
+            set { tfsUrl = value; }
         }
         
         public void Show()

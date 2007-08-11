@@ -32,8 +32,8 @@ namespace SvnBridge
             IListener listener = ListenerFactory.Create();
             if (startOptions.Port > 0)
                 listener.Port = startOptions.Port;
-            if (!String.IsNullOrEmpty(startOptions.TfsServerUrl))
-                listener.TfsServerUrl = startOptions.TfsServerUrl;
+            if (!String.IsNullOrEmpty(startOptions.TfsUrl))
+                listener.TfsUrl = startOptions.TfsUrl;
 
             if (startOptions.DisplayGui)
                 RunWithGui(listener);
@@ -81,7 +81,7 @@ namespace SvnBridge
                 if (!settingsViewPresenter.Cancelled)
                 {
                     listener.Port = settingsViewPresenter.Port;
-                    listener.TfsServerUrl = settingsViewPresenter.TfsServerUrl;
+                    listener.TfsUrl = settingsViewPresenter.TfsUrl;
                 }
             }
 

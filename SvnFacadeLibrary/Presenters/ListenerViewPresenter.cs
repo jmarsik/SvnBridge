@@ -21,9 +21,9 @@ namespace SvnBridge.Presenters
             get { return listener.Port; }
         }
 
-        public string TfsServerUrl
+        public string TfsUrl
         {
-            get { return listener.TfsServerUrl; }
+            get { return listener.TfsUrl; }
         }
 
         public void ChangeSettings(ISettingsView settingsView)
@@ -32,9 +32,9 @@ namespace SvnBridge.Presenters
 
             settingsViewPresenter.Show();
 
-            if ((!settingsViewPresenter.Cancelled) && (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsServerUrl)))
+            if ((!settingsViewPresenter.Cancelled) && (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl)))
             {
-                ApplyNewSettings(settingsViewPresenter.Port, settingsViewPresenter.TfsServerUrl);
+                ApplyNewSettings(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl);
             }
         }
 
@@ -57,19 +57,19 @@ namespace SvnBridge.Presenters
             view.OnListenerStopped();
         }
 
-        private void ApplyNewSettings(int port, string tfsServerUrl)
+        private void ApplyNewSettings(int port, string tfsUrl)
         {
             StopListener();
 
             listener.Port = port;
-            listener.TfsServerUrl = tfsServerUrl;
+            listener.TfsUrl = tfsUrl;
 
             StartListener();
         }
 
-        private bool SettingsHaveChanged(int port, string tfsServerUrl)
+        private bool SettingsHaveChanged(int port, string tfsUrl)
         {
-            return port != listener.Port || tfsServerUrl != listener.TfsServerUrl;
+            return port != listener.Port || tfsUrl != listener.TfsUrl;
         }
     }
 }

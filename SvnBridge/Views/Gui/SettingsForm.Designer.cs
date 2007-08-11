@@ -32,7 +32,7 @@ namespace SvnBridge.Views.Gui
             this.txtPortNumber = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.txtTFSServer = new System.Windows.Forms.TextBox();
+            this.txtTfsUrl = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -73,12 +73,12 @@ namespace SvnBridge.Views.Gui
             this.label2.TabIndex = 2;
             this.label2.Text = "&Team Foundation Server:";
             // 
-            // txtTFSServer
+            // txtTfsUrl
             // 
-            this.txtTFSServer.Location = new System.Drawing.Point(149, 41);
-            this.txtTFSServer.Name = "txtTFSServer";
-            this.txtTFSServer.Size = new System.Drawing.Size(171, 20);
-            this.txtTFSServer.TabIndex = 3;
+            this.txtTfsUrl.Location = new System.Drawing.Point(149, 41);
+            this.txtTfsUrl.Name = "txtTfsUrl";
+            this.txtTfsUrl.Size = new System.Drawing.Size(171, 20);
+            this.txtTfsUrl.TabIndex = 3;
             // 
             // cancelButton
             // 
@@ -109,7 +109,7 @@ namespace SvnBridge.Views.Gui
             this.ClientSize = new System.Drawing.Size(329, 101);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.txtTFSServer);
+            this.Controls.Add(this.txtTfsUrl);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtPortNumber);
             this.Controls.Add(this.cancelButton);
@@ -131,7 +131,7 @@ namespace SvnBridge.Views.Gui
         private System.Windows.Forms.TextBox txtPortNumber;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtTFSServer;
+        private System.Windows.Forms.TextBox txtTfsUrl;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Label label3;
     }

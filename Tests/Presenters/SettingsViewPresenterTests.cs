@@ -57,19 +57,19 @@ namespace SvnBridge.Presenters
         }
 
         [Test]
-        public void TestViewSetsTfsServerUrl()
+        public void TestViewSetsTfsUrl()
         {
             string expected = "http://foo";
             stubView.Show_Delegate =
                 delegate
                 {
-                    stubView.Presenter.TfsServerUrl = "http://foo";
+                    stubView.Presenter.TfsUrl = "http://foo";
                 };
             SettingsViewPresenter presenter = CreatePresenter();
 
             presenter.Show();
 
-            Assert.Equal(expected, presenter.TfsServerUrl);
+            Assert.Equal(expected, presenter.TfsUrl);
         }
 
         [Test]

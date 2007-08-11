@@ -23,7 +23,7 @@ namespace SvnBridge.Views.Gui
 
             notifyIcon.ShowBalloonTip(500, "SvnBridge",
                                       "Started on port " + presenter.Port + "\r\nForwarding to " +
-                                      presenter.TfsServerUrl, ToolTipIcon.Info);
+                                      presenter.TfsUrl, ToolTipIcon.Info);
         }
 
         public void OnListenerStopped()

@@ -10,9 +10,9 @@ namespace SvnBridge.Handlers
 {
     public abstract class HttpContextHandlerBase
     {
-        public void Handle(IHttpContext context, string tfsServerUrl)
+        public void Handle(IHttpContext context, string tfsUrl)
         {
-            ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsServerUrl, GetCredential(context));
+            ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, GetCredential(context));
 
             Handle(context, sourceControlProvider);
         }

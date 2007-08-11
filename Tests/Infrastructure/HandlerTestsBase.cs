@@ -18,7 +18,7 @@ namespace SvnBridge.Infrastructure
         protected StubHttpContext context;
         protected StubHttpRequest request;
         protected StubHttpResponse response;
-        protected string tfsServerUrl;
+        protected string tfsUrl;
 
         [SetUp]
         public virtual void Setup()
@@ -32,7 +32,7 @@ namespace SvnBridge.Infrastructure
             response = new StubHttpResponse();
             response.OutputStream = new MemoryStream(Constants.BufferSize);
             context.Response = response;
-            tfsServerUrl = "http://tfsserver";
+            tfsUrl = "http://tfsserver";
         }
     }
 }

@@ -6,9 +6,9 @@ namespace SvnBridge
     {
         private bool displayGui;
         private int port;
-        private string tfsServerUrl;
+        private string tfsUrl;
 
-        private const string usage = "usage: SvnBridge.exe [<port> <tfsServerUrl>] [/gui|/gui-]"; // TODO: localize
+        private const string usage = "usage: SvnBridge.exe [<port> <tfsUrl>] [/gui|/gui-]"; // TODO: localize
 
         public StartOptions(string[] commandLineArguments)
         {
@@ -34,7 +34,7 @@ namespace SvnBridge
 
             ReadPort(commandLineArguments[0]);
 
-            ReadTfsServerUrl(commandLineArguments[1]);
+            ReadTfsUrl(commandLineArguments[1]);
         }
 
         public bool DisplayGui
@@ -47,9 +47,9 @@ namespace SvnBridge
             get { return port; }
         }
 
-        public string TfsServerUrl
+        public string TfsUrl
         {
-            get { return tfsServerUrl; }
+            get { return tfsUrl; }
         }
 
         private static bool HasHideGuiFlag(string[] commandLineArguments)
@@ -82,14 +82,14 @@ namespace SvnBridge
                 throw new StartOptionsException("Invalid port: must be between 1 and 65535", DisplayGui); // TODO: localize
         }
 
-        private void ReadTfsServerUrl(string tfsServerUrlArgument)
+        private void ReadTfsUrl(string tfsUrlArgument)
         {
             Uri uri;
 
-            if (!Uri.TryCreate(tfsServerUrlArgument, UriKind.Absolute, out uri))
+            if (!Uri.TryCreate(tfsUrlArgument, UriKind.Absolute, out uri))
                 throw new StartOptionsException("Invalid TFS server URL: must be a valid, absolute URL", DisplayGui); // TODO: localize
 
-            tfsServerUrl = uri.ToString();
+            tfsUrl = uri.ToString();
         }
     }
 

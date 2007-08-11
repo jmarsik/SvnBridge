@@ -25,7 +25,7 @@ namespace SvnBridge.Handlers
             request.Path = "http://localhost:8082/!svn/bc/5522/File.txt";
             request.Headers["Destination"] = "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt";
 
-            handler.Handle(context, tfsServerUrl);
+            handler.Handle(context, tfsUrl);
 
             string expected =
                 "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +

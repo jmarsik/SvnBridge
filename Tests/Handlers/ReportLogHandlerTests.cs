@@ -32,7 +32,7 @@ namespace SvnBridge.Handlers
             request.Path = "http://localhost:8082/!svn/bc/5522/File.txt";
             request.Input = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5531</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
 
-            handler.Handle(context, tfsServerUrl);
+            handler.Handle(context, tfsUrl);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +

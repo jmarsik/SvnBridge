@@ -9,8 +9,8 @@ namespace SvnBridge.Stubs
     {
         public int Get_Port;
         public int Set_Port;
-        public string Get_TfsServerUrl;
-        public string Set_TfsServerUrl;
+        public string Get_TfsUrl;
+        public string Set_TfsUrl;
         public bool Start_Called;
         public StartDelegate Start_Delegate;
         public bool Stop_Called;
@@ -22,10 +22,10 @@ namespace SvnBridge.Stubs
             set { Set_Port = value; }
         }
 
-        public string TfsServerUrl
+        public string TfsUrl
         {
-            get { return Get_TfsServerUrl; }
-            set { Set_TfsServerUrl = value; }
+            get { return Get_TfsUrl; }
+            set { Set_TfsUrl = value; }
         }
 
         public void Start()

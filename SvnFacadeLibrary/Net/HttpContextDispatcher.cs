@@ -8,7 +8,7 @@ namespace SvnBridge.Net
 {
     public class HttpContextDispatcher
     {
-        private string tfsServerUrl;
+        private string tfsUrl;
 
         public HttpContextHandlerBase GetHandler(string httpMethod)
         {
@@ -29,15 +29,15 @@ namespace SvnBridge.Net
             }
         }
 
-        public string TfsServerUrl
+        public string TfsUrl
         {
-            get { return tfsServerUrl; }
-            set { tfsServerUrl = value; }
+            get { return tfsUrl; }
+            set { tfsUrl = value; }
         }
 
         public void Dispatch(IHttpContext connection)
         {
-            if (string.IsNullOrEmpty(TfsServerUrl))
+            if (string.IsNullOrEmpty(TfsUrl))
                 throw new InvalidOperationException("A TFS server URL must be specified before connections can be dispatched.");
 
             HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
@@ -46,7 +46,7 @@ namespace SvnBridge.Net
             {
                 try
                 {
-                    handler.Handle(connection, tfsServerUrl);
+                    handler.Handle(connection, tfsUrl);
                 }
                 catch (WebException ex)
                 {

@@ -18,7 +18,7 @@ namespace SvnBridge.Handlers
             Results r = mock.Attach(provider.MakeActivity);
             request.Path = "http://localhost:8080/!svn/act/c512ecbe-7577-ce46-939c-a9e81eb4d98e";
 
-            handler.Handle(context, tfsServerUrl);
+            handler.Handle(context, tfsUrl);
 
             Assert.AreEqual(1, r.CalledCount);
             Assert.AreEqual("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);

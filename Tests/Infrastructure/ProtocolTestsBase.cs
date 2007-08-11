@@ -28,7 +28,7 @@ namespace Tests
             provider = mock.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             HttpDispatcher = new HttpContextDispatcher();
-            HttpDispatcher.TfsServerUrl = "http://foo";
+            HttpDispatcher.TfsUrl = "http://foo";
         }
 
         [TearDown]

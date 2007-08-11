@@ -70,7 +70,7 @@ namespace SvnBridge
 
             Assert.True(startOptions.DisplayGui);
             Assert.Equal(0, startOptions.Port);
-            Assert.Equal(null, startOptions.TfsServerUrl);
+            Assert.Equal(null, startOptions.TfsUrl);
         }
 
         [Test]
@@ -170,18 +170,18 @@ namespace SvnBridge
         }
 
         [Test]
-        public void TestValidTfsServerUrl()
+        public void TestValidTfsUrl()
         {
             string expected = "http://foo/";
             string[] commandLineArguments = new string[2] { "8081", "http://foo/" };
 
             StartOptions startOptions = new StartOptions(commandLineArguments);
 
-            Assert.Equal(expected, startOptions.TfsServerUrl);
+            Assert.Equal(expected, startOptions.TfsUrl);
         }
 
         [Test]
-        public void TestInvalidTfsServerUrl()
+        public void TestInvalidTfsUrl()
         {
             string[] commandLineArguments = new string[2] { "8081", "foo" };
 

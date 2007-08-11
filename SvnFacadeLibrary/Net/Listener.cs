@@ -20,16 +20,16 @@ namespace SvnBridge.Net
         {
         }
 
-        public Listener(int port, string tfsServerUrl) : this((int?) port, tfsServerUrl)
+        public Listener(int port, string tfsUrl) : this((int?) port, tfsUrl)
         {
         }
 
-        private Listener(int? port, string tfsServerUrl)
+        private Listener(int? port, string tfsUrl)
         {
             this.port = port;
 
             dispatcher = new HttpContextDispatcher();
-            dispatcher.TfsServerUrl = tfsServerUrl;
+            dispatcher.TfsUrl = tfsUrl;
         }
 
         #region IListener Members
@@ -46,9 +46,9 @@ namespace SvnBridge.Net
             }
         }
 
-        public string TfsServerUrl
+        public string TfsUrl
         {
-            get { return dispatcher.TfsServerUrl; }
+            get { return dispatcher.TfsUrl; }
             set
             {
                 if (isListening)
@@ -58,7 +58,7 @@ namespace SvnBridge.Net
                 if (!Uri.TryCreate(value, UriKind.Absolute, out validUri))
                     throw new UriFormatException();
 
-                dispatcher.TfsServerUrl = value;
+                dispatcher.TfsUrl = value;
             }
         }
 
@@ -67,7 +67,7 @@ namespace SvnBridge.Net
             if (!port.HasValue)
                 throw new InvalidOperationException("A port must be specified before starting the listener.");
 
-            if (string.IsNullOrEmpty(TfsServerUrl))
+            if (string.IsNullOrEmpty(TfsUrl))
                 throw new InvalidOperationException("A TFS server URL must be specified before starting the listener.");
 
             isListening = true;

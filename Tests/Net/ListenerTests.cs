@@ -8,14 +8,14 @@ namespace SvnBridge.Net
     public class ListenerTests
     {
         [Test]
-        public void SetInvalidTfsServerUrlThrows()
+        public void SetInvalidTfsUrlThrows()
         {
             Listener listener = new Listener();        
 
             Assert.Throws<UriFormatException>(
                 delegate
                 {
-                    listener.TfsServerUrl = "foo";
+                    listener.TfsUrl = "foo";
                 });
         }
 
@@ -23,7 +23,7 @@ namespace SvnBridge.Net
         public void StartWithoutSettingPortThrows()
         {
             Listener listener = new Listener();
-            listener.TfsServerUrl = "http://foo";
+            listener.TfsUrl = "http://foo";
 
             Assert.Throws<InvalidOperationException>(
                 delegate
@@ -33,7 +33,7 @@ namespace SvnBridge.Net
         }
 
         [Test]
-        public void StartWithoutSettingTfsServerUrlThrows()
+        public void StartWithoutSettingTfsUrlThrows()
         {
             Listener listener = new Listener();
             listener.Port = 8081;
@@ -50,7 +50,7 @@ namespace SvnBridge.Net
         {
             Listener listener = new Listener();
             listener.Port = 8081;
-            listener.TfsServerUrl = "http://foo";
+            listener.TfsUrl = "http://foo";
             listener.Start();
 
             Assert.Throws<InvalidOperationException>(
@@ -63,17 +63,17 @@ namespace SvnBridge.Net
         }
 
         [Test]
-        public void SetTfsServerUrlAfterStartThrows()
+        public void SetTfsUrlAfterStartThrows()
         {
             Listener listener = new Listener();
             listener.Port = 8081;
-            listener.TfsServerUrl = "http://foo";
+            listener.TfsUrl = "http://foo";
             listener.Start();
 
             Assert.Throws<InvalidOperationException>(
                 delegate
                 {
-                    listener.TfsServerUrl = "http://bar";
+                    listener.TfsUrl = "http://bar";
                 });
 
             listener.Stop();

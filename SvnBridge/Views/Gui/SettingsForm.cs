@@ -47,29 +47,29 @@ namespace SvnBridge.Views.Gui
                 return;
             }
 
-            if (!Helper.IsValidUrl(txtTFSServer.Text))
+            if (!Helper.IsValidUrl(txtTfsUrl.Text))
             {
                 MessageBox.Show("The TFS Server URL does not appear to be valid.", "SvnBridge", MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
-                txtTFSServer.Focus();
-                txtTFSServer.SelectAll();
+                txtTfsUrl.Focus();
+                txtTfsUrl.SelectAll();
                 return;
             }
 
             Cursor = Cursors.WaitCursor;
-            bool validTfsUrl = Helper.IsValidTFSUrl(txtTFSServer.Text);
+            bool validTfsUrl = Helper.IsValidTFSUrl(txtTfsUrl.Text);
             Cursor = Cursors.Default;
             if (!validTfsUrl)
             {
                 MessageBox.Show("The TFS Server URL does not appear to a TFS server.", "SvnBridge", MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
-                txtTFSServer.Focus();
-                txtTFSServer.SelectAll();
+                txtTfsUrl.Focus();
+                txtTfsUrl.SelectAll();
                 return;
             }
 
             presenter.Port = int.Parse(txtPortNumber.Text);
-            presenter.TfsServerUrl = txtTFSServer.Text;
+            presenter.TfsUrl = txtTfsUrl.Text;
             
             DialogResult = DialogResult.OK;
             Close();

@@ -14,7 +14,7 @@ namespace SvnBridge.Views.Console
         public void OnListenerStarted()
         {
             System.Console.WriteLine("Listening on port {0}", presenter.Port); // TODO: localize
-            System.Console.WriteLine("Forwarding requests to {0}", presenter.TfsServerUrl); // TODO: localize
+            System.Console.WriteLine("Forwarding requests to {0}", presenter.TfsUrl); // TODO: localize
             System.Console.WriteLine("Press CTRL + C to stop listening"); // TODO: localize
         }
 

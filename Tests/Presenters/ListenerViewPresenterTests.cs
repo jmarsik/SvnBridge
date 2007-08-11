@@ -46,14 +46,14 @@ namespace SvnBridge.Presenters
         }
 
         [Test]
-        public void TestGetTfsServerUrlReturnsListenersTfsServerUrl()
+        public void TestGetTfsUrlReturnsListenersTfsUrl()
         {
             string expected = "http://foo";
             ListenerViewPresenter presenter = CreatePresenter();
 
-            stubListener.Get_TfsServerUrl = "http://foo";
+            stubListener.Get_TfsUrl = "http://foo";
 
-            Assert.Equal(expected, presenter.TfsServerUrl);
+            Assert.Equal(expected, presenter.TfsUrl);
         }
 
         [Test]
@@ -110,14 +110,14 @@ namespace SvnBridge.Presenters
         public void TestChangeSettingsWithNoChangesDoesntStopListener()
         {
             stubListener.Get_Port = 8081;
-            stubListener.Get_TfsServerUrl = "http://foo";
+            stubListener.Get_TfsUrl = "http://foo";
             ListenerViewPresenter presenter = CreatePresenter();
             StubSettingsView stubSettingsView = new StubSettingsView();
             stubSettingsView.Show_Delegate = 
                 delegate
                 {
                     stubSettingsView.Presenter.Port = 8081;
-                    stubSettingsView.Presenter.TfsServerUrl = "http://foo";
+                    stubSettingsView.Presenter.TfsUrl = "http://foo";
                 };
             
             presenter.ChangeSettings(stubSettingsView);
@@ -129,14 +129,14 @@ namespace SvnBridge.Presenters
         public void TestChangeSettingsWithChangesStopsAndStartsListener()
         {
             stubListener.Get_Port = 8081;
-            stubListener.Get_TfsServerUrl = "http://foo";
+            stubListener.Get_TfsUrl = "http://foo";
             ListenerViewPresenter presenter = CreatePresenter();
             StubSettingsView stubSettingsView = new StubSettingsView();
             stubSettingsView.Show_Delegate =
                 delegate
                 {
                     stubSettingsView.Presenter.Port = 8082;
-                    stubSettingsView.Presenter.TfsServerUrl = "http://foo";
+                    stubSettingsView.Presenter.TfsUrl = "http://foo";
                 };
             
             presenter.ChangeSettings(stubSettingsView);
@@ -149,14 +149,14 @@ namespace SvnBridge.Presenters
         public void TestCancelChangeSettingsDoesntStopListener()
         {
             stubListener.Get_Port = 8081;
-            stubListener.Get_TfsServerUrl = "http://foo";
+            stubListener.Get_TfsUrl = "http://foo";
             ListenerViewPresenter presenter = CreatePresenter();
             StubSettingsView stubSettingsView = new StubSettingsView();
             stubSettingsView.Show_Delegate =
                 delegate
                 {
                     stubSettingsView.Presenter.Port = 8082;
-                    stubSettingsView.Presenter.TfsServerUrl = "http://foo";
+                    stubSettingsView.Presenter.TfsUrl = "http://foo";
                     stubSettingsView.Presenter.Cancelled = true;
                 };
 

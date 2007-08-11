@@ -19,7 +19,7 @@ namespace SvnBridge.Views.Console
             System.Console.CancelKeyPress += delegate { presenter.Cancelled = true; };
 
             presenter.Port = GetPort();
-            presenter.TfsServerUrl = GetTfsServerUrl();
+            presenter.TfsUrl = GetTfsUrl();
         }
 
         private static int GetPort()
@@ -42,20 +42,20 @@ namespace SvnBridge.Views.Console
             }
         }
 
-        private static string GetTfsServerUrl()
+        private static string GetTfsUrl()
         {
             while (true)
             {
-                Uri tfsServerUrl;
+                Uri tfsUrl;
 
                 System.Console.Write("Enter the Team Foundation Server URL: ");
 
-                string tfsServerUrlInput = System.Console.ReadLine();
+                string tfsUrlInput = System.Console.ReadLine();
 
-                if (!(Uri.TryCreate(tfsServerUrlInput, UriKind.Absolute, out tfsServerUrl)))
+                if (!(Uri.TryCreate(tfsUrlInput, UriKind.Absolute, out tfsUrl)))
                     System.Console.WriteLine("Invalid Team Foundation Server URL: must be a valid, absolute URL");
                 else
-                    return tfsServerUrl.ToString();
+                    return tfsUrl.ToString();
             }
         }
     }
