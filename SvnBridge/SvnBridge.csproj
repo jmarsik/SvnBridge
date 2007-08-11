@@ -85,7 +85,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SvnFacadeLibrary\SvnBridgeLibrary.csproj">
+    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridgeLibrary.csproj">
       <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
       <Name>SvnBridgeLibrary</Name>
     </ProjectReference>

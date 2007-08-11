@@ -31,13 +31,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsProtocol", "TestsProto
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeLibrary", "SvnFacadeLibrary\SvnBridgeLibrary.csproj", "{95E4E16B-0975-4705-B3A0-83700DE483C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeViaIis", "SvnBridgeViaIis\SvnBridgeViaIis.csproj", "{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeViaIis", "SvnBridgeViaIis\SvnBridgeViaIis.csproj", "{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeLibrary", "SvnBridgeLibrary\SvnBridgeLibrary.csproj", "{95E4E16B-0975-4705-B3A0-83700DE483C2}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -69,14 +69,14 @@ Global
 		{593B4F22-DB4E-451C-BC6E-5F620CE818E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{593B4F22-DB4E-451C-BC6E-5F620CE818E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{593B4F22-DB4E-451C-BC6E-5F620CE818E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E4E16B-0975-4705-B3A0-83700DE483C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

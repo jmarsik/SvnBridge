@@ -97,13 +97,13 @@
     <Compile Include="Utility\HelperTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridgeLibrary.csproj">
+      <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
+      <Name>SvnBridgeLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SvnBridge\SvnBridge.csproj">
       <Project>{22D15920-C064-457D-889B-F7A2E16F3E05}</Project>
       <Name>SvnBridge</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SvnFacadeLibrary\SvnBridgeLibrary.csproj">
-      <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
-      <Name>SvnBridgeLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
