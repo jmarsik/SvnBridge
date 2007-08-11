@@ -2,7 +2,7 @@ using System;
 using System.Windows.Forms;
 using SvnBridge.Presenters;
 
-namespace SvnBridge.Views.Gui
+namespace SvnBridge.Views
 {
     public partial class ToolTrayForm : Form, IListenerView
     {

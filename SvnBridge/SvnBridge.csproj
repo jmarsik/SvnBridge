@@ -5,12 +5,11 @@
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{22D15920-C064-457D-889B-F7A2E16F3E05}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SvnBridge</RootNamespace>
     <AssemblyName>SvnBridge</AssemblyName>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>SvnBridge.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,7 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Presenters\ListenerViewPresenter.cs" />
+    <Compile Include="Presenters\SettingsViewPresenter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -47,11 +47,11 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Views\Gui\SettingsForm.resx">
+    <EmbeddedResource Include="Views\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Views\Gui\ToolTrayForm.resx">
+    <EmbeddedResource Include="Views\ToolTrayForm.resx">
       <DependentUpon>ToolTrayForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -69,20 +69,20 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Views\Console\ConsoleListenerView.cs" />
-    <Compile Include="Views\Console\ConsoleSettingsView.cs" />
-    <Compile Include="Views\Gui\SettingsForm.cs">
+    <Compile Include="Views\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\Gui\SettingsForm.Designer.cs">
+    <Compile Include="Views\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\Gui\ToolTrayForm.cs">
+    <Compile Include="Views\ToolTrayForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\Gui\ToolTrayForm.Designer.cs">
+    <Compile Include="Views\ToolTrayForm.Designer.cs">
       <DependentUpon>ToolTrayForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\IListenerView.cs" />
+    <Compile Include="Views\ISettingsView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SvnBridgeLibrary\SvnBridgeLibrary.csproj">

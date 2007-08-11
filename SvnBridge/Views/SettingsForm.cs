@@ -4,7 +4,7 @@ using SvnBridge.Presenters;
 using SvnBridge.Utility;
 using SvnBridge.Views;
 
-namespace SvnBridge.Views.Gui
+namespace SvnBridge.Views
 {
     public partial class SettingsForm : Form, ISettingsView
     {
