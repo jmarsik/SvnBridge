@@ -91,7 +91,7 @@ namespace Tests
 
             Assert.AreEqual(1, folder.Items.Count);
             Assert.AreEqual(path.Substring(1), folder.Items[0].Name);
-            Assert.AreEqual("Fun text 3", GetString(ReadFile(path)));
+            Assert.AreEqual("Fun text 3", ReadFile(path));
         }
 
         [Test]

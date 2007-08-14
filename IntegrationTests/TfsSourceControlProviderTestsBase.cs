@@ -66,11 +66,12 @@ namespace Tests
             return created;
         }
 
-        protected void Commit()
+        protected MergeActivityResponse Commit()
         {
-            _provider.MergeActivity(_activityId);
+            MergeActivityResponse response = _provider.MergeActivity(_activityId);
             _provider.DeleteActivity(_activityId);
             _provider.MakeActivity(_activityId);
+            return response;
         }
 
         protected void DeleteItem(string path,
@@ -109,10 +110,10 @@ namespace Tests
                 Commit();
         }
 
-        protected byte[] ReadFile(string path)
+        protected string ReadFile(string path)
         {
             ItemMetaData item = _provider.GetItems(-1, path, Recursion.None);
-            return _provider.ReadFile(item);
+            return GetString(_provider.ReadFile(item));
         }
 
         protected void SetProperty(string path, string name, string value, bool commit)

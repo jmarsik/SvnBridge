@@ -16,11 +16,16 @@ namespace Tests
             byte[] testFile = GetBytes("Test file contents");
 
             bool created = _provider.WriteFile(_activityId, _testPath + "/TestFile.txt", testFile);
-            Commit();
+            MergeActivityResponse response = Commit();
 
-            byte[] actual = ReadFile(_testPath + "/TestFile.txt");
-            Assert.AreEqual(GetString(testFile), GetString(actual));
+            Assert.AreEqual(GetString(testFile), ReadFile(_testPath + "/TestFile.txt"));
             Assert.AreEqual(true, created);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -30,21 +35,30 @@ namespace Tests
             byte[] testFile = GetBytes("Test file contents\r\nUpdated");
 
             bool created = _provider.WriteFile(_activityId, _testPath + "/TestFile.txt", testFile);
-            Commit();
+            MergeActivityResponse response = Commit();
 
-            byte[] actual = ReadFile(_testPath + "/TestFile.txt");
-            Assert.AreEqual(GetString(testFile), GetString(actual));
+            Assert.AreEqual(GetString(testFile), ReadFile(_testPath + "/TestFile.txt"));
             Assert.AreEqual(false, created);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
         }
 
         [Test]
         public void TestCommitNewFolder()
         {
             _provider.MakeCollection(_activityId, _testPath + "/TestFolder");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             Assert.IsTrue(_provider.ItemExists(_testPath + "/TestFolder"));
             Assert.AreEqual(ItemType.Folder, _provider.GetItems(-1, _testPath + "/TestFolder", Recursion.None).ItemType);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFolder", response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -55,14 +69,37 @@ namespace Tests
             _provider.WriteFile(_activityId, _testPath + "/TestFile1.txt", testFile);
             _provider.WriteFile(_activityId, _testPath + "/TestFile2.txt", testFile);
             _provider.WriteFile(_activityId, _testPath + "/TestFile3.txt", testFile);
-            Commit();
+            MergeActivityResponse response = Commit();
 
-            byte[] actual = ReadFile(_testPath + "/TestFile1.txt");
-            Assert.AreEqual(GetString(testFile), GetString(actual));
-            actual = ReadFile(_testPath + "/TestFile2.txt");
-            Assert.AreEqual(GetString(testFile), GetString(actual));
-            actual = ReadFile(_testPath + "/TestFile3.txt");
-            Assert.AreEqual(GetString(testFile), GetString(actual));
+            Assert.AreEqual(GetString(testFile), ReadFile(_testPath + "/TestFile1.txt"));
+            Assert.AreEqual(GetString(testFile), ReadFile(_testPath + "/TestFile2.txt"));
+            Assert.AreEqual(GetString(testFile), ReadFile(_testPath + "/TestFile3.txt"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(4, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.AreEqual(_testPath + "/TestFile2.txt", response.Items[2].Path);
+            Assert.AreEqual(ItemType.File, response.Items[2].Type);
+            Assert.AreEqual(_testPath + "/TestFile3.txt", response.Items[3].Path);
+            Assert.AreEqual(ItemType.File, response.Items[3].Type);
+        }
+
+        [Test]
+        public void TestResponseFilesAreSortedAlphabetically()
+        {
+            byte[] fileData = GetBytes("Test file contents");
+
+            _provider.WriteFile(_activityId, _testPath + "/TestFile2.txt", fileData);
+            _provider.WriteFile(_activityId, _testPath + "/TestFile3.txt", fileData);
+            _provider.WriteFile(_activityId, _testPath + "/TestFile1.txt", fileData);
+            MergeActivityResponse response = Commit();
+
+            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(_testPath + "/TestFile2.txt", response.Items[2].Path);
+            Assert.AreEqual(_testPath + "/TestFile3.txt", response.Items[3].Path);
         }
 
         [Test]
@@ -70,23 +107,38 @@ namespace Tests
         {
             _provider.MakeCollection(_activityId, _testPath + "/TestFolder");
             _provider.MakeCollection(_activityId, _testPath + "/TestFolder/SubFolder");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             Assert.IsTrue(_provider.ItemExists(_testPath + "/TestFolder/SubFolder"));
             Assert.AreEqual(ItemType.Folder, _provider.GetItems(-1, _testPath + "/TestFolder/SubFolder", Recursion.None).ItemType);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFolder/SubFolder", response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.AreEqual(_testPath + "/TestFolder", response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.AreEqual(_testPath, response.Items[2].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[2].Type);
         }
 
         [Test]
         public void TestCommitNewFileInNewFolder()
         {
-            byte[] testFile = GetBytes("Test file contents");
+            byte[] fileData = GetBytes("Test file contents");
 
             _provider.MakeCollection(_activityId, _testPath + "/TestFolder");
-            _provider.WriteFile(_activityId, _testPath + "/TestFolder/TestFile.txt", testFile);
-            Commit();
+            _provider.WriteFile(_activityId, _testPath + "/TestFolder/TestFile.txt", fileData);
+            MergeActivityResponse response = Commit();
 
-            byte[] actual = ReadFile(_testPath + "/TestFolder/TestFile.txt");
-            Assert.AreEqual(GetString(testFile), GetString(actual));
+            Assert.AreEqual(GetString(fileData), ReadFile(_testPath + "/TestFolder/TestFile.txt"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFolder/TestFile.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.AreEqual(_testPath + "/TestFolder", response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.AreEqual(_testPath, response.Items[2].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[2].Type);
         }
 
         [Test]
@@ -96,9 +148,13 @@ namespace Tests
             WriteFile(path, "Test file contents", true);
 
             _provider.DeleteItem(_activityId, path);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             Assert.IsFalse(_provider.ItemExists(path));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.AreEqual(_testPath, response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
         }
 
         [Test]
@@ -108,9 +164,13 @@ namespace Tests
             CreateFolder(path, true);
 
             _provider.DeleteItem(_activityId, path);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             Assert.IsFalse(_provider.ItemExists(path));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.AreEqual(_testPath, response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
         }
 
         [Test]
@@ -121,10 +181,14 @@ namespace Tests
             WriteFile(path, "Fun text", true);
 
             _provider.SetProperty(_activityId, path, "mime-type", mimeType);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
         }
 
         [Test]
@@ -133,10 +197,14 @@ namespace Tests
             string ignore = "*.bad\n";
 
             _provider.SetProperty(_activityId, _testPath, "ignore", ignore);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(ignore, item.Properties["ignore"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.AreEqual(_testPath, response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
         }
 
         [Test]
@@ -149,10 +217,14 @@ namespace Tests
             SetProperty(path, "mime-type", mimeType1, true);
 
             _provider.SetProperty(_activityId, path, "mime-type", mimeType2);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(mimeType2, item.Items[0].Properties["mime-type"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
         }
 
         [Test]
@@ -163,10 +235,14 @@ namespace Tests
             SetProperty(_testPath, "ignore", ignore1, true);
 
             _provider.SetProperty(_activityId, _testPath, "ignore", ignore2);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual(ignore2, item.Properties["ignore"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.AreEqual(_testPath, response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
         }
 
         [Test]
@@ -179,13 +255,19 @@ namespace Tests
             _provider.SetProperty(_activityId, _testPath + "/TestFile1.txt", "mime-type2", "mime2");
             _provider.SetProperty(_activityId, _testPath + "/TestFile2.txt", "mime-type3", "mime3");
             _provider.SetProperty(_activityId, _testPath + "/TestFile2.txt", "mime-type4", "mime4");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
             Assert.AreEqual("mime2", item.Items[0].Properties["mime-type2"]);
             Assert.AreEqual("mime3", item.Items[1].Properties["mime-type3"]);
             Assert.AreEqual("mime4", item.Items[1].Properties["mime-type4"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.AreEqual(_testPath + "/TestFile2.txt", response.Items[1].Path);
+            Assert.AreEqual(ItemType.File, response.Items[1].Type);
         }
 
         [Test]
@@ -198,13 +280,19 @@ namespace Tests
             _provider.SetProperty(_activityId, _testPath + "/Folder1", "mime-type2", "mime2");
             _provider.SetProperty(_activityId, _testPath + "/Folder2", "mime-type3", "mime3");
             _provider.SetProperty(_activityId, _testPath + "/Folder2", "mime-type4", "mime4");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
             Assert.AreEqual("mime2", item.Items[0].Properties["mime-type2"]);
             Assert.AreEqual("mime3", item.Items[1].Properties["mime-type3"]);
             Assert.AreEqual("mime4", item.Items[1].Properties["mime-type4"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/Folder1", response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.AreEqual(_testPath + "/Folder2", response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -212,10 +300,16 @@ namespace Tests
         {
             _provider.MakeCollection(_activityId, _testPath + "/Folder1");
             _provider.SetProperty(_activityId, _testPath + "/Folder1", "mime-type1", "mime1");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/Folder1", response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -225,10 +319,16 @@ namespace Tests
 
             _provider.WriteFile(_activityId, _testPath + "/TestFile1.txt", fileData);
             _provider.SetProperty(_activityId, _testPath + "/TestFile1.txt", "mime-type1", "mime1");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
             Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -236,11 +336,12 @@ namespace Tests
         {
             int startVersion = _provider.GetLatestVersion();
 
-            MergeActivityResponse response = _provider.MergeActivity(_activityId);
+            MergeActivityResponse response = Commit();
 
             int endVersion = _provider.GetLatestVersion();
-            Assert.AreEqual(startVersion, response.Version);
             Assert.AreEqual(startVersion, endVersion);
+            Assert.AreEqual(endVersion, response.Version);
+            Assert.AreEqual(0, response.Items.Count);
         }
 
         [Test]
@@ -250,10 +351,16 @@ namespace Tests
 
             _provider.DeleteItem(_activityId, _testPath + "/Fun.txt");
             _provider.CopyItem(_activityId, _testPath + "/Fun.txt", _testPath + "/FunRename.txt");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunRename.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath, response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.AreEqual(_testPath + "/FunRename.txt", response.Items[1].Path);
+            Assert.AreEqual(ItemType.File, response.Items[1].Type);
         }
 
         [Test]
@@ -263,10 +370,16 @@ namespace Tests
 
             _provider.CopyItem(_activityId, _testPath + "/Fun.txt", _testPath + "/FunRename.txt");
             _provider.DeleteItem(_activityId, _testPath + "/Fun.txt");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunRename.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/FunRename.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -276,10 +389,16 @@ namespace Tests
 
             _provider.DeleteItem(_activityId, _testPath + "/Fun");
             _provider.CopyItem(_activityId, _testPath + "/Fun", _testPath + "/FunRename");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunRename", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath, response.Items[0].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.AreEqual(_testPath + "/FunRename", response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -288,10 +407,12 @@ namespace Tests
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);
 
             _provider.CopyItem(_activityId, _testPath + "/Fun.txt", _testPath + "/FunBranch.txt");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunBranch.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Branch, log.History[0].Changes[0].ChangeType & ChangeType.Branch);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(0, response.Items.Count);
         }
 
         [Test]
@@ -300,10 +421,12 @@ namespace Tests
             CreateFolder(_testPath + "/Fun", true);
 
             _provider.CopyItem(_activityId, _testPath + "/Fun", _testPath + "/FunBranch");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunBranch", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Branch, log.History[0].Changes[0].ChangeType & ChangeType.Branch);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(0, response.Items.Count);
         }
 
         [Test]
@@ -315,13 +438,18 @@ namespace Tests
             _provider.CopyItem(_activityId, _testPath + "/Fun.txt", _testPath + "/FunRename.txt");
             _provider.DeleteItem(_activityId, _testPath + "/Fun.txt");
             bool created = _provider.WriteFile(_activityId, _testPath + "/FunRename.txt", updatedText);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunRename.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
-            byte[] actualUpdatedText = ReadFile(_testPath + "/FunRename.txt");
-            Assert.AreEqual(GetString(updatedText), GetString(actualUpdatedText));
+            Assert.AreEqual(GetString(updatedText), ReadFile(_testPath + "/FunRename.txt"));
             Assert.AreEqual(false, created);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.AreEqual(_testPath + "/FunRename.txt", response.Items[0].Path);
+            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.AreEqual(_testPath, response.Items[1].Path);
+            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
         }
 
         [Test]
@@ -333,7 +461,7 @@ namespace Tests
             _provider.CopyItem(_activityId, _testPath + "/TestFolder/TestFile.txt", _testPath + "/FunFile.txt");
             _provider.DeleteItem(_activityId, _testPath + "/TestFolder/TestFile.txt");
             _provider.DeleteItem(_activityId, _testPath + "/TestFolder");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunFile.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
@@ -349,7 +477,7 @@ namespace Tests
             SetProperty(path, "mime-type", mimeType, true);
 
             _provider.DeleteItem(_activityId, _testPath + "/TestFile.txt");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             ItemMetaData item = _provider.GetItems(-1, _testPath, Recursion.Full);
         }
@@ -365,12 +493,11 @@ namespace Tests
             _provider.DeleteItem(_activityId, _testPath + "/Nodes/Fun.txt");
             _provider.CopyItem(_activityId, _testPath + "/Nodes/Fun.txt", _testPath + "/Protocol/Fun.txt");
             bool created = _provider.WriteFile(_activityId, _testPath + "/Protocol/Fun.txt", fileData);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/Protocol/Fun.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
-            byte[] actualFileData = ReadFile(_testPath + "/Protocol/Fun.txt");
-            Assert.AreEqual(GetString(actualFileData), GetString(fileData));
+            Assert.AreEqual(GetString(fileData), ReadFile(_testPath + "/Protocol/Fun.txt"));
         }
 
         [Test]
@@ -384,12 +511,11 @@ namespace Tests
             _provider.DeleteItem(_activityId, _testPath + "/A");
             _provider.CopyItem(_activityId, _testPath + "/A", _testPath + "/B/A");
             bool created = _provider.WriteFile(_activityId, _testPath + "/B/A/Test.txt", fileData);
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/B/A/Test.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
-            byte[] actualFileData = ReadFile(_testPath + "/B/A/Test.txt");
-            Assert.AreEqual(GetString(actualFileData), GetString(fileData));
+            Assert.AreEqual(GetString(fileData), ReadFile(_testPath + "/B/A/Test.txt"));
         }
 
         [Test]
@@ -400,7 +526,7 @@ namespace Tests
 
             _provider.DeleteItem(_activityId, _testPath + "/A");
             _provider.CopyItem(_activityId, _testPath + "/A/Test.txt", _testPath + "/Test.txt");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/Test.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
@@ -417,7 +543,7 @@ namespace Tests
             _provider.DeleteItem(_activityId, _testPath + "/A");
             _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/Test1.txt");
             _provider.CopyItem(_activityId, _testPath + "/A/Test2.txt", _testPath + "/Test2.txt");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/Test1.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
@@ -437,7 +563,7 @@ namespace Tests
             _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/B/Test1.txt");
             _provider.CopyItem(_activityId, _testPath + "/A/Test2.txt", _testPath + "/B/Test2.txt");
             _provider.DeleteItem(_activityId, _testPath + "/A");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log1 = _provider.GetLog(_testPath + "/B/Test1.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[0].ChangeType);
@@ -457,7 +583,7 @@ namespace Tests
             _provider.CopyItem(_activityId, _testPath + "/A", _testPath + "/B");
             _provider.DeleteItem(_activityId, _testPath + "/B/Test1.txt");
             _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/B/Test2.txt");
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log1 = _provider.GetLog(_testPath + "/B", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[0].ChangeType);
@@ -476,11 +602,11 @@ namespace Tests
             _provider.DeleteItem(_activityId, _testPath + "/A");
             _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/B/Test1.txt");
             _provider.WriteFile(_activityId, _testPath + "/B/Test1.txt", GetBytes("filedata2"));
-            Commit();
+            MergeActivityResponse response = Commit();
 
             LogItem log2 = _provider.GetLog(_testPath + "/B/Test1.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log2.History[0].Changes[0].ChangeType);
-            Assert.AreEqual("filedata2", GetString(ReadFile(_testPath + "/B/Test1.txt")));
+            Assert.AreEqual("filedata2", ReadFile(_testPath + "/B/Test1.txt"));
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
         }
     }
