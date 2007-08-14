@@ -1,7 +1,6 @@
 using System.Configuration;
 using System.Web;
 using SvnBridge.Net;
-using HttpContext=System.Web.HttpContext;
 
 namespace SvnBridge.Web
 {
@@ -25,6 +24,8 @@ namespace SvnBridge.Web
         public void ProcessRequest(HttpContext context)
         {
             dispatcher.Dispatch(new HttpContextWrapper(context));
+            
+            context.Response.OutputStream.Close();
         }
 
         #endregion

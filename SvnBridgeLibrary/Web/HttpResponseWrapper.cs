@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Web;
@@ -35,8 +36,8 @@ namespace SvnBridge.Web
 
         public bool SendChunked
         {
-            get { return false; }
-            set { }
+            get { throw new NotSupportedException(); }
+            set { response.BufferOutput = !value; }
         }
 
         public int StatusCode
