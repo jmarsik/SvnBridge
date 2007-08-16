@@ -22,10 +22,8 @@ namespace Tests
             Assert.AreEqual(true, created);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -41,8 +39,7 @@ namespace Tests
             Assert.AreEqual(false, created);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(1, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile.txt", ItemType.File));
         }
 
         [Test]
@@ -55,10 +52,8 @@ namespace Tests
             Assert.AreEqual(ItemType.Folder, _provider.GetItems(-1, _testPath + "/TestFolder", Recursion.None).ItemType);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFolder", response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFolder", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -76,30 +71,10 @@ namespace Tests
             Assert.AreEqual(GetString(testFile), ReadFile(_testPath + "/TestFile3.txt"));
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(4, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
-            Assert.AreEqual(_testPath + "/TestFile2.txt", response.Items[2].Path);
-            Assert.AreEqual(ItemType.File, response.Items[2].Type);
-            Assert.AreEqual(_testPath + "/TestFile3.txt", response.Items[3].Path);
-            Assert.AreEqual(ItemType.File, response.Items[3].Type);
-        }
-
-        [Test]
-        public void TestResponseFilesAreSortedAlphabetically()
-        {
-            byte[] fileData = GetBytes("Test file contents");
-
-            _provider.WriteFile(_activityId, _testPath + "/TestFile2.txt", fileData);
-            _provider.WriteFile(_activityId, _testPath + "/TestFile3.txt", fileData);
-            _provider.WriteFile(_activityId, _testPath + "/TestFile1.txt", fileData);
-            MergeActivityResponse response = Commit();
-
-            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(_testPath + "/TestFile2.txt", response.Items[2].Path);
-            Assert.AreEqual(_testPath + "/TestFile3.txt", response.Items[3].Path);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile1.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile2.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile3.txt", ItemType.File));
         }
 
         [Test]
@@ -113,12 +88,9 @@ namespace Tests
             Assert.AreEqual(ItemType.Folder, _provider.GetItems(-1, _testPath + "/TestFolder/SubFolder", Recursion.None).ItemType);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(3, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFolder/SubFolder", response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
-            Assert.AreEqual(_testPath + "/TestFolder", response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
-            Assert.AreEqual(_testPath, response.Items[2].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[2].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFolder", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFolder/SubFolder", ItemType.Folder));
         }
 
         [Test]
@@ -133,12 +105,9 @@ namespace Tests
             Assert.AreEqual(GetString(fileData), ReadFile(_testPath + "/TestFolder/TestFile.txt"));
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(3, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFolder/TestFile.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
-            Assert.AreEqual(_testPath + "/TestFolder", response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
-            Assert.AreEqual(_testPath, response.Items[2].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[2].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFolder/TestFile.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFolder", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -153,8 +122,7 @@ namespace Tests
             Assert.IsFalse(_provider.ItemExists(path));
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(1, response.Items.Count);
-            Assert.AreEqual(_testPath, response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -169,8 +137,7 @@ namespace Tests
             Assert.IsFalse(_provider.ItemExists(path));
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(1, response.Items.Count);
-            Assert.AreEqual(_testPath, response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -187,8 +154,7 @@ namespace Tests
             Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(1, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile.txt", ItemType.File));
         }
 
         [Test]
@@ -203,8 +169,7 @@ namespace Tests
             Assert.AreEqual(ignore, item.Properties["ignore"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(1, response.Items.Count);
-            Assert.AreEqual(_testPath, response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -223,8 +188,7 @@ namespace Tests
             Assert.AreEqual(mimeType2, item.Items[0].Properties["mime-type"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(1, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFile.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile.txt", ItemType.File));
         }
 
         [Test]
@@ -241,8 +205,7 @@ namespace Tests
             Assert.AreEqual(ignore2, item.Properties["ignore"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(1, response.Items.Count);
-            Assert.AreEqual(_testPath, response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -264,10 +227,8 @@ namespace Tests
             Assert.AreEqual("mime4", item.Items[1].Properties["mime-type4"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
-            Assert.AreEqual(_testPath + "/TestFile2.txt", response.Items[1].Path);
-            Assert.AreEqual(ItemType.File, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile1.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile2.txt", ItemType.File));
         }
 
         [Test]
@@ -289,10 +250,8 @@ namespace Tests
             Assert.AreEqual("mime4", item.Items[1].Properties["mime-type4"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/Folder1", response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
-            Assert.AreEqual(_testPath + "/Folder2", response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Folder1", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Folder2", ItemType.Folder));
         }
 
         [Test]
@@ -306,10 +265,8 @@ namespace Tests
             Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/Folder1", response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Folder1", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -325,10 +282,8 @@ namespace Tests
             Assert.AreEqual("mime1", item.Items[0].Properties["mime-type1"]);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/TestFile1.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile1.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -357,29 +312,25 @@ namespace Tests
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath, response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
-            Assert.AreEqual(_testPath + "/FunRename.txt", response.Items[1].Path);
-            Assert.AreEqual(ItemType.File, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/FunRename.txt", ItemType.File));
         }
 
         [Test]
         public void TestCommitRenameFileWithCopyBeforeDelete()
         {
-            WriteFile(_testPath + "/Fun.txt", "Fun text", true);
+            WriteFile(_testPath + "/FunRename.txt", "Fun text", true);
 
-            _provider.CopyItem(_activityId, _testPath + "/Fun.txt", _testPath + "/FunRename.txt");
-            _provider.DeleteItem(_activityId, _testPath + "/Fun.txt");
+            _provider.CopyItem(_activityId, _testPath + "/FunRename.txt", _testPath + "/Fun.txt");
+            _provider.DeleteItem(_activityId, _testPath + "/FunRename.txt");
             MergeActivityResponse response = Commit();
 
-            LogItem log = _provider.GetLog(_testPath + "/FunRename.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            LogItem log = _provider.GetLog(_testPath + "/Fun.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/FunRename.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Fun.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -395,10 +346,8 @@ namespace Tests
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath, response.Items[0].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[0].Type);
-            Assert.AreEqual(_testPath + "/FunRename", response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/FunRename", ItemType.Folder));
         }
 
         [Test]
@@ -435,8 +384,8 @@ namespace Tests
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);
             byte[] updatedText = GetBytes("Test file contents");
 
-            _provider.CopyItem(_activityId, _testPath + "/Fun.txt", _testPath + "/FunRename.txt");
             _provider.DeleteItem(_activityId, _testPath + "/Fun.txt");
+            _provider.CopyItem(_activityId, _testPath + "/Fun.txt", _testPath + "/FunRename.txt");
             bool created = _provider.WriteFile(_activityId, _testPath + "/FunRename.txt", updatedText);
             MergeActivityResponse response = Commit();
 
@@ -446,10 +395,8 @@ namespace Tests
             Assert.AreEqual(false, created);
             Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
             Assert.AreEqual(2, response.Items.Count);
-            Assert.AreEqual(_testPath + "/FunRename.txt", response.Items[0].Path);
-            Assert.AreEqual(ItemType.File, response.Items[0].Type);
-            Assert.AreEqual(_testPath, response.Items[1].Path);
-            Assert.AreEqual(ItemType.Folder, response.Items[1].Type);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/FunRename.txt", ItemType.File));
         }
 
         [Test]
@@ -459,13 +406,16 @@ namespace Tests
             bool created = WriteFile(_testPath + "/TestFolder/TestFile.txt", "Test file contents", true);
 
             _provider.CopyItem(_activityId, _testPath + "/TestFolder/TestFile.txt", _testPath + "/FunFile.txt");
-            _provider.DeleteItem(_activityId, _testPath + "/TestFolder/TestFile.txt");
             _provider.DeleteItem(_activityId, _testPath + "/TestFolder");
             MergeActivityResponse response = Commit();
 
             LogItem log = _provider.GetLog(_testPath + "/FunFile.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
             Assert.IsNull(_provider.GetItems(-1, _testPath + "/TestFolder", Recursion.None));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/FunFile.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -480,6 +430,9 @@ namespace Tests
             MergeActivityResponse response = Commit();
 
             ItemMetaData item = _provider.GetItems(-1, _testPath, Recursion.Full);
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(1, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -498,6 +451,11 @@ namespace Tests
             LogItem log = _provider.GetLog(_testPath + "/Protocol/Fun.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
             Assert.AreEqual(GetString(fileData), ReadFile(_testPath + "/Protocol/Fun.txt"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Protocol/Fun.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Protocol", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Nodes", ItemType.Folder));
         }
 
         [Test]
@@ -516,6 +474,12 @@ namespace Tests
             LogItem log = _provider.GetLog(_testPath + "/B/A/Test.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log.History[0].Changes[0].ChangeType);
             Assert.AreEqual(GetString(fileData), ReadFile(_testPath + "/B/A/Test.txt"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(4, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/A/Test.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/A", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
         }
 
         [Test]
@@ -531,6 +495,10 @@ namespace Tests
             LogItem log = _provider.GetLog(_testPath + "/Test.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Test.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
 
         [Test]
@@ -550,6 +518,11 @@ namespace Tests
             log = _provider.GetLog(_testPath + "/Test2.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log.History[0].Changes[0].ChangeType);
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Test1.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/Test2.txt", ItemType.File));
         }
 
         [Test]
@@ -559,10 +532,10 @@ namespace Tests
             WriteFile(_testPath + "/A/Test1.txt", "filedata", false);
             WriteFile(_testPath + "/A/Test2.txt", "filedata", true);
 
+            _provider.DeleteItem(_activityId, _testPath + "/A");
             _provider.MakeCollection(_activityId, _testPath + "/B");
             _provider.CopyItem(_activityId, _testPath + "/A/Test1.txt", _testPath + "/B/Test1.txt");
             _provider.CopyItem(_activityId, _testPath + "/A/Test2.txt", _testPath + "/B/Test2.txt");
-            _provider.DeleteItem(_activityId, _testPath + "/A");
             MergeActivityResponse response = Commit();
 
             LogItem log1 = _provider.GetLog(_testPath + "/B/Test1.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
@@ -570,6 +543,12 @@ namespace Tests
             LogItem log2 = _provider.GetLog(_testPath + "/B/Test2.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log2.History[0].Changes[0].ChangeType);
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(4, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/Test1.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/Test2.txt", ItemType.File));
         }
 
         [Test]
@@ -590,6 +569,11 @@ namespace Tests
             LogItem log2 = _provider.GetLog(_testPath + "/B/Test2.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
             Assert.AreEqual(ChangeType.Rename, log2.History[0].Changes[0].ChangeType);
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/Test2.txt", ItemType.File));
         }
 
         [Test]
@@ -608,6 +592,11 @@ namespace Tests
             Assert.AreEqual(ChangeType.Rename | ChangeType.Edit, log2.History[0].Changes[0].ChangeType);
             Assert.AreEqual("filedata2", ReadFile(_testPath + "/B/Test1.txt"));
             Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/Test1.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
         }
     }
 }

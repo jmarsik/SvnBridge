@@ -132,5 +132,15 @@ namespace Tests
         {
             return Encoding.Default.GetBytes(data);
         }
+
+        protected bool ResponseContains(MergeActivityResponse response, string path, ItemType itemType)
+        {
+            bool found = false;
+            foreach (MergeActivityResponseItem item in response.Items)
+                if ((item.Path == path) && (item.Type == itemType))
+                    found = true;
+
+            return found;
+        }
     }
 }

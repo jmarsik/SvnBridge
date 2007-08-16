@@ -440,8 +440,14 @@ namespace SvnBridge.SourceControl
                 }
                 changesetId = _sourceControlSvc.Commit(_serverUrl, _credentials, activityId, _activities[activityId].Comment, commitServerList);
             }
+            return GenerateMergeResponse(activityId, changesetId);
+        }
 
-            SortedDictionary<string, SortedList<string, ActivityItem>> sortedMergeResponse = new SortedDictionary<string,SortedList<string,ActivityItem>>();
+        private MergeActivityResponse GenerateMergeResponse(string activityId, int changesetId)
+        {
+            MergeActivityResponse mergeResponse = new MergeActivityResponse(changesetId, DateTime.Now, "unknown");
+            List<string> baseFolders = new List<string>();
+            List<string> sortedMergeResponse = new List<string>();
             foreach (ActivityItem item in _activities[activityId].MergeList)
             {
                 ActivityItem newItem = item;
@@ -458,47 +464,39 @@ namespace SvnBridge.SourceControl
                         }
                         newItem = new ActivityItem(path, newItemType, item.Action);
                     }
-                    string folderName = GetFolderName(newItem.Path);
-                    if (!sortedMergeResponse.ContainsKey(folderName))
-                        sortedMergeResponse[folderName] = new SortedList<string, ActivityItem>();
 
-                    if (!sortedMergeResponse[folderName].ContainsKey(newItem.Path))
-                        sortedMergeResponse[folderName].Add(newItem.Path, newItem);
-                }
-            }
-
-            List<SortedList<string, ActivityItem>> values = new List<SortedList<string,ActivityItem>>();
-            foreach (SortedList<string, ActivityItem> folder in sortedMergeResponse.Values)
-                values.Insert(0, folder);
-
-            MergeActivityResponse mergeResponse = new MergeActivityResponse(changesetId, DateTime.Now, "unknown");
-            List<string> baseFolders = new List<string>();
-            foreach (SortedList<string, ActivityItem> folder in values)
-            {
-                foreach (ActivityItem item in folder.Values)
-                {
-                    MergeActivityResponseItem responseItem = new MergeActivityResponseItem(item.FileType, item.Path.Substring(2));
-                    if (item.Action != ActivityItemAction.Deleted && item.Action != ActivityItemAction.Branch && item.Action != ActivityItemAction.RenameDelete)
-                        mergeResponse.Items.Add(responseItem);
-
-                    string folderName = GetFolderName(item.Path);
-                    if (((item.Action == ActivityItemAction.New) || (item.Action == ActivityItemAction.Deleted) || (item.Action == ActivityItemAction.RenameDelete)) && !baseFolders.Contains(folderName))
+                    if (!sortedMergeResponse.Contains(newItem.Path))
                     {
-                        baseFolders.Add(folderName);
-                        bool folderFound = false;
-                        foreach (ActivityItem folderItem in _activities[activityId].MergeList)
-                            if (folderItem.FileType == ItemType.Folder && folderItem.Path == folderName)
-                                folderFound = true;
+                        sortedMergeResponse.Add(newItem.Path);
 
-                        if (!folderFound)
-                        {
-                            responseItem = new MergeActivityResponseItem(ItemType.Folder, GetFolderName(responseItem.Path));
+                        MergeActivityResponseItem responseItem = new MergeActivityResponseItem(newItem.FileType, newItem.Path.Substring(2));
+                        if (newItem.Action != ActivityItemAction.Deleted && newItem.Action != ActivityItemAction.Branch && newItem.Action != ActivityItemAction.RenameDelete)
                             mergeResponse.Items.Add(responseItem);
-                        }
+
+                        AddBaseFolderIfRequired(activityId, newItem, baseFolders, mergeResponse);
                     }
                 }
             }
             return mergeResponse;
+        }
+
+        private void AddBaseFolderIfRequired(string activityId, ActivityItem item, List<string> baseFolders, MergeActivityResponse mergeResponse)
+        {
+            string folderName = GetFolderName(item.Path);
+            if (((item.Action == ActivityItemAction.New) || (item.Action == ActivityItemAction.Deleted) || (item.Action == ActivityItemAction.RenameDelete)) && !baseFolders.Contains(folderName))
+            {
+                baseFolders.Add(folderName);
+                bool folderFound = false;
+                foreach (ActivityItem folderItem in _activities[activityId].MergeList)
+                    if (folderItem.FileType == ItemType.Folder && folderItem.Path == folderName)
+                        folderFound = true;
+
+                if (!folderFound)
+                {
+                    MergeActivityResponseItem responseItem = new MergeActivityResponseItem(ItemType.Folder, GetFolderName(item.Path.Substring(2)));
+                    mergeResponse.Items.Add(responseItem);
+                }
+            }
         }
 
         public byte[] ReadFile(ItemMetaData item)
