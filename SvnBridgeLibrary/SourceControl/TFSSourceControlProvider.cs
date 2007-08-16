@@ -560,17 +560,14 @@ namespace SvnBridge.SourceControl
             }
             else
             {
-                ItemSpec spec = new ItemSpec();
-                spec.item = SERVER_PATH + path;
-                ExtendedItem[][] items = _sourceControlSvc.QueryItemsExtended(_serverUrl, _credentials, activityId, new ItemSpec[1] { spec }, DeletedState.NonDeleted, ItemType.Any);
-
-                if (items[0].Length == 0)
+                ItemMetaData pendingItem = GetPendingItem(activityId, path);
+                if (pendingItem == null)
                 {
                     pendRequests.Add(PendRequest.AddFile(localPath, TfsUtil.CodePage_ANSI));
                 }
                 else
                 {
-                    UpdateLocalVersion(activityId, items[0][0].itemid, items[0][0].latest, localPath);
+                    UpdateLocalVersion(activityId, pendingItem, localPath);
                     pendRequests.Add(PendRequest.Edit(localPath));
                     newFile = false;
                 }
@@ -625,18 +622,44 @@ namespace SvnBridge.SourceControl
         {
             Activity activity = _activities[activityId];
 
-            string localPath = GetLocalPath(activityId, copyAction.Path);
-            string localTargetPath = GetLocalPath(activityId, copyAction.TargetPath);
-
-            ItemMetaData item = GetItems(-1, copyAction.Path, Recursion.None);
-            UpdateLocalVersion(activityId, item, localPath);
-
             bool copyIsRename = false;
             if (activity.DeletedItems.Contains(copyAction.Path))
             {
                 copyIsRename = true;
                 activity.DeletedItems.Remove(copyAction.Path);
                 _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + copyAction.Path });
+            }
+
+            string localPath = GetLocalPath(activityId, copyAction.Path);
+            string localTargetPath = GetLocalPath(activityId, copyAction.TargetPath);
+            ItemMetaData item = GetItems(-1, copyAction.Path, Recursion.None);
+            UpdateLocalVersion(activityId, item, localPath);
+
+            if (!copyIsRename)
+            {
+                foreach (CopyAction copy in activity.CopiedItems)
+                {
+                    if (copyAction.Path.StartsWith(copy.Path + "/"))
+                    {
+                        string path = copy.TargetPath + copyAction.Path.Substring(copy.Path.Length);
+                        for (int i = activity.DeletedItems.Count - 1; i >= 0; i--)
+                        {
+                            if (activity.DeletedItems[i] == path)
+                            {
+                                copyIsRename = true;
+                                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + activity.DeletedItems[i] });
+                                for (int j = activity.MergeList.Count - 1; j >= 0; j--)
+                                    if (activity.MergeList[j].Path == SERVER_PATH + activity.DeletedItems[i])
+                                        activity.MergeList.RemoveAt(j);
+
+                                activity.DeletedItems.RemoveAt(i);
+                                localPath = GetLocalPath(activityId, path);
+                                ItemMetaData pendingItem = GetPendingItem(activityId, path);
+                                UpdateLocalVersion(activityId, pendingItem, localPath);
+                            }
+                        }
+                    }
+                }
             }
             if (!copyIsRename)
             {
@@ -708,6 +731,9 @@ namespace SvnBridge.SourceControl
             string localPath = GetLocalPath(activityId, path);
 
             ItemMetaData item = GetItems(-1, path, Recursion.None, true);
+            if (item == null)
+                item = GetPendingItem(activityId, path);
+
             UpdateLocalVersion(activityId, item, localPath);
 
             if (item.ItemType != ItemType.Folder)
@@ -772,6 +798,23 @@ namespace SvnBridge.SourceControl
         private string GetFolderName(string path)
         {
             return path.Substring(0, path.LastIndexOf('/'));
+        }
+
+        private ItemMetaData GetPendingItem(string activityId, string path)
+        {
+            ItemSpec spec = new ItemSpec();
+            spec.item = SERVER_PATH + path;
+            ExtendedItem[][] items = _sourceControlSvc.QueryItemsExtended(_serverUrl, _credentials, activityId, new ItemSpec[1] { spec }, DeletedState.NonDeleted, ItemType.Any);
+            if (items[0].Length == 0)
+                return null;
+            else
+            {
+                ItemMetaData pendingItem = new ItemMetaData();
+                pendingItem.Id = items[0][0].itemid;
+                pendingItem.Revision = items[0][0].latest;
+                pendingItem.ItemType = items[0][0].type;
+                return pendingItem;
+            }
         }
 
         private ItemMetaData ConvertSourceItem(SourceItem sourceItem)
