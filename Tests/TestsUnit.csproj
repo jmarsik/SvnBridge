@@ -74,7 +74,7 @@
     <Compile Include="Handlers\PropFindHandlerTests.cs" />
     <Compile Include="Handlers\PropPatchHandlerTests.cs" />
     <Compile Include="Handlers\PutHandlerTests.cs" />
-    <Compile Include="Handlers\ReportLogHandlerTests.cs" />
+    <Compile Include="Handlers\ReportHandlerTests.cs" />
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
     <Compile Include="Infrastructure\TestHelper.cs" />
