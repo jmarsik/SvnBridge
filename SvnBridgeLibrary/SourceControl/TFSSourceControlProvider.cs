@@ -136,8 +136,11 @@ namespace SvnBridge.SourceControl
             _activities.Remove(activityId);
         }
 
-        public void DeleteItem(string activityId, string path)
+        public bool DeleteItem(string activityId, string path)
         {
+            if ((GetItems(-1, path, Recursion.None, true) == null) && (GetPendingItem(activityId, path) == null))
+                return false;
+
             Activity activity = _activities[activityId];
             bool postCommitDelete = false;
             foreach (CopyAction copy in activity.CopiedItems)
@@ -171,6 +174,7 @@ namespace SvnBridge.SourceControl
                     activity.DeletedItems.Add(path);
                 }
             }
+            return true;
         }
 
         public FolderMetaData GetChangedItems(string path, int versionFrom, int versionTo, UpdateReportData reportData)
@@ -739,8 +743,7 @@ namespace SvnBridge.SourceControl
             if (item.ItemType != ItemType.Folder)
             {
                 string propertiesFile = GetPropertiesFileName(path, item.ItemType);
-                if (GetItems(-1, propertiesFile, Recursion.None, true) != null)
-                    DeleteItem(activityId, propertiesFile);
+                DeleteItem(activityId, propertiesFile);
             }
 
             List<PendRequest> pendRequests = new List<PendRequest>();

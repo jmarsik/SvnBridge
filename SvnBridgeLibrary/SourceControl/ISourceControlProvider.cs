@@ -7,7 +7,7 @@ namespace SvnBridge.SourceControl
     {
         void CopyItem(string activityId, string path, string targetPath);
         void DeleteActivity(string activityId);
-        void DeleteItem(string activityId, string path);
+        bool DeleteItem(string activityId, string path);
         FolderMetaData GetChangedItems(string path, int versionFrom, int VersionTo, UpdateReportData reportData);
         ItemMetaData GetItems(int version, string path, Recursion recursion);
         int GetLatestVersion();

@@ -34,6 +34,24 @@ namespace Tests
         }
 
         [Test]
+        public void TestDeleteItemReturnsTrueWhenFileExists()
+        {
+            WriteFile(_testPath + "/File.txt", "filedata", true);
+
+            bool result = _provider.DeleteItem(_activityId, _testPath + "/File.txt");
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void TestDeleteItemReturnsFalseIfFileDoesNotExist()
+        {
+            bool result = _provider.DeleteItem(_activityId, _testPath + "/NotHere.txt");
+
+            Assert.IsFalse(result);
+        }
+
+        [Test]
         public void TestGetLogReturnsOriginalNameAndRevisionForRenamedItems()
         {
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);

@@ -407,7 +407,7 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.ItemExists, false);
+            mock.Attach(provider.DeleteItem, false);
 
             string request =
                 "DELETE //!svn/wrk/70df3104-9f67-8d4e-add7-6012fe86c03a/Spikes/SvnFacade/trunk/New%20Folder/Test2.txt HTTP/1.1\r\n" +

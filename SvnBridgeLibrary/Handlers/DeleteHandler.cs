@@ -50,11 +50,7 @@ namespace SvnBridge.Handlers
             {
                 string activityId = path.Substring(11, path.IndexOf('/', 11) - 11);
                 string filePath = path.Substring(path.IndexOf('/', 11));
-                if (!sourceControlProvider.ItemExists(Helper.Decode(filePath)))
-                {
-                    return false;
-                }
-                sourceControlProvider.DeleteItem(activityId, Helper.Decode(filePath));
+                return sourceControlProvider.DeleteItem(activityId, Helper.Decode(filePath));
             }
             return true;
         }

@@ -589,8 +589,7 @@ namespace Tests
         [Test]
         public void Test14()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.DeleteItem);
+            mock.Attach(provider.DeleteItem, true);
 
             string request =
                 "DELETE //!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FunRenamedAgain.txt HTTP/1.1\r\n" +

@@ -10,43 +10,41 @@ namespace Tests
 {
     public class MyMocks : MockFramework
     {
+        public delegate bool DeleteItem(string activityId, string path);
+        public Results Attach(DeleteItem method, bool returnValue)
+        {
+            return base.Attach((Delegate)method, (object)returnValue);
+        }
+
         public delegate bool ItemExists(string path, int version);
         public Results Attach(ItemExists method, bool returnValue)
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
 
-        public Results Attach(ItemExists method,
-                              Exception throwException)
+        public Results Attach(ItemExists method, Exception throwException)
         {
             return base.Attach((Delegate)method, throwException);
         }
 
-        public Results Attach(ItemExists method,
-                              MultipleReturnValues returnValues)
+        public Results Attach(ItemExists method, MultipleReturnValues returnValues)
         {
             return base.Attach((Delegate)method, returnValues);
         }
 
         public delegate int GetLatestVersion();
-
-        public Results Attach(GetLatestVersion method,
-                              int returnValue)
+        public Results Attach(GetLatestVersion method, int returnValue)
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
 
-        public delegate bool IsDirectory(int version,
-                                         string path);
-
-        public Results Attach(IsDirectory method,
-                              bool returnValue)
+        public delegate bool IsDirectory(int version, string path);
+        public Results Attach(IsDirectory method, bool returnValue)
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public delegate void MakeActivity(string activityId);
-
         public Results Attach(MakeActivity method)
         {
             return base.Attach((Delegate)method);

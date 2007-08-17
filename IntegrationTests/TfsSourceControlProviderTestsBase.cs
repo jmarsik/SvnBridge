@@ -33,6 +33,7 @@ namespace Tests
         [TearDown]
         public void TearDown()
         {
+            Commit();
             DeleteItem(_testPath, false);
             _provider.MergeActivity(_activityId);
             _provider.DeleteActivity(_activityId);
