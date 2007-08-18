@@ -340,5 +340,19 @@ namespace Tests
             Assert.AreEqual(_testPath.Substring(1) + "/Folder1", folder.Items[0].Name);
             Assert.AreEqual("prop1value", folder.Items[0].Properties["prop1"]);
         }
+
+        [Test]
+        public void TestGetChangedItemsWithAddedFileThenDeletedFileReturnsNothing()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
+            DeleteItem(_testPath + "/TestFile.txt", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
     }
 }

@@ -954,6 +954,10 @@ namespace SvnBridge.SourceControl
 
                         folder.Items.Add(item);
                     }
+                    else if (item is DeleteMetaData)
+                    {
+                        folder.Items.Remove(item);
+                    }
                     if (i != nameParts.Length - 1)
                     {
                         folder = (FolderMetaData)item;
