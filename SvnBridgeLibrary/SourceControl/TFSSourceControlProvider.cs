@@ -360,6 +360,17 @@ namespace SvnBridge.SourceControl
                             ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
                             change.Item = new RenamedSourceItem(change.Item, SERVER_PATH + oldItem.Name, oldItem.Revision);
                         }
+                        else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
+                        {
+                            ChangesetVersionSpec branchChangeset = new ChangesetVersionSpec();
+                            branchChangeset.cs = history.ChangeSetID;
+                            ItemSpec spec = new ItemSpec();
+                            spec.item = change.Item.RemoteName;
+                            BranchRelative[][] branches = _sourceControlSvc.QueryBranches(_serverUrl, _credentials, null, new ItemSpec[] { spec }, branchChangeset);
+                            string oldName = branches[0][branches[0].GetUpperBound(0)].BranchFromItem.item;
+                            int oldRevision = change.Item.RemoteChangesetId - 1;
+                            change.Item = new RenamedSourceItem(change.Item, oldName, oldRevision);
+                        }
 
             return logItem;
         }

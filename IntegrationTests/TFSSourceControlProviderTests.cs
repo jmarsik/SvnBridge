@@ -25,6 +25,35 @@ namespace Tests
             Assert.AreEqual(2, logItem.History.Length);
         }
 
+        [Test]
+        public void TestGetLogWithBranchedFileContainsOriginalNameAndRevision()
+        {
+            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            CopyItem(_testPath + "/TestFile.txt", _testPath + "/TestFileBranch.txt", true);
+            int versionTo = _provider.GetLatestVersion();
+
+            LogItem logItem = _provider.GetLog(_testPath, versionTo, versionTo, Recursion.Full, Int32.MaxValue);
+
+            Assert.AreEqual(ChangeType.Branch, logItem.History[0].Changes[0].ChangeType & ChangeType.Branch);
+            Assert.AreEqual(_testPath + "/TestFile.txt", ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRemoteName.Substring(1));
+            Assert.AreEqual(versionFrom, ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRevision);
+        }
+
+        [Test]
+        public void TestGetLogWithBranchedFileContainsOriginalVersionAsRevisionImmediatelyBeforeBranch()
+        {
+            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
+            WriteFile(_testPath + "/TestFile2.txt", "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            CopyItem(_testPath + "/TestFile.txt", _testPath + "/TestFileBranch.txt", true);
+            int versionTo = _provider.GetLatestVersion();
+
+            LogItem logItem = _provider.GetLog(_testPath, versionTo, versionTo, Recursion.Full, Int32.MaxValue);
+
+            Assert.AreEqual(versionFrom, ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRevision);
+        }
+
         [Test, ExpectedException(typeof(FolderAlreadyExistsException))]
         public void TestAddFolderThatAlreadyExistsThrowsException()
         {
