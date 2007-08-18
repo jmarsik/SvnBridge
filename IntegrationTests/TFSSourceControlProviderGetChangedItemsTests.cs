@@ -354,5 +354,19 @@ namespace Tests
 
             Assert.AreEqual(0, folder.Items.Count);
         }
+
+        [Test]
+        public void TestGetChangedItemsWithAddedFolderThenDeletedFolderReturnsNothing()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            CreateFolder(_testPath + "/TestFolder", true);
+            DeleteItem(_testPath + "/TestFolder", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
     }
 }

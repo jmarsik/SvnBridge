@@ -220,7 +220,7 @@ namespace SvnBridge.SourceControl
                                         else
                                             remoteName = remoteName.Replace("/" + PROP_FOLDER + "/", "/");
                                     }
-                                    ProcessAddedFile(path, remoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                    ProcessAddedItem(path, remoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
                                 }
                             }
                             else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
@@ -231,7 +231,7 @@ namespace SvnBridge.SourceControl
                             {
                                 ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
                                 ProcessDeletedFile(path, "$/" + oldItem.Name, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
-                                ProcessAddedFile(path, change.Item.RemoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                ProcessAddedItem(path, change.Item.RemoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
                             }
                             else
                             {
@@ -932,7 +932,7 @@ namespace SvnBridge.SourceControl
             }
         }
 
-        private void ProcessAddedFile(string path, string remoteName, SourceItemChange change, FolderMetaData root,
+        private void ProcessAddedItem(string path, string remoteName, SourceItemChange change, FolderMetaData root,
             int versionTo, Dictionary<string, int> clientExistingFiles, Dictionary<string, string> clientDeletedFiles)
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Add, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
@@ -954,7 +954,11 @@ namespace SvnBridge.SourceControl
 
                         folder.Items.Add(item);
                     }
-                    else if (item is DeleteMetaData)
+                    else if ((item is DeleteMetaData) && (item.ItemType == change.Item.ItemType))
+                    {
+                        folder.Items.Remove(item);
+                    }
+                    else if ((item is DeleteFolderMetaData) && (item.ItemType == change.Item.ItemType))
                     {
                         folder.Items.Remove(item);
                     }
