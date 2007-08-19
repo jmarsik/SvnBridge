@@ -368,5 +368,20 @@ namespace Tests
 
             Assert.AreEqual(0, folder.Items.Count);
         }
+
+        [Test]
+        public void TestGetChangedItemsWithAddedFileThenEditedThenDeletedFileReturnsNothing()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
+            WriteFile(_testPath + "/TestFile.txt", "Fun text2", true);
+            DeleteItem(_testPath + "/TestFile.txt", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
     }
 }
