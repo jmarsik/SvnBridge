@@ -895,7 +895,7 @@ namespace SvnBridge.SourceControl
                 for (int i = 0; i < nameParts.Length; i++)
                 {
                     folderName += "/" + nameParts[i];
-                    ItemMetaData item = FindItem(folder, nameParts[i]);
+                    ItemMetaData item = FindItem(folder, folderName);
                     if (item == null)
                     {
                         if (i == nameParts.Length - 1)
@@ -927,6 +927,10 @@ namespace SvnBridge.SourceControl
                         {
                             folder = (FolderMetaData)item;
                         }
+                    }
+                    else if (item is DeleteFolderMetaData)
+                    {
+                        return;
                     }
                 }
             }
