@@ -402,5 +402,22 @@ namespace Tests
             Assert.AreEqual(_testPath.Substring(1) + "/Folder1", folder.Items[0].Name);
             Assert.IsInstanceOfType(typeof(DeleteFolderMetaData), folder.Items[0]);
         }
+
+        [Test]
+        public void TestGetChangedItemsWithAddedFileThenFolderContainingFileIsDeleted()
+        {
+            CreateFolder(_testPath + "/Folder1", true);
+            int versionFrom = _provider.GetLatestVersion();
+            WriteFile(_testPath + "/Folder1/Test.txt", "fun text", true);
+            DeleteItem(_testPath + "/Folder1", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Folder1", folder.Items[0].Name);
+            Assert.IsInstanceOfType(typeof(DeleteFolderMetaData), folder.Items[0]);
+        }
     }
 }

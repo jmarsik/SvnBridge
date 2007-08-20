@@ -958,7 +958,11 @@ namespace SvnBridge.SourceControl
 
                         folder.Items.Add(item);
                     }
-                    else if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) && ((item is DeleteMetaData) ||(item is DeleteFolderMetaData)))
+                    else if ((item is DeleteFolderMetaData) && (i != nameParts.Length - 1))
+                    {
+                        return;
+                    }
+                    else if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) && ((item is DeleteMetaData) || (item is DeleteFolderMetaData)))
                     {
                         folder.Items.Remove(item);
                     }
