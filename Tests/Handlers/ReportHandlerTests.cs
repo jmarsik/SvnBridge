@@ -160,5 +160,40 @@ namespace SvnBridge.Handlers
             Assert.AreEqual(Recursion.Full, r.Parameters[3]);
             Assert.AreEqual(100, r.Parameters[4]);
         }
+
+        [Test]
+        public void VerifyHandleOutputForGetLocationsReportOnRoot()
+        {
+            request.Path = "http://localhost:8082/!svn/bc/5696";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><S:get-locations xmlns:S=\"svn:\" xmlns:D=\"DAV:\"><S:path></S:path><S:peg-revision>5696</S:peg-revision><S:location-revision>5597</S:location-revision></S:get-locations>";
+
+            handler.Handle(context, "http://tfsserver");
+
+            string expected =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
+                "<S:location rev=\"5597\" path=\"/\"/>\n" +
+                "</S:get-locations-report>\n";
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+            Assert.AreEqual(200, context.Response.StatusCode);
+            Assert.AreEqual("text/xml; charset=\"utf-8\"", context.Response.ContentType);
+            Assert.AreEqual(true, context.Response.SendChunked);
+        }
+
+        [Test]
+        public void VerifyHandleOutputForGetLocationsReportOnSubFolder()
+        {
+            request.Path = "http://localhost:8082/!svn/bc/5696/Folder1";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><S:get-locations xmlns:S=\"svn:\" xmlns:D=\"DAV:\"><S:path></S:path><S:peg-revision>5696</S:peg-revision><S:location-revision>5573</S:location-revision></S:get-locations>";
+
+            handler.Handle(context, "http://tfsserver");
+
+            string expected =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
+                "<S:location rev=\"5573\" path=\"/Folder1\"/>\n" +
+                "</S:get-locations-report>\n";
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+        }
     }
 }

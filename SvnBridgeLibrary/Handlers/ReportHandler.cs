@@ -52,7 +52,35 @@ namespace SvnBridge.Handlers
                         LogReport(sourceControlProvider, data, path, output);
                     }
                 }
+                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locations")
+                {
+                    GetLocationsReportData data = Helper.DeserializeXml<GetLocationsReportData>(reader);
+                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                    response.SendChunked = true;
+                    using (StreamWriter output = new StreamWriter(response.OutputStream))
+                    {
+                        GetLocationsReport(sourceControlProvider, data, path, output);
+                    }
+                }
+                else
+                {
+
+                    throw new Exception("Unrecognized report name: " + reader.LocalName);
+                }
             }
+        }
+
+        private void GetLocationsReport(ISourceControlProvider sourceControlProvider, GetLocationsReportData getLocationsReport, string path, StreamWriter output)
+        {
+            if (path.IndexOf('/', 9) > -1)
+                path = path.Substring(path.IndexOf('/', 9));
+            else
+                path = "/";
+
+            output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+            output.Write("<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
+            output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + path + "\"/>\n");
+            output.Write("</S:get-locations-report>\n");
         }
 
         private void UpdateReport(ISourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output)

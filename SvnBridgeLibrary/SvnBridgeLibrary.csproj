@@ -87,6 +87,7 @@
     <Compile Include="Protocol\CheckedInData.cs" />
     <Compile Include="Protocol\CheckoutData.cs" />
     <Compile Include="Protocol\EntryData.cs" />
+    <Compile Include="Protocol\GetLocationsReportData.cs" />
     <Compile Include="Protocol\GetLocksReportData.cs" />
     <Compile Include="Protocol\LogReportData.cs" />
     <Compile Include="Protocol\MergeData.cs" />
