@@ -90,8 +90,9 @@ namespace SvnBridge.Handlers
 
         private void LogReport(ISourceControlProvider sourceControlProvider, LogReportData logreport, string path, StreamWriter output)
         {
-            string serverPath = path.Substring(9);
-            serverPath = serverPath.Substring(serverPath.IndexOf('/'));
+            string serverPath = "/";
+            if (path.IndexOf('/',9) > -1)
+                serverPath = path.Substring(path.IndexOf('/', 9));
 
             LogItem logItem = sourceControlProvider.GetLog(serverPath, int.Parse(logreport.EndRevision), int.Parse(logreport.StartRevision), Recursion.Full, int.Parse(logreport.Limit));
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");

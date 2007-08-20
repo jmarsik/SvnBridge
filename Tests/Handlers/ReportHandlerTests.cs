@@ -126,8 +126,39 @@ namespace SvnBridge.Handlers
                 "<S:added-path copyfrom-path=\"/newFolder4/F!@#$%^&amp;()~`_-+={[}];',.txt\" copyfrom-rev=\"5531\">/newFolder4/G!@#$%^&amp;()~`_-+={[}];',.txt</S:added-path>\n" +
                 "</S:log-item>\n" +
                 "</S:log-report>\n";
-
             Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+        }
+
+        [Test]
+        public void VerifyHandleForGetAtLogRoot()
+        {
+            List<SourceItemHistory> histories = new List<SourceItemHistory>();
+            SourceItemHistory history1 = new SourceItemHistory(5696, "jwanagel", DateTime.Parse("2007-08-20T03:23:41.054140Z"), "1234");
+            history1.Changes.Add(TestHelper.MakeChange(ChangeType.Delete, "$/Folder9"));
+            histories.Add(history1);
+            Results r = mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/", histories.ToArray()));
+            request.Path = "http://localhost:8082/!svn/bc/5696";
+            request.Input = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5696</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:strict-node-history/><S:path></S:path></S:log-report>";
+
+            handler.Handle(context, "http://tfsserver");
+
+            string expected =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<S:log-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
+                "<S:log-item>\n" +
+                "<D:version-name>5696</D:version-name>\n" +
+                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
+                "<S:date>2007-08-20T03:23:41.054140Z</S:date>\n" +
+                "<D:comment>1234</D:comment>\n" +
+                "<S:deleted-path>/Folder9</S:deleted-path>\n" +
+                "</S:log-item>\n" +
+                "</S:log-report>\n";
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+            Assert.AreEqual("/", r.Parameters[0]);
+            Assert.AreEqual(1, r.Parameters[1]);
+            Assert.AreEqual(5696, r.Parameters[2]);
+            Assert.AreEqual(Recursion.Full, r.Parameters[3]);
+            Assert.AreEqual(100, r.Parameters[4]);
         }
     }
 }
