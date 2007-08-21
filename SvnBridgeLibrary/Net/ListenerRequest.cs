@@ -54,7 +54,7 @@ namespace SvnBridge.Net
         {
             string host = Headers["host"];
 
-            if (!String.IsNullOrEmpty(host))
+            if (!String.IsNullOrEmpty(host) && !path.StartsWith("http"))
                 url = new Uri(String.Format("http://{0}{1}", host, path));
             else
                 url = new Uri(path);

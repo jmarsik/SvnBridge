@@ -55,9 +55,25 @@ namespace SvnBridge.Nodes
                     return GetRepositoryUUID(property);
                 case "checked-in":
                     return GetCheckedIn(property);
+                case "deadprop-count":
+                    return "<lp2:deadprop-count>0</lp2:deadprop-count>";
+                case "creator-displayname":
+                    return GetCreatorDisplayName(property);
+                case "creationdate":
+                    return GetCreationDate(property);
+                case "version-name":
+                    return GetVersionName(property);
+                case "getcontentlength":
+                    return GetContentLength();
                 default:
                     throw new Exception("Property not found: " + property.LocalName);
             }
+        }
+
+        private string GetContentLength()
+        {
+            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
+            return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>\n";
         }
 
         string GetVersionControlledConfiguration(XmlElement property)
@@ -104,6 +120,24 @@ namespace SvnBridge.Nodes
         {
             ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
             return "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>";
+        }
+
+        string GetCreatorDisplayName(XmlElement property)
+        {
+            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
+            return "<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>";
+        }
+
+        string GetCreationDate(XmlElement property)
+        {
+            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
+            return "<lp1:creationdate>" + item.LastModifiedDate.ToString("o") + "</lp1:creationdate>";
+        }
+
+        string GetVersionName(XmlElement property)
+        {
+            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
+            return "<lp1:version-name>" + item.Revision + "</lp1:version-name>";
         }
     }
 }

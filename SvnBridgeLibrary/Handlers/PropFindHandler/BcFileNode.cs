@@ -1,35 +1,34 @@
 using System.Text.RegularExpressions;
 using System.Xml;
 using SvnBridge.SourceControl;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Nodes
 {
     public class BcFileNode : INode
     {
-        FileNode node;
-        string path;
-        int version;
-        string filePath;
+        readonly FileNode node;
+        readonly int version;
+        readonly string filePath;
 
         public BcFileNode(string vccPath,
                           string path,
+                          int version,
                           ISourceControlProvider sourceControlProvider,
                           string repositoryUuid)
         {
-            this.path = path;
-            Match m = Regex.Match(path, @"/!svn/bc/(\d+)/?");
-            version = int.Parse(m.Groups[1].Value);
-            filePath = path.Substring(m.Groups[0].Value.Length);
+            this.version = version;
+            filePath = path;
             node = new FileNode(vccPath, filePath, sourceControlProvider, repositoryUuid, version);
         }
 
         public string Href()
         {
-            string href = path;
+            string href = "/!svn/bc/" + version + filePath;
             if ((href.Length == 0) || (href[href.Length - 1] != '/'))
                 href += "/";
 
-            return href;
+            return Helper.Encode(href);
         }
 
         public string GetProperty(XmlElement property)

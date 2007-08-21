@@ -95,5 +95,21 @@ namespace SvnBridge.Handlers
 
             Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
         }
+
+        [Test]
+        public void TestGetLocksReport()
+        {
+            request.Path = "http://localhost:8082/Foo";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><S:get-locks-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\"></S:get-locks-report>";
+
+            handler.Handle(context, "http://foo");
+
+            string expected =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<S:get-locks-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
+                "</S:get-locks-report>\n";
+            string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
+            Assert.IsTrue(result.Contains(expected));
+        }
     }
 }
