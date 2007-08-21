@@ -206,8 +206,9 @@ namespace SvnBridge.SourceControl
 
                     foreach (SourceItemHistory history in logItem.History)
                     {
-                        foreach (SourceItemChange change in history.Changes)
+                        for (int i = history.Changes.Count - 1; i >= 0; i--)
                         {
+                            SourceItemChange change = history.Changes[i];
                             if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit))
                             {
                                 if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER))
@@ -931,6 +932,10 @@ namespace SvnBridge.SourceControl
                     else if (item is DeleteFolderMetaData)
                     {
                         return;
+                    }
+                    if (i != nameParts.Length - 1)
+                    {
+                        folder = (FolderMetaData)item;
                     }
                 }
             }

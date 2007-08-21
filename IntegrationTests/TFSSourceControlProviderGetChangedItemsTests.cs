@@ -419,5 +419,42 @@ namespace Tests
             Assert.AreEqual(_testPath.Substring(1) + "/Folder1", folder.Items[0].Name);
             Assert.IsInstanceOfType(typeof(DeleteFolderMetaData), folder.Items[0]);
         }
+
+        [Test]
+        public void TestGetChangedItemsWithDeleteFileThenDeleteFolderThatContainedFileWithinSubfolder()
+        {
+            CreateFolder(_testPath + "/Test1", false);
+            CreateFolder(_testPath + "/Test1/Folder1", false);
+            WriteFile(_testPath + "/Test1/Folder1/Test.txt", "fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            DeleteItem(_testPath + "/Test1/Folder1/Test.txt", true);
+            DeleteItem(_testPath + "/Test1/Folder1", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Test1", folder.Items[0].Name);
+            Assert.AreEqual(1, ((FolderMetaData)folder.Items[0]).Items.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/Test1/Folder1", ((FolderMetaData)folder.Items[0]).Items[0].Name);
+            Assert.IsTrue(((FolderMetaData)folder.Items[0]).Items[0] is DeleteFolderMetaData);
+            Assert.AreEqual(0, ((FolderMetaData)((FolderMetaData)folder.Items[0]).Items[0]).Items.Count);
+        }
+
+        [Test]
+        public void TestGetChangedItemsWithAddedFolderAndFileWithinFolderInSingleCommitThenDeleteFolder()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            CreateFolder(_testPath + "/Folder1", false);
+            WriteFile(_testPath + "/Folder1/Test.txt", "fun text", true);
+            DeleteItem(_testPath + "/Folder1", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
     }
 }
