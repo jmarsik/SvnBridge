@@ -24,7 +24,12 @@ namespace SvnBridge.Nodes
 
         public string Href()
         {
-            string href = "/!svn/bc/" + version + filePath;
+            string path = filePath;
+
+            if (!path.StartsWith("/"))
+                path = "/" + path; 
+
+            string href = "/!svn/bc/" + version + path;
             if ((href.Length == 0) || (href[href.Length - 1] != '/'))
                 href += "/";
 

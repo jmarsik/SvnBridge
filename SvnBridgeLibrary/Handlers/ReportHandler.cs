@@ -26,11 +26,12 @@ namespace SvnBridge.Handlers
                 reader.MoveToContent();
                 if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locks-report")
                 {
-                    //GetLocksReportData getlocksreport = Helper.DeserializeXml<GetLocksReportData>(reader);
-                    SetResponseSettings(response, "text/xml", Encoding.UTF8, 200);
-                    XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                    ns.Add("D", WebDav.Namespaces.DAV);
-                    //SerializeResponse<GetLocksReportData>(getlocksreport, ns, _context.OutputStream);
+                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                    response.SendChunked = true;
+                    using (StreamWriter writer = new StreamWriter(response.OutputStream))
+                    {
+                        GetLocksReport(writer);
+                    }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "update-report")
                 {
@@ -70,6 +71,14 @@ namespace SvnBridge.Handlers
             }
         }
 
+        private void GetLocksReport(StreamWriter writer)
+        {
+            writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+            writer.Write("<S:get-locks-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
+            writer.Write("</S:get-locks-report>\n");
+
+        }
+        
         private void GetLocationsReport(ISourceControlProvider sourceControlProvider, GetLocationsReportData getLocationsReport, string path, StreamWriter output)
         {
             if (path.IndexOf('/', 9) > -1)
