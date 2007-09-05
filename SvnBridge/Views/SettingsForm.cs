@@ -22,6 +22,8 @@ namespace SvnBridge.Views
 
         public new void Show()
         {
+            txtPortNumber.Text = presenter.Port.ToString();
+            txtTfsUrl.Text = presenter.TfsUrl;
             ShowDialog();
         }
 

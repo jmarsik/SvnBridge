@@ -31,7 +31,8 @@ namespace SvnBridge
         {
             SettingsForm view = new SettingsForm();
             SettingsViewPresenter presenter = new SettingsViewPresenter(view);
-
+            presenter.TfsUrl = tfsUrl;
+            presenter.Port = port;
             presenter.Show();
 
             if (!presenter.Cancelled)

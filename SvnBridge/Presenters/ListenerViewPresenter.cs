@@ -29,7 +29,8 @@ namespace SvnBridge.Presenters
         public void ChangeSettings(ISettingsView settingsView)
         {
             SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView);
-
+            settingsViewPresenter.Port = listener.Port;
+            settingsViewPresenter.TfsUrl = listener.TfsUrl;
             settingsViewPresenter.Show();
 
             if ((!settingsViewPresenter.Cancelled) && (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl)))

@@ -107,6 +107,20 @@ namespace SvnBridge.Presenters
         }
 
         [Test]
+        public void TestChangeSettingsDefaultsToExistingSettings()
+        {
+            stubListener.Get_Port = 8081;
+            stubListener.Get_TfsUrl = "http://foo";
+            ListenerViewPresenter presenter = CreatePresenter();
+            StubSettingsView stubSettingsView = new StubSettingsView();
+
+            presenter.ChangeSettings(stubSettingsView);
+
+            Assert.Equal(stubSettingsView.Presenter.Port, 8081);
+            Assert.Equal(stubSettingsView.Presenter.TfsUrl, "http://foo");
+        }
+
+        [Test]
         public void TestChangeSettingsWithNoChangesDoesntStopListener()
         {
             stubListener.Get_Port = 8081;

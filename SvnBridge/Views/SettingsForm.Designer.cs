@@ -53,7 +53,6 @@ namespace SvnBridge.Views
             this.txtPortNumber.Name = "txtPortNumber";
             this.txtPortNumber.Size = new System.Drawing.Size(70, 20);
             this.txtPortNumber.TabIndex = 1;
-            this.txtPortNumber.Text = "8081";
             // 
             // label1
             // 
