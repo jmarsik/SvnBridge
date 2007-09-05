@@ -209,7 +209,7 @@ namespace SvnBridge.SourceControl
                         for (int i = history.Changes.Count - 1; i >= 0; i--)
                         {
                             SourceItemChange change = history.Changes[i];
-                            if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit))
+                            if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit) || ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch))
                             {
                                 if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER))
                                 {

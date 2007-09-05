@@ -78,6 +78,23 @@ namespace Tests
         }
 
         [Test]
+        public void TestGetChangedItemsWithBranchedFile()
+        {
+            WriteFile(_testPath + "/Fun.txt", "Fun text", true);
+            int versionFrom = _provider.GetLatestVersion();
+            CopyItem(_testPath + "/Fun.txt", _testPath + "/FunRename.txt", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(_testPath.Substring(1), folder.Name);
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(_testPath.Substring(1) + "/FunRename.txt", folder.Items[0].Name);
+            Assert.IsNotNull(folder.Items[0].DownloadUrl);
+        }
+
+        [Test]
         public void TestGetChangedItemsWithSameFileUpdatedTwice()
         {
             string path = _testPath + "/TestFile.txt";
