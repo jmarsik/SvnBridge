@@ -214,25 +214,30 @@ namespace SvnBridge.SourceControl
                                 if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER))
                                 {
                                     string remoteName = change.Item.RemoteName;
+                                    bool propertyChange = false;
                                     if (remoteName.Contains("/" + PROP_FOLDER + "/"))
                                     {
+                                        propertyChange = true;
                                         if (remoteName.EndsWith("/" + PROP_FOLDER + "/" + FOLDER_PROP_FILE))
                                             remoteName = remoteName.Substring(0, remoteName.IndexOf("/" + PROP_FOLDER + "/" + FOLDER_PROP_FILE));
                                         else
                                             remoteName = remoteName.Replace("/" + PROP_FOLDER + "/", "/");
                                     }
-                                    ProcessAddedItem(path, remoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                    ProcessAddedItem(path, remoteName, change, propertyChange, root, versionTo, clientExistingFiles, clientDeletedFiles);
                                 }
                             }
                             else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
                             {
-                                ProcessDeletedFile(path, change.Item.RemoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER) && !change.Item.RemoteName.Contains("/" + PROP_FOLDER + "/"))
+                                {
+                                    ProcessDeletedFile(path, change.Item.RemoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                }
                             }
                             else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                             {
                                 ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
                                 ProcessDeletedFile(path, "$/" + oldItem.Name, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
-                                ProcessAddedItem(path, change.Item.RemoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                ProcessAddedItem(path, change.Item.RemoteName, change, false, root, versionTo, clientExistingFiles, clientDeletedFiles);
                             }
                             else
                             {
@@ -242,7 +247,6 @@ namespace SvnBridge.SourceControl
                     }
                 }
             }
-
             return root;
         }
 
@@ -941,7 +945,7 @@ namespace SvnBridge.SourceControl
             }
         }
 
-        private void ProcessAddedItem(string path, string remoteName, SourceItemChange change, FolderMetaData root,
+        private void ProcessAddedItem(string path, string remoteName, SourceItemChange change, bool propertyChange, FolderMetaData root,
             int versionTo, Dictionary<string, int> clientExistingFiles, Dictionary<string, string> clientDeletedFiles)
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Add, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
@@ -969,7 +973,8 @@ namespace SvnBridge.SourceControl
                     }
                     else if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) && ((item is DeleteMetaData) || (item is DeleteFolderMetaData)))
                     {
-                        folder.Items.Remove(item);
+                        if (!propertyChange)
+                            folder.Items.Remove(item);
                     }
                     if (i != nameParts.Length - 1)
                     {
