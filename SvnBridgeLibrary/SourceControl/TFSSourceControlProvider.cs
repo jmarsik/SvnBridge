@@ -202,46 +202,51 @@ namespace SvnBridge.SourceControl
                 }
                 else
                 {
-                    LogItem logItem = GetLog(path, versionFrom + 1, versionTo, Recursion.Full, Int32.MaxValue);
-
-                    foreach (SourceItemHistory history in logItem.History)
+                    versionFrom++;
+                    int lastVersion = versionTo + 1;
+                    while (versionFrom != lastVersion)
                     {
-                        for (int i = history.Changes.Count - 1; i >= 0; i--)
+                        LogItem logItem = GetLog(path, versionFrom, lastVersion - 1, Recursion.Full, 256);
+                        foreach (SourceItemHistory history in logItem.History)
                         {
-                            SourceItemChange change = history.Changes[i];
-                            if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit) || ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch))
+                            lastVersion = history.ChangeSetID;
+                            for (int i = history.Changes.Count - 1; i >= 0; i--)
                             {
-                                if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER))
+                                SourceItemChange change = history.Changes[i];
+                                if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) || ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit) || ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch))
                                 {
-                                    string remoteName = change.Item.RemoteName;
-                                    bool propertyChange = false;
-                                    if (remoteName.Contains("/" + PROP_FOLDER + "/"))
+                                    if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER))
                                     {
-                                        propertyChange = true;
-                                        if (remoteName.EndsWith("/" + PROP_FOLDER + "/" + FOLDER_PROP_FILE))
-                                            remoteName = remoteName.Substring(0, remoteName.IndexOf("/" + PROP_FOLDER + "/" + FOLDER_PROP_FILE));
-                                        else
-                                            remoteName = remoteName.Replace("/" + PROP_FOLDER + "/", "/");
+                                        string remoteName = change.Item.RemoteName;
+                                        bool propertyChange = false;
+                                        if (remoteName.Contains("/" + PROP_FOLDER + "/"))
+                                        {
+                                            propertyChange = true;
+                                            if (remoteName.EndsWith("/" + PROP_FOLDER + "/" + FOLDER_PROP_FILE))
+                                                remoteName = remoteName.Substring(0, remoteName.IndexOf("/" + PROP_FOLDER + "/" + FOLDER_PROP_FILE));
+                                            else
+                                                remoteName = remoteName.Replace("/" + PROP_FOLDER + "/", "/");
+                                        }
+                                        ProcessAddedItem(path, remoteName, change, propertyChange, root, versionTo, clientExistingFiles, clientDeletedFiles);
                                     }
-                                    ProcessAddedItem(path, remoteName, change, propertyChange, root, versionTo, clientExistingFiles, clientDeletedFiles);
                                 }
-                            }
-                            else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
-                            {
-                                if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER) && !change.Item.RemoteName.Contains("/" + PROP_FOLDER + "/"))
+                                else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
                                 {
-                                    ProcessDeletedFile(path, change.Item.RemoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                    if (!change.Item.RemoteName.EndsWith("/" + PROP_FOLDER) && !change.Item.RemoteName.Contains("/" + PROP_FOLDER + "/"))
+                                    {
+                                        ProcessDeletedFile(path, change.Item.RemoteName, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                    }
                                 }
-                            }
-                            else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
-                            {
-                                ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
-                                ProcessDeletedFile(path, "$/" + oldItem.Name, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
-                                ProcessAddedItem(path, change.Item.RemoteName, change, false, root, versionTo, clientExistingFiles, clientDeletedFiles);
-                            }
-                            else
-                            {
-                                throw new Exception("Unrecognized change type " + change.ChangeType);
+                                else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
+                                {
+                                    ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
+                                    ProcessDeletedFile(path, "$/" + oldItem.Name, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                    ProcessAddedItem(path, change.Item.RemoteName, change, false, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                }
+                                else
+                                {
+                                    throw new Exception("Unrecognized change type " + change.ChangeType);
+                                }
                             }
                         }
                     }
