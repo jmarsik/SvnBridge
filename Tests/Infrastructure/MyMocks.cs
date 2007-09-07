@@ -43,6 +43,10 @@ namespace Tests
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
+        public Results Attach(IsDirectory method, MultipleReturnValues returnValues)
+        {
+            return base.Attach((Delegate)method, returnValues);
+        }
 
         public delegate void MakeActivity(string activityId);
         public Results Attach(MakeActivity method)

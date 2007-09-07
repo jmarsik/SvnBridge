@@ -35,7 +35,7 @@ namespace SvnBridge.Nodes
         public string Href()
         {
             string href = path;
-            if (sourceControlProvider.IsDirectory(-1, Helper.Decode(path)) && !href.EndsWith("/"))
+            if (sourceControlProvider.IsDirectory(version, Helper.Decode(path)) && !href.EndsWith("/"))
                 href += "/";
 
             return href;
@@ -65,6 +65,8 @@ namespace SvnBridge.Nodes
                     return GetVersionName(property);
                 case "getcontentlength":
                     return GetContentLength();
+                case "lockdiscovery":
+                    return GetLockDiscovery();
                 default:
                     throw new Exception("Property not found: " + property.LocalName);
             }
@@ -72,8 +74,8 @@ namespace SvnBridge.Nodes
 
         private string GetContentLength()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
-            return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>\n";
+            ItemMetaData item = sourceControlProvider.GetItems(version, Helper.Decode(path), Recursion.None);
+            return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>";
         }
 
         string GetVersionControlledConfiguration(XmlElement property)
@@ -83,7 +85,7 @@ namespace SvnBridge.Nodes
 
         string GetResourceType(XmlElement property)
         {
-            if (sourceControlProvider.IsDirectory(-1, Helper.Decode(path)))
+            if (sourceControlProvider.IsDirectory(version, Helper.Decode(path)))
             {
                 return "<lp1:resourcetype><D:collection/></lp1:resourcetype>";
             }
@@ -131,13 +133,18 @@ namespace SvnBridge.Nodes
         string GetCreationDate(XmlElement property)
         {
             ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
-            return "<lp1:creationdate>" + item.LastModifiedDate.ToString("o") + "</lp1:creationdate>";
+            return "<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate) + "</lp1:creationdate>";
         }
 
         string GetVersionName(XmlElement property)
         {
             ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
             return "<lp1:version-name>" + item.Revision + "</lp1:version-name>";
+        }
+
+        string GetLockDiscovery()
+        {
+            return "<D:lockdiscovery/>";
         }
     }
 }

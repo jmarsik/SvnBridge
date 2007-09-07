@@ -575,6 +575,10 @@ namespace Tests
         public void Test13()
         {
             mock.Attach(provider.ItemExists, true);
+            FolderMetaData item = new FolderMetaData();
+            item.Name = "";
+            item.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, item);
             mock.Attach(provider.IsDirectory, true);
 
             string request =

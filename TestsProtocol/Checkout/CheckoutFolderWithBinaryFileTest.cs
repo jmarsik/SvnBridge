@@ -593,8 +593,9 @@ namespace Tests
         {
             mock.Attach(provider.IsDirectory, true);
             mock.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            FolderMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =

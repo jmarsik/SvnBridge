@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using Attach;
 using SvnBridge.Infrastructure;
+using SvnBridge.Nodes;
 using SvnBridge.SourceControl;
 using System.IO;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
@@ -13,6 +16,18 @@ namespace SvnBridge.Handlers
     public class PropFindHandlerTests : HandlerTestsBase
     {
         protected PropFindHandler handler = new PropFindHandler();
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestInvalidDepthThrowsEx()
+        {
+            mock.Attach(provider.ItemExists, true);
+            request.Path = "http://localhost:8082/Folder%20With%20Spaces";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
+            request.Headers["Depth"] = "2";
+
+            handler.Handle(context, tfsUrl);
+        }
 
         [Test]
         public void VerifyBaselineRelativePathPropertyForFolderReturnsDecoded()
@@ -69,6 +84,9 @@ namespace SvnBridge.Handlers
         public void VerifyDeadPropCountReturnsZero()
         {
             mock.Attach(provider.ItemExists, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Foo";
+            mock.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><deadprop-count xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -117,7 +135,7 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:creationdate>" + dt.ToString("o") + "</lp1:creationdate>"));
+            Assert.IsTrue(result.Contains("<lp1:creationdate>" + Helper.FormatDate(dt.ToUniversalTime()) + "</lp1:creationdate>"));
         }
 
         [Test]
@@ -160,7 +178,85 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:getcontentlength>4</lp1:getcontentlength>"));
+            Assert.IsTrue(result.Contains("<g0:getcontentlength/>"));
+        }
+
+        [Test]
+        public void TestPropFindLockDiscovery()
+        {
+            mock.Attach(provider.ItemExists, true);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Foo";
+            mock.Attach(provider.GetItems, item);
+
+            request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:propfind xmlns:D='DAV:'><D:prop><D:lockdiscovery/></D:prop></D:propfind>";
+            request.Headers["Depth"] = "0";
+
+            handler.Handle(context, tfsUrl);
+
+            string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
+            Assert.IsTrue(result.Contains("<D:lockdiscovery/>"));            
+        }
+
+        [Test]
+        public void TestBcFileNodeHrefForFolder()
+        {   
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Foo/Bar.txt";
+            mock.Attach(provider.GetItems, item);
+            
+            BcFileNode node = new BcFileNode(1234, item, provider);
+
+            string expected = "/!svn/bc/1234/Foo/Bar.txt";
+            Assert.AreEqual(expected, node.Href());
+        }
+
+        [Test]
+        public void TestCorrectlyInvokesProviderWithBcPathAndDepthOne()
+        {
+            mock.Attach(provider.ItemExists, true);
+            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "Foo";
+            Results results = mock.Attach(provider.GetItems, folder);
+            request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>";
+            request.Headers["Depth"] = "1";
+
+            handler.Handle(context, tfsUrl);
+
+            Assert.AreEqual(1, results.CalledCount);
+            Assert.AreEqual(1234, results.Parameters[0]);
+            Assert.AreEqual("/Foo", results.Parameters[1]);
+            Assert.AreEqual(Recursion.OneLevel, results.Parameters[2]);
+        }
+
+        [Test]
+        public void TestPropFindWithDepthOneIncludesFolderAndChildren()
+        {
+            mock.Attach(provider.ItemExists, true);
+            MultipleReturnValues returnValues = new MultipleReturnValues();
+            returnValues.Add(true);
+            returnValues.Add(false);
+            mock.Attach(provider.IsDirectory, returnValues);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "Foo";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Foo/Bar.txt";
+            item.ItemType = ItemType.File;
+            folder.Items.Add(item);
+            request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>";
+            request.Headers["Depth"] = "1";
+
+            handler.Handle(context, tfsUrl);
+
+            string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
+            Assert.IsTrue(result.Contains("<D:href>/!svn/bc/1234/Foo/</D:href>"));
+            Assert.IsTrue(result.Contains("<D:href>/!svn/bc/1234/Foo/Bar.txt</D:href>"));
         }
     }
 

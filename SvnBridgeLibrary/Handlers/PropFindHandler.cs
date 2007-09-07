@@ -84,14 +84,19 @@ namespace SvnBridge.Handlers
 
                 ItemMetaData item = new ItemMetaData();
                 item.Name = path;
+                item.ItemType = ItemType.Folder;
                 if (version.HasValue)
                     item.Revision = version.Value;
                 folderInfo.Items.Add(item);
 
                 return folderInfo;
             }
-            else
-                return (FolderMetaData) sourceControlProvider.GetItems(sourceControlProvider.GetLatestVersion(), path, Recursion.OneLevel);
+            else if (depth == "1")
+            {
+                return (FolderMetaData) sourceControlProvider.GetItems(version.Value, path, Recursion.OneLevel);
+            }
+            else 
+                throw new InvalidOperationException(String.Format("Depth not supported: {0}", depth));
         }
 
         private static void HandleAllProp(ISourceControlProvider sourceControlProvider, string requestPath, Stream outputStream)
@@ -192,9 +197,17 @@ namespace SvnBridge.Handlers
 
                 WriteMultiStatusStart(writer, data.Properties.Count > 1);
 
+                
+                if (depthHeader == "1")
+                {
+                    INode node = new BcFileNode(version, folderInfo, sourceControlProvider);
+
+                    WriteProperties(node, data.Properties, writer, folderInfo.ItemType == ItemType.Folder);
+                }
+                
                 foreach (ItemMetaData item in folderInfo.Items)
                 {
-                    INode node = new BcFileNode(Constants.VccPath, item.Name, item.Revision, sourceControlProvider, Constants.RepositoryUuid);
+                    INode node = new BcFileNode(version, item, sourceControlProvider);
 
                     WriteProperties(node, data.Properties, writer, item.ItemType == ItemType.Folder);
                 }

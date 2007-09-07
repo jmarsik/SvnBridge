@@ -1,5 +1,5 @@
-using System.Text.RegularExpressions;
 using System.Xml;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
@@ -7,30 +7,28 @@ namespace SvnBridge.Nodes
 {
     public class BcFileNode : INode
     {
+        readonly int requestVersion;
         readonly FileNode node;
-        readonly int version;
-        readonly string filePath;
+        readonly ItemMetaData item;
 
-        public BcFileNode(string vccPath,
-                          string path,
-                          int version,
-                          ISourceControlProvider sourceControlProvider,
-                          string repositoryUuid)
+        public BcFileNode(int requestVersion, ItemMetaData item, ISourceControlProvider sourceControlProvider)
         {
-            this.version = version;
-            filePath = path;
-            node = new FileNode(vccPath, filePath, sourceControlProvider, repositoryUuid, version);
+            this.requestVersion = requestVersion;
+            this.item = item;
+            node = new FileNode(Constants.VccPath, item.Name, sourceControlProvider, Constants.RepositoryUuid, item.Revision);
+            
         }
 
         public string Href()
         {
-            string path = filePath;
+            string path = item.Name;
 
             if (!path.StartsWith("/"))
-                path = "/" + path; 
+                path = "/" + path;
 
-            string href = "/!svn/bc/" + version + path;
-            if ((href.Length == 0) || (href[href.Length - 1] != '/'))
+            string href = "/!svn/bc/" + requestVersion + path;
+
+            if (item.ItemType == ItemType.Folder && ((href.Length == 0) || (href[href.Length - 1] != '/')))
                 href += "/";
 
             return Helper.Encode(href);
