@@ -503,5 +503,20 @@ namespace Tests
 
             Assert.AreEqual(1, folder.Items.Count);
         }
+
+        [Test]
+        public void TestGetChangedItemsCompletesWhenChangesetDoesNotExistInPath()
+        {
+            int versionFrom = _provider.GetLatestVersion();
+            CreateFolder(_testPath + "2", true);
+            CreateFolder(_testPath + "/Folder1", true);
+            DeleteItem(_testPath + "2", true);
+            int versionTo = _provider.GetLatestVersion();
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+        }
     }
 }

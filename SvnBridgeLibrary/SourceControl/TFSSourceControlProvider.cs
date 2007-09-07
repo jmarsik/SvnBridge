@@ -206,7 +206,10 @@ namespace SvnBridge.SourceControl
                     int lastVersion = versionTo + 1;
                     while (versionFrom != lastVersion)
                     {
-                        LogItem logItem = GetLog(path, versionFrom, lastVersion - 1, Recursion.Full, 256);
+                        LogItem logItem = GetLog(path, versionFrom, lastVersion - 1, Recursion.Full, Int32.MaxValue);
+                        if (logItem.History.Length == 0)
+                            lastVersion = versionFrom;
+
                         foreach (SourceItemHistory history in logItem.History)
                         {
                             lastVersion = history.ChangeSetID;
