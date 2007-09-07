@@ -401,11 +401,17 @@ namespace SvnBridge.SourceControl
 
         public bool ItemExists(string path, int version)
         {
-            ItemMetaData item = GetItems(version, path, Recursion.None);
-            if (item != null)
-                return true;
-            else
-                return false;
+            ItemSpec spec = new ItemSpec();
+            spec.item = SERVER_PATH + path;
+            spec.recurse = RecursionType.None;
+
+            VersionSpec versionSpec = VersionSpec.Latest;
+            if (version != -1)
+                versionSpec = VersionSpec.FromChangeset(version);
+
+            ItemSet[] item = _sourceControlSvc.QueryItems(_serverUrl, _credentials, null, null, new ItemSpec[1] { spec }, versionSpec, DeletedState.NonDeleted, ItemType.Any, false);
+
+            return (item[0].Items.Length > 0);
         }
 
         public void MakeActivity(string activityId)

@@ -14,44 +14,32 @@ namespace Tests
     public class TFSSourceControlProviderTests : TFSSourceControlProviderTestsBase
     {
         [Test]
-        public void TestGetLog()
+        public void TestItemExistsReturnsTrueIfFileExists()
         {
-            int versionFrom = _provider.GetLatestVersion();
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
-            int versionTo = _provider.GetLatestVersion();
 
-            LogItem logItem = _provider.GetLog(_testPath, versionFrom, versionTo, Recursion.Full, Int32.MaxValue);
+            bool result = _provider.ItemExists(_testPath + "/TestFile.txt");
 
-            Assert.AreEqual(2, logItem.History.Length);
+            Assert.IsTrue(result);
         }
 
         [Test]
-        public void TestGetLogWithBranchedFileContainsOriginalNameAndRevision()
+        public void TestItemExistsReturnsFalseIfFileDoesNotExist()
         {
-            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
-            CopyItem(_testPath + "/TestFile.txt", _testPath + "/TestFileBranch.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            bool result = _provider.ItemExists(_testPath + "/TestFile.txt");
 
-            LogItem logItem = _provider.GetLog(_testPath, versionTo, versionTo, Recursion.Full, Int32.MaxValue);
-
-            Assert.AreEqual(ChangeType.Branch, logItem.History[0].Changes[0].ChangeType & ChangeType.Branch);
-            Assert.AreEqual(_testPath + "/TestFile.txt", ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRemoteName.Substring(1));
-            Assert.AreEqual(versionFrom, ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRevision);
+            Assert.IsFalse(result);
         }
 
         [Test]
-        public void TestGetLogWithBranchedFileContainsOriginalVersionAsRevisionImmediatelyBeforeBranch()
+        public void TestItemExistsReturnsFalseIfFileDoesNotExistInSpecifiedVersion()
         {
+            int version = _provider.GetLatestVersion();
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
-            WriteFile(_testPath + "/TestFile2.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
-            CopyItem(_testPath + "/TestFile.txt", _testPath + "/TestFileBranch.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            
+            bool result = _provider.ItemExists(_testPath + "/TestFile.txt", version);
 
-            LogItem logItem = _provider.GetLog(_testPath, versionTo, versionTo, Recursion.Full, Int32.MaxValue);
-
-            Assert.AreEqual(versionFrom, ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRevision);
+            Assert.IsFalse(result);
         }
 
         [Test, ExpectedException(typeof(FolderAlreadyExistsException))]
@@ -78,21 +66,6 @@ namespace Tests
             bool result = _provider.DeleteItem(_activityId, _testPath + "/NotHere.txt");
 
             Assert.IsFalse(result);
-        }
-
-        [Test]
-        public void TestGetLogReturnsOriginalNameAndRevisionForRenamedItems()
-        {
-            WriteFile(_testPath + "/Fun.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
-            MoveItem(_testPath + "/Fun.txt", _testPath + "/FunRename.txt", true);
-            int versionTo = _provider.GetLatestVersion();
-
-            LogItem logItem = _provider.GetLog(_testPath + "/FunRename.txt", versionFrom, versionTo, Recursion.None, 1);
-
-            Assert.AreEqual(_testPath + "/Fun.txt", ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRemoteName.Substring(1));
-            Assert.AreEqual(versionFrom, ((RenamedSourceItem)logItem.History[0].Changes[0].Item).OriginalRevision);
-            Assert.AreEqual(_testPath + "/FunRename.txt", logItem.History[0].Changes[0].Item.RemoteName.Substring(1));
         }
     }
 }

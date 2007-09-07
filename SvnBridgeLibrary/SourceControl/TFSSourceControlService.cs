@@ -33,5 +33,11 @@ namespace SvnBridge.SourceControl
             string username = TfsUtil.GetUsername(credentials, tfsUrl);
             return webSvc.QueryBranches(workspaceName, username, items, version);
         }
+
+        public ItemSet[] QueryItems(string tfsUrl, ICredentials credentials, string workspaceName, string workspaceOwner, ItemSpec[] items, VersionSpec version, DeletedState deletedState, ItemType itemType, bool generateDownloadUrls)
+        {
+            Repository webSvc = (Repository)_webSvcFactory.Create(tfsUrl, credentials);
+            return webSvc.QueryItems(workspaceName, workspaceOwner, items, version, deletedState, itemType, generateDownloadUrls);
+        }
     }
 }

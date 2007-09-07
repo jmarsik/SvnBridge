@@ -47,6 +47,7 @@
     <Compile Include="TFSSourceControlProviderCommitTests.cs" />
     <Compile Include="TFSSourceControlProviderGetChangedItemsTests.cs" />
     <Compile Include="TFSSourceControlProviderGetItemsTests.cs" />
+    <Compile Include="TFSSourceControlProviderGetLogTests.cs" />
     <Compile Include="TFSSourceControlProviderTests.cs" />
     <Compile Include="TfsSourceControlProviderTestsBase.cs" />
   </ItemGroup>
