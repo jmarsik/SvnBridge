@@ -68,6 +68,7 @@
     <Compile Include="FileNodeTests.cs" />
     <Compile Include="Handlers\CopyHandlerTests.cs" />
     <Compile Include="Handlers\DeleteHandlerTests.cs" />
+    <Compile Include="Handlers\GetHandlerTests.cs" />
     <Compile Include="Handlers\MkActivityHandlerTests.cs" />
     <Compile Include="Handlers\MkColHandlerTests.cs" />
     <Compile Include="Handlers\OptionsHandlerTests.cs" />

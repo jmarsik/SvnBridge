@@ -45,6 +45,7 @@
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
+    <Compile Include="Handlers\GetHandler.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />
     <Compile Include="Handlers\MkActivityHandler.cs" />
     <Compile Include="Handlers\MkColHandler.cs" />

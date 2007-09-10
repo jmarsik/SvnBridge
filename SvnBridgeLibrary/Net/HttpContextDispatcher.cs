@@ -25,6 +25,7 @@ namespace SvnBridge.Net
                 case "proppatch": return new PropPatchHandler();
                 case "put": return new PutHandler();
                 case "report": return new ReportHandler();
+                case "get": return new GetHandler();
                 default: return null;
             }
         }
