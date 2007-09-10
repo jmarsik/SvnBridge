@@ -12,7 +12,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -61,7 +61,7 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -104,7 +104,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.MakeActivity);
+            stub.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/0eaf3261-5f80-a140-b21d-c1b0316a256a HTTP/1.1\r\n" +
@@ -143,11 +143,11 @@ namespace Tests
         [Test]
         public void Test4()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "/Spikes/SvnFacade/trunk";
             folder.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, folder);
+            stub.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -192,7 +192,7 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            mock.Attach(provider.GetLatestVersion, 5463);
+            stub.Attach(provider.GetLatestVersion, 5463);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -275,7 +275,7 @@ namespace Tests
         [Test]
         public void Test7()
         {
-            mock.Attach(provider.SetActivityComment);
+            stub.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/0eaf3261-5f80-a140-b21d-c1b0316a256a/5463 HTTP/1.1\r\n" +
@@ -319,12 +319,12 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
             item.ItemType = ItemType.Folder;
             item.Revision = 5463;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -371,7 +371,7 @@ namespace Tests
         {
             ItemMetaData item = new ItemMetaData();
             item.Revision = 0;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5463/Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -411,7 +411,7 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.MakeCollection);
+            stub.Attach(provider.MakeCollection);
 
             string request =
                 "MKCOL //!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Spikes/SvnFacade/trunk/New%20Folder%206 HTTP/1.1\r\n" +
@@ -451,7 +451,7 @@ namespace Tests
             MergeActivityResponse mergeResponse = new MergeActivityResponse(5464, DateTime.Parse("2007-06-09T08:36:38.370653Z"), "jwanagel");
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.Folder, "/Spikes/SvnFacade/trunk/New Folder 6"));
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.Folder, "/Spikes/SvnFacade/trunk"));
-            mock.Attach(provider.MergeActivity, mergeResponse);
+            stub.Attach(provider.MergeActivity, mergeResponse);
 
             string request =
                 "MERGE /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -524,7 +524,7 @@ namespace Tests
         [Test]
         public void Test12()
         {
-            mock.Attach(provider.DeleteActivity);
+            stub.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/0eaf3261-5f80-a140-b21d-c1b0316a256a HTTP/1.1\r\n" +

@@ -13,7 +13,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -62,7 +62,7 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -105,7 +105,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.MakeActivity);
+            stub.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/de1ec288-d55c-6146-950d-ceaf2ce9403b HTTP/1.1\r\n" +
@@ -144,11 +144,11 @@ namespace Tests
         [Test]
         public void Test4()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, folder);
+            stub.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -193,7 +193,7 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            mock.Attach(provider.GetLatestVersion, 5514);
+            stub.Attach(provider.GetLatestVersion, 5514);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -276,7 +276,7 @@ namespace Tests
         [Test]
         public void Test7()
         {
-            mock.Attach(provider.SetActivityComment);
+            stub.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/de1ec288-d55c-6146-950d-ceaf2ce9403b/5514 HTTP/1.1\r\n" +
@@ -320,12 +320,12 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "";
             item.Revision = 5514;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -372,7 +372,7 @@ namespace Tests
         {
             ItemMetaData item = new ItemMetaData();
             item.Revision = 0;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5514/ HTTP/1.1\r\n" +
@@ -412,7 +412,7 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.MakeCollection, new FolderAlreadyExistsException());
+            stub.Attach(provider.MakeCollection, new FolderAlreadyExistsException());
 
             string request =
                 "MKCOL //!svn/wrk/de1ec288-d55c-6146-950d-ceaf2ce9403b/newdir HTTP/1.1\r\n" +
@@ -449,7 +449,7 @@ namespace Tests
         [Test]
         public void Test11()
         {
-            mock.Attach(provider.DeleteActivity);
+            stub.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/de1ec288-d55c-6146-950d-ceaf2ce9403b HTTP/1.1\r\n" +

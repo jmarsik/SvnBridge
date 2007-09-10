@@ -14,7 +14,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -63,7 +63,7 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -106,7 +106,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.MakeActivity);
+            stub.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/61652fe8-44cd-8d43-810f-c95deccc6db3 HTTP/1.1\r\n" +
@@ -145,8 +145,11 @@ namespace Tests
         [Test]
         public void Test4()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            stub.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -191,7 +194,7 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            mock.Attach(provider.GetLatestVersion, 5707);
+            stub.Attach(provider.GetLatestVersion, 5707);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -274,7 +277,7 @@ namespace Tests
         [Test]
         public void Test7()
         {
-            mock.Attach(provider.SetActivityComment);
+            stub.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/61652fe8-44cd-8d43-810f-c95deccc6db3/5707 HTTP/1.1\r\n" +
@@ -318,12 +321,12 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "";
             item.Revision = 5707;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -370,7 +373,7 @@ namespace Tests
         {
             ItemMetaData item = new ItemMetaData();
             item.Revision = 0;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5707/Test.txt HTTP/1.1\r\n" +
@@ -410,11 +413,11 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.ItemExists, false);
+            stub.Attach(provider.ItemExists, false);
             ItemMetaData item = new ItemMetaData();
-            mock.Attach(provider.GetItems, item);
-            mock.Attach(provider.ReadFile, Encoding.Default.GetBytes("bbbb"));
-            mock.Attach(provider.WriteFile, false);
+            stub.Attach(provider.GetItems, item);
+            stub.Attach(provider.ReadFile, Encoding.Default.GetBytes("bbbb"));
+            stub.Attach(provider.WriteFile, false);
 
             string request =
                 "PUT //!svn/wrk/61652fe8-44cd-8d43-810f-c95deccc6db3/Test.txt HTTP/1.1\r\n" +
@@ -446,7 +449,7 @@ namespace Tests
         [Test]
         public void Test11()
         {
-            mock.Attach((MyMocks.MergeActivity)provider.MergeActivity, new ConflictException("Conflict at '/Test.txt'"));
+            stub.Attach((MyMocks.MergeActivity)provider.MergeActivity, new ConflictException("Conflict at '/Test.txt'"));
 
             string request =
                 "MERGE / HTTP/1.1\r\n" +
@@ -487,7 +490,7 @@ namespace Tests
         [Test]
         public void Test12()
         {
-            mock.Attach(provider.DeleteActivity);
+            stub.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/61652fe8-44cd-8d43-810f-c95deccc6db3 HTTP/1.1\r\n" +

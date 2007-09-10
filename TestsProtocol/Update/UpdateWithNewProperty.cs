@@ -13,7 +13,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -63,11 +63,11 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -118,7 +118,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.GetLatestVersion, 5551);
+            stub.Attach(provider.GetLatestVersion, 5551);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -207,11 +207,11 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -259,7 +259,7 @@ namespace Tests
         [Test]
         public void Test6()
         {
-            mock.Attach(provider.GetLatestVersion, 5551);
+            stub.Attach(provider.GetLatestVersion, 5551);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -348,11 +348,11 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -413,13 +413,13 @@ namespace Tests
             folder.LastModifiedDate = DateTime.Parse("2007-08-08T20:54:17.904624Z");
             folder.Properties["ignore"] = "*.ignore3\n";
             metadata.Items.Add(folder);
-            mock.Attach(provider.GetChangedItems, metadata);
+            stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = GetBytes("New file");
-            mock.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFile, fileData);
             MultipleReturnValues returnValues = new MultipleReturnValues();
             returnValues.Add(true);
             returnValues.Add(false);
-            mock.Attach(provider.ItemExists, returnValues);
+            stub.Attach(provider.ItemExists, returnValues);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

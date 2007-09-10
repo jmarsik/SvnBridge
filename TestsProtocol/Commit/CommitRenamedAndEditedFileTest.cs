@@ -13,7 +13,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -62,7 +62,7 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -105,7 +105,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.MakeActivity);
+            stub.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/cdfcf93f-8649-5e44-a8ec-b3f40e10e907 HTTP/1.1\r\n" +
@@ -144,11 +144,11 @@ namespace Tests
         [Test]
         public void Test4()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, folder);
+            stub.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -193,7 +193,7 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            mock.Attach(provider.GetLatestVersion, 5522);
+            stub.Attach(provider.GetLatestVersion, 5522);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -276,7 +276,7 @@ namespace Tests
         [Test]
         public void Test7()
         {
-            mock.Attach(provider.SetActivityComment);
+            stub.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/5522 HTTP/1.1\r\n" +
@@ -320,12 +320,12 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "";
             item.Revision = 5522;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -372,7 +372,7 @@ namespace Tests
         {
             ItemMetaData item = new ItemMetaData();
             item.Revision = 0;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5522/ HTTP/1.1\r\n" +
@@ -412,7 +412,7 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.ItemExists, false);
+            stub.Attach(provider.ItemExists, false);
 
             string request =
                 "PROPFIND /Fun2.txt HTTP/1.1\r\n" +
@@ -454,11 +454,11 @@ namespace Tests
         [Test]
         public void Test11()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, false);
+            stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, false);
             ItemMetaData item = new ItemMetaData();
             item.Name = "FunRenamedAgain.txt";
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /FunRenamedAgain.txt HTTP/1.1\r\n" +
@@ -552,7 +552,7 @@ namespace Tests
         [Test]
         public void Test13()
         {
-            mock.Attach(provider.CopyItem);
+            stub.Attach(provider.CopyItem);
 
             string request =
                 "COPY /!svn/bc/5522/FunRenamedAgain.txt HTTP/1.1\r\n" +
@@ -592,7 +592,7 @@ namespace Tests
         [Test]
         public void Test14()
         {
-            mock.Attach(provider.DeleteItem, true);
+            stub.Attach(provider.DeleteItem, true);
 
             string request =
                 "DELETE //!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FunRenamedAgain.txt HTTP/1.1\r\n" +
@@ -620,10 +620,10 @@ namespace Tests
         [Test]
         public void Test15()
         {
-            mock.Attach(provider.ItemExists, false);
+            stub.Attach(provider.ItemExists, false);
             ItemMetaData item = new ItemMetaData();
-            mock.Attach(provider.GetItems, item);
-            mock.Attach(provider.WriteFile, false);
+            stub.Attach(provider.GetItems, item);
+            stub.Attach(provider.WriteFile, false);
 
             string request =
                 "PUT //!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/Fun2.txt HTTP/1.1\r\n" +
@@ -657,7 +657,7 @@ namespace Tests
             MergeActivityResponse mergeResponse = new MergeActivityResponse(5523, DateTime.Parse("2007-07-19T20:33:06.674229Z"), "jwanagel");
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.Folder, "/"));
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/Fun2.txt"));
-            mock.Attach(provider.MergeActivity, mergeResponse);
+            stub.Attach(provider.MergeActivity, mergeResponse);
 
             string request =
                 "MERGE / HTTP/1.1\r\n" +
@@ -730,7 +730,7 @@ namespace Tests
         [Test]
         public void Test17()
         {
-            mock.Attach(provider.DeleteActivity);
+            stub.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/cdfcf93f-8649-5e44-a8ec-b3f40e10e907 HTTP/1.1\r\n" +

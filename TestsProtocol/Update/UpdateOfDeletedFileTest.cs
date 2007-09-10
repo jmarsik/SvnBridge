@@ -12,7 +12,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /newFolder HTTP/1.1\r\n" +
@@ -62,7 +62,7 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, false);
+            stub.Attach(provider.ItemExists, false);
 
             string request =
                 "PROPFIND /newFolder HTTP/1.1\r\n" +
@@ -107,11 +107,11 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, folder);
+            stub.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -159,7 +159,7 @@ namespace Tests
         [Test]
         public void Test4()
         {
-            mock.Attach(provider.GetLatestVersion, 5513);
+            stub.Attach(provider.GetLatestVersion, 5513);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -248,7 +248,7 @@ namespace Tests
         [Test]
         public void Test6()
         {
-            mock.Attach(provider.ItemExists, false);
+            stub.Attach(provider.ItemExists, false);
 
             string request =
                 "PROPFIND /newFolder HTTP/1.1\r\n" +
@@ -290,11 +290,11 @@ namespace Tests
         [Test]
         public void Test7()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, folder);
+            stub.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -342,7 +342,7 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach(provider.GetLatestVersion, 5513);
+            stub.Attach(provider.GetLatestVersion, 5513);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -431,7 +431,7 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.ItemExists, false);
+            stub.Attach(provider.ItemExists, false);
 
             string request =
                 "PROPFIND /newFolder HTTP/1.1\r\n" +
@@ -473,11 +473,11 @@ namespace Tests
         [Test]
         public void Test11()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, folder);
+            stub.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -530,7 +530,7 @@ namespace Tests
             deletedFile.Name = "zxvc.txt";
             deletedFile.ItemType = ItemType.File;
             metadata.Items.Add(deletedFile);
-            mock.Attach(provider.GetChangedItems, metadata);
+            stub.Attach(provider.GetChangedItems, metadata);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

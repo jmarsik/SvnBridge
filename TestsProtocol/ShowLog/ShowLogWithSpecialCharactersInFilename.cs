@@ -14,7 +14,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /newFolder4 HTTP/1.1\r\n" +
@@ -64,11 +64,11 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "newFolder4";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder4 HTTP/1.1\r\n" +
@@ -119,7 +119,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.GetLatestVersion, 5532);
+            stub.Attach(provider.GetLatestVersion, 5532);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -208,11 +208,11 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "newFolder4";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder4 HTTP/1.1\r\n" +
@@ -260,7 +260,7 @@ namespace Tests
         [Test]
         public void Test6()
         {
-            mock.Attach(provider.GetLatestVersion, 5532);
+            stub.Attach(provider.GetLatestVersion, 5532);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -349,7 +349,7 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /newFolder4 HTTP/1.1\r\n" +
@@ -399,11 +399,11 @@ namespace Tests
         [Test]
         public void Test9()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "newFolder4";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder4 HTTP/1.1\r\n" +
@@ -454,7 +454,7 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.GetLatestVersion, 5532);
+            stub.Attach(provider.GetLatestVersion, 5532);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -543,11 +543,11 @@ namespace Tests
         [Test]
         public void Test12()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "newFolder4";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder4 HTTP/1.1\r\n" +
@@ -647,7 +647,7 @@ namespace Tests
             history1.Changes.Add(MakeChange(ChangeType.Add, "$/newFolder4/A!@#$%^&()~`_-+={[}];',.txt"));
             histories.Add(history1);
 
-            mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder4", histories.ToArray()));
+            stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder4", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5532/newFolder4 HTTP/1.1\r\n" +

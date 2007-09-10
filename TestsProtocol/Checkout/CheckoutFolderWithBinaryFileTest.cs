@@ -14,7 +14,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -64,11 +64,11 @@ namespace Tests
         [Test]
         public void Test2()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -119,7 +119,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            mock.Attach(provider.GetLatestVersion, 5479);
+            stub.Attach(provider.GetLatestVersion, 5479);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -208,11 +208,11 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -260,7 +260,7 @@ namespace Tests
         [Test]
         public void Test6()
         {
-            mock.Attach(provider.GetLatestVersion, 5479);
+            stub.Attach(provider.GetLatestVersion, 5479);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -349,11 +349,11 @@ namespace Tests
         [Test]
         public void Test8()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -401,7 +401,7 @@ namespace Tests
         [Test]
         public void Test9()
         {
-            mock.Attach(provider.GetLatestVersion, 5479);
+            stub.Attach(provider.GetLatestVersion, 5479);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -446,8 +446,8 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
 
             string request =
                 "PROPFIND /!svn/bln/5479 HTTP/1.1\r\n" +
@@ -493,11 +493,11 @@ namespace Tests
         [Test]
         public void Test11()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -591,12 +591,12 @@ namespace Tests
         [Test]
         public void Test13()
         {
-            mock.Attach(provider.IsDirectory, true);
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /!svn/bc/5479/Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -644,11 +644,11 @@ namespace Tests
         [Test]
         public void Test14()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -696,7 +696,7 @@ namespace Tests
         [Test]
         public void Test15()
         {
-            mock.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -746,11 +746,11 @@ namespace Tests
         [Test]
         public void Test16()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -801,7 +801,7 @@ namespace Tests
         [Test]
         public void Test17()
         {
-            mock.Attach(provider.GetLatestVersion, 5479);
+            stub.Attach(provider.GetLatestVersion, 5479);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -890,11 +890,11 @@ namespace Tests
         [Test]
         public void Test19()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -942,7 +942,7 @@ namespace Tests
         [Test]
         public void Test20()
         {
-            mock.Attach(provider.GetLatestVersion, 5479);
+            stub.Attach(provider.GetLatestVersion, 5479);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -987,8 +987,8 @@ namespace Tests
         [Test]
         public void Test21()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
 
             string request =
                 "PROPFIND /!svn/bln/5479 HTTP/1.1\r\n" +
@@ -1034,11 +1034,11 @@ namespace Tests
         [Test]
         public void Test22()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder%2011 HTTP/1.1\r\n" +
@@ -1099,14 +1099,14 @@ namespace Tests
             item.LastModifiedDate = DateTime.Parse("2007-06-18T08:04:51.247115Z");
             item.Properties["mime-type"] = "application/octet-stream";
             metadata.Items.Add(item);
-            mock.Attach(provider.GetItems, metadata);
+            stub.Attach(provider.GetItems, metadata);
             byte[] fileData = GetBytes("GIF89a\u0004\0\u0007\0\u0080\0\0\u00FF\u00FF\u00FF\u00D1\u008D\u000F!\u00F9\u0004\u0001\0\0\0\0,\0\0\0\0\u0004\0\u0007\0\0\u0002\u0008L\0\u0086\u00A8i\u00E7\u00D6*\0;");
             SvnDiff svnDiff = SvnDiffEngine.CreateReplaceDiff(fileData);
             MemoryStream svnDiffStream = new MemoryStream();
             SvnDiffParser.WriteSvnDiff(svnDiff, svnDiffStream);
             byte[] svnDiffData = svnDiffStream.ToArray();
             string txdelta = Convert.ToBase64String(svnDiffData);
-            mock.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFile, fileData);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

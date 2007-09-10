@@ -19,13 +19,13 @@ namespace Tests
     public abstract class ProtocolTestsBase
     {
         protected HttpContextDispatcher HttpDispatcher;
-        protected MyMocks mock = new MyMocks();
+        protected MyMocks stub = new MyMocks();
         protected StubSourceControlProvider provider;
 
         [SetUp]
         public virtual void Setup()
         {
-            provider = mock.CreateObject<StubSourceControlProvider>();
+            provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             HttpDispatcher = new HttpContextDispatcher();
             HttpDispatcher.TfsUrl = "http://foo";
