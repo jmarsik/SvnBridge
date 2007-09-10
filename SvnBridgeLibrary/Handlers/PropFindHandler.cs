@@ -95,7 +95,7 @@ namespace SvnBridge.Handlers
             {
                 return (FolderMetaData) sourceControlProvider.GetItems(version.Value, path, Recursion.OneLevel);
             }
-            else 
+            else
                 throw new InvalidOperationException(String.Format("Depth not supported: {0}", depth));
         }
 
@@ -108,31 +108,74 @@ namespace SvnBridge.Handlers
 
             using (StreamWriter writer = new StreamWriter(outputStream))
             {
-                writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-                writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
-                writer.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n");
-                writer.Write("<D:href>" + requestPath + "</D:href>\n");
-                writer.Write("<D:propstat>\n");
-                writer.Write("<D:prop>\n");
-                writer.Write("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>\n");
-                writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
-                writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") + "</lp1:creationdate>\n");
-                writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
-                writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>\n");
-                writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath + "</D:href></lp1:version-controlled-configuration>\n");
-                writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
-                writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
-                writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
-                writer.Write("<lp2:repository-uuid>" + Constants.RepositoryUuid + "</lp2:repository-uuid>\n");
-                writer.Write("<lp2:deadprop-count>0</lp2:deadprop-count>\n");
-                writer.Write("<lp1:resourcetype><D:collection/></lp1:resourcetype>\n");
-                writer.Write("<D:lockdiscovery/>\n");
-                writer.Write("</D:prop>\n");
-                writer.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
-                writer.Write("</D:propstat>\n");
-                writer.Write("</D:response>\n");
-                writer.Write("</D:multistatus>\n");
+                if (item.ItemType == ItemType.Folder)
+                    WriteAllPropForFolder(writer, requestPath, item);
+                else
+                    WriteAllPropForItem(writer, requestPath, item, sourceControlProvider.ReadFile(item));
             }
+        }
+
+        private static void WriteAllPropForFolder(TextWriter writer, string requestPath, ItemMetaData item)
+        {
+            writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+            writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
+            writer.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n");
+            writer.Write("<D:href>" + requestPath + "</D:href>\n");
+            writer.Write("<D:propstat>\n");
+            writer.Write("<D:prop>\n");
+            writer.Write("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>\n");
+            writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
+            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") + "</lp1:creationdate>\n");
+            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
+            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>\n");
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath + "</D:href></lp1:version-controlled-configuration>\n");
+            writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
+            writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
+            writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
+            writer.Write("<lp2:repository-uuid>" + Constants.RepositoryUuid + "</lp2:repository-uuid>\n");
+            writer.Write("<lp2:deadprop-count>0</lp2:deadprop-count>\n");
+            writer.Write("<lp1:resourcetype><D:collection/></lp1:resourcetype>\n");
+            writer.Write("<D:lockdiscovery/>\n");
+            writer.Write("</D:prop>\n");
+            writer.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
+            writer.Write("</D:propstat>\n");
+            writer.Write("</D:response>\n");
+            writer.Write("</D:multistatus>\n");
+        }
+
+        private static void WriteAllPropForItem(TextWriter writer, string requestPath, ItemMetaData item, byte[] itemData)
+        {
+            writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+            writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
+            writer.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n");
+            writer.Write("<D:href>" + requestPath + "</D:href>\n");
+            writer.Write("<D:propstat>\n");
+            writer.Write("<D:prop>\n");
+            writer.Write("<lp1:getcontenttype>text/plain</lp1:getcontenttype>\n");
+            writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
+            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") + "</lp1:creationdate>\n");
+            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
+            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>\n");
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath + "</D:href></lp1:version-controlled-configuration>\n");
+            writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
+            writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
+            writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
+            writer.Write("<lp2:md5-checksum>" + Helper.GetMd5Checksum(itemData) + "</lp2:md5-checksum>\n");
+            writer.Write("<lp2:repository-uuid>" + Constants.RepositoryUuid + "</lp2:repository-uuid>\n");
+            writer.Write("<lp2:deadprop-count>0</lp2:deadprop-count>\n");
+            writer.Write("<lp1:resourcetype/>\n");
+            writer.Write("<D:supportedlock>\n");
+            writer.Write("<D:lockentry>\n");
+            writer.Write("<D:lockscope><D:exclusive/></D:lockscope>\n");
+            writer.Write("<D:locktype><D:write/></D:locktype>\n");
+            writer.Write("</D:lockentry>\n");
+            writer.Write("</D:supportedlock>\n");
+            writer.Write("<D:lockdiscovery/>\n");
+            writer.Write("</D:prop>\n");
+            writer.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
+            writer.Write("</D:propstat>\n");
+            writer.Write("</D:response>\n");
+            writer.Write("</D:multistatus>\n");
         }
 
         private static void HandleProp(
@@ -197,14 +240,14 @@ namespace SvnBridge.Handlers
 
                 WriteMultiStatusStart(writer, data.Properties.Count > 1);
 
-                
+
                 if (depthHeader == "1")
                 {
                     INode node = new BcFileNode(version, folderInfo, sourceControlProvider);
 
                     WriteProperties(node, data.Properties, writer, folderInfo.ItemType == ItemType.Folder);
                 }
-                
+
                 foreach (ItemMetaData item in folderInfo.Items)
                 {
                     INode node = new BcFileNode(version, item, sourceControlProvider);

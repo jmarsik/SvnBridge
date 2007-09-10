@@ -67,6 +67,8 @@ namespace SvnBridge.Nodes
                     return GetContentLength();
                 case "lockdiscovery":
                     return GetLockDiscovery();
+                case "md5-checksum":
+                    return GetMd5Checksum();
                 default:
                     throw new Exception("Property not found: " + property.LocalName);
             }
@@ -145,6 +147,12 @@ namespace SvnBridge.Nodes
         string GetLockDiscovery()
         {
             return "<D:lockdiscovery/>";
+        }
+
+        string GetMd5Checksum()
+        {
+            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
+            return "<lp2:md5-checksum>" + Helper.GetMd5Checksum(sourceControlProvider.ReadFile(item)) + "</lp2:md5-checksum>";
         }
     }
 }
