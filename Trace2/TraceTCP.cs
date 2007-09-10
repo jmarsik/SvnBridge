@@ -51,6 +51,7 @@ namespace Trace
             WriteTestLogLine("    {");
 
             Thread requestProcessor = new Thread(StartListening);
+            requestProcessor.IsBackground = true;
             requestProcessor.Start();
         }
 
@@ -86,6 +87,7 @@ namespace Trace
             {
                 TcpClient client = _server.AcceptTcpClient();
                 Thread newConnection = new Thread(HandleConnection);
+                newConnection.IsBackground = true;
                 threads.Add(newConnection);
                 newConnection.Start(new object[] { client, _targetServer, _targetPort });
             }
@@ -113,7 +115,9 @@ namespace Trace
         {
             byte[] buffer = new byte[5000];
             Thread copyInput = new Thread(CopyStream);
+            copyInput.IsBackground = true;
             Thread copyOutput = new Thread(CopyStream);
+            copyOutput.IsBackground = true;
 
             copyInput.Start(new object[] { input, output, 1 });
             copyOutput.Start(new object[] { output, input, 2 });
@@ -160,6 +164,10 @@ namespace Trace
             int count;
             while ((count = input.Read(buffer, 0, buffer.Length)) != 0)
             {
+                //string data = Encoding.Default.GetString(buffer, 0, count);
+                //if (data.StartsWith("PUT //"))
+                //    System.Threading.Thread.Sleep(500);
+
                 WriteTest(buffer, count, direction);
                 WriteLog(buffer, count);
                 output.Write(buffer, 0, count);

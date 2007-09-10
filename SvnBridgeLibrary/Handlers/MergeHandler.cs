@@ -5,6 +5,7 @@ using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Exceptions;
 
 namespace SvnBridge.Handlers
 {
@@ -17,21 +18,36 @@ namespace SvnBridge.Handlers
 
             string path = GetPath(request);
             MergeData data = Helper.DeserializeXml<MergeData>(request.InputStream);
-            SetResponseSettings(response, "text/xml", Encoding.UTF8, 200);
+            string activityId = data.Source.Href.Substring(10);
             response.AppendHeader("Cache-Control", "no-cache");
-            response.SendChunked = true;
 
-            using (StreamWriter output = new StreamWriter(response.OutputStream))
+            try
             {
-                Merge(sourceControlProvider, data, path, output);
+                MergeActivityResponse mergeResponse = sourceControlProvider.MergeActivity(activityId);
+                SetResponseSettings(response, "text/xml", Encoding.UTF8, 200);
+                response.SendChunked = true;
+                using (StreamWriter output = new StreamWriter(response.OutputStream))
+                {
+                    WriteMergeResponse(mergeResponse, output);
+                }
+            }
+            catch (ConflictException ex)
+            {
+                SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 409);
+                string responseContent =
+                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                    "<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n" +
+                    "<C:error/>\n" +
+                    "<m:human-readable errcode=\"160024\">\n" +
+                    ex.Message + "\n" +
+                    "</m:human-readable>\n" +
+                    "</D:error>\n";
+                WriteToResponse(response, responseContent);
             }
         }
 
-        private void Merge(ISourceControlProvider sourceControlProvider, MergeData request, string path, StreamWriter output)
+        private void WriteMergeResponse(MergeActivityResponse mergeResponse, StreamWriter output)
         {
-            string activityId = request.Source.Href.Substring(10);
-            MergeActivityResponse mergeResponse = sourceControlProvider.MergeActivity(activityId);
-
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<D:merge-response xmlns:D=\"DAV:\">\n");
             output.Write("<D:updated-set>\n");

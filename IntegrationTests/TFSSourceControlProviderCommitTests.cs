@@ -5,6 +5,7 @@ using NUnit.Framework;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.SourceControl;
 using CodePlex.TfsLibrary.ObjectModel;
+using SvnBridge.Exceptions;
 
 namespace Tests
 {
@@ -617,6 +618,23 @@ namespace Tests
             Assert.IsTrue(ResponseContains(response, _testPath + "/B/Test1.txt", ItemType.File));
             Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
             Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+        }
+
+        [Test, Ignore("Not implemented yet")]
+        [ExpectedException(typeof(ConflictException))]
+        public void TestCommitUpdatedFileAtSameTimeAsAnotherUserThrowsConflictException()
+        {
+            string activity2 = Guid.NewGuid().ToString();
+            WriteFile(_testPath + "/Test.txt", "data", true);
+
+            //_provider.Checkout(_activityId);
+            _provider.MakeActivity(activity2);
+            //_provider.Checkout(activity2);
+            _provider.WriteFile(activity2, _testPath + "/Test.txt", GetBytes("new1"));
+            _provider.MergeActivity(activity2);
+            _provider.DeleteActivity(activity2);
+            _provider.WriteFile(_activityId, _testPath + "/Test.txt", GetBytes("new2"));
+            _provider.MergeActivity(_activityId);
         }
     }
 }
