@@ -63,7 +63,10 @@ namespace Tests
         public void Test2()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -204,7 +207,10 @@ namespace Tests
         public void Test5()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -342,7 +348,10 @@ namespace Tests
         public void Test8()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -480,7 +489,10 @@ namespace Tests
         public void Test11()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -575,9 +587,8 @@ namespace Tests
         public void Test13()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             FolderMetaData item = new FolderMetaData();
-            item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.Name = "";
             item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
@@ -600,7 +611,7 @@ namespace Tests
                 "HTTP/1.1 207 Multi-Status\r\n" +
                 "Date: Wed, 27 Jun 2007 23:56:13 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 642\r\n" +
+                "Content-Length: 642\r\n" + 
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
                 "\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -628,7 +639,10 @@ namespace Tests
         public void Test14()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -727,7 +741,10 @@ namespace Tests
         public void Test16()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -868,7 +885,10 @@ namespace Tests
         public void Test19()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -1006,7 +1026,10 @@ namespace Tests
         public void Test22()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +

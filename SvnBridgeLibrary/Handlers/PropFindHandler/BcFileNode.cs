@@ -15,7 +15,7 @@ namespace SvnBridge.Nodes
         {
             this.requestVersion = requestVersion;
             this.item = item;
-            node = new FileNode(Constants.VccPath, item.Name, sourceControlProvider, Constants.RepositoryUuid, item.Revision);
+            node = new FileNode(item, sourceControlProvider);
             
         }
 

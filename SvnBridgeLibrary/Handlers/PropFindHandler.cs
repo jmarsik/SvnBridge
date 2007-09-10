@@ -81,12 +81,10 @@ namespace SvnBridge.Handlers
             if (depth == "0")
             {
                 FolderMetaData folderInfo = new FolderMetaData();
+                folderInfo.ItemType = ItemType.Folder;
 
-                ItemMetaData item = new ItemMetaData();
-                item.Name = path;
-                item.ItemType = ItemType.Folder;
-                if (version.HasValue)
-                    item.Revision = version.Value;
+                ItemMetaData item = sourceControlProvider.GetItems(version.HasValue ? version.Value : -1, path, Recursion.None);
+
                 folderInfo.Items.Add(item);
 
                 return folderInfo;
@@ -276,7 +274,7 @@ namespace SvnBridge.Handlers
 
                 foreach (ItemMetaData item in folderInfo.Items)
                 {
-                    INode node = new FileNode(Constants.VccPath, item.Name, sourceControlProvider, Constants.RepositoryUuid);
+                    INode node = new FileNode(item, sourceControlProvider);
 
                     WriteProperties(node, data.Properties, writer, item.ItemType == ItemType.Folder);
                 }

@@ -63,9 +63,9 @@ namespace Tests
         public void Test2()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -207,9 +207,9 @@ namespace Tests
         public void Test5()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -348,9 +348,9 @@ namespace Tests
         public void Test8()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -489,9 +489,9 @@ namespace Tests
         public void Test11()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -640,9 +640,9 @@ namespace Tests
         public void Test14()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -742,9 +742,9 @@ namespace Tests
         public void Test16()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -886,9 +886,9 @@ namespace Tests
         public void Test19()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -1027,9 +1027,9 @@ namespace Tests
         public void Test22()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 4";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =

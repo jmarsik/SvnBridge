@@ -144,7 +144,10 @@ namespace Tests
         public void Test4()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "/Spikes/SvnFacade/trunk";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -317,9 +320,9 @@ namespace Tests
         public void Test8()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
+            item.ItemType = ItemType.Folder;
             item.Revision = 5466;
             mock.Attach(provider.GetItems, item);
 

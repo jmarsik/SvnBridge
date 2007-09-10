@@ -144,7 +144,10 @@ namespace Tests
         public void Test4()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +

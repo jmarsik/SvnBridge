@@ -65,9 +65,9 @@ namespace Tests
         public void Test2()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -209,9 +209,9 @@ namespace Tests
         public void Test5()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -400,9 +400,9 @@ namespace Tests
         public void Test9()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =
@@ -544,9 +544,9 @@ namespace Tests
         public void Test12()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 5";
+            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
 
             string request =

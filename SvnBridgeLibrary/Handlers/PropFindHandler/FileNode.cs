@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
@@ -7,38 +8,26 @@ namespace SvnBridge.Nodes
 {
     public class FileNode : INode
     {
-        string vccPath;
-        string path;
-        ISourceControlProvider sourceControlProvider;
-        string repositoryUuid;
-        int version;
+        readonly ItemMetaData item;
+        readonly ISourceControlProvider sourceControlProvider;
 
-        public FileNode(string vccPath,
-                        string path,
-                        ISourceControlProvider sourceControlProvider,
-                        string repositoryUuid)
-            : this(vccPath, path, sourceControlProvider, repositoryUuid, -1) { }
-
-            public FileNode(string vccPath,
-                        string path,
-                        ISourceControlProvider sourceControlProvider,
-                        string repositoryUuid,
-                        int version)
+        public FileNode(ItemMetaData item, ISourceControlProvider sourceControlProvider)
         {
-            this.vccPath = vccPath;
-            this.path = path;
+            this.item = item;
             this.sourceControlProvider = sourceControlProvider;
-            this.repositoryUuid = repositoryUuid;
-            this.version = version;
         }
 
         public string Href()
         {
-            string href = path;
-            if (sourceControlProvider.IsDirectory(version, Helper.Decode(path)) && !href.EndsWith("/"))
+            string href = item.Name;
+
+            if (!href.StartsWith("/"))
+                href = "/" + href;
+
+            if (item.ItemType == ItemType.Folder && !href.EndsWith("/"))
                 href += "/";
 
-            return href;
+            return Helper.Encode(href);
         }
 
         public string GetProperty(XmlElement property)
@@ -46,23 +35,23 @@ namespace SvnBridge.Nodes
             switch (property.LocalName)
             {
                 case "version-controlled-configuration":
-                    return GetVersionControlledConfiguration(property);
+                    return GetVersionControlledConfiguration();
                 case "resourcetype":
-                    return GetResourceType(property);
+                    return GetResourceType();
                 case "baseline-relative-path":
-                    return GetBaselineRelativePath(property);
+                    return GetBaselineRelativePath();
                 case "repository-uuid":
-                    return GetRepositoryUUID(property);
+                    return GetRepositoryUUID();
                 case "checked-in":
-                    return GetCheckedIn(property);
+                    return GetCheckedIn();
                 case "deadprop-count":
                     return "<lp2:deadprop-count>0</lp2:deadprop-count>";
                 case "creator-displayname":
-                    return GetCreatorDisplayName(property);
+                    return GetCreatorDisplayName();
                 case "creationdate":
-                    return GetCreationDate(property);
+                    return GetCreationDate();
                 case "version-name":
-                    return GetVersionName(property);
+                    return GetVersionName();
                 case "getcontentlength":
                     return GetContentLength();
                 case "lockdiscovery":
@@ -76,18 +65,17 @@ namespace SvnBridge.Nodes
 
         private string GetContentLength()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(version, Helper.Decode(path), Recursion.None);
             return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>";
         }
 
-        string GetVersionControlledConfiguration(XmlElement property)
+        private static string GetVersionControlledConfiguration()
         {
-            return "<lp1:version-controlled-configuration><D:href>" + vccPath + "</D:href></lp1:version-controlled-configuration>";
+            return "<lp1:version-controlled-configuration><D:href>" + Constants.VccPath + "</D:href></lp1:version-controlled-configuration>";
         }
 
-        string GetResourceType(XmlElement property)
+        private string GetResourceType()
         {
-            if (sourceControlProvider.IsDirectory(version, Helper.Decode(path)))
+            if (item.ItemType == ItemType.Folder)
             {
                 return "<lp1:resourcetype><D:collection/></lp1:resourcetype>";
             }
@@ -97,9 +85,9 @@ namespace SvnBridge.Nodes
             }
         }
 
-        string GetBaselineRelativePath(XmlElement property)
+        string GetBaselineRelativePath()
         {
-            string brl = path;
+            string brl = item.Name;
             if ((brl.Length > 0) && (brl[0] == '/'))
                 brl = brl.Substring(1);
             if ((brl.Length > 0) && (brl[brl.Length - 1] == '/'))
@@ -108,50 +96,44 @@ namespace SvnBridge.Nodes
             brl = Helper.Decode(brl);
             if (brl.Length > 0)
             {
-                ItemMetaData item = sourceControlProvider.GetItems(version, Helper.Decode(path), Recursion.None);
-                return "<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>";
+                return "<lp2:baseline-relative-path>" + brl + "</lp2:baseline-relative-path>";
             }
             else
                 return "<lp2:baseline-relative-path/>";
         }
 
-        string GetRepositoryUUID(XmlElement property)
+        private static string GetRepositoryUUID()
         {
-            return "<lp2:repository-uuid>" + repositoryUuid + "</lp2:repository-uuid>";
+            return "<lp2:repository-uuid>" + Constants.RepositoryUuid + "</lp2:repository-uuid>";
         }
 
-        string GetCheckedIn(XmlElement property)
+        private string GetCheckedIn()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
-            return "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>";
+            return "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>";
         }
 
-        string GetCreatorDisplayName(XmlElement property)
+        private string GetCreatorDisplayName()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
             return "<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>";
         }
 
-        string GetCreationDate(XmlElement property)
+        private string GetCreationDate()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
-            return "<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate) + "</lp1:creationdate>";
+            return "<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate.ToUniversalTime()) + "</lp1:creationdate>";
         }
 
-        string GetVersionName(XmlElement property)
+        private string GetVersionName()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
             return "<lp1:version-name>" + item.Revision + "</lp1:version-name>";
         }
 
-        string GetLockDiscovery()
+        private static string GetLockDiscovery()
         {
             return "<D:lockdiscovery/>";
         }
 
-        string GetMd5Checksum()
+        private string GetMd5Checksum()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(version, Helper.Decode(path), Recursion.None);
             return "<lp2:md5-checksum>" + Helper.GetMd5Checksum(sourceControlProvider.ReadFile(item)) + "</lp2:md5-checksum>";
         }
     }

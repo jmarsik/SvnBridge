@@ -1,5 +1,6 @@
 using System;
 using CodePlex.TfsLibrary;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using SvnBridge.SourceControl;
 
@@ -143,7 +144,10 @@ namespace Tests
         public void Test4()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "/Spikes/SvnFacade/trunk/New Folder";
+            folder.ItemType = ItemType.Folder;
+            mock.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk/New%20Folder HTTP/1.1\r\n" +
@@ -316,9 +320,9 @@ namespace Tests
         public void Test8()
         {
             mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
+            item.ItemType = ItemType.Folder;
             item.Revision = 5487;
             mock.Attach(provider.GetItems, item);
 
