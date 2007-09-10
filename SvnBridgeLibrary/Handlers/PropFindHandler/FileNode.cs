@@ -151,7 +151,7 @@ namespace SvnBridge.Nodes
 
         string GetMd5Checksum()
         {
-            ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(path), Recursion.None);
+            ItemMetaData item = sourceControlProvider.GetItems(version, Helper.Decode(path), Recursion.None);
             return "<lp2:md5-checksum>" + Helper.GetMd5Checksum(sourceControlProvider.ReadFile(item)) + "</lp2:md5-checksum>";
         }
     }
