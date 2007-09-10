@@ -17,6 +17,10 @@
 
 	<Target Name="Test" DependsOnTargets="UnitTest;ProtocolTest;IntegrationTest" />
 
+  <Target Name="Zip" DependsOnTargets="Merge">
+    <Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip Merge\SvnBridge.exe"/>
+  </Target>
+
 	<!-- Individiual targets -->
 
 	<Target Name="Clean">
@@ -44,8 +48,9 @@
     <Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\Properties\AssemblyInfo.cs"/>
   </Target>
 
-	<Target Name="Zip">
-		<Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip SvnBridge\bin\$(BuildType)\*.*"/>
-	</Target>
+  <Target Name="Merge">
+    <MakeDir Directories="Merge"/>
+    <Exec Command="$(CodePlex3rdParty)\ilmerge.exe /out:Merge\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnFacade.Library.dll"/>
+  </Target>
 
 </Project>
