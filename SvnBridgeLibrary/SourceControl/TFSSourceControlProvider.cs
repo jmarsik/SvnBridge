@@ -964,35 +964,38 @@ namespace SvnBridge.SourceControl
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Add, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
             {
-                string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
-                string changePath = remoteName.Substring(1);
-                string folderName = path.Substring(1);
-                FolderMetaData folder = root;
-                for (int i = 0; i < nameParts.Length; i++)
+                if (remoteName.Length > path.Length + 1)
                 {
-                    folderName += "/" + nameParts[i];
-                    ItemMetaData item = FindItem(folder, folderName);
-                    if (item == null)
-                    {
-                        if ((i == nameParts.Length - 1) && (change.Item.ItemType == ItemType.File))
-                            item = GetItems(versionTo, remoteName.Substring(2), Recursion.None);
-                        else
-                            item = GetItems(versionTo, folderName, Recursion.None);
+                    string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
 
-                        folder.Items.Add(item);
-                    }
-                    else if ((item is DeleteFolderMetaData) && (i != nameParts.Length - 1))
+                    string folderName = path.Substring(1);
+                    FolderMetaData folder = root;
+                    for (int i = 0; i < nameParts.Length; i++)
                     {
-                        return;
-                    }
-                    else if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) && ((item is DeleteMetaData) || (item is DeleteFolderMetaData)))
-                    {
-                        if (!propertyChange)
-                            folder.Items.Remove(item);
-                    }
-                    if (i != nameParts.Length - 1)
-                    {
-                        folder = (FolderMetaData)item;
+                        folderName += "/" + nameParts[i];
+                        ItemMetaData item = FindItem(folder, folderName);
+                        if (item == null)
+                        {
+                            if ((i == nameParts.Length - 1) && (change.Item.ItemType == ItemType.File))
+                                item = GetItems(versionTo, remoteName.Substring(2), Recursion.None);
+                            else
+                                item = GetItems(versionTo, folderName, Recursion.None);
+
+                            folder.Items.Add(item);
+                        }
+                        else if ((item is DeleteFolderMetaData) && (i != nameParts.Length - 1))
+                        {
+                            return;
+                        }
+                        else if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) && ((item is DeleteMetaData) || (item is DeleteFolderMetaData)))
+                        {
+                            if (!propertyChange)
+                                folder.Items.Remove(item);
+                        }
+                        if (i != nameParts.Length - 1)
+                        {
+                            folder = (FolderMetaData)item;
+                        }
                     }
                 }
             }
