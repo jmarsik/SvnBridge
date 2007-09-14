@@ -829,7 +829,19 @@ namespace SvnBridge.SourceControl
                     properties = new ItemProperties();
 
                 foreach (KeyValuePair<string, string> property in activity.AddedProperties[path])
-                    properties.Properties.Add(new Property(property.Key, property.Value));
+                {
+                    bool found = false;
+                    foreach (Property currentProperty in properties.Properties)
+                    {
+                        if (currentProperty.Name == property.Key)
+                        {
+                            currentProperty.Value = property.Value;
+                            found = true;
+                        }
+                    }
+                    if (!found)
+                        properties.Properties.Add(new Property(property.Key, property.Value));
+                }
 
                 string propertiesPath = GetPropertiesFileName(path, itemType);
                 string propertiesFolder = GetPropertiesFolderName(path, itemType);

@@ -16,9 +16,9 @@ namespace Tests
         [Test]
         public void TestGetLog()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
 
             LogItem logItem = _provider.GetLog(_testPath, versionFrom, versionTo, Recursion.Full, Int32.MaxValue);
 
@@ -29,9 +29,9 @@ namespace Tests
         public void TestGetLogWithBranchedFileContainsOriginalNameAndRevision()
         {
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CopyItem(_testPath + "/TestFile.txt", _testPath + "/TestFileBranch.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
 
             LogItem logItem = _provider.GetLog(_testPath, versionTo, versionTo, Recursion.Full, Int32.MaxValue);
 
@@ -45,9 +45,9 @@ namespace Tests
         {
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
             WriteFile(_testPath + "/TestFile2.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CopyItem(_testPath + "/TestFile.txt", _testPath + "/TestFileBranch.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
 
             LogItem logItem = _provider.GetLog(_testPath, versionTo, versionTo, Recursion.Full, Int32.MaxValue);
 
@@ -58,9 +58,9 @@ namespace Tests
         public void TestGetLogReturnsOriginalNameAndRevisionForRenamedItems()
         {
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             MoveItem(_testPath + "/Fun.txt", _testPath + "/FunRename.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
 
             LogItem logItem = _provider.GetLog(_testPath + "/FunRename.txt", versionFrom, versionTo, Recursion.None, 1);
 

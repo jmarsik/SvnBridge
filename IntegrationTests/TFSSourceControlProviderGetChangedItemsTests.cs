@@ -14,9 +14,9 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFile()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -31,9 +31,9 @@ namespace Tests
         {
             string path = _testPath + "/TestFile.txt";
             WriteFile(path, "Test file contents", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(path, true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -47,9 +47,9 @@ namespace Tests
         {
             string path = _testPath + "/Test Folder";
             CreateFolder(path, true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(path, true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -62,9 +62,9 @@ namespace Tests
         public void TestGetChangedItemsWithRenamedFile()
         {
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             MoveItem(_testPath + "/Fun.txt", _testPath + "/FunRename.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -81,9 +81,9 @@ namespace Tests
         public void TestGetChangedItemsWithBranchedFile()
         {
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CopyItem(_testPath + "/Fun.txt", _testPath + "/FunRename.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -99,10 +99,10 @@ namespace Tests
         {
             string path = _testPath + "/TestFile.txt";
             WriteFile(path, "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             UpdateFile(path, "Fun text 2", true);
             UpdateFile(path, "Fun text 3", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -115,10 +115,10 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithNewFileInNewFolderInSameChangeset()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CreateFolder(_testPath + "/New Folder", false);
             WriteFile(_testPath + "/New Folder/New File.txt", "Fun text", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -134,9 +134,9 @@ namespace Tests
         {
             CreateFolder(_testPath + "/New Folder", false);
             WriteFile(_testPath + "/New Folder/New File.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(_testPath + "/New Folder", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             reportData.UpdateTarget = "New File.txt";
 
@@ -152,9 +152,9 @@ namespace Tests
         {
             string path = _testPath + "/TestFile.txt";
             WriteFile(path, "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             UpdateFile(path, "Fun text 2", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             reportData.Entries = new List<EntryData>();
             EntryData entry = new EntryData();
@@ -170,10 +170,10 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithNewFolderAndNewFileReturnsNothingWhenClientStateAlreadyCurrent()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CreateFolder(_testPath + "/Folder1", false);
             WriteFile(_testPath + "/Folder1/Test.txt", "filedata", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             reportData.Entries = new List<EntryData>();
             reportData.Entries.Add(new EntryData());
@@ -192,9 +192,9 @@ namespace Tests
         {
             string path = _testPath + "/FolderA";
             CreateFolder(path, true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(path, true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             reportData.Entries = new List<EntryData>();
             EntryData entry = new EntryData();
@@ -213,9 +213,9 @@ namespace Tests
         {
             CreateFolder(_testPath + "/FolderA", false);
             WriteFile(_testPath + "/FolderA/Test1.txt", "filedata", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(_testPath + "/FolderA", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             reportData.Entries = new List<EntryData>();
             EntryData entry = new EntryData();
@@ -234,9 +234,9 @@ namespace Tests
         {
             string path = _testPath + "/TestFile.txt";
             WriteFile(path, "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(path, true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             reportData.Missing = new List<string>();
             reportData.Missing.Add("TestFile.txt");
@@ -251,9 +251,9 @@ namespace Tests
         {
             CreateFolder(_testPath + "/Folder", false);
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             MoveItem(_testPath + "/Fun.txt", _testPath + "/FunRenamed.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             reportData.Missing = new List<string>();
             reportData.Missing.Add("Fun.txt");
@@ -272,10 +272,10 @@ namespace Tests
         public void TestGetChangedItemsWithDeletedAndReAddedItemReturnsNothingWhenClientStateAlreadyCurrent()
         {
             CreateFolder(_testPath + "/New Folder", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(_testPath + "/New Folder", true);
             CreateFolder(_testPath + "/New Folder", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
             EntryData entry = new EntryData();
             reportData.Entries = new List<EntryData>();
@@ -295,9 +295,9 @@ namespace Tests
         public void TestGetChangedItemsWithUpdatedFolderProperty()
         {
             CreateFolder(_testPath + "/Folder1", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             SetProperty(_testPath + "/Folder1", "prop1", "prop1value", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -312,9 +312,9 @@ namespace Tests
         public void TestGetChangedItemsWithUpdatedFileProperty()
         {
             WriteFile(_testPath + "/Test1.txt", "filedata", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             SetProperty(_testPath + "/Test1.txt", "prop1", "prop1value", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -328,10 +328,10 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFileContainingProperty()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             WriteFile(_testPath + "/Test1.txt", "filedata", false);
             SetProperty(_testPath + "/Test1.txt", "prop1", "prop1value", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -345,10 +345,10 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFolderContainingProperty()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CreateFolder(_testPath + "/Folder1", false);
             SetProperty(_testPath + "/Folder1", "prop1", "prop1value", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -362,10 +362,10 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFileThenDeletedFileReturnsNothing()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
             DeleteItem(_testPath + "/TestFile.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -376,10 +376,10 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFolderThenDeletedFolderReturnsNothing()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CreateFolder(_testPath + "/TestFolder", true);
             DeleteItem(_testPath + "/TestFolder", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -390,11 +390,11 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFileThenEditedThenDeletedFileReturnsNothing()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
             WriteFile(_testPath + "/TestFile.txt", "Fun text2", true);
             DeleteItem(_testPath + "/TestFile.txt", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -407,10 +407,10 @@ namespace Tests
         {
             CreateFolder(_testPath + "/Folder1", false);
             WriteFile(_testPath + "/Folder1/Test.txt", "fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(_testPath + "/Folder1/Test.txt", true);
             DeleteItem(_testPath + "/Folder1", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -424,10 +424,10 @@ namespace Tests
         public void TestGetChangedItemsWithAddedFileThenFolderContainingFileIsDeleted()
         {
             CreateFolder(_testPath + "/Folder1", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             WriteFile(_testPath + "/Folder1/Test.txt", "fun text", true);
             DeleteItem(_testPath + "/Folder1", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -443,10 +443,10 @@ namespace Tests
             CreateFolder(_testPath + "/Test1", false);
             CreateFolder(_testPath + "/Test1/Folder1", false);
             WriteFile(_testPath + "/Test1/Folder1/Test.txt", "fun text", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             DeleteItem(_testPath + "/Test1/Folder1/Test.txt", true);
             DeleteItem(_testPath + "/Test1/Folder1", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -462,11 +462,11 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFolderAndFileWithinFolderInSingleCommitThenDeleteFolder()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CreateFolder(_testPath + "/Folder1", false);
             WriteFile(_testPath + "/Folder1/Test.txt", "fun text", true);
             DeleteItem(_testPath + "/Folder1", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -477,11 +477,11 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithAddedFolderThenAddedPropertyThenDeletedFolder()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CreateFolder(_testPath + "/Folder1", true);
             SetProperty(_testPath + "/Folder1", "prop", "val2", true);
             DeleteItem(_testPath + "/Folder1", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -493,10 +493,10 @@ namespace Tests
         public void TestGetChangedItemsWithAddedFolderPropertyThenDeletedFolder()
         {
             CreateFolder(_testPath + "/Folder1", true);
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             SetProperty(_testPath + "/Folder1", "prop", "val1", true);
             DeleteItem(_testPath + "/Folder1", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -507,11 +507,11 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsCompletesWhenChangesetDoesNotExistInPath()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             CreateFolder(_testPath + "2", true);
             CreateFolder(_testPath + "/Folder1", true);
             DeleteItem(_testPath + "2", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
@@ -522,9 +522,9 @@ namespace Tests
         [Test]
         public void TestGetChangedItemsWithUpdatedPropertyAtRoot()
         {
-            int versionFrom = _provider.GetLatestVersion();
+            int versionFrom = _lastCommitRevision;
             SetProperty(_testPath, "prop1", "val1", true);
-            int versionTo = _provider.GetLatestVersion();
+            int versionTo = _lastCommitRevision;
             UpdateReportData reportData = new UpdateReportData();
 
             FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);

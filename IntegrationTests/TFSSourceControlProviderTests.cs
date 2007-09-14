@@ -34,7 +34,7 @@ namespace Tests
         [Test]
         public void TestItemExistsReturnsFalseIfFileDoesNotExistInSpecifiedVersion()
         {
-            int version = _provider.GetLatestVersion();
+            int version = _lastCommitRevision;
             WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
             
             bool result = _provider.ItemExists(_testPath + "/TestFile.txt", version);

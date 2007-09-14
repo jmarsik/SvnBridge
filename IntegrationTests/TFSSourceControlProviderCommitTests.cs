@@ -142,7 +142,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitNewMimeTypePropertyOnFile()
+        public void TestCommitNewPropertyOnFile()
         {
             string mimeType = "application/octet-stream";
             string path = _testPath + "/TestFile.txt";
@@ -159,7 +159,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitNewIgnoreListPropertyOnFolder()
+        public void TestCommitNewPropertyOnFolder()
         {
             string ignore = "*.bad\n";
 
@@ -174,7 +174,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitUpdateMimeTypePropertyOnFile()
+        public void TestCommitUpdatePropertyOnFile()
         {
             string mimeType1 = "application/octet-stream1";
             string mimeType2 = "application/octet-stream2";
@@ -193,7 +193,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitUpdateIgnoreListPropertyOnFolder()
+        public void TestCommitUpdatePropertyOnFolder()
         {
             string ignore1 = "*.bad\n";
             string ignore2 = "*.good\n";
