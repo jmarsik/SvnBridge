@@ -289,7 +289,7 @@ namespace SvnBridge.SourceControl
             for (int i = 0; i < items.Length; i++)
             {
                 ItemMetaData item = ConvertSourceItem(items[i]);
-                if (recursion != Recursion.Full)
+                if (recursion != Recursion.Full && !returnPropertyFiles) 
                     RetrievePropertiesForItem(item);
 
                 if (item.Name.Contains("/" + PROP_FOLDER + "/") && !returnPropertyFiles)
@@ -328,10 +328,16 @@ namespace SvnBridge.SourceControl
 
         private void RetrievePropertiesForItem(ItemMetaData item)
         {
-            ItemProperties properties = ReadPropertiesForItem(item.Name, item.ItemType);
+            int revision;
+            ItemProperties properties = ReadPropertiesForItem(item.Name, item.ItemType, out revision);
             if (properties != null)
+            {
+                if (revision > item.Revision)
+                    item.Revision = revision;
+
                 foreach (Property property in properties.Properties)
                     item.Properties[property.Name] = property.Value;
+            }
         }
 
         public int GetLatestVersion()
@@ -785,16 +791,23 @@ namespace SvnBridge.SourceControl
 
         private ItemProperties ReadPropertiesForItem(string path, ItemType itemType)
         {
+            int revision;
+            return ReadPropertiesForItem(path, itemType, out revision);
+        }
+        
+        private ItemProperties ReadPropertiesForItem(string path, ItemType itemType, out int revision)
+        {
+            revision = -1;
             ItemProperties properties = null;
             string propertiesPath = GetPropertiesFileName(path, itemType);
             ItemMetaData item = GetItems(-1, propertiesPath, Recursion.None, true);
             if (item != null)
             {
                 properties = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
+                revision = item.Revision;
             }
             return properties;
         }
-
         private void UpdateProperties(string activityId)
         {
             Activity activity = _activities[activityId];

@@ -18,6 +18,7 @@ namespace Tests
         protected string _activityId;
         protected string _testPath;
         protected TFSSourceControlProvider _provider;
+        protected int _lastCommitRevision;
 
         [SetUp]
         public void SetUp()
@@ -70,6 +71,7 @@ namespace Tests
         protected MergeActivityResponse Commit()
         {
             MergeActivityResponse response = _provider.MergeActivity(_activityId);
+            _lastCommitRevision = response.Version;
             _provider.DeleteActivity(_activityId);
             _provider.MakeActivity(_activityId);
             return response;

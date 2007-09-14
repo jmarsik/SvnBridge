@@ -78,5 +78,29 @@ namespace IntegrationTests
         {
             FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, "", Recursion.OneLevel);
         }
+        [Test]
+        public void TestGetItemsReturnsCorrectRevisionWhenPropertyIsAdded()
+        {
+            WriteFile(_testPath + "/File1.txt", "filedata", true);
+            SetProperty(_testPath + "/File1.txt", "prop1", "val1", true);
+            int revision = _lastCommitRevision;
+
+            ItemMetaData item = _provider.GetItems(-1, _testPath + "/File1.txt", Recursion.None);
+
+            Assert.AreEqual(revision, item.Revision);
+        }
+
+        [Test]
+        public void TestGetItemsReturnsCorrectRevisionWhenPropertyIsAddedThenFileIsUpdated()
+        {
+            WriteFile(_testPath + "/File1.txt", "filedata", true);
+            SetProperty(_testPath + "/File1.txt", "prop1", "val1", true);
+            WriteFile(_testPath + "/File1.txt", "filedata2", true);
+            int revision = _lastCommitRevision;
+
+            ItemMetaData item = _provider.GetItems(-1, _testPath + "/File1.txt", Recursion.None);
+
+            Assert.AreEqual(revision, item.Revision);
+        }
     }
 }
