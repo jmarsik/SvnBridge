@@ -190,6 +190,9 @@ namespace SvnBridge.SourceControl
                     clientDeletedFiles[path + "/" + missingPath] = missingPath;
 
             FolderMetaData root = (FolderMetaData)GetItems(versionTo, path, Recursion.None);
+            if (root != null)
+                root.Properties.Clear();
+
             if (versionFrom != versionTo)
             {
                 if (root == null && reportData.UpdateTarget != null)
@@ -977,7 +980,12 @@ namespace SvnBridge.SourceControl
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Add, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
             {
-                if (remoteName.Length > path.Length + 1)
+                if (remoteName.Length == path.Length + 1)
+                {
+                    ItemMetaData item = GetItems(versionTo, remoteName.Substring(2), Recursion.None);
+                    root.Properties = item.Properties;
+                }
+                else
                 {
                     string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
 

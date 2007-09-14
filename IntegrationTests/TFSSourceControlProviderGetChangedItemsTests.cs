@@ -533,5 +533,21 @@ namespace Tests
             Assert.AreEqual(_testPath.Substring(1), folder.Name);
             Assert.AreEqual("val1", folder.Properties["prop1"]);
         }
+
+        [Test]
+        public void TestGetChangedItemsWithNoUpdatesDoesNotIncludeProperties()
+        {
+            SetProperty(_testPath, "prop1", "val1", true);
+            int versionFrom = _lastCommitRevision;
+            int versionTo = _lastCommitRevision;
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+            Assert.AreEqual(_testPath.Substring(1), folder.Name);
+            Assert.AreEqual(versionTo, folder.Revision);
+            Assert.AreEqual(0, folder.Properties.Count);
+        }
     }
 }
