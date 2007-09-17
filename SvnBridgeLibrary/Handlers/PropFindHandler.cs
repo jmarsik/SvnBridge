@@ -82,19 +82,22 @@ namespace SvnBridge.Handlers
             {
                 FolderMetaData folderInfo = new FolderMetaData();
                 folderInfo.ItemType = ItemType.Folder;
-
-                ItemMetaData item = sourceControlProvider.GetItems(version.HasValue ? version.Value : -1, path, Recursion.None);
-
+                ItemMetaData item = GetItems(sourceControlProvider, version.HasValue ? version.Value : -1, path, Recursion.None);
                 folderInfo.Items.Add(item);
-
                 return folderInfo;
             }
             else if (depth == "1")
             {
-                return (FolderMetaData) sourceControlProvider.GetItems(version.Value, path, Recursion.OneLevel);
+                return (FolderMetaData)GetItems(sourceControlProvider, version.Value, path, Recursion.OneLevel);
             }
             else
                 throw new InvalidOperationException(String.Format("Depth not supported: {0}", depth));
+        }
+
+        private static ItemMetaData GetItems(ISourceControlProvider sourceControlProvider, int version, string path, Recursion recursion)
+        {
+            // Make sure path is decoded
+            return sourceControlProvider.GetItems(version, Helper.Decode(path), recursion);
         }
 
         private static void HandleAllProp(ISourceControlProvider sourceControlProvider, string requestPath, Stream outputStream)
@@ -102,7 +105,7 @@ namespace SvnBridge.Handlers
             string revision = requestPath.Split('/')[3];
             string path = requestPath.Substring(9 + revision.Length);
 
-            ItemMetaData item = sourceControlProvider.GetItems(int.Parse(revision), Helper.Decode(path), Recursion.None);
+            ItemMetaData item = GetItems(sourceControlProvider, int.Parse(revision), path, Recursion.None);
 
             using (StreamWriter writer = new StreamWriter(outputStream))
             {
@@ -223,12 +226,10 @@ namespace SvnBridge.Handlers
         private static void WriteBcResponse(ISourceControlProvider sourceControlProvider, string requestPath, string depthHeader, PropData data, Stream outputStream)
         {
             int version = int.Parse(requestPath.Split('/')[3]);
-            string path = Helper.Decode(requestPath.Substring(9 + version.ToString().Length));
+            string path = requestPath.Substring(9 + version.ToString().Length);
 
             if (!sourceControlProvider.ItemExists(Helper.Decode(path), version))
-            {
                 throw new FileNotFoundException();
-            }
 
             FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depthHeader, path, version);
 
@@ -260,9 +261,7 @@ namespace SvnBridge.Handlers
         private static void WritePathResponse(ISourceControlProvider sourceControlProvider, string requestPath, string depth, PropData data, Stream outputStream)
         {
             if (!sourceControlProvider.ItemExists(Helper.Decode(requestPath), -1))
-            {
                 throw new FileNotFoundException();
-            }
 
             FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depth, requestPath, null);
 

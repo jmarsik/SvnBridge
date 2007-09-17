@@ -52,18 +52,19 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
         {
-            Results r = mock.Attach(provider.ItemExists, true);
+            Results r1 = mock.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "New%20Folder%207";
             item.ItemType = ItemType.Folder;
-            mock.Attach(provider.GetItems, item);
+            Results r2 = mock.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/Spikes/SvnFacade/trunk/New%20Folder%207";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", r.Parameters[0]);
+            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", r1.Parameters[0]);
+            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", r2.Parameters[1]);
         }
 
         [Test]
