@@ -549,5 +549,24 @@ namespace Tests
             Assert.AreEqual(versionTo, folder.Revision);
             Assert.AreEqual(0, folder.Properties.Count);
         }
+
+        [Test]
+        public void TestGetChangedItemsDoesNotIncludePropertiesInSubFoldersIfNotUpdated()
+        {
+            CreateFolder(_testPath + "/Folder1", false);
+            SetProperty(_testPath, "prop1", "val1", false);
+            SetProperty(_testPath + "/Folder1", "prop2", "val2", true);
+            int versionFrom = _lastCommitRevision;
+            WriteFile(_testPath + "/Folder1/Test1.txt", "filedata", true);
+            int versionTo = _lastCommitRevision;
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(_testPath, versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(1, folder.Items.Count);
+            Assert.AreEqual(1, ((FolderMetaData)folder.Items[0]).Items.Count);
+            Assert.AreEqual(0, folder.Properties.Count);
+            Assert.AreEqual(0, folder.Items[0].Properties.Count);
+        }
     }
 }

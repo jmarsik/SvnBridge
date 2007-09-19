@@ -999,33 +999,47 @@ namespace SvnBridge.SourceControl
                 }
                 else
                 {
-                    string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
-
-                    string folderName = path.Substring(1);
                     FolderMetaData folder = root;
+                    string itemName = path.Substring(1);
+                    string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
                     for (int i = 0; i < nameParts.Length; i++)
                     {
-                        folderName += "/" + nameParts[i];
-                        ItemMetaData item = FindItem(folder, folderName);
+                        bool lastNamePart = false;
+                        if (i == nameParts.Length - 1)
+                            lastNamePart = true;
+
+                        itemName += "/" + nameParts[i];
+                        ItemMetaData item = FindItem(folder, itemName);
                         if (item == null)
                         {
-                            if ((i == nameParts.Length - 1) && (change.Item.ItemType == ItemType.File))
-                                item = GetItems(versionTo, remoteName.Substring(2), Recursion.None);
-                            else
-                                item = GetItems(versionTo, folderName, Recursion.None);
-
+                            item = GetItems(versionTo, itemName, Recursion.None);
+                            if (!lastNamePart)
+                            {
+                                StubFolderMetaData stubFolder = new StubFolderMetaData();
+                                stubFolder.RealFolder = (FolderMetaData)item;
+                                stubFolder.Name = item.Name;
+                                stubFolder.Revision = item.Revision;
+                                stubFolder.LastModifiedDate = item.LastModifiedDate;
+                                stubFolder.Author = item.Author;
+                                item = stubFolder;
+                            }
                             folder.Items.Add(item);
                         }
-                        else if ((item is DeleteFolderMetaData) && (i != nameParts.Length - 1))
+                        else if ((item is StubFolderMetaData) && lastNamePart)
+                        {
+                            folder.Items.Remove(item);
+                            folder.Items.Add(((StubFolderMetaData)item).RealFolder);
+                        }
+                        else if ((item is DeleteFolderMetaData) && !lastNamePart)
                         {
                             return;
                         }
-                        else if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) && ((item is DeleteMetaData) || (item is DeleteFolderMetaData)))
+                        else if (((item is DeleteFolderMetaData) || (item is DeleteMetaData)) && ((change.ChangeType & ChangeType.Add) == ChangeType.Add))
                         {
                             if (!propertyChange)
                                 folder.Items.Remove(item);
                         }
-                        if (i != nameParts.Length - 1)
+                        if (!lastNamePart)
                         {
                             folder = (FolderMetaData)item;
                         }
