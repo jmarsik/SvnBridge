@@ -288,6 +288,7 @@ namespace SvnBridge.SourceControl
             }
             SourceItem[] items = _sourceControlSvc.QueryItems(_serverUrl, _credentials, SERVER_PATH + path, recursionType, versionSpec, DeletedState.NonDeleted, ItemType.Any);
             Dictionary<string, FolderMetaData> folders = new Dictionary<string, FolderMetaData>();
+            Dictionary<string, int> itemPropertyRevision = new Dictionary<string, int>();
             ItemMetaData firstItem = null;
             for (int i = 0; i < items.Length; i++)
             {
@@ -301,6 +302,7 @@ namespace SvnBridge.SourceControl
                     itemPath = itemPath.Replace("/" + PROP_FOLDER + "/", "/");
                     ItemProperties itemProperties = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
                     properties[itemPath] = itemProperties;
+                    itemPropertyRevision[itemPath] = item.Revision;
                 }
                 else if (!item.Name.EndsWith("/" + PROP_FOLDER) || item.ItemType != ItemType.Folder || returnPropertyFiles)
                 {
@@ -326,6 +328,23 @@ namespace SvnBridge.SourceControl
                 }
             }
             SetProperties(folders, properties);
+            foreach (KeyValuePair<string, int> propertyRevision in itemPropertyRevision)
+            {
+                ItemMetaData item = null;
+                if (folders.ContainsKey(propertyRevision.Key.ToLower()))
+                {
+                    item = folders[propertyRevision.Key.ToLower()];
+                }
+                else
+                {
+                    string folderName = GetFolderName(propertyRevision.Key).ToLower();
+                    foreach (ItemMetaData folderItem in folders[folderName].Items)
+                        if (folderItem.Name == propertyRevision.Key)
+                            item = folderItem;
+                }
+                if (item.Revision < propertyRevision.Value)
+                    item.Revision = propertyRevision.Value;
+            }
             return firstItem;
         }
 

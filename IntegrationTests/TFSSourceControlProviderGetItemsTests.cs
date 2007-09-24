@@ -102,5 +102,29 @@ namespace IntegrationTests
 
             Assert.AreEqual(revision, item.Revision);
         }
+
+        [Test]
+        public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFolderAndRecursionIsFull()
+        {
+            CreateFolder(_testPath + "/Folder1", true);
+            SetProperty(_testPath + "/Folder1", "prop1", "val1", true);
+            int revision = _lastCommitRevision;
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
+
+            Assert.AreEqual(revision, item.Items[0].Revision);
+        }
+
+        [Test]
+        public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFileAndRecursionIsFull()
+        {
+            WriteFile(_testPath + "/Test.txt", "whee", true);
+            SetProperty(_testPath + "/Test.txt", "prop1", "val1", true);
+            int revision = _lastCommitRevision;
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, _testPath, Recursion.Full);
+
+            Assert.AreEqual(revision, item.Items[0].Revision);
+        }
     }
 }
