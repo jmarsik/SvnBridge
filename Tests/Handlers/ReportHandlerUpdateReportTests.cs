@@ -30,7 +30,6 @@ namespace SvnBridge.Handlers
             folder.Revision = 5700;
             folder.LastModifiedDate = DateTime.Parse("2007-09-05T18:37:14.239559Z");
             folder.Items.Add(new ItemMetaData());
-            folder.Items[0].ItemType = ItemType.File;
             folder.Items[0].Name = "asfd2.txt";
             folder.Items[0].Author = "jwanagel";
             folder.Items[0].Revision = 5700;
@@ -86,7 +85,6 @@ namespace SvnBridge.Handlers
             folder.Revision = 5698;
             folder.LastModifiedDate = DateTime.Parse("2007-08-21T00:41:27.680005Z");
             folder.Items.Add(new FolderMetaData());
-            folder.Items[0].ItemType = ItemType.Folder;
             folder.Items[0].Name = "Test9";
             folder.Items[0].Author = "jwanagel";
             folder.Items[0].Revision = 5698;

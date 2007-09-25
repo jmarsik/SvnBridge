@@ -64,9 +64,8 @@ namespace Tests
         public void Test2()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -208,9 +207,8 @@ namespace Tests
         public void Test5()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -349,9 +347,8 @@ namespace Tests
         public void Test8()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -493,9 +490,8 @@ namespace Tests
         public void Test11()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -594,7 +590,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -644,9 +639,8 @@ namespace Tests
         public void Test14()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -746,9 +740,8 @@ namespace Tests
         public void Test16()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -890,9 +883,8 @@ namespace Tests
         public void Test19()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -1034,9 +1026,8 @@ namespace Tests
         public void Test22()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -1092,7 +1083,6 @@ namespace Tests
             metadata.LastModifiedDate = DateTime.Parse("2007-04-09T03:54:04.385945Z");
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder/Test2.txt";
-            item.ItemType = ItemType.File;
             item.Revision = 5385;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-04-09T03:54:04.385945Z");

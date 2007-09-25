@@ -107,9 +107,8 @@ namespace Tests
         public void Test3()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -290,9 +289,8 @@ namespace Tests
         public void Test7()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -473,9 +471,8 @@ namespace Tests
         public void Test11()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -656,9 +653,8 @@ namespace Tests
         public void Test15()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -893,9 +889,8 @@ namespace Tests
         public void Test20()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -1076,9 +1071,8 @@ namespace Tests
         public void Test24()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -1259,9 +1253,8 @@ namespace Tests
         public void Test28()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -1442,9 +1435,8 @@ namespace Tests
         public void Test32()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =

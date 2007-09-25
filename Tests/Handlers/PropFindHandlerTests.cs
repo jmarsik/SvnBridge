@@ -36,7 +36,6 @@ namespace SvnBridge.Handlers
             mock.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Folder With Spaces";
-            item.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/Folder%20With%20Spaces";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
@@ -55,7 +54,6 @@ namespace SvnBridge.Handlers
             Results r1 = mock.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "New%20Folder%207";
-            item.ItemType = ItemType.Folder;
             Results r2 = mock.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/Spikes/SvnFacade/trunk/New%20Folder%207";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
@@ -127,7 +125,6 @@ namespace SvnBridge.Handlers
             mock.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
-            item.ItemType = ItemType.File;
             item.Revision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
@@ -170,7 +167,6 @@ namespace SvnBridge.Handlers
             mock.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
-            item.ItemType = ItemType.Folder;
             item.Revision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
@@ -267,11 +263,9 @@ namespace SvnBridge.Handlers
             mock.Attach(provider.IsDirectory, returnValues);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Foo";
-            folder.ItemType = ItemType.Folder;
             mock.Attach(provider.GetItems, folder);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            item.ItemType = ItemType.File;
             folder.Items.Add(item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>";
@@ -299,7 +293,6 @@ namespace SvnBridge.Handlers
 
             item = new FolderMetaData();
             item.Name = "Foo";
-            item.ItemType = ItemType.Folder;
             item.Revision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();

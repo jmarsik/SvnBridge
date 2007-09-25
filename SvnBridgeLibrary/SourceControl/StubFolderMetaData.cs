@@ -9,11 +9,6 @@ namespace SvnBridge.SourceControl
     {
         public FolderMetaData RealFolder;
 
-        public StubFolderMetaData()
-        {
-            this.ItemType = ItemType.Folder;
-        }
-
         public override List<ItemMetaData> Items
         {
             get

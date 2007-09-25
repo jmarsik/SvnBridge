@@ -65,7 +65,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -209,7 +208,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -350,7 +348,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -491,7 +488,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -589,7 +585,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
             stub.Attach(provider.IsDirectory, true);
 
@@ -642,7 +637,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -744,7 +738,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -888,7 +881,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -1029,7 +1021,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -1085,7 +1076,6 @@ namespace Tests
             metadata.LastModifiedDate = DateTime.Parse("2007-06-28T00:55:30.845181Z");
             FolderMetaData item = new FolderMetaData();
             item.Name = "Test&";
-            item.ItemType = ItemType.Folder;
             item.Revision = 5511;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-28T00:55:30.845181Z");

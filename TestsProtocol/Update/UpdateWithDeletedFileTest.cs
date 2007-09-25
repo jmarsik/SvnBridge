@@ -63,9 +63,8 @@ namespace Tests
         public void Test2()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -207,9 +206,8 @@ namespace Tests
         public void Test5()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -348,9 +346,8 @@ namespace Tests
         public void Test8()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -406,14 +403,12 @@ namespace Tests
             metadata.LastModifiedDate = DateTime.Parse("2007-06-15T03:16:19.085017Z");
             FolderMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 8";
-            item.ItemType = ItemType.Folder;
             item.Revision = 5472;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-15T03:16:19.085017Z");
             metadata.Items.Add(item);
             DeleteMetaData deletedFile = new DeleteMetaData();
             deletedFile.Name = "Spikes/SvnFacade/trunk/New Folder 8/development.log";
-            deletedFile.ItemType = ItemType.File;
             item.Items.Add(deletedFile);
             stub.Attach(provider.GetChangedItems, metadata);
             stub.Attach(provider.ItemExists, true);

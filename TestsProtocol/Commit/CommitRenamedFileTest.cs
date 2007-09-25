@@ -146,7 +146,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =

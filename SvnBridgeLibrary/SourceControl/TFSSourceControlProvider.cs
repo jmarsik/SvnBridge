@@ -200,7 +200,6 @@ namespace SvnBridge.SourceControl
                     root = new FolderMetaData();
                     DeleteMetaData deletedFile = new DeleteMetaData();
                     deletedFile.Name = reportData.UpdateTarget;
-                    deletedFile.ItemType = ItemType.File;
                     root.Items.Add(deletedFile);
                 }
                 else
@@ -327,7 +326,13 @@ namespace SvnBridge.SourceControl
                     }
                 }
             }
-            SetProperties(folders, properties);
+            SetItemProperties(folders, properties);
+            UpdateItemRevisionsBasedOnPropertyItemRevisions(folders, itemPropertyRevision);
+            return firstItem;
+        }
+
+        private void UpdateItemRevisionsBasedOnPropertyItemRevisions(Dictionary<string, FolderMetaData> folders, Dictionary<string,int> itemPropertyRevision)
+        {
             foreach (KeyValuePair<string, int> propertyRevision in itemPropertyRevision)
             {
                 ItemMetaData item = null;
@@ -345,7 +350,6 @@ namespace SvnBridge.SourceControl
                 if (item.Revision < propertyRevision.Value)
                     item.Revision = propertyRevision.Value;
             }
-            return firstItem;
         }
 
         private void RetrievePropertiesForItem(ItemMetaData item)
@@ -890,9 +894,11 @@ namespace SvnBridge.SourceControl
             else
             {
                 ItemMetaData pendingItem = new ItemMetaData();
+                if (items[0][0].type == ItemType.Folder)
+                    pendingItem = new FolderMetaData();
+
                 pendingItem.Id = items[0][0].itemid;
                 pendingItem.Revision = items[0][0].latest;
-                pendingItem.ItemType = items[0][0].type;
                 return pendingItem;
             }
         }
@@ -901,15 +907,10 @@ namespace SvnBridge.SourceControl
         {
             ItemMetaData item;
             if (sourceItem.ItemType == ItemType.Folder)
-            {
                 item = new FolderMetaData();
-                item.ItemType = ItemType.Folder;
-            }
             else
-            {
                 item = new ItemMetaData();
-                item.ItemType = ItemType.File;
-            }
+
             item.Id = sourceItem.ItemId;
             item.Name = sourceItem.RemoteName.Substring(2);
             item.Author = "unknown";
@@ -919,7 +920,7 @@ namespace SvnBridge.SourceControl
             return item;
         }
 
-        private void SetProperties(Dictionary<string, FolderMetaData> folders,
+        private void SetItemProperties(Dictionary<string, FolderMetaData> folders,
                                   Dictionary<string, ItemProperties> properties)
         {
             foreach (KeyValuePair<string, ItemProperties> itemProperties in properties)
@@ -967,15 +968,10 @@ namespace SvnBridge.SourceControl
                         if (i == nameParts.Length - 1)
                         {
                             if (change.Item.ItemType == ItemType.File)
-                            {
                                 item = new DeleteMetaData();
-                                item.ItemType = ItemType.File;
-                            }
                             else
-                            {
                                 item = new DeleteFolderMetaData();
-                                item.ItemType = ItemType.Folder;
-                            }
+
                             item.Name = remoteName.Substring(2);
                         }
                         else
@@ -984,7 +980,6 @@ namespace SvnBridge.SourceControl
                             if (item == null)
                             {
                                 item = new DeleteFolderMetaData();
-                                item.ItemType = ItemType.Folder;
                                 item.Name = folderName;
                             }
                         }

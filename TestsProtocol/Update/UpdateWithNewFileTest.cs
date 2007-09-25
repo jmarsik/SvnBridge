@@ -65,9 +65,8 @@ namespace Tests
         public void Test2()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -209,9 +208,8 @@ namespace Tests
         public void Test5()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -350,9 +348,8 @@ namespace Tests
         public void Test8()
         {
             stub.Attach(provider.ItemExists, true);
-            ItemMetaData item = new ItemMetaData();
+            ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
-            item.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -408,14 +405,12 @@ namespace Tests
             metadata.LastModifiedDate = DateTime.Parse("2007-06-07T20:45:13.462598Z");
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Spikes/SvnFacade/trunk/New Folder 3";
-            folder.ItemType = ItemType.Folder;
             folder.Revision = 5461;
             folder.Author = "jwanagel";
             folder.LastModifiedDate = DateTime.Parse("2007-06-07T20:45:13.462598Z");
             metadata.Items.Add(folder);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 3/AddedFile.txt";
-            item.ItemType = ItemType.File;
             item.Revision = 5461;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-07T20:45:13.462598Z");

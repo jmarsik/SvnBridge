@@ -81,7 +81,6 @@ namespace SvnBridge.Handlers
             if (depth == "0")
             {
                 FolderMetaData folderInfo = new FolderMetaData();
-                folderInfo.ItemType = ItemType.Folder;
                 ItemMetaData item = GetItems(sourceControlProvider, version.HasValue ? version.Value : -1, path, Recursion.None);
                 folderInfo.Items.Add(item);
                 return folderInfo;

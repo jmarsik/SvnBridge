@@ -110,7 +110,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -293,7 +292,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -476,7 +474,6 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.ItemType = ItemType.Folder;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -528,7 +525,6 @@ namespace Tests
             FolderMetaData metadata = new FolderMetaData();
             DeleteMetaData deletedFile = new DeleteMetaData();
             deletedFile.Name = "zxvc.txt";
-            deletedFile.ItemType = ItemType.File;
             metadata.Items.Add(deletedFile);
             stub.Attach(provider.GetChangedItems, metadata);
 
