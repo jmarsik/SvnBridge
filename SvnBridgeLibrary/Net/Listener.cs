@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using SvnBridge.Handlers;
+using System.IO;
 
 namespace SvnBridge.Net
 {
@@ -112,7 +113,11 @@ namespace SvnBridge.Net
 
             dispatcher.Dispatch(connection);
 
-            connection.Response.OutputStream.Flush();
+            try
+            {
+                connection.Response.OutputStream.Flush();
+            }
+            catch (IOException) { /* Ignore error, caused by client cancelling operation */ }
 
             tcpClient.Close();
         }

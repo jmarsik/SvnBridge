@@ -10,6 +10,8 @@ using System;
 using System.Threading;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace SvnBridge.Handlers
 {
@@ -172,96 +174,57 @@ namespace SvnBridge.Handlers
             output.Write("</S:log-report>\n");
         }
 
-        private class LoadingQueue
-        {
-            public ItemMetaData[] Files = new ItemMetaData[3] { null, null, null };
-            public bool Continue = true;
-        }
-
         void LoadAllFiles(object parameters)
         {
-            object folderInfo = ((object[])parameters)[0];
+            FolderMetaData folderInfo = (FolderMetaData)((object[])parameters)[0];
             ISourceControlProvider sourceControlProvider = (ISourceControlProvider)((object[])parameters)[1];
-            const int LOADING_THREADS = 3;
-            LoadingQueue[] queues = new LoadingQueue[LOADING_THREADS];
+            Queue<ItemMetaData> loadingQueue = new Queue<ItemMetaData>();
+
+            QueueItemsInFolder(loadingQueue, folderInfo);
+
+            const int LOADING_THREADS = 5;
+            ItemLoader[] itemLoaders = new ItemLoader[LOADING_THREADS];
             Thread[] loadingThreads = new Thread[LOADING_THREADS];
-            for (int i = 0; i < queues.Length; i++)
+            for (int i = 0; i < itemLoaders.Length; i++)
             {
-                queues[i] = new LoadingQueue();
-                loadingThreads[i] = new Thread(FileLoader);
-                loadingThreads[i].Start(new object[] { queues[i], sourceControlProvider });
+                itemLoaders[i] = new ItemLoader(loadingQueue, sourceControlProvider);
+                loadingThreads[i] = new Thread(itemLoaders[i].Start);
+                loadingThreads[i].Start();
             }
 
-            LoadFolderFiles(new object[] { folderInfo, queues });
-
-            for (int i = 0; i < queues.Length; i++)
+            bool threadsActive;
+            do
             {
-                queues[i].Continue = false;
-            }
+                Thread.Sleep(100);
+
+                threadsActive = false;
+                foreach (Thread thread in loadingThreads)
+                    if (thread.ThreadState != ThreadState.Stopped)
+                        threadsActive = true;
+
+                if (_cancel)
+                    foreach (ItemLoader itemLoader in itemLoaders)
+                        itemLoader.Cancel();
+
+            } while (threadsActive);
         }
 
-        void FileLoader(object parameters)
+        void QueueItemsInFolder(Queue<ItemMetaData> loadingQueue, FolderMetaData folder)
         {
-            LoadingQueue queue = (LoadingQueue)((object[])parameters)[0];
-            ISourceControlProvider sourceControlProvider = (ISourceControlProvider)((object[])parameters)[1];
-            while (true)
+            foreach (ItemMetaData item in folder.Items)
             {
-                bool loadedFile = false;
-                for (int i = 0; i < queue.Files.Length; i++)
-                {
-                    if (queue.Files[i] != null && queue.Files[i].DataLoaded == false)
-                    {
-                        queue.Files[i].Data = sourceControlProvider.ReadFile(queue.Files[i]);
-                        queue.Files[i].DataLoaded = true;
-                        loadedFile = true;
-                    }
-                }
-                if (!loadedFile)
-                {
-                    if (!queue.Continue)
-                    {
-                        return;
-                    }
-                    Thread.Sleep(100);
-                }
-            }
-        }
-
-        void LoadFolderFiles(object[] parameters)
-        {
-            FolderMetaData info = (FolderMetaData)parameters[0];
-            LoadingQueue[] queues = (LoadingQueue[])parameters[1];
-            for (int i = 0; i < info.Items.Count; i++)
-            {
-                ItemMetaData item = info.Items[i];
                 if (item.ItemType == ItemType.Folder)
                 {
-                    LoadFolderFiles(new object[] { item, queues });
+                    QueueItemsInFolder(loadingQueue, (FolderMetaData)item);
                 }
                 else if (!(item is DeleteMetaData))
                 {
-                    while (!AddFileToLoadingQueue(queues, item))
+                    lock (((ICollection)loadingQueue).SyncRoot)
                     {
-                        Thread.Sleep(50);
+                        loadingQueue.Enqueue(item);
                     }
                 }
             }
-        }
-
-        bool AddFileToLoadingQueue(LoadingQueue[] queues, ItemMetaData item)
-        {
-            for (int i = 0; i < queues[0].Files.Length; i++)
-            {
-                foreach (LoadingQueue queue in queues)
-                {
-                    if (queue.Files[i] == null || queue.Files[i].DataLoaded == true)
-                    {
-                        queue.Files[i] = item;
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     }
 }

@@ -79,6 +79,7 @@
     <Compile Include="Handlers\PutHandlerTests.cs" />
     <Compile Include="Handlers\ReportHandlerTests.cs" />
     <Compile Include="Handlers\ReportHandlerUpdateReportTests.cs" />
+    <Compile Include="Handlers\ReportHandler\ItemLoaderTests.cs" />
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
     <Compile Include="Infrastructure\TestHelper.cs" />

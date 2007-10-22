@@ -57,6 +57,7 @@
     <Compile Include="Handlers\HttpContextHandlerBase.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
+    <Compile Include="Handlers\ReportHandler\ItemLoader.cs" />
     <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
     <Compile Include="Net\ListenerContext.cs" />
     <Compile Include="Net\HttpContextDispatcher.cs" />

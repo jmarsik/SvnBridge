@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using CodePlex.TfsLibrary;
 using SvnBridge.Handlers;
+using System.IO;
 
 namespace SvnBridge.Net
 {
@@ -61,6 +62,11 @@ namespace SvnBridge.Net
                 catch (NetworkAccessDeniedException)
                 {
                     SendUnauthorizedResponse(connection);
+                }
+                catch (IOException)
+                {
+                    // Error caused by client cancelling operation
+                    handler.Cancel();
                 }
             }
             else
