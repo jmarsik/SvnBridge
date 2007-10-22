@@ -10,8 +10,6 @@ namespace SvnBridge.Handlers
 {
     public abstract class HttpContextHandlerBase
     {
-        protected bool _cancel = false;
-
         public void Handle(IHttpContext context, string tfsUrl)
         {
             ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, GetCredential(context));
@@ -19,10 +17,7 @@ namespace SvnBridge.Handlers
             Handle(context, sourceControlProvider);
         }
 
-        public void Cancel()
-        {
-            _cancel = true;
-        }
+        public virtual void Cancel() { }
 
         protected abstract void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider);
 

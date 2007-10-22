@@ -17,6 +17,13 @@ namespace SvnBridge.Handlers
 {
     public class ReportHandler : HttpContextHandlerBase
     {
+        private ItemLoaderManager itemLoaderManager;
+
+        public override void Cancel()
+        {
+            itemLoaderManager.Cancel();
+        }
+
         protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
@@ -106,17 +113,13 @@ namespace SvnBridge.Handlers
 
             FolderMetaData metadata;
             if (updatereport.Entries[0].StartEmpty)
-            {
                 metadata = (FolderMetaData)sourceControlProvider.GetItems(int.Parse(updatereport.TargetRevision), basePath, Recursion.Full);
-                Thread loadData = new Thread(LoadAllFiles);
-                loadData.Start(new object[] { metadata, sourceControlProvider });
-            }
             else
-            {
                 metadata = sourceControlProvider.GetChangedItems(basePath, int.Parse(updatereport.Entries[0].Rev), int.Parse(updatereport.TargetRevision), updatereport);
-                Thread loadData = new Thread(LoadAllFiles);
-                loadData.Start(new object[] { metadata, sourceControlProvider });
-            }
+
+            itemLoaderManager = new ItemLoaderManager(metadata, sourceControlProvider);
+            Thread loadData = new Thread(itemLoaderManager.Start);
+            loadData.Start();
 
             UpdateReportService updateReportService = new UpdateReportService(sourceControlProvider);
 
@@ -172,59 +175,6 @@ namespace SvnBridge.Handlers
             }
 
             output.Write("</S:log-report>\n");
-        }
-
-        void LoadAllFiles(object parameters)
-        {
-            FolderMetaData folderInfo = (FolderMetaData)((object[])parameters)[0];
-            ISourceControlProvider sourceControlProvider = (ISourceControlProvider)((object[])parameters)[1];
-            Queue<ItemMetaData> loadingQueue = new Queue<ItemMetaData>();
-
-            QueueItemsInFolder(loadingQueue, folderInfo);
-
-            const int LOADING_THREADS = 5;
-            ItemLoader[] itemLoaders = new ItemLoader[LOADING_THREADS];
-            Thread[] loadingThreads = new Thread[LOADING_THREADS];
-            for (int i = 0; i < itemLoaders.Length; i++)
-            {
-                itemLoaders[i] = new ItemLoader(loadingQueue, sourceControlProvider);
-                loadingThreads[i] = new Thread(itemLoaders[i].Start);
-                loadingThreads[i].Start();
-            }
-
-            bool threadsActive;
-            do
-            {
-                Thread.Sleep(100);
-
-                threadsActive = false;
-                foreach (Thread thread in loadingThreads)
-                    if (thread.ThreadState != ThreadState.Stopped)
-                        threadsActive = true;
-
-                if (_cancel)
-                    foreach (ItemLoader itemLoader in itemLoaders)
-                        itemLoader.Cancel();
-
-            } while (threadsActive);
-        }
-
-        void QueueItemsInFolder(Queue<ItemMetaData> loadingQueue, FolderMetaData folder)
-        {
-            foreach (ItemMetaData item in folder.Items)
-            {
-                if (item.ItemType == ItemType.Folder)
-                {
-                    QueueItemsInFolder(loadingQueue, (FolderMetaData)item);
-                }
-                else if (!(item is DeleteMetaData))
-                {
-                    lock (((ICollection)loadingQueue).SyncRoot)
-                    {
-                        loadingQueue.Enqueue(item);
-                    }
-                }
-            }
         }
     }
 }
