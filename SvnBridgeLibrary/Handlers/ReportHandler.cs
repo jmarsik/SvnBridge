@@ -112,10 +112,16 @@ namespace SvnBridge.Handlers
             string basePath = "/" + srcPathUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
 
             FolderMetaData metadata;
-            if (updatereport.Entries[0].StartEmpty)
-                metadata = (FolderMetaData)sourceControlProvider.GetItems(int.Parse(updatereport.TargetRevision), basePath, Recursion.Full);
+            int targetRevision;
+            if (updatereport.TargetRevision != null)
+                targetRevision = int.Parse(updatereport.TargetRevision);
             else
-                metadata = sourceControlProvider.GetChangedItems(basePath, int.Parse(updatereport.Entries[0].Rev), int.Parse(updatereport.TargetRevision), updatereport);
+                targetRevision = sourceControlProvider.GetLatestVersion();
+
+            if (updatereport.Entries[0].StartEmpty)
+                metadata = (FolderMetaData)sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
+            else
+                metadata = sourceControlProvider.GetChangedItems(basePath, int.Parse(updatereport.Entries[0].Rev), targetRevision, updatereport);
 
             itemLoaderManager = new ItemLoaderManager(metadata, sourceControlProvider);
             Thread loadData = new Thread(itemLoaderManager.Start);
@@ -125,7 +131,7 @@ namespace SvnBridge.Handlers
 
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
-            output.Write("<S:target-revision rev=\"" + updatereport.TargetRevision + "\"/>\n");
+            output.Write("<S:target-revision rev=\"" + targetRevision + "\"/>\n");
             updateReportService.ProcessUpdateReportForDirectory(updatereport, metadata, output, true);
             output.Write("</S:update-report>\n");
         }

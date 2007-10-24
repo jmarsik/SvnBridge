@@ -129,5 +129,38 @@ namespace SvnBridge.Handlers
             Assert.AreEqual(5697, r.Parameters[1]);
             Assert.AreEqual(5698, r.Parameters[2]);
         }
+
+        [Test]
+        public void VerifyHandleSucceedsWhenTargetRevisionIsNotSpecified()
+        {
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            folder.Author = "jwanagel";
+            folder.Revision = 5713;
+            folder.LastModifiedDate = DateTime.Parse("2007-09-17T02:38:24.225369Z");
+            mock.Attach(provider.GetChangedItems, folder);
+            mock.Attach(provider.GetLatestVersion, 5713);
+
+            request.Path = "http://localhost:8085/!svn/vcc/default";
+            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8085</S:src-path><S:entry rev=\"5713\" ></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+
+            string expected =
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n" +
+                "<S:target-revision rev=\"5713\"/>\n" +
+                "<S:open-directory rev=\"5713\">\n" +
+                "<D:checked-in><D:href>/!svn/ver/5713/</D:href></D:checked-in>\n" +
+                "<S:set-prop name=\"svn:entry:committed-rev\">5713</S:set-prop>\n" +
+                "<S:set-prop name=\"svn:entry:committed-date\">2007-09-17T02:38:24.225369Z</S:set-prop>\n" +
+                "<S:set-prop name=\"svn:entry:last-author\">jwanagel</S:set-prop>\n" +
+                "<S:set-prop name=\"svn:entry:uuid\">81a5aebe-f34e-eb42-b435-ac1ecbb335f7</S:set-prop>\n" +
+                "<S:prop></S:prop>\n" +
+                "</S:open-directory>\n" +
+                "</S:update-report>\n";
+
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+        }
     }
 }
