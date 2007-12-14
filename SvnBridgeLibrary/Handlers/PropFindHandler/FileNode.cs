@@ -93,7 +93,7 @@ namespace SvnBridge.Nodes
             if ((brl.Length > 0) && (brl[brl.Length - 1] == '/'))
                 brl = brl.Substring(0, brl.Length - 1);
 
-            brl = Helper.Decode(brl);
+            brl = Helper.EncodeB(brl);
             if (brl.Length > 0)
             {
                 return "<lp2:baseline-relative-path>" + brl + "</lp2:baseline-relative-path>";
@@ -109,7 +109,7 @@ namespace SvnBridge.Nodes
 
         private string GetCheckedIn()
         {
-            return "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>";
+            return "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true) + "</D:href></lp1:checked-in>";
         }
 
         private string GetCreatorDisplayName()

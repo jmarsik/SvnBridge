@@ -9,17 +9,33 @@ namespace Tests
         [Test]
         public void VerifyDecodeCorrectlyDecodesSpecialCharacters()
         {
-            string result = Helper.Decode("%20%25&amp;");
+            string result = Helper.Decode("%20%25%23%5e%7b%5b%7d%5d%3b%60&amp;");
 
-            Assert.AreEqual(" %&", result);
+            Assert.AreEqual(" %#^{[}];`&", result);
         }
 
         [Test]
         public void VerifyEncodeCorrectlyEncodesSpecialCharacters()
         {
-            string result = Helper.Encode(" %&");
+            string result = Helper.Encode(" %#^{[}];`&");
 
-            Assert.AreEqual("%20%25&amp;", result);
+            Assert.AreEqual("%20%25%23%5e%7b%5b%7d%5d%3b%60&amp;", result);
+        }
+
+        [Test]
+        public void VerifyEncodeWithCapitalizeCorrectlyEncodesUsingCapitals()
+        {
+            string result = Helper.Encode(" %#^{[}];`", true);
+
+            Assert.AreEqual("%20%25%23%5E%7B%5B%7D%5D%3B%60", result);
+        }
+
+        [Test]
+        public void VerifyEncodeWithCapitalizeDoesNotCapitalizeAmpersandEncoding()
+        {
+            string result = Helper.Encode("&", true);
+
+            Assert.AreEqual("&amp;", result);
         }
 
         [Test]
@@ -39,7 +55,7 @@ namespace Tests
         }
 
         [Test]
-        public void VerifyEncodeWorksCorrectlyStringWithSpacesAndPercentages()
+        public void VerifyEncodeWorksCorrectlyWithSpacesAndPercentages()
         {
             string result = Helper.Encode(" % %");
 
@@ -47,11 +63,27 @@ namespace Tests
         }
 
         [Test]
-        public void VerifyDecodeWorksCorrectlyStringWithSpacesAndPercentages()
+        public void VerifyDecodeWorksCorrectlyWithSpacesAndPercentages()
         {
             string result = Helper.Decode("%2520");
 
             Assert.AreEqual("%20", result);
+        }
+
+        [Test]
+        public void VerifyEncodeCCorrectlyEncodesString()
+        {
+            string result = Helper.EncodeC(" %#^{[}];`");
+
+            Assert.AreEqual("%20%25%23%5E%7B%5B%7D%5D%3B%60", result);
+        }
+
+        [Test]
+        public void VerifyEncodeCDoesNotEncodeAmpersand()
+        {
+            string result = Helper.EncodeC("&");
+
+            Assert.AreEqual("&", result);
         }
     }
 }

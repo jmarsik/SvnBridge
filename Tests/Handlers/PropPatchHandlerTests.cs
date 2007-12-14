@@ -52,5 +52,18 @@ namespace SvnBridge.Handlers
 
             Assert.AreEqual("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
         }
+
+        [Test]
+        public void VerifyHandleEncodesHrefElement()
+        {
+            Results r = mock.Attach(provider.SetProperty);
+            request.Path = "http://localhost:8082//!svn/wrk/208d5649-1590-0247-a7d6-831b1e447dbf/Spikes/SvnFacade/trunk/New%20Folder%2010/banner_top_project.jpg";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><S:mime-type>application/octet-stream</S:mime-type></D:prop></D:set></D:propertyupdate>";
+
+            handler.Handle(context, tfsUrl);
+
+            string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
+            Assert.IsTrue(result.Contains("<D:href>//!svn/wrk/208d5649-1590-0247-a7d6-831b1e447dbf/Spikes/SvnFacade/trunk/New%20Folder%2010/banner_top_project.jpg</D:href>"));
+        }
     }
 }

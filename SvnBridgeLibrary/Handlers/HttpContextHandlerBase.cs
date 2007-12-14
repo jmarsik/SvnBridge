@@ -64,7 +64,7 @@ namespace SvnBridge.Handlers
 
         protected static string GetPath(IHttpRequest request)
         {
-            return HttpUtility.UrlPathEncode(request.Url.LocalPath);
+            return request.Url.LocalPath;
         }
     }
 }

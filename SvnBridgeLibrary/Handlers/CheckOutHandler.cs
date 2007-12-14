@@ -22,14 +22,14 @@ namespace SvnBridge.Handlers
                 string location = CheckOut(sourceControlProvider, data, path, request.Headers["Host"]);
                 SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
                 response.AppendHeader("Cache-Control", "no-cache");
-                response.AppendHeader("Location", "http://" + request.Headers["Host"] + location);
+                response.AppendHeader("Location", "http://" + request.Headers["Host"] + Helper.EncodeC(location));
                 string responseContent =
                     "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
                     "<html><head>\n" +
                     "<title>201 Created</title>\n" +
                     "</head><body>\n" +
                     "<h1>Created</h1>\n" +
-                    "<p>Checked-out resource " + location + " has been created.</p>\n" +
+                    "<p>Checked-out resource " + Helper.Encode(location, true) + " has been created.</p>\n" +
                     "<hr />\n" +
                     "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " + request.Url.Port + "</address>\n" +
                     "</body></html>\n";

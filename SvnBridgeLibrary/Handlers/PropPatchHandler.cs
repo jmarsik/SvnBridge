@@ -54,7 +54,7 @@ namespace SvnBridge.Handlers
                     output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
                     output.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns3=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns2=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
                     output.Write("<D:response>\n");
-                    output.Write("<D:href>" + path + "</D:href>\n");
+                    output.Write("<D:href>" + Helper.Encode(path) + "</D:href>\n");
                     output.Write("<D:propstat>\n");
                     output.Write("<D:prop>\n");
                     output.Write("<ns1:" + request.Set.Prop.Properties[0].LocalName + "/>\r\n");

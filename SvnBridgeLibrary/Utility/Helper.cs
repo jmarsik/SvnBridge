@@ -159,18 +159,18 @@ namespace SvnBridge.Utility
             return sb.ToString();
         }
 
-        static readonly string[] DECODED = new string[] { "%", " ", "&" };
-        static readonly string[] ENCODED = new string[] { "%25", "%20", "&amp;" };
-
-        public static string Encode(string value)
+        private static string Encode(string[] encoded, string[] decoded, string value, bool capitalize)
         {
-            for (int i = 0; i < DECODED.Length; i++)
-                value = value.Replace(DECODED[i], ENCODED[i]);
+            for (int i = 0; i < decoded.Length; i++)
+                if (capitalize && decoded[i] != "&")
+                    value = value.Replace(decoded[i], encoded[i].ToUpper());
+                else
+                    value = value.Replace(decoded[i], encoded[i]);
 
             return value;
         }
 
-        public static string Decode(string value)
+        private static string Decode(string[] encoded, string[] decoded, string value)
         {
             for (int i = ENCODED.Length - 1; i >= 0; i--)
                 value = value.Replace(ENCODED[i], DECODED[i]);
@@ -178,24 +178,43 @@ namespace SvnBridge.Utility
             return value;
         }
 
+        static readonly string[] DECODED = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`", "&" };
+        static readonly string[] ENCODED = new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;" };
+
+        public static string Encode(string value)
+        {
+            return Encode(value, false);
+        }
+
+        public static string Encode(string value, bool capitalize)
+        {
+            return Encode(ENCODED, DECODED, value, capitalize);
+        }
+
+        public static string Decode(string value)
+        {
+            return Decode(ENCODED, DECODED, value);
+        }
+
         static readonly string[] DECODED_B = new string[] { "&", "<", ">" };
         static readonly string[] ENCODED_B = new string[] { "&amp;", "&lt;", "&gt;" };
 
         public static string EncodeB(string value)
         {
-            if (value != null)
-                for (int i = 0; i < DECODED_B.Length; i++)
-                    value = value.Replace(DECODED_B[i], ENCODED_B[i]);
-
-            return value;
+            return Encode(ENCODED_B, DECODED_B, value, false);
         }
 
         public static string DecodeB(string value)
         {
-            for (int i = ENCODED_B.Length - 1; i >= 0; i--)
-                value = value.Replace(ENCODED_B[i], DECODED_B[i]);
+            return Decode(ENCODED_B, DECODED_B, value);
+        }
 
-            return value;
+        static readonly string[] DECODED_C = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`" };
+        static readonly string[] ENCODED_C = new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60" };
+
+        public static string EncodeC(string value)
+        {
+            return Encode(ENCODED_C, DECODED_C, value, true);
         }
 
         public static string FormatDate(DateTime date)

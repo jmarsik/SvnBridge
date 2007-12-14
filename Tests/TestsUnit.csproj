@@ -66,6 +66,7 @@
     <Compile Include="Assert\ThrowsException.cs" />
     <Compile Include="Assert\TrueException.cs" />
     <Compile Include="FileNodeTests.cs" />
+    <Compile Include="Handlers\CheckoutHandlerTests.cs" />
     <Compile Include="Handlers\CopyHandlerTests.cs" />
     <Compile Include="Handlers\DeleteHandlerTests.cs" />
     <Compile Include="Handlers\GetHandlerTests.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Handlers\OptionsHandlerTests.cs" />
     <Compile Include="Handlers\PropFindHandlerTests.cs" />
     <Compile Include="Handlers\PropFindHandler\BcFileNodeTests.cs" />
+    <Compile Include="Handlers\PropFindHandler\FileNodeTests.cs" />
     <Compile Include="Handlers\PropPatchHandlerTests.cs" />
     <Compile Include="Handlers\PutHandlerTests.cs" />
     <Compile Include="Handlers\ReportHandlerTests.cs" />
