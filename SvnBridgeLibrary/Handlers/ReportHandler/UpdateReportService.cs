@@ -40,9 +40,9 @@ namespace SvnBridge.Handlers
                 }
                 else
                 {
-                    output.Write("<S:add-file name=\"" + GetFileName(item.Name) + "\">\n");
+                    output.Write("<S:add-file name=\"" + Helper.EncodeB(GetFileName(item.Name)) + "\">\n");
                 }
-                output.Write("<D:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" + Helper.Encode(item.Name) + "</D:href></D:checked-in>\n");
+                output.Write("<D:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" + Helper.Encode(item.Name,true) + "</D:href></D:checked-in>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + item.Revision.ToString() + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + Helper.FormatDate(item.LastModifiedDate) + "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:last-author\">" + item.Author + "</S:set-prop>\n");
@@ -108,12 +108,12 @@ namespace SvnBridge.Handlers
                     }
                     else
                     {
-                        output.Write("<S:add-directory name=\"" + Helper.EncodeB(GetFileName(folder.Name)) + "\" bc-url=\"/!svn/bc/" + folder.Revision + "/" + Helper.EncodeB(folder.Name) + "\">\n");
+                        output.Write("<S:add-directory name=\"" + Helper.EncodeB(GetFileName(folder.Name)) + "\" bc-url=\"/!svn/bc/" + folder.Revision + "/" + Helper.Encode(folder.Name,true) + "\">\n");
                     }
                 }
                 if (!rootFolder || updateReportRequest.UpdateTarget == null)
                 {
-                    output.Write("<D:checked-in><D:href>/!svn/ver/" + folder.Revision.ToString() + "/" + Helper.Encode(folder.Name) + "</D:href></D:checked-in>\n");
+                    output.Write("<D:checked-in><D:href>/!svn/ver/" + folder.Revision.ToString() + "/" + Helper.Encode(folder.Name,true) + "</D:href></D:checked-in>\n");
                     output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + folder.Revision.ToString() + "</S:set-prop>\n");
                     output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + Helper.FormatDate(folder.LastModifiedDate) + "</S:set-prop>\n");
                     output.Write("<S:set-prop name=\"svn:entry:last-author\">" + folder.Author + "</S:set-prop>\n");

@@ -17,7 +17,7 @@ using SvnBridge.Infrastructure;
 namespace SvnBridge.Handlers
 {
     [TestFixture]
-    public class ReportHandlerTests : HandlerTestsBase
+    public class ReportHandlerLogReportTests : HandlerTestsBase
     {
         protected ReportHandler handler = new ReportHandler();
 

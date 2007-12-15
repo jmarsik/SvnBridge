@@ -49,6 +49,7 @@
     <Compile Include="Checkout\CheckoutFolderWithAmpersandInNameTest.cs" />
     <Compile Include="Checkout\CheckoutFolderWithBinaryFileTest.cs" />
     <Compile Include="Checkout\CheckoutFolderWithEmptyFileTest.cs" />
+    <Compile Include="Checkout\CheckoutFolderWithFileContainingSpecialCharactersTest.cs" />
     <Compile Include="Checkout\CheckoutFolderWithIgnoreFileTest.cs" />
     <Compile Include="Checkout\CheckoutFolderWithOneFileTest.cs" />
     <Compile Include="Checkout\CheckoutNonexistentPathTest.cs" />
