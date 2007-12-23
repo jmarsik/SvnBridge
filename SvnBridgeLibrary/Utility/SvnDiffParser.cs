@@ -8,7 +8,7 @@ namespace SvnBridge.Utility
     {
         public static SvnDiff[] ParseSvnDiff(Stream inputStream)
         {
-            BinaryReader reader = new BinaryReader(inputStream);
+            BinaryReaderEOF reader = new BinaryReaderEOF(inputStream);
 
             byte[] signature = reader.ReadBytes(3);
             byte version = reader.ReadByte();
@@ -19,7 +19,7 @@ namespace SvnBridge.Utility
                 throw new Exception("Unsupported SVN diff version");
 
             List<SvnDiff> diffs = new List<SvnDiff>();
-            while (reader.PeekChar() != -1)
+            while (!reader.EOF)
             {
                 SvnDiff diff = new SvnDiff();
 
@@ -69,13 +69,13 @@ namespace SvnBridge.Utility
             writer.Flush();
         }
 
-        public static ulong ReadInt(BinaryReader reader)
+        public static ulong ReadInt(BinaryReaderEOF reader)
         {
             int bytesRead;
             return ReadInt(reader, out bytesRead);
         }
 
-        public static ulong ReadInt(BinaryReader reader,
+        public static ulong ReadInt(BinaryReaderEOF reader,
                                     out int bytesRead)
         {
             ulong value = 0;

@@ -129,6 +129,7 @@
     <Compile Include="SourceControl\TFSSourceControlProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\BinaryReaderEOF.cs" />
     <Compile Include="Utility\SvnDiff.cs" />
     <Compile Include="Utility\SvnDiffEngine.cs" />
     <Compile Include="Utility\SvnDiffInstruction.cs" />

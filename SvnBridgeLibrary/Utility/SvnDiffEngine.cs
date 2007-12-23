@@ -14,7 +14,7 @@ namespace SvnBridge.Utility
             int targetIndex = 0;
 
             MemoryStream instructionStream = new MemoryStream(svnDiff.InstructionSectionBytes);
-            BinaryReader instructionReader = new BinaryReader(instructionStream);
+            BinaryReaderEOF instructionReader = new BinaryReaderEOF(instructionStream);
             MemoryStream dataStream = new MemoryStream(svnDiff.DataSectionBytes);
             BinaryReader dataReader = new BinaryReader(dataStream);
 
@@ -87,9 +87,9 @@ namespace SvnBridge.Utility
             return svnDiff;
         }
 
-        static SvnDiffInstruction ReadInstruction(BinaryReader reader)
+        static SvnDiffInstruction ReadInstruction(BinaryReaderEOF reader)
         {
-            if (reader.BaseStream.Position == reader.BaseStream.Length)
+            if (reader.EOF)
                 return null;
 
             SvnDiffInstruction instruction = new SvnDiffInstruction();

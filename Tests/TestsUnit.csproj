@@ -99,6 +99,7 @@
     <Compile Include="Stubs\StubListenerView.cs" />
     <Compile Include="Presenters\ListenerViewPresenterTests.cs" />
     <Compile Include="Stubs\StubSettingsView.cs" />
+    <Compile Include="Utility\BinaryReaderEOFTests.cs" />
     <Compile Include="Utility\SvnDiffEngineTests.cs" />
     <Compile Include="Utility\HelperTests.cs" />
   </ItemGroup>
