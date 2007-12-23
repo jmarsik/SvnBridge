@@ -26,6 +26,19 @@ namespace SvnBridge.Handlers
         }
 
         [Test]
+        public void VerifyHandleCorrectlyInvokesSourceControlProviderForDeleteFile()
+        {
+            Results r = mock.Attach(provider.DeleteItem, true);
+            request.Path = "http://localhost:8082//!svn/wrk/c512ecbe-7577-ce46-939c-a9e81eb4d98e/Spikes/SvnFacade/trunk/Test4.txt";
+
+            handler.Handle(context, tfsUrl);
+
+            Assert.AreEqual(1, r.CalledCount);
+            Assert.AreEqual("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
+            Assert.AreEqual("/Spikes/SvnFacade/trunk/Test4.txt", r.Parameters[1]);
+        }
+
+        [Test]
         public void VerifyHandleDecodesPathWhenInvokingSourceControlProviderForDeleteItem()
         {
             Results r = mock.Attach(provider.DeleteItem, true);

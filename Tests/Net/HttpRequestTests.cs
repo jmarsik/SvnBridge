@@ -9,6 +9,7 @@ namespace SvnBridge.Net
     [TestFixture]
     public class HttpRequestTests
     {
+        [Test]
         public void TestParseRequestWithContentLengthGreaterThanBufferSize()
         {
             StringBuilder buffer = new StringBuilder();
@@ -24,6 +25,22 @@ namespace SvnBridge.Net
                 {
                     new ListenerRequest(stream);
                 });
+        }
+
+        [Test]
+        public void TestRequestUrlExcludesDoubleLeadingSlash()
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.Append("GET //foo/bar HTTP/1.1\r\n");
+            buffer.Append("HOST: localhost:8081\r\n");
+            buffer.AppendFormat("Content-Length: {0}\r\n", 5);
+            buffer.Append("\r\n");
+            buffer.Append("12345");
+            StubStream stream = new StubStream(Encoding.ASCII.GetBytes(buffer.ToString()));
+
+            ListenerRequest request = new ListenerRequest(stream);
+
+            Assert.Equal<string>("/foo/bar", request.Url.LocalPath);
         }
 
         class StubStream : Stream

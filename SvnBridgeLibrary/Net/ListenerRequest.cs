@@ -158,10 +158,10 @@ namespace SvnBridge.Net
         private void ParseStartLine(string startLine)
         {
             string[] startLineParts = startLine.Split(' ');
-
             httpMethod = startLineParts[0].ToLowerInvariant();
-
             path = startLineParts[1];
+            if (path.StartsWith("//"))
+                path = path.Substring(1);
         }
 
         private void ParseHeaderLine(string headerLine)

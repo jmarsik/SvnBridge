@@ -30,7 +30,7 @@ namespace SvnBridge.Handlers
                     "<title>404 Not Found</title>\n" +
                     "</head><body>\n" +
                     "<h1>Not Found</h1>\n" +
-                    "<p>The requested URL " + Helper.Decode(path) + " was not found on this server.</p>\n" +
+                    "<p>The requested URL /" + Helper.Decode(path) + " was not found on this server.</p>\n" +
                     "<hr>\n" +
                     "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " + request.Url.Port + "</address>\n" +
                     "</body></html>\n";
@@ -46,10 +46,10 @@ namespace SvnBridge.Handlers
                 string activityId = path.Substring(10);
                 sourceControlProvider.DeleteActivity(activityId);
             }
-            else if (path.StartsWith("//!svn/wrk/"))
+            else if (path.StartsWith("/!svn/wrk/"))
             {
-                string activityId = path.Substring(11, path.IndexOf('/', 11) - 11);
-                string filePath = path.Substring(path.IndexOf('/', 11));
+                string activityId = path.Substring(10, path.IndexOf('/', 10) - 10);
+                string filePath = path.Substring(path.IndexOf('/', 10));
                 return sourceControlProvider.DeleteItem(activityId, Helper.Decode(filePath));
             }
             return true;

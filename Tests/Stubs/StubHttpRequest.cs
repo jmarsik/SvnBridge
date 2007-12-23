@@ -46,7 +46,12 @@ namespace SvnBridge.Stubs
         {
             set
             {
-                url = new Uri(value);
+                string path = value;
+                if (path.Length > path.IndexOf("/", path.IndexOf("://") + 3) + 1)
+                    if (path.Substring(path.IndexOf("/", path.IndexOf("://") + 3), 2) == "//")
+                        path = path.Remove(path.IndexOf("/", path.IndexOf("://") + 3), 1);
+                
+                url = new Uri(path);
                 headers["Host"] = url.Authority;
             }
         }
