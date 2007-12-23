@@ -5,6 +5,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using System.Net;
 using CodePlex.TfsLibrary.Utility;
+using CodePlex.TfsLibrary;
 
 namespace SvnBridge.SourceControl
 {
@@ -37,7 +38,17 @@ namespace SvnBridge.SourceControl
         public ItemSet[] QueryItems(string tfsUrl, ICredentials credentials, string workspaceName, string workspaceOwner, ItemSpec[] items, VersionSpec version, DeletedState deletedState, ItemType itemType, bool generateDownloadUrls)
         {
             Repository webSvc = (Repository)_webSvcFactory.Create(tfsUrl, credentials);
-            return webSvc.QueryItems(workspaceName, workspaceOwner, items, version, deletedState, itemType, generateDownloadUrls);
+            try
+            {
+                return webSvc.QueryItems(workspaceName, workspaceOwner, items, version, deletedState, itemType, generateDownloadUrls);
+            }
+            catch (Exception e)
+            {
+                if (e.Message.StartsWith("TF14002:"))
+                    throw new NetworkAccessDeniedException(e);
+
+                throw;
+            }
         }
     }
 }
