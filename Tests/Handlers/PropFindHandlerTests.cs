@@ -22,7 +22,7 @@ namespace SvnBridge.Handlers
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestInvalidDepthThrowsEx()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/Folder%20With%20Spaces";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "2";
@@ -33,10 +33,10 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyBaselineRelativePathPropertyForFolderReturnsDecoded()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Folder With Spaces";
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/Folder%20With%20Spaces";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -51,10 +51,10 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
         {
-            Results r1 = mock.Attach(provider.ItemExists, true);
+            Results r1 = stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "New%20Folder%207";
-            Results r2 = mock.Attach(provider.GetItems, item);
+            Results r2 = stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/Spikes/SvnFacade/trunk/New%20Folder%207";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -68,11 +68,11 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForSvnBcFolderPath()
         {
-            Results r = mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            Results r = stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Test Project";
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/3444/Test%20Project";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -85,10 +85,10 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyDeadPropCountReturnsZero()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><deadprop-count xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -102,13 +102,13 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyCreatorDisplayName()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
             item.Revision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><creator-displayname xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -122,14 +122,14 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyCreationDate()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
             item.Revision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><creationdate xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -143,14 +143,14 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyVersionName()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
             item.Revision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-name xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -164,15 +164,15 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyGetContentLengthForFolder()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
             item.Revision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
-            mock.Attach(provider.GetItems, item);
-            mock.Attach(provider.ReadFile, new byte[4] {0, 1, 2, 3});
+            stub.Attach(provider.GetItems, item);
+            stub.Attach(provider.ReadFile, new byte[4] {0, 1, 2, 3});
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getcontentlength xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
@@ -186,10 +186,10 @@ namespace SvnBridge.Handlers
         [Test]
         public void TestPropFindLockDiscovery()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
 
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:propfind xmlns:D='DAV:'><D:prop><D:lockdiscovery/></D:prop></D:propfind>";
@@ -204,11 +204,11 @@ namespace SvnBridge.Handlers
         [Test]
         public void TestBcMd5Checksum()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            mock.Attach(provider.GetItems, item);
-            mock.Attach(provider.ReadFile, new byte[4] { 0, 1, 2, 3 });
+            stub.Attach(provider.GetItems, item);
+            stub.Attach(provider.ReadFile, new byte[4] { 0, 1, 2, 3 });
 
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo/Bar.txt";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:propfind xmlns:D='DAV:'><D:prop><D:md5-checksum/></D:prop></D:propfind>";
@@ -225,7 +225,7 @@ namespace SvnBridge.Handlers
         {   
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
             
             BcFileNode node = new BcFileNode(1234, item, provider);
 
@@ -236,11 +236,11 @@ namespace SvnBridge.Handlers
         [Test]
         public void TestCorrectlyInvokesProviderWithBcPathAndDepthOne()
         {
-            mock.Attach(provider.ItemExists, true);
-            mock.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.IsDirectory, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Foo";
-            Results results = mock.Attach(provider.GetItems, folder);
+            Results results = stub.Attach(provider.GetItems, folder);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "1";
@@ -256,14 +256,14 @@ namespace SvnBridge.Handlers
         [Test]
         public void TestPropFindWithDepthOneIncludesFolderAndChildren()
         {
-            mock.Attach(provider.ItemExists, true);
+            stub.Attach(provider.ItemExists, true);
             MultipleReturnValues returnValues = new MultipleReturnValues();
             returnValues.Add(true);
             returnValues.Add(false);
-            mock.Attach(provider.IsDirectory, returnValues);
+            stub.Attach(provider.IsDirectory, returnValues);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Foo";
-            mock.Attach(provider.GetItems, folder);
+            stub.Attach(provider.GetItems, folder);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
             folder.Items.Add(item);
@@ -296,7 +296,7 @@ namespace SvnBridge.Handlers
             item.Revision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
-            mock.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItems, item);
         }
 
         [Test]
@@ -477,8 +477,8 @@ namespace SvnBridge.Handlers
             item.Revision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Parse("2007-08-14T23:08:22.908519Z");
-            mock.Attach(provider.GetItems, item);
-            mock.Attach(provider.ReadFile, new byte[4] { 0, 1, 2, 3 });
+            stub.Attach(provider.GetItems, item);
+            stub.Attach(provider.ReadFile, new byte[4] { 0, 1, 2, 3 });
         }
 
         private void ArrangeRequest()

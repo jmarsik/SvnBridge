@@ -16,7 +16,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleCorrectlyCallsSourceControlProviderForCheckinComment()
         {
-            Results r = mock.Attach(provider.SetActivityComment);
+            Results r = stub.Attach(provider.SetActivityComment);
             request.Path = "http://localhost:8082//!svn/wbl/c512ecbe-7577-ce46-939c-a9e81eb4d98e/5465";
             request.Input = "<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">Test comment</log></D:prop></D:set>\n</D:propertyupdate>\n";
 
@@ -29,7 +29,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleCorrectlyCallsSourceControlProviderForSetProperty()
         {
-            Results r = mock.Attach(provider.SetProperty);
+            Results r = stub.Attach(provider.SetProperty);
             request.Path = "http://localhost:8082//!svn/wrk/be05cf36-7514-3f4d-81ea-7822f7b1dfe7/Folder1";
             request.Input = "<D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><S:ignore>*.bad\n</S:ignore></D:prop></D:set></D:propertyupdate>";
 
@@ -44,7 +44,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleCallsSourceControlProviderWithCorrectActivityIdWhenPathHasOneSlashAfterHostname()
         {
-            Results r = mock.Attach(provider.SetActivityComment);
+            Results r = stub.Attach(provider.SetActivityComment);
             request.Path = "http://localhost:8082/!svn/wbl/c512ecbe-7577-ce46-939c-a9e81eb4d98e/5465";
             request.Input = "<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">Test comment</log></D:prop></D:set>\n</D:propertyupdate>\n";
 
@@ -56,7 +56,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleEncodesHrefElement()
         {
-            Results r = mock.Attach(provider.SetProperty);
+            Results r = stub.Attach(provider.SetProperty);
             request.Path = "http://localhost:8082//!svn/wrk/208d5649-1590-0247-a7d6-831b1e447dbf/Spikes/SvnFacade/trunk/New%20Folder%2010/banner_top_project.jpg";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><S:mime-type>application/octet-stream</S:mime-type></D:prop></D:set></D:propertyupdate>";
 
@@ -69,7 +69,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyCorrectOutputForPropertyUpdate()
         {
-            Results r = mock.Attach(provider.SetProperty);
+            Results r = stub.Attach(provider.SetProperty);
             request.Path = "http://localhost:8082//!svn/wrk/be05cf36-7514-3f4d-81ea-7822f7b1dfe7/Spikes/SvnFacade/trunk/New%20Folder%204";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><S:ignore>*.bad\n</S:ignore></D:prop></D:set></D:propertyupdate>";
 
@@ -95,7 +95,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyCorrectOutputForLog()
         {
-            Results r = mock.Attach(provider.SetActivityComment);
+            Results r = stub.Attach(provider.SetActivityComment);
             request.Path = "http://localhost:8082//!svn/wbl/c512ecbe-7577-ce46-939c-a9e81eb4d98e/5465";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">Deleted a file</log></D:prop></D:set>\n</D:propertyupdate>\n";
 

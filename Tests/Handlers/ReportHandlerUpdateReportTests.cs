@@ -34,10 +34,10 @@ namespace SvnBridge.Handlers
             folder.Items[0].Author = "jwanagel";
             folder.Items[0].Revision = 5700;
             folder.Items[0].LastModifiedDate = DateTime.Parse("2007-09-05T18:37:14.239559Z");
-            Results r = mock.Attach(provider.GetChangedItems, folder);
-            mock.Attach(provider.ItemExists, false);
+            Results r = stub.Attach(provider.GetChangedItems, folder);
+            stub.Attach(provider.ItemExists, false);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            mock.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFile, fileData);
             request.Path = "http://localhost:8082/!svn/vcc/default";
             request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5700</S:target-revision><S:entry rev=\"5699\" ></S:entry></S:update-report>";
 
@@ -91,8 +91,8 @@ namespace SvnBridge.Handlers
             folder.Items[0].LastModifiedDate = DateTime.Parse("2007-08-21T00:41:27.680005Z");
             ((FolderMetaData)folder.Items[0]).Items.Add(new DeleteMetaData());
             ((FolderMetaData)folder.Items[0]).Items[0].Name = "Test.txt";
-            Results r = mock.Attach(provider.GetChangedItems, folder);
-            mock.Attach(provider.ItemExists, true);
+            Results r = stub.Attach(provider.GetChangedItems, folder);
+            stub.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/!svn/vcc/default";
             request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5698</S:target-revision><S:entry rev=\"5697\" ></S:entry></S:update-report>";
 
@@ -138,8 +138,8 @@ namespace SvnBridge.Handlers
             folder.Author = "jwanagel";
             folder.Revision = 5713;
             folder.LastModifiedDate = DateTime.Parse("2007-09-17T02:38:24.225369Z");
-            mock.Attach(provider.GetChangedItems, folder);
-            mock.Attach(provider.GetLatestVersion, 5713);
+            stub.Attach(provider.GetChangedItems, folder);
+            stub.Attach(provider.GetLatestVersion, 5713);
 
             request.Path = "http://localhost:8085/!svn/vcc/default";
             request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8085</S:src-path><S:entry rev=\"5713\" ></S:entry></S:update-report>";
@@ -177,9 +177,9 @@ namespace SvnBridge.Handlers
             item.Author = "bradwils";
             item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(item);
-            mock.Attach(provider.GetItems, metadata);
+            stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            mock.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFile, fileData);
 
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
@@ -204,9 +204,9 @@ namespace SvnBridge.Handlers
             item.Author = "bradwils";
             item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(item);
-            mock.Attach(provider.GetItems, metadata);
+            stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            mock.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFile, fileData);
 
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
@@ -231,9 +231,9 @@ namespace SvnBridge.Handlers
             folder.Author = "bradwils";
             folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(folder);
-            mock.Attach(provider.GetItems, metadata);
+            stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            mock.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFile, fileData);
 
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
@@ -258,9 +258,9 @@ namespace SvnBridge.Handlers
             folder.Author = "bradwils";
             folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(folder);
-            mock.Attach(provider.GetItems, metadata);
+            stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            mock.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFile, fileData);
 
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";

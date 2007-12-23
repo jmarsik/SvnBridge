@@ -13,7 +13,7 @@ namespace SvnBridge.Infrastructure
 {
     public abstract class HandlerTestsBase
     {
-        protected MyMocks mock = new MyMocks();
+        protected MyMocks stub = new MyMocks();
         protected StubSourceControlProvider provider;
         protected StubHttpContext context;
         protected StubHttpRequest request;
@@ -23,7 +23,7 @@ namespace SvnBridge.Infrastructure
         [SetUp]
         public virtual void Setup()
         {
-            provider = mock.CreateObject<StubSourceControlProvider>();
+            provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             context = new StubHttpContext();
             request = new StubHttpRequest();

@@ -18,8 +18,8 @@ namespace SvnBridge.Handlers
         {
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            Results getItemsResult = mock.Attach(provider.GetItems, item);
-            Results readFileResult = mock.Attach(provider.ReadFile, Encoding.Default.GetBytes("asdf"));
+            Results getItemsResult = stub.Attach(provider.GetItems, item);
+            Results readFileResult = stub.Attach(provider.ReadFile, Encoding.Default.GetBytes("asdf"));
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo/Bar.txt";
 
             handler.Handle(context, tfsUrl);

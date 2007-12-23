@@ -16,7 +16,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
         {
-            Results r = mock.Attach(provider.WriteFile, false);
+            Results r = stub.Attach(provider.WriteFile, false);
             request.Path = "http://localhost:8082//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New%20Folder%207/Empty%20File%202.txt";
             request.Input = "SVN\0";
 
@@ -28,7 +28,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyCorrectOutput()
         {
-            Results r = mock.Attach(provider.WriteFile, true);
+            Results r = stub.Attach(provider.WriteFile, true);
             request.Path = "http://localhost:8082//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New%20Folder%207/Empty%20File%202.txt";
             request.Input = "SVN\0";
 

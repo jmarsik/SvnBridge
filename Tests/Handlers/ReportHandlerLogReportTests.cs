@@ -28,7 +28,7 @@ namespace SvnBridge.Handlers
             SourceItemHistory history1 = new SourceItemHistory(5531, "jwanagel", DateTime.Parse("2007-07-24T07:46:20.635845Z"), "Renamed file");
             history1.Changes.Add(TestHelper.MakeChange(ChangeType.Rename, "$/newFolder3/NewFileRename.txt", "$/newFolder3/NewFile.txt", 5530));
             histories.Add(history1);
-            Results r = mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder2", histories.ToArray()));
+            Results r = stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder2", histories.ToArray()));
             request.Path = "http://localhost:8082/!svn/bc/5522/File.txt";
             request.Input = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5531</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
 
@@ -66,7 +66,7 @@ namespace SvnBridge.Handlers
             SourceItemHistory history1 = new SourceItemHistory(5679, "jwanagel", DateTime.Parse("2007-08-17T21:47:11.400569Z"), "made a copy");
             history1.Changes.Add(TestHelper.MakeChange(ChangeType.Branch, "$/Test3Branch.txt", "$/Test3.txt", 5678));
             histories.Add(history1);
-            Results r = mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/", histories.ToArray()));
+            Results r = stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/", histories.ToArray()));
             request.Path = "http://localhost:8082/!svn/bc/5679/Test3Branch.txt";
             request.Input = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5679</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:strict-node-history/><S:path></S:path></S:log-report>";
 
@@ -103,7 +103,7 @@ namespace SvnBridge.Handlers
             history1.Changes.Add(TestHelper.MakeChange(ChangeType.Rename, "$/newFolder4/E!@#$%^&()~`_-+={[}];',.txt", "$/newFolder4/D!@#$%^&()~`_-+={[}];',.txt", 5531));
             history1.Changes.Add(TestHelper.MakeChange(ChangeType.Branch, "$/newFolder4/G!@#$%^&()~`_-+={[}];',.txt", "$/newFolder4/F!@#$%^&()~`_-+={[}];',.txt", 5531));
             histories.Add(history1);
-            Results r = mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder4", histories.ToArray()));
+            Results r = stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder4", histories.ToArray()));
             request.Path = "http://localhost:8082/!svn/bc/5532/newFolder4";
             request.Input = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5532</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
 
@@ -136,7 +136,7 @@ namespace SvnBridge.Handlers
             SourceItemHistory history1 = new SourceItemHistory(5696, "jwanagel", DateTime.Parse("2007-08-20T03:23:41.054140Z"), "1234");
             history1.Changes.Add(TestHelper.MakeChange(ChangeType.Delete, "$/Folder9"));
             histories.Add(history1);
-            Results r = mock.Attach(provider.GetLog, new LogItem(@"C:\", "$/", histories.ToArray()));
+            Results r = stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/", histories.ToArray()));
             request.Path = "http://localhost:8082/!svn/bc/5696";
             request.Input = "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5696</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:strict-node-history/><S:path></S:path></S:log-report>";
 

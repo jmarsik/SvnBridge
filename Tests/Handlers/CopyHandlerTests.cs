@@ -21,7 +21,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleProducesCorrectOutput()
         {
-            Results r = mock.Attach(provider.CopyItem);
+            Results r = stub.Attach(provider.CopyItem);
             request.Path = "http://localhost:8082/!svn/bc/5522/File.txt";
             request.Headers["Destination"] = "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt";
 

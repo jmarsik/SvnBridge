@@ -17,7 +17,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleCorrectlyInvokesSourceControlProvider()
         {
-            Results r = mock.Attach(provider.MakeCollection);
+            Results r = stub.Attach(provider.MakeCollection);
             request.Path = "http://localhost:8081//!svn/wrk/5b34ae67-87de-3741-a590-8bda26893532/Spikes/SvnFacade/trunk/Empty";
 
             handler.Handle(context, tfsUrl);
@@ -30,7 +30,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyPathIsDecodedWhenCallingSourceControlProvider()
         {
-            Results r = mock.Attach(provider.MakeCollection);
+            Results r = stub.Attach(provider.MakeCollection);
             request.Path = "http://localhost:8081//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Folder%20With%20Spaces";
 
             handler.Handle(context, tfsUrl);
@@ -41,7 +41,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyCorrectOutputForSuccessfulCreate()
         {
-            Results r = mock.Attach(provider.MakeCollection);
+            Results r = stub.Attach(provider.MakeCollection);
             request.Path = "http://localhost:8082//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Spikes/SvnFacade/trunk/New%20Folder%206";
 
             handler.Handle(context, tfsUrl);
@@ -66,7 +66,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyCorrectOutputWhenFolderAlreadyExists()
         {
-            mock.Attach(provider.MakeCollection, new FolderAlreadyExistsException());
+            stub.Attach(provider.MakeCollection, new FolderAlreadyExistsException());
             request.Path = "http://localhost:8082//!svn/wrk/de1ec288-d55c-6146-950d-ceaf2ce9403b/newdir";
 
             handler.Handle(context, tfsUrl);
