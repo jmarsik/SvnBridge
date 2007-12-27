@@ -10,6 +10,7 @@ namespace SvnBridge.SourceControl
         bool DeleteItem(string activityId, string path);
         FolderMetaData GetChangedItems(string path, int versionFrom, int VersionTo, UpdateReportData reportData);
         ItemMetaData GetItems(int version, string path, Recursion recursion);
+        ItemMetaData GetItemInActivity(string activityId, string path);
         int GetLatestVersion();
         LogItem GetLog(string path, int versionFrom, int versionTo, Recursion recursion, int maxCount);
         bool IsDirectory(int version, string path);

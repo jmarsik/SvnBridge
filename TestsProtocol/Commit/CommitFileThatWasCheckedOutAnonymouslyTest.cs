@@ -403,7 +403,7 @@ namespace Tests
         {
             stub.Attach(provider.ItemExists, false);
             ItemMetaData item = new ItemMetaData();
-            stub.Attach(provider.GetItems, item);
+            stub.Attach(provider.GetItemInActivity, item);
             stub.Attach(provider.ReadFile, Encoding.Default.GetBytes("Fun text\r\nMore"));
             stub.Attach(provider.WriteFile, false);
 

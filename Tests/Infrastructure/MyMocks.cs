@@ -76,6 +76,12 @@ namespace Tests
             return base.Attach((Delegate)method, throwException);
         }
 
+        public delegate ItemMetaData GetItemInActivity(string activityId, string path);
+        public Results Attach(GetItemInActivity method, ItemMetaData returnValue)
+        {
+            return base.Attach((Delegate)method, (ItemMetaData)returnValue);
+        }
+
         public delegate ItemMetaData GetItems(int version, string path, Recursion recursion);
         public Results Attach(GetItems method, ItemMetaData returnValue)
         {

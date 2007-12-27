@@ -95,7 +95,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitNewFileInNewFolder()
+        public void TestCommitNewFolderContainingNewFile()
         {
             byte[] fileData = GetBytes("Test file contents");
 
@@ -380,7 +380,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitRenameAndEditFile()
+        public void TestCommitRenameAndUpdateFile()
         {
             WriteFile(_testPath + "/Fun.txt", "Fun text", true);
             byte[] updatedText = GetBytes("Test file contents");
@@ -401,7 +401,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitOfMoveFileOutOfFolderAndDeleteFolder()
+        public void TestCommitMoveFileOutOfFolderAndDeleteFolder()
         {
             CreateFolder(_testPath + "/TestFolder", false);
             bool created = WriteFile(_testPath + "/TestFolder/TestFile.txt", "Test file contents", true);
@@ -437,7 +437,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitMovedAndUpdatedFile()
+        public void TestCommitMoveAnUpdateFile()
         {
             CreateFolder(_testPath + "/Nodes", false);
             WriteFile(_testPath + "/Nodes/Fun.txt", "filedata", false);
@@ -460,7 +460,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitMovedFolderWithUpdatedFile()
+        public void TestCommitMoveFolderWithUpdatedFile()
         {
             CreateFolder(_testPath + "/A", false);
             WriteFile(_testPath + "/A/Test.txt", "filedata", false);
@@ -484,7 +484,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitMovedFileFromDeletedFolder()
+        public void TestCommitMoveFileFromDeletedFolder()
         {
             CreateFolder(_testPath + "/A", false);
             WriteFile(_testPath + "/A/Test.txt", "filedata", true);
@@ -503,7 +503,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitMultipleMovedFilesFromDeletedFolder()
+        public void TestCommitMoveMultipleFilesFromDeletedFolder()
         {
             CreateFolder(_testPath + "/A", false);
             WriteFile(_testPath + "/A/Test1.txt", "filedata", false);
@@ -553,7 +553,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitRenamedFolderAndDeleteFileWithinFolder()
+        public void TestCommitRenameFolderAndDeleteFileWithinFolder()
         {
             CreateFolder(_testPath + "/A", false);
             WriteFile(_testPath + "/A/Test1.txt", "filedata", true);
@@ -574,7 +574,7 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitRenamedFolderContainingRenamedFile()
+        public void TestCommitRenameFolderContainingRenamedFile()
         {
             CreateFolder(_testPath + "/A", false);
             WriteFile(_testPath + "/A/Test1.txt", "filedata", true);
@@ -598,7 +598,36 @@ namespace Tests
         }
 
         [Test]
-        public void TestCommitMovedAndUpdatedFileThenDeleteFolderThatContainedFile()
+        public void TestCommitRenameFolderContainingUpdatedFile()
+        {
+            CreateFolder(_testPath + "/A", false);
+            WriteFile(_testPath + "/A/Test.txt", "filedata", true);
+
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            _provider.CopyItem(_activityId, _testPath + "/A", _testPath + "/B");
+            bool created = _provider.WriteFile(_activityId, _testPath + "/B/Test.txt", GetBytes("filedata2"));
+            MergeActivityResponse response = Commit();
+
+            // Assert state of TFS database
+            Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.IsTrue(_provider.ItemExists(_testPath + "/B"));
+            Assert.IsTrue(_provider.ItemExists(_testPath + "/B/Test.txt"));
+            Assert.AreEqual("filedata2", ReadFile(_testPath + "/B/Test.txt"));
+            // Assert TFS history
+            LogItem log1 = _provider.GetLog(_testPath + "/B", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[0].ChangeType);
+            LogItem log2 = _provider.GetLog(_testPath + "/B/Test.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Edit | ChangeType.Rename, log2.History[0].Changes[0].ChangeType);
+            // Assert commit output
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/Test.txt", ItemType.File));
+        }
+
+        [Test]
+        public void TestCommitMoveAnUpdatedFileThenDeleteFolderThatContainedFile()
         {
             CreateFolder(_testPath + "/A", false);
             CreateFolder(_testPath + "/B", false);

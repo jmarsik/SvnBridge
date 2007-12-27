@@ -126,5 +126,18 @@ namespace IntegrationTests
 
             Assert.AreEqual(revision, item.Items[0].Revision);
         }
+
+        [Test]
+        public void TestGetItemInActivityReturnsCorrectItemIfIsInRenamedFolder()
+        {
+            CreateFolder(_testPath + "/A", false);
+            WriteFile(_testPath + "/A/Test.txt", "filedata", true);
+            DeleteItem(_testPath + "/A", false);
+            CopyItem(_testPath + "/A", _testPath + "/B", false);
+
+            ItemMetaData item = _provider.GetItemInActivity(_activityId, _testPath + "/B/Test.txt");
+
+            Assert.AreEqual(_testPath.Substring(1) + "/A/Test.txt", item.Name);
+        }
     }
 }

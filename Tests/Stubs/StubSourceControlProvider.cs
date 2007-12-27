@@ -8,6 +8,11 @@ namespace Tests
 {
     public class StubSourceControlProvider : ISourceControlProvider
     {
+        public virtual ItemMetaData GetItemInActivity(string activityId, string path)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
         public virtual void MakeActivity(string activityId)
         {
             throw new Exception("The method or operation is not implemented.");

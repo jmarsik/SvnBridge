@@ -260,6 +260,17 @@ namespace SvnBridge.SourceControl
             return root;
         }
 
+        public ItemMetaData GetItemInActivity(string activityId, string path)
+        {
+            Activity activity = _activities[activityId];
+
+            foreach (CopyAction copy in activity.CopiedItems)
+                if (path.StartsWith(copy.TargetPath))
+                    path = copy.Path + path.Substring(copy.TargetPath.Length);
+
+            return GetItems(-1, path, Recursion.None);
+        }
+
         public ItemMetaData GetItems(int version, string path, Recursion recursion)
         {
             return GetItems(version, path, recursion, false);

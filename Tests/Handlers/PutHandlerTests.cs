@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Attach;
 using SvnBridge.Infrastructure;
 using System.IO;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
@@ -14,7 +15,7 @@ namespace SvnBridge.Handlers
         protected PutHandler handler = new PutHandler();
 
         [Test]
-        public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
+        public void TestPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
         {
             Results r = stub.Attach(provider.WriteFile, false);
             request.Path = "http://localhost:8082//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New%20Folder%207/Empty%20File%202.txt";
@@ -26,7 +27,33 @@ namespace SvnBridge.Handlers
         }
 
         [Test]
-        public void VerifyCorrectOutput()
+        [ExpectedException(typeof(Exception), ExpectedMessage="Checksum mismatch with base file")]
+        public void TestThrowsExceptionIfBaseFileDoesNotMatchChecksum()
+        {
+            stub.Attach(provider.GetItemInActivity, new ItemMetaData());
+            stub.Attach(provider.ReadFile, new byte[] { });
+            request.Path = "http://localhost:8082//!svn/wrk/61652fe8-44cd-8d43-810f-c95deccc6db3/Test.txt";
+            request.Input = "SVN\0\0\u0004\u0008\u0001\u0008\u0088bbbb111a";
+            request.Headers["X-SVN-Base-Fulltext-MD5"] = "65ba841e01d6db7733e90a5b7f9e6f80";
+
+            handler.Handle(context, tfsUrl);
+        }
+
+        [Test]
+        [ExpectedException(typeof(Exception), ExpectedMessage = "Checksum mismatch with base file")]
+        public void TestThrowsExceptionIfBaseFileDoesNotMatchChecksumWhenUpdateToEmptyFile()
+        {
+            stub.Attach(provider.GetItemInActivity, new ItemMetaData());
+            stub.Attach(provider.ReadFile, new byte[] { });
+            request.Path = "http://localhost:8082//!svn/wrk/61652fe8-44cd-8d43-810f-c95deccc6db3/Test.txt";
+            request.Input = "SVN\0";
+            request.Headers["X-SVN-Base-Fulltext-MD5"] = "65ba841e01d6db7733e90a5b7f9e6f80";
+
+            handler.Handle(context, tfsUrl);
+        }
+
+        [Test]
+        public void TestCorrectOutput()
         {
             Results r = stub.Attach(provider.WriteFile, true);
             request.Path = "http://localhost:8082//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New%20Folder%207/Empty%20File%202.txt";
