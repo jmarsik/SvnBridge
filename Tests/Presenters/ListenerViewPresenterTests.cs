@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using SvnBridge.Stubs;
 using Assert=CodePlex.NUnitExtensions.Assert;
+using System.Windows.Forms;
 
 namespace SvnBridge.Presenters
 {
@@ -171,7 +172,7 @@ namespace SvnBridge.Presenters
                 {
                     stubSettingsView.Presenter.Port = 8082;
                     stubSettingsView.Presenter.TfsUrl = "http://foo";
-                    stubSettingsView.Presenter.Cancelled = true;
+                    stubSettingsView.DialogResult_Return = DialogResult.Cancel;
                 };
 
             presenter.ChangeSettings(stubSettingsView);

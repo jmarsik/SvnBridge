@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using SvnBridge.Stubs;
 using Assert = CodePlex.NUnitExtensions.Assert;
+using System.Windows.Forms;
 
 namespace SvnBridge.Presenters
 {
@@ -31,7 +32,7 @@ namespace SvnBridge.Presenters
             stubView.Show_Delegate =
                 delegate
                 {
-                    stubView.Presenter.Cancelled = true;
+                    stubView.DialogResult_Return = DialogResult.Cancel;
                 };
             SettingsViewPresenter presenter = CreatePresenter();
 

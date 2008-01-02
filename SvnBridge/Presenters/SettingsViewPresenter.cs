@@ -1,4 +1,5 @@
 using SvnBridge.Views;
+using System.Windows.Forms;
 
 namespace SvnBridge.Presenters
 {
@@ -18,8 +19,13 @@ namespace SvnBridge.Presenters
 
         public bool Cancelled
         {
-            get { return cancelled; }
-            set { cancelled = value; }
+            get
+            {
+                if (view.DialogResult == DialogResult.Cancel)
+                    return true;
+                else
+                    return false;
+            }
         }
 
         public int Port

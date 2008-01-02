@@ -79,8 +79,6 @@ namespace SvnBridge.Views
 
         private void OnCancelButtonClicked(object sender, EventArgs e)
         {
-            presenter.Cancelled = true;
-
             DialogResult = DialogResult.Cancel;
             Close();
         }

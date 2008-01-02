@@ -1,5 +1,6 @@
 using SvnBridge.Presenters;
 using SvnBridge.Views;
+using System.Windows.Forms;
 
 namespace SvnBridge.Stubs
 {
@@ -10,6 +11,7 @@ namespace SvnBridge.Stubs
         public SettingsViewPresenter PresenterProperty;
         public bool Show_Called;
         public ShowDelegate Show_Delegate;
+        public DialogResult DialogResult_Return;
 
         #region ISettingsView Members
 
@@ -25,6 +27,11 @@ namespace SvnBridge.Stubs
                 Show_Delegate();
                 
             Show_Called = true;
+        }
+
+        public DialogResult DialogResult
+        {
+            get { return DialogResult_Return; }
         }
 
         #endregion
