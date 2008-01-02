@@ -322,7 +322,7 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            folder.Revision = 5718;
+            folder.ItemRevision = 5718;
             stub.Attach(provider.GetItems, folder);
 
             string request =
@@ -371,7 +371,7 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
-            item.Revision = 5718;
+            item.ItemRevision = 5718;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -471,7 +471,7 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
-            item.Revision = 5718;
+            item.ItemRevision = 5718;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -518,7 +518,7 @@ namespace Tests
         public void Test12()
         {
             ItemMetaData item = new ItemMetaData();
-            item.Revision = 0;
+            item.ItemRevision = 0;
             stub.Attach(provider.GetItems, item);
 
             string request =

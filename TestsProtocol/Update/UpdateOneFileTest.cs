@@ -399,12 +399,12 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk";
-            metadata.Revision = 5460;
+            metadata.ItemRevision = 5460;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-05-28T02:59:20.395367Z");
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/Test.txt";
-            item.Revision = 5460;
+            item.ItemRevision = 5460;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-05-28T02:59:20.395367Z");
             metadata.Items.Add(item);

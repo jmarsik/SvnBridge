@@ -18,7 +18,7 @@ namespace SvnBridge.Handlers
         public void VerifyHandleEncodesLocationResponseHeader()
         {
             ItemMetaData item = new ItemMetaData();
-            item.Revision = 0;
+            item.ItemRevision = 0;
             Results r = stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8084/!svn/ver/5718/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',~%60..txt";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:activity-set></D:checkout>";
@@ -32,7 +32,7 @@ namespace SvnBridge.Handlers
         public void VerifyHandleEncodesCheckedOutResourceOutput()
         {
             ItemMetaData item = new ItemMetaData();
-            item.Revision = 0;
+            item.ItemRevision = 0;
             Results r = stub.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8084/!svn/ver/5718/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',~%60..txt";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:activity-set></D:checkout>";

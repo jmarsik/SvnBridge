@@ -1079,12 +1079,12 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk/New Folder 11";
-            metadata.Revision = 5479;
+            metadata.ItemRevision = 5479;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-06-18T08:04:51.247115Z");
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 11/arrow_sm.gif";
-            item.Revision = 5479;
+            item.ItemRevision = 5479;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-18T08:04:51.247115Z");
             item.Properties["mime-type"] = "application/octet-stream";

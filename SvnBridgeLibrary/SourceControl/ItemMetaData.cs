@@ -7,7 +7,8 @@ namespace SvnBridge.SourceControl
     public class ItemMetaData
     {
         public int Id;
-        public int Revision;
+        public int ItemRevision;
+        public int PropertyRevision;
         public string Name;
         public string Author;
         public DateTime LastModifiedDate;
@@ -19,6 +20,17 @@ namespace SvnBridge.SourceControl
         public virtual ItemType ItemType
         {
             get { return ItemType.File; }
+        }
+
+        public virtual int Revision
+        {
+            get
+            {
+                if (PropertyRevision > ItemRevision)
+                    return PropertyRevision;
+                else
+                    return ItemRevision;
+            }
         }
     }
 }

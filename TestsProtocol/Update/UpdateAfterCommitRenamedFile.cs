@@ -400,7 +400,7 @@ namespace Tests
             stub.Attach(provider.ItemExists, false);
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "";
-            metadata.Revision = 5525;
+            metadata.ItemRevision = 5525;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-07-23T20:50:18.801099Z");
             DeleteMetaData deletedFile = new DeleteMetaData();
@@ -408,7 +408,7 @@ namespace Tests
             metadata.Items.Add(deletedFile);
             ItemMetaData newFile = new ItemMetaData();
             newFile.Name = "Fun3.txt";
-            newFile.Revision = 5525;
+            newFile.ItemRevision = 5525;
             newFile.Author = "jwanagel";
             newFile.LastModifiedDate = DateTime.Parse("2007-07-23T20:50:18.801099Z");
             metadata.Items.Add(newFile);

@@ -399,12 +399,12 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "";
-            metadata.Revision = 5551;
+            metadata.ItemRevision = 5551;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-08-08T20:54:17.904624Z");
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Folder12";
-            folder.Revision = 5551;
+            folder.ItemRevision = 5551;
             folder.Author = "jwanagel";
             folder.LastModifiedDate = DateTime.Parse("2007-08-08T20:54:17.904624Z");
             folder.Properties["ignore"] = "*.ignore3\n";

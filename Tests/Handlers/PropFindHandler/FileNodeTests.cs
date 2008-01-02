@@ -30,7 +30,7 @@ namespace SvnBridge.Handlers
         {
             XmlDocument xml = new XmlDocument();
             ItemMetaData item = new ItemMetaData();
-            item.Revision = 5718;
+            item.ItemRevision = 5718;
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
             FileNode node = new FileNode(item, null);
 

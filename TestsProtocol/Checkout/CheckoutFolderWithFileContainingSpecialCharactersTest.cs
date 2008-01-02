@@ -1072,18 +1072,18 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Test";
-            metadata.Revision = 5722;
+            metadata.ItemRevision = 5722;
             metadata.Author = "bradwils";
             metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Test/B !@#$%^&()_-+={[}];',.~`";
-            folder.Revision = 5722;
+            folder.ItemRevision = 5722;
             folder.Author = "bradwils";
             folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(folder);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Test/B !@#$%^&()_-+={[}];',.~`/C !@#$%^&()_-+={[}];',.~`..txt";
-            item.Revision = 5722;
+            item.ItemRevision = 5722;
             item.Author = "bradwils";
             item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             folder.Items.Add(item);

@@ -358,8 +358,7 @@ namespace SvnBridge.SourceControl
                         if (folderItem.Name == propertyRevision.Key)
                             item = folderItem;
                 }
-                if (item.Revision < propertyRevision.Value)
-                    item.Revision = propertyRevision.Value;
+                item.PropertyRevision = propertyRevision.Value;
             }
         }
 
@@ -369,9 +368,7 @@ namespace SvnBridge.SourceControl
             ItemProperties properties = ReadPropertiesForItem(item.Name, item.ItemType, out revision);
             if (properties != null)
             {
-                if (revision > item.Revision)
-                    item.Revision = revision;
-
+                item.PropertyRevision = revision;
                 foreach (Property property in properties.Properties)
                     item.Properties[property.Name] = property.Value;
             }
@@ -685,7 +682,7 @@ namespace SvnBridge.SourceControl
 
         private void UpdateLocalVersion(string activityId, ItemMetaData item, string localPath)
         {
-            UpdateLocalVersion(activityId, item.Id, item.Revision, localPath);
+            UpdateLocalVersion(activityId, item.Id, item.ItemRevision, localPath);
         }
 
         private void UpdateLocalVersion(string activityId, int itemId, int itemRevision, string localPath)
@@ -775,7 +772,7 @@ namespace SvnBridge.SourceControl
                 if (activity.MergeList[i].Path == SERVER_PATH + copyAction.Path)
                     activity.MergeList[i].Action = ActivityItemAction.RenameDelete;
 
-            _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
+             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
             if (copyAction.Rename)
                 activity.MergeList.Add(new ActivityItem(SERVER_PATH + copyAction.TargetPath, item.ItemType, ActivityItemAction.New));
             else
@@ -909,7 +906,7 @@ namespace SvnBridge.SourceControl
                     pendingItem = new FolderMetaData();
 
                 pendingItem.Id = items[0][0].itemid;
-                pendingItem.Revision = items[0][0].latest;
+                pendingItem.ItemRevision = items[0][0].latest;
                 return pendingItem;
             }
         }
@@ -926,7 +923,7 @@ namespace SvnBridge.SourceControl
             item.Name = sourceItem.RemoteName.Substring(2);
             item.Author = "unknown";
             item.LastModifiedDate = sourceItem.RemoteDate;
-            item.Revision = sourceItem.RemoteChangesetId;
+            item.ItemRevision = sourceItem.RemoteChangesetId;
             item.DownloadUrl = sourceItem.DownloadUrl;
             return item;
         }
@@ -1043,7 +1040,7 @@ namespace SvnBridge.SourceControl
                                 StubFolderMetaData stubFolder = new StubFolderMetaData();
                                 stubFolder.RealFolder = (FolderMetaData)item;
                                 stubFolder.Name = item.Name;
-                                stubFolder.Revision = item.Revision;
+                                stubFolder.ItemRevision = item.Revision;
                                 stubFolder.LastModifiedDate = item.LastModifiedDate;
                                 stubFolder.Author = item.Author;
                                 item = stubFolder;

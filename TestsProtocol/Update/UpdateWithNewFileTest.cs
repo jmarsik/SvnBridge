@@ -400,18 +400,18 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk";
-            metadata.Revision = 5461;
+            metadata.ItemRevision = 5461;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-06-07T20:45:13.462598Z");
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Spikes/SvnFacade/trunk/New Folder 3";
-            folder.Revision = 5461;
+            folder.ItemRevision = 5461;
             folder.Author = "jwanagel";
             folder.LastModifiedDate = DateTime.Parse("2007-06-07T20:45:13.462598Z");
             metadata.Items.Add(folder);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 3/AddedFile.txt";
-            item.Revision = 5461;
+            item.ItemRevision = 5461;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-07T20:45:13.462598Z");
             folder.Items.Add(item);

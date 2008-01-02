@@ -627,6 +627,30 @@ namespace Tests
         }
 
         [Test]
+        public void TestCommitRenameFolderWithPropertiesAddedInCommitAfterFolderCreated()
+        {
+            CreateFolder(_testPath + "/A", true);
+            SetProperty(_testPath + "/A", "prop1", "val1", true);
+
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            _provider.CopyItem(_activityId, _testPath + "/A", _testPath + "/B");
+            MergeActivityResponse response = Commit();
+
+            // Assert state of TFS database
+            Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.IsTrue(_provider.ItemExists(_testPath + "/B"));
+            Assert.AreEqual("val1", _provider.GetItems(-1, _testPath + "/B", Recursion.None).Properties["prop1"]);
+            // Assert TFS history
+            LogItem log1 = _provider.GetLog(_testPath + "/B", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[0].ChangeType);
+            // Assert commit output
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+        }
+
+        [Test]
         public void TestCommitMoveAnUpdatedFileThenDeleteFolderThatContainedFile()
         {
             CreateFolder(_testPath + "/A", false);

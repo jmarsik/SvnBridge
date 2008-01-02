@@ -321,7 +321,7 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 7";
-            item.Revision = 5468;
+            item.ItemRevision = 5468;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -368,7 +368,7 @@ namespace Tests
         public void Test9()
         {
             ItemMetaData item = new ItemMetaData();
-            item.Revision = 0;
+            item.ItemRevision = 0;
             stub.Attach(provider.GetItems, item);
 
             string request =

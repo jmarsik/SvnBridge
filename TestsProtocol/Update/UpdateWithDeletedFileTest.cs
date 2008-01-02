@@ -398,12 +398,12 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk";
-            metadata.Revision = 5472;
+            metadata.ItemRevision = 5472;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-06-15T03:16:19.085017Z");
             FolderMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 8";
-            item.Revision = 5472;
+            item.ItemRevision = 5472;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-15T03:16:19.085017Z");
             metadata.Items.Add(item);

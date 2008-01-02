@@ -323,7 +323,7 @@ namespace Tests
             stub.Attach(provider.IsDirectory, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "";
-            item.Revision = 5514;
+            item.ItemRevision = 5514;
             stub.Attach(provider.GetItems, item);
 
             string request =
@@ -370,7 +370,7 @@ namespace Tests
         public void Test9()
         {
             ItemMetaData item = new ItemMetaData();
-            item.Revision = 0;
+            item.ItemRevision = 0;
             stub.Attach(provider.GetItems, item);
 
             string request =

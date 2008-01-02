@@ -1078,12 +1078,12 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk/New Folder";
-            metadata.Revision = 5385;
+            metadata.ItemRevision = 5385;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-04-09T03:54:04.385945Z");
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder/Test2.txt";
-            item.Revision = 5385;
+            item.ItemRevision = 5385;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-04-09T03:54:04.385945Z");
             metadata.Items.Add(item);

@@ -105,7 +105,7 @@ namespace SvnBridge.Handlers
             stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
-            item.Revision = 1234;
+            item.ItemRevision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
             stub.Attach(provider.GetItems, item);
@@ -125,7 +125,7 @@ namespace SvnBridge.Handlers
             stub.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
-            item.Revision = 1234;
+            item.ItemRevision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
@@ -146,7 +146,7 @@ namespace SvnBridge.Handlers
             stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
-            item.Revision = 1234;
+            item.ItemRevision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
@@ -167,7 +167,7 @@ namespace SvnBridge.Handlers
             stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
-            item.Revision = 1234;
+            item.ItemRevision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
@@ -293,7 +293,7 @@ namespace SvnBridge.Handlers
 
             item = new FolderMetaData();
             item.Name = "Foo";
-            item.Revision = 1234;
+            item.ItemRevision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
             stub.Attach(provider.GetItems, item);
@@ -474,7 +474,7 @@ namespace SvnBridge.Handlers
 
             item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            item.Revision = 1234;
+            item.ItemRevision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Parse("2007-08-14T23:08:22.908519Z");
             stub.Attach(provider.GetItems, item);

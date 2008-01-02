@@ -1071,12 +1071,12 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "";
-            metadata.Revision = 5511;
+            metadata.ItemRevision = 5511;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-06-28T00:55:30.845181Z");
             FolderMetaData item = new FolderMetaData();
             item.Name = "Test&";
-            item.Revision = 5511;
+            item.ItemRevision = 5511;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-28T00:55:30.845181Z");
             metadata.Items.Add(item);

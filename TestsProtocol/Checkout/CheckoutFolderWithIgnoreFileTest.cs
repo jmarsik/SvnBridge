@@ -1071,7 +1071,7 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk/New Folder 4";
-            metadata.Revision = 5463;
+            metadata.ItemRevision = 5463;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-06-09T07:59:44.933153Z");
             metadata.Properties["ignore"] = "*.bad\n";

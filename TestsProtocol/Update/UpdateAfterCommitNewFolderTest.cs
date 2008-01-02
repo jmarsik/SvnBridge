@@ -398,7 +398,7 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk";
-            metadata.Revision = 5486;
+            metadata.ItemRevision = 5486;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-06-25T19:33:59.018758Z");
             stub.Attach(provider.GetChangedItems, metadata);

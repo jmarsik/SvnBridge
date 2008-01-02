@@ -654,12 +654,12 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Spikes/SvnFacade/trunk/New Folder 5";
-            metadata.Revision = 5393;
+            metadata.ItemRevision = 5393;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-05-16T04:17:42.098980Z");
             ItemMetaData item = new ItemMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 5/Test1.txt";
-            item.Revision = 5393;
+            item.ItemRevision = 5393;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-05-16T04:17:42.098980Z");
             metadata.Items.Add(item);

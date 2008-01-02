@@ -27,12 +27,12 @@ namespace SvnBridge.Handlers
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.Author = "jwanagel";
-            folder.Revision = 5700;
+            folder.ItemRevision = 5700;
             folder.LastModifiedDate = DateTime.Parse("2007-09-05T18:37:14.239559Z");
             folder.Items.Add(new ItemMetaData());
             folder.Items[0].Name = "asfd2.txt";
             folder.Items[0].Author = "jwanagel";
-            folder.Items[0].Revision = 5700;
+            folder.Items[0].ItemRevision = 5700;
             folder.Items[0].LastModifiedDate = DateTime.Parse("2007-09-05T18:37:14.239559Z");
             Results r = stub.Attach(provider.GetChangedItems, folder);
             stub.Attach(provider.ItemExists, false);
@@ -82,12 +82,12 @@ namespace SvnBridge.Handlers
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.Author = "jwanagel";
-            folder.Revision = 5698;
+            folder.ItemRevision = 5698;
             folder.LastModifiedDate = DateTime.Parse("2007-08-21T00:41:27.680005Z");
             folder.Items.Add(new FolderMetaData());
             folder.Items[0].Name = "Test9";
             folder.Items[0].Author = "jwanagel";
-            folder.Items[0].Revision = 5698;
+            folder.Items[0].ItemRevision = 5698;
             folder.Items[0].LastModifiedDate = DateTime.Parse("2007-08-21T00:41:27.680005Z");
             ((FolderMetaData)folder.Items[0]).Items.Add(new DeleteMetaData());
             ((FolderMetaData)folder.Items[0]).Items[0].Name = "Test.txt";
@@ -136,7 +136,7 @@ namespace SvnBridge.Handlers
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.Author = "jwanagel";
-            folder.Revision = 5713;
+            folder.ItemRevision = 5713;
             folder.LastModifiedDate = DateTime.Parse("2007-09-17T02:38:24.225369Z");
             stub.Attach(provider.GetChangedItems, folder);
             stub.Attach(provider.GetLatestVersion, 5713);
@@ -168,12 +168,12 @@ namespace SvnBridge.Handlers
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Test";
-            metadata.Revision = 5722;
+            metadata.ItemRevision = 5722;
             metadata.Author = "bradwils";
             metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             ItemMetaData item = new ItemMetaData();
             item.Name = "Test/C !@#$%^&()_-+={[}];',.~`..txt";
-            item.Revision = 5722;
+            item.ItemRevision = 5722;
             item.Author = "bradwils";
             item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(item);
@@ -195,12 +195,12 @@ namespace SvnBridge.Handlers
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Test";
-            metadata.Revision = 5722;
+            metadata.ItemRevision = 5722;
             metadata.Author = "bradwils";
             metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             ItemMetaData item = new ItemMetaData();
             item.Name = "Test/C !@#$%^&()_-+={[}];',.~`..txt";
-            item.Revision = 5722;
+            item.ItemRevision = 5722;
             item.Author = "bradwils";
             item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(item);
@@ -222,12 +222,12 @@ namespace SvnBridge.Handlers
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Test";
-            metadata.Revision = 5722;
+            metadata.ItemRevision = 5722;
             metadata.Author = "bradwils";
             metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Test/B !@#$%^&()_-+={[}];',.~`";
-            folder.Revision = 5722;
+            folder.ItemRevision = 5722;
             folder.Author = "bradwils";
             folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(folder);
@@ -249,12 +249,12 @@ namespace SvnBridge.Handlers
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "Test";
-            metadata.Revision = 5722;
+            metadata.ItemRevision = 5722;
             metadata.Author = "bradwils";
             metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Test/B !@#$%^&()_-+={[}];',.~`";
-            folder.Revision = 5722;
+            folder.ItemRevision = 5722;
             folder.Author = "bradwils";
             folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(folder);

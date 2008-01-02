@@ -398,7 +398,7 @@ namespace Tests
         {
             FolderMetaData metadata = new FolderMetaData();
             metadata.Name = "";
-            metadata.Revision = 5553;
+            metadata.ItemRevision = 5553;
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2007-08-09T00:40:07.341064Z");
             stub.Attach(provider.GetChangedItems, metadata);
