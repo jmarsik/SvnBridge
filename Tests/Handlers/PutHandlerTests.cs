@@ -77,5 +77,18 @@ namespace SvnBridge.Handlers
             Assert.AreEqual("text/html", response.ContentType);
             Assert.IsTrue(response.Headers.Contains(new KeyValuePair<string, string>("Location", "http://localhost:8082//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New Folder 7/Empty File 2.txt")));
         }
+
+        [Test]
+        public void TestResourceIsProperlyEncoded()
+        {
+            Results r = stub.Attach(provider.WriteFile, true);
+            request.Path = "http://localhost:8082//!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60..txt";
+            request.Input = "SVN\0";
+
+            handler.Handle(context, tfsUrl);
+            string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
+
+            Assert.IsTrue(result.Contains("Resource //!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A !@#$%^&amp;()_-+={[}];',.~`/B !@#$%^&amp;()_-+={[}];',.~`/C !@#$%^&amp;()_-+={[}];',.~`..txt has been created."));
+        }
     }
 }

@@ -67,6 +67,7 @@
     <Compile Include="Commit\CommitNewFolderTest.cs" />
     <Compile Include="Commit\CommitRenamedAndEditedFileTest.cs" />
     <Compile Include="Commit\CommitRenamedFileTest.cs" />
+    <Compile Include="Commit\CommitReplacedFileTest.cs" />
     <Compile Include="Commit\CommitUpdatedFileTest.cs" />
     <Compile Include="Commit\CommitUpdatedFileThatIsOutOfDateTest.cs" />
     <Compile Include="Commit\CommitUpdatedFileWithConflictAfterCheckoutTest.cs" />

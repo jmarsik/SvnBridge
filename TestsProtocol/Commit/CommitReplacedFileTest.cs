@@ -1,14 +1,14 @@
 using System;
-using System.Text;
 using CodePlex.TfsLibrary;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using SvnBridge.SourceControl;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
+using System.Text;
 
 namespace Tests
 {
     [TestFixture]
-    public class CommitUpdatedFileTest : ProtocolTestsBase
+    public class CommitReplacedFileTest : ProtocolTestsBase
     {
         [Test]
         public void Test1()
@@ -16,9 +16,9 @@ namespace Tests
             stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
-                "OPTIONS /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "OPTIONS /A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Keep-Alive: \r\n" +
                 "Connection: TE, Keep-Alive\r\n" +
                 "TE: trailers\r\n" +
@@ -31,7 +31,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 401 Authorization Required\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:30 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:47 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "WWW-Authenticate: Basic realm=\"CodePlex Subversion Repository\"\r\n" +
                 "Content-Length: 493\r\n" +
@@ -51,7 +51,7 @@ namespace Tests
                 "browser doesn't understand how to supply\n" +
                 "the credentials required.</p>\n" +
                 "<hr>\n" +
-                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8084</address>\n" +
                 "</body></html>\n";
 
             string actual = ProcessRequest(request, ref expected);
@@ -65,9 +65,9 @@ namespace Tests
             stub.Attach(provider.ItemExists, true);
 
             string request =
-                "OPTIONS /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "OPTIONS /A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Keep-Alive: \r\n" +
                 "Connection: TE, Keep-Alive\r\n" +
                 "TE: trailers\r\n" +
@@ -81,7 +81,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 200 OK\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:30 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "DAV: 1,2\r\n" +
                 "DAV: version-control,checkout,working-resource\r\n" +
@@ -108,9 +108,9 @@ namespace Tests
             stub.Attach(provider.MakeActivity);
 
             string request =
-                "MKACTIVITY /!svn/act/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1 HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "MKACTIVITY /!svn/act/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
@@ -118,10 +118,10 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 201 Created\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:31 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Cache-Control: no-cache\r\n" +
-                "Location: http://localhost:8082/!svn/act/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1\r\n" +
+                "Location: http://localhost:8084/!svn/act/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603\r\n" +
                 "Content-Length: 312\r\n" +
                 "Content-Type: text/html\r\n" +
                 "X-Pad: avoid browser bug\r\n" +
@@ -131,9 +131,9 @@ namespace Tests
                 "<title>201 Created</title>\n" +
                 "</head><body>\n" +
                 "<h1>Created</h1>\n" +
-                "<p>Activity /!svn/act/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1 has been created.</p>\n" +
+                "<p>Activity /!svn/act/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603 has been created.</p>\n" +
                 "<hr />\n" +
-                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8084</address>\n" +
                 "</body></html>\n";
 
             string actual = ProcessRequest(request, ref expected);
@@ -146,13 +146,13 @@ namespace Tests
         {
             stub.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
-            folder.Name = "Spikes/SvnFacade/trunk";
+            folder.Name = "A !@#$%^&()_-+={[}];',.~`/B !@#$%^&()_-+={[}];',.~`";
             stub.Attach(provider.GetItems, folder);
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "PROPFIND /A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Content-Length: 133\r\n" +
@@ -166,15 +166,15 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:31 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 437\r\n" +
+                "Content-Length: 514\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
                 "\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/Spikes/SvnFacade/trunk/</D:href>\n" +
+                "<D:href>/A%20!@%23$%25%5e&amp;()_-+=%7b%5b%7d%5d%3b',.~%60/B%20!@%23$%25%5e&amp;()_-+=%7b%5b%7d%5d%3b',.~%60/</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
                 "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
@@ -192,12 +192,12 @@ namespace Tests
         [Test]
         public void Test5()
         {
-            stub.Attach(provider.GetLatestVersion, 5464);
+            stub.Attach(provider.GetLatestVersion, 5724);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Content-Length: 111\r\n" +
@@ -211,7 +211,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:31 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 383\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -222,7 +222,7 @@ namespace Tests
                 "<D:href>/!svn/vcc/default</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:checked-in><D:href>/!svn/bln/5464</D:href></lp1:checked-in>\n" +
+                "<lp1:checked-in><D:href>/!svn/bln/5724</D:href></lp1:checked-in>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -238,22 +238,22 @@ namespace Tests
         public void Test6()
         {
             string request =
-                "CHECKOUT /!svn/bln/5464 HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "CHECKOUT /!svn/bln/5724 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Content-Length: 174\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
                 "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1</D:href></D:activity-set></D:checkout>";
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603</D:href></D:activity-set></D:checkout>";
 
             string expected =
                 "HTTP/1.1 201 Created\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:31 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:52 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Cache-Control: no-cache\r\n" +
-                "Location: http://localhost:8082//!svn/wbl/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1/5464\r\n" +
+                "Location: http://localhost:8084//!svn/wbl/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/5724\r\n" +
                 "Content-Length: 330\r\n" +
                 "Content-Type: text/html\r\n" +
                 "\r\n" +
@@ -262,9 +262,9 @@ namespace Tests
                 "<title>201 Created</title>\n" +
                 "</head><body>\n" +
                 "<h1>Created</h1>\n" +
-                "<p>Checked-out resource //!svn/wbl/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1/5464 has been created.</p>\n" +
+                "<p>Checked-out resource //!svn/wbl/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/5724 has been created.</p>\n" +
                 "<hr />\n" +
-                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8084</address>\n" +
                 "</body></html>\n";
 
             string actual = ProcessRequest(request, ref expected);
@@ -278,22 +278,22 @@ namespace Tests
             stub.Attach(provider.SetActivityComment);
 
             string request =
-                "PROPPATCH //!svn/wbl/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1/5464 HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "PROPPATCH //!svn/wbl/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/5724 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
-                "Content-Length: 200\r\n" +
+                "Content-Length: 198\r\n" +
                 "Content-Type: application/xml\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
                 "\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
-                "<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">An updated file</log></D:prop></D:set>\n" +
+                "<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">Replaced file</log></D:prop></D:set>\n" +
                 "</D:propertyupdate>\n";
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:31 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 348\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
@@ -301,7 +301,7 @@ namespace Tests
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response>\n" +
-                "<D:href>//!svn/wbl/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1/5464</D:href>\n" +
+                "<D:href>//!svn/wbl/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/5724</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
                 "<ns1:log/>\r\n" +
@@ -321,14 +321,14 @@ namespace Tests
         {
             stub.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
-            item.Name = "Spikes/SvnFacade/trunk";
-            item.ItemRevision = 5464;
+            item.Name = "A !@#$%^&()_-+={[}];',.~`/B !@#$%^&()_-+={[}];',.~`";
+            item.ItemRevision = 5721;
             stub.Attach(provider.GetItems, item);
 
             string request =
-                "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "PROPFIND /A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Content-Length: 111\r\n" +
@@ -342,18 +342,18 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:32 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 413\r\n" +
+                "Content-Length: 567\r\n" +
                 "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
                 "\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
                 "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/Spikes/SvnFacade/trunk/</D:href>\n" +
+                "<D:href>/A%20!@%23$%25%5e&amp;()_-+=%7b%5b%7d%5d%3b',.~%60/B%20!@%23$%25%5e&amp;()_-+=%7b%5b%7d%5d%3b',.~%60/</D:href>\n" +
                 "<D:propstat>\n" +
                 "<D:prop>\n" +
-                "<lp1:checked-in><D:href>/!svn/ver/5464/Spikes/SvnFacade/trunk</D:href></lp1:checked-in>\n" +
+                "<lp1:checked-in><D:href>/!svn/ver/5721/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60</D:href></lp1:checked-in>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -373,23 +373,23 @@ namespace Tests
             stub.Attach(provider.GetItems, item);
 
             string request =
-                "CHECKOUT /!svn/ver/5403/Spikes/SvnFacade/trunk/Test1.txt HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "CHECKOUT /!svn/ver/5721/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Content-Length: 174\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
                 "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1</D:href></D:activity-set></D:checkout>";
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603</D:href></D:activity-set></D:checkout>";
 
             string expected =
                 "HTTP/1.1 201 Created\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:32 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Cache-Control: no-cache\r\n" +
-                "Location: http://localhost:8082//!svn/wrk/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1/Spikes/SvnFacade/trunk/Test1.txt\r\n" +
-                "Content-Length: 358\r\n" +
+                "Location: http://localhost:8084//!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60\r\n" +
+                "Content-Length: 425\r\n" +
                 "Content-Type: text/html\r\n" +
                 "\r\n" +
                 "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
@@ -397,9 +397,9 @@ namespace Tests
                 "<title>201 Created</title>\n" +
                 "</head><body>\n" +
                 "<h1>Created</h1>\n" +
-                "<p>Checked-out resource //!svn/wrk/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1/Spikes/SvnFacade/trunk/Test1.txt has been created.</p>\n" +
+                "<p>Checked-out resource //!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60 has been created.</p>\n" +
                 "<hr />\n" +
-                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8084</address>\n" +
                 "</body></html>\n";
 
             string actual = ProcessRequest(request, ref expected);
@@ -410,30 +410,21 @@ namespace Tests
         [Test]
         public void Test10()
         {
-            stub.Attach(provider.ItemExists, false);
-            ItemMetaData item = new ItemMetaData();
-            stub.Attach(provider.GetItemInActivity, item);
-            stub.Attach(provider.ReadFile, Encoding.Default.GetBytes("Fun test1.txt\r\nMore fun1\r\nMore fun2\r\nMore fun3\r\nMore fun4\r\nMore fun5\r\nMore fun6\r\nMore fun7\r\nMore fun8\r\nMore fun9"));
-            stub.Attach(provider.WriteFile, false);
+            stub.Attach(provider.DeleteItem, true);
 
             string request =
-                "PUT //!svn/wrk/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1/Spikes/SvnFacade/trunk/Test1.txt HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "DELETE //!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60..txt HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
-                "Content-Type: application/vnd.svn-svndiff\r\n" +
-                "X-SVN-Base-Fulltext-MD5: bc502e1a6a02211228f16e6230ec038e\r\n" +
-                "X-SVN-Result-Fulltext-MD5: b4f4b6b88b5686a793b8d396c9326004\r\n" +
-                "Content-Length: 25\r\n" +
+                "X-SVN-Version-Name: 5724\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "SVN\0\0p|\u0004\u000C\0p\0\u008C\r\n" +
-                "More fun10";
+                "\r\n";
 
             string expected =
                 "HTTP/1.1 204 No Content\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:32 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 0\r\n" +
                 "Content-Type: text/plain\r\n" +
@@ -447,14 +438,57 @@ namespace Tests
         [Test]
         public void Test11()
         {
-            MergeActivityResponse mergeResponse = new MergeActivityResponse(5465, DateTime.Parse("2007-06-11T21:59:32.848723Z"), "jwanagel");
-            mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/Spikes/SvnFacade/trunk/Test1.txt"));
+            stub.Attach(provider.GetItems, null);
+            stub.Attach(provider.WriteFile, true);
+
+            string request =
+                "PUT //!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60..txt HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Type: application/vnd.svn-svndiff\r\n" +
+                "X-SVN-Result-Fulltext-MD5: 91bb248359043fe98416e259c9bdf10d\r\n" +
+                "Content-Length: 18\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "SVN\0\0\0\u0008\u0001\u0008\u0088replaced";
+
+            string expected =
+                "HTTP/1.1 201 Created\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:53 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Location: http://localhost:8084//!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A !@#$%^&()_-+={[}];',.~`/B !@#$%^&()_-+={[}];',.~`/C !@#$%^&()_-+={[}];',.~`..txt\r\n" +
+                "Content-Length: 408\r\n" +
+                "Content-Type: text/html\r\n" +
+                "\r\n" +
+                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
+                "<html><head>\n" +
+                "<title>201 Created</title>\n" +
+                "</head><body>\n" +
+                "<h1>Created</h1>\n" +
+                "<p>Resource //!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A !@#$%^&amp;()_-+={[}];',.~`/B !@#$%^&amp;()_-+={[}];',.~`/C !@#$%^&amp;()_-+={[}];',.~`..txt has been created.</p>\n" +
+                "<hr />\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8084</address>\n" +
+                "</body></html>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void Test12()
+        {
+            MergeActivityResponse mergeResponse = new MergeActivityResponse(5725, DateTime.Parse("2008-01-02T23:57:53.590563Z"), "jwanagel");
+            mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/A !@#$%^&()_-+={[}];',.~`/B !@#$%^&()_-+={[}];',.~`/C !@#$%^&()_-+={[}];',.~`..txt"));
+            mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.Folder, "/A !@#$%^&()_-+={[}];',.~`/B !@#$%^&()_-+={[}];',.~`"));
             stub.Attach(provider.MergeActivity, mergeResponse);
 
             string request =
-                "MERGE /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "MERGE /A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Content-Length: 297\r\n" +
@@ -464,17 +498,17 @@ namespace Tests
                 "Accept-Encoding: gzip\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
                 "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
 
             string expected =
                 "HTTP/1.1 200 OK\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:32 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Cache-Control: no-cache\r\n" +
                 "Transfer-Encoding: chunked\r\n" +
                 "Content-Type: text/xml\r\n" +
                 "\r\n" +
-                "2e9\r\n" +
+                "592\r\n" +
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<D:merge-response xmlns:D=\"DAV:\">\n" +
                 "<D:updated-set>\n" +
@@ -483,18 +517,27 @@ namespace Tests
                 "<D:propstat><D:prop>\n" +
                 "<D:resourcetype><D:baseline/></D:resourcetype>\n" +
                 "\n" +
-                "<D:version-name>5465</D:version-name>\n" +
-                "<D:creationdate>2007-06-11T21:59:32.848723Z</D:creationdate>\n" +
+                "<D:version-name>5725</D:version-name>\n" +
+                "<D:creationdate>2008-01-02T23:57:53.590563Z</D:creationdate>\n" +
                 "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
                 "</D:response>\n" +
                 "<D:response>\n" +
-                "<D:href>/Spikes/SvnFacade/trunk/Test1.txt</D:href>\n" +
+                "<D:href>/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60..txt</D:href>\n" +
                 "<D:propstat><D:prop>\n" +
                 "<D:resourcetype/>\n" +
-                "<D:checked-in><D:href>/!svn/ver/5465/Spikes/SvnFacade/trunk/Test1.txt</D:href></D:checked-in>\n" +
+                "<D:checked-in><D:href>/!svn/ver/5725/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60..txt</D:href></D:checked-in>\n" +
+                "</D:prop>\n" +
+                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
+                "</D:propstat>\n" +
+                "</D:response>\n" +
+                "<D:response>\n" +
+                "<D:href>/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60</D:href>\n" +
+                "<D:propstat><D:prop>\n" +
+                "<D:resourcetype><D:collection/></D:resourcetype>\n" +
+                "<D:checked-in><D:href>/!svn/ver/5725/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60</D:href></D:checked-in>\n" +
                 "</D:prop>\n" +
                 "<D:status>HTTP/1.1 200 OK</D:status>\n" +
                 "</D:propstat>\n" +
@@ -511,14 +554,14 @@ namespace Tests
         }
 
         [Test]
-        public void Test12()
+        public void Test13()
         {
             stub.Attach(provider.DeleteActivity);
 
             string request =
-                "DELETE /!svn/act/cd41de09-d4dd-9d45-bd7a-6cb0fafb9dd1 HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "DELETE /!svn/act/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603 HTTP/1.1\r\n" +
+                "Host: localhost:8084\r\n" +
+                "User-Agent: SVN/1.4.4 (r25188) neon/0.26.3\r\n" +
                 "Connection: TE\r\n" +
                 "TE: trailers\r\n" +
                 "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
@@ -526,7 +569,7 @@ namespace Tests
 
             string expected =
                 "HTTP/1.1 204 No Content\r\n" +
-                "Date: Mon, 11 Jun 2007 21:59:32 GMT\r\n" +
+                "Date: Wed, 02 Jan 2008 23:57:53 GMT\r\n" +
                 "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
                 "Content-Length: 0\r\n" +
                 "Content-Type: text/plain\r\n" +

@@ -28,6 +28,28 @@ namespace Tests
         }
 
         [Test]
+        public void TestCommitReplacedFile()
+        {
+            WriteFile(_testPath + "/TestFile.txt", "Test file contents", true);
+
+            _provider.DeleteItem(_activityId, _testPath + "/TestFile.txt");
+            _provider.WriteFile(_activityId, _testPath + "/TestFile.txt", GetBytes("new"));
+            MergeActivityResponse response = Commit();
+
+            // Assert state of TFS database
+            Assert.IsTrue(_provider.ItemExists(_testPath + "/TestFile.txt"));
+            Assert.AreEqual("new", ReadFile(_testPath + "/TestFile.txt"));
+            // Assert TFS history
+            LogItem log1 = _provider.GetLog(_testPath + "/TestFile.txt", 1, _provider.GetLatestVersion(), Recursion.None, 1);
+            Assert.AreEqual(ChangeType.Edit, log1.History[0].Changes[0].ChangeType);
+            // Assert commit output
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(2, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath + "/TestFile.txt", ItemType.File));
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+        }
+
+        [Test]
         public void TestCommitUpdatedFile()
         {
             WriteFile(_testPath + "/TestFile.txt", "Test file contents", true);

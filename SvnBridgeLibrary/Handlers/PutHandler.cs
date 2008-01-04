@@ -28,7 +28,7 @@ namespace SvnBridge.Handlers
                                          "<title>201 Created</title>\n" +
                                          "</head><body>\n" +
                                          "<h1>Created</h1>\n" +
-                                         "<p>Resource /" + Helper.Decode(path) + " has been created.</p>\n" +
+                                         "<p>Resource /" + Helper.EncodeB(Helper.Decode(path)) + " has been created.</p>\n" +
                                          "<hr />\n" +
                                          "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " + request.Url.Port + "</address>\n" +
                                          "</body></html>\n";
