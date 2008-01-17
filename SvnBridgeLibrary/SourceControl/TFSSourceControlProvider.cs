@@ -22,6 +22,7 @@ namespace SvnBridge.SourceControl
         static Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
         ICredentials _credentials;
         string _serverUrl;
+        string _rootPath;
         TFSSourceControlService _sourceControlSvc;
         WebTransferService _webTransferSvc;
 
@@ -91,10 +92,14 @@ namespace SvnBridge.SourceControl
             public List<Property> Properties = new List<Property>();
         }
 
-        public TFSSourceControlProvider(string serverUrl, NetworkCredential credentials)
+        public TFSSourceControlProvider(string serverUrl, string projectName, NetworkCredential credentials)
         {
             _serverUrl = serverUrl;
             _credentials = credentials;
+            if (projectName != null)
+                _rootPath = SERVER_PATH + projectName + "/";
+            else
+                _rootPath = SERVER_PATH;
 
             if (_credentials == null)
             {
@@ -245,7 +250,7 @@ namespace SvnBridge.SourceControl
                                 else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                                 {
                                     ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
-                                    ProcessDeletedFile(path, "$/" + oldItem.Name, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
+                                    ProcessDeletedFile(path, oldItem.Name, change, root, versionTo, clientExistingFiles, clientDeletedFiles);
                                     ProcessAddedItem(path, change.Item.RemoteName, change, false, root, versionTo, clientExistingFiles, clientDeletedFiles);
                                 }
                                 else
@@ -296,7 +301,7 @@ namespace SvnBridge.SourceControl
                 changeSetVersionSpec.cs = version;
                 versionSpec = changeSetVersionSpec;
             }
-            SourceItem[] items = _sourceControlSvc.QueryItems(_serverUrl, _credentials, SERVER_PATH + path, recursionType, versionSpec, DeletedState.NonDeleted, ItemType.Any);
+            SourceItem[] items = _sourceControlSvc.QueryItems(_serverUrl, _credentials, _rootPath + path, recursionType, versionSpec, DeletedState.NonDeleted, ItemType.Any);
             Dictionary<string, FolderMetaData> folders = new Dictionary<string, FolderMetaData>();
             Dictionary<string, int> itemPropertyRevision = new Dictionary<string, int>();
             ItemMetaData firstItem = null;
@@ -368,10 +373,10 @@ namespace SvnBridge.SourceControl
             bool reverted = false;
             if (activity.DeletedItems.Contains(path))
             {
-                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + path });
+                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { _rootPath + path });
                 activity.DeletedItems.Remove(path);
                 for (int j = activity.MergeList.Count - 1; j >= 0; j--)
-                    if (activity.MergeList[j].Path == SERVER_PATH + path)
+                    if (activity.MergeList[j].Path == _rootPath + path)
                         activity.MergeList.RemoveAt(j);
 
                 reverted = true;
@@ -403,7 +408,7 @@ namespace SvnBridge.SourceControl
                               int maxCount)
         //                              bool getOriginalNames)
         {
-            string serverPath = SERVER_PATH + path.Substring(1);
+            string serverPath = _rootPath + path.Substring(1);
             RecursionType recursionType = RecursionType.None;
             switch (recursion)
             {
@@ -424,23 +429,26 @@ namespace SvnBridge.SourceControl
 
             foreach (SourceItemHistory history in logItem.History)
                 foreach (SourceItemChange change in history.Changes)
+                {
+                    change.Item.RemoteName = change.Item.RemoteName.Substring(_rootPath.Length);
                     if (true)
                         if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                         {
                             ItemMetaData oldItem = GetItem(history.ChangeSetID - 1, change.Item.ItemId);
-                            change.Item = new RenamedSourceItem(change.Item, SERVER_PATH + oldItem.Name, oldItem.Revision);
+                            change.Item = new RenamedSourceItem(change.Item, oldItem.Name, oldItem.Revision);
                         }
                         else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
                         {
                             ChangesetVersionSpec branchChangeset = new ChangesetVersionSpec();
                             branchChangeset.cs = history.ChangeSetID;
                             ItemSpec spec = new ItemSpec();
-                            spec.item = change.Item.RemoteName;
+                            spec.item = _rootPath + change.Item.RemoteName;
                             BranchRelative[][] branches = _sourceControlSvc.QueryBranches(_serverUrl, _credentials, null, new ItemSpec[] { spec }, branchChangeset);
-                            string oldName = branches[0][branches[0].GetUpperBound(0)].BranchFromItem.item;
+                            string oldName = branches[0][branches[0].GetUpperBound(0)].BranchFromItem.item.Substring(_rootPath.Length);
                             int oldRevision = change.Item.RemoteChangesetId - 1;
                             change.Item = new RenamedSourceItem(change.Item, oldName, oldRevision);
                         }
+                }
 
             return logItem;
         }
@@ -462,7 +470,7 @@ namespace SvnBridge.SourceControl
         public bool ItemExists(string path, int version)
         {
             ItemSpec spec = new ItemSpec();
-            spec.item = SERVER_PATH + path;
+            spec.item = _rootPath + path;
             spec.recurse = RecursionType.None;
 
             VersionSpec versionSpec = VersionSpec.Latest;
@@ -479,7 +487,7 @@ namespace SvnBridge.SourceControl
             string workspaceComment = "Temporary workspace for edit-merge-commit";
             _sourceControlSvc.CreateWorkspace(_serverUrl, _credentials, activityId, workspaceComment);
             string localPath = GetLocalPath(activityId, "");
-            _sourceControlSvc.AddWorkspaceMapping(_serverUrl, _credentials, activityId, SERVER_PATH, localPath);
+            _sourceControlSvc.AddWorkspaceMapping(_serverUrl, _credentials, activityId, _rootPath, localPath);
             _activities[activityId] = new Activity();
         }
 
@@ -492,7 +500,11 @@ namespace SvnBridge.SourceControl
             string existingPath = path.Substring(1);
             do
             {
-                existingPath = existingPath.Substring(0, existingPath.LastIndexOf('/'));
+                if (existingPath.IndexOf('/') != -1)
+                    existingPath = existingPath.Substring(0, existingPath.LastIndexOf('/'));
+                else
+                    existingPath = "";
+
                 item = GetItems(-1, existingPath, Recursion.None);
             }
             while (item == null);
@@ -502,7 +514,7 @@ namespace SvnBridge.SourceControl
             List<PendRequest> pendRequests = new List<PendRequest>();
             pendRequests.Add(PendRequest.AddFolder(localPath));
             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
-            _activities[activityId].MergeList.Add(new ActivityItem(SERVER_PATH + path, ItemType.Folder, ActivityItemAction.New));
+            _activities[activityId].MergeList.Add(new ActivityItem(_rootPath + path, ItemType.Folder, ActivityItemAction.New));
             _activities[activityId].Collections.Add(path);
         }
 
@@ -527,7 +539,7 @@ namespace SvnBridge.SourceControl
                 foreach (string path in _activities[activityId].PostCommitDeletedItems)
                 {
                     ProcessDeleteItem(activityId, path);
-                    commitServerList.Add(SERVER_PATH + path);
+                    commitServerList.Add(_rootPath + path);
                 }
                 changesetId = _sourceControlSvc.Commit(_serverUrl, _credentials, activityId, _activities[activityId].Comment, commitServerList);
             }
@@ -560,7 +572,7 @@ namespace SvnBridge.SourceControl
                     {
                         sortedMergeResponse.Add(newItem.Path);
 
-                        MergeActivityResponseItem responseItem = new MergeActivityResponseItem(newItem.FileType, newItem.Path.Substring(2));
+                        MergeActivityResponseItem responseItem = new MergeActivityResponseItem(newItem.FileType, newItem.Path.Substring(_rootPath.Length));
                         if (newItem.Action != ActivityItemAction.Deleted && newItem.Action != ActivityItemAction.Branch && newItem.Action != ActivityItemAction.RenameDelete)
                             mergeResponse.Items.Add(responseItem);
 
@@ -584,7 +596,7 @@ namespace SvnBridge.SourceControl
 
                 if (!folderFound)
                 {
-                    MergeActivityResponseItem responseItem = new MergeActivityResponseItem(ItemType.Folder, GetFolderName(item.Path.Substring(2)));
+                    MergeActivityResponseItem responseItem = new MergeActivityResponseItem(ItemType.Folder, GetFolderName(item.Path.Substring(_rootPath.Length)));
                     mergeResponse.Items.Add(responseItem);
                 }
             }
@@ -670,14 +682,14 @@ namespace SvnBridge.SourceControl
             }
 
             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
-            _sourceControlSvc.UploadFileFromBytes(_serverUrl, _credentials, activityId, fileData, SERVER_PATH + path);
+            _sourceControlSvc.UploadFileFromBytes(_serverUrl, _credentials, activityId, fileData, _rootPath + path);
 
             if (addToMergeList)
             {
                 if (!replaced && (!newFile || reportUpdatedFile))
-                    activity.MergeList.Add(new ActivityItem(SERVER_PATH + path, ItemType.File, ActivityItemAction.Updated));
+                    activity.MergeList.Add(new ActivityItem(_rootPath + path, ItemType.File, ActivityItemAction.Updated));
                 else
-                    activity.MergeList.Add(new ActivityItem(SERVER_PATH + path, ItemType.File, ActivityItemAction.New));
+                    activity.MergeList.Add(new ActivityItem(_rootPath + path, ItemType.File, ActivityItemAction.New));
             }
 
             return newFile;
@@ -687,9 +699,9 @@ namespace SvnBridge.SourceControl
         {
             Activity activity = _activities[activityId];
 
-            _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + copy.TargetPath });
+            _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { _rootPath + copy.TargetPath });
             for (int i = activity.MergeList.Count - 1; i >= 0; i--)
-                if (activity.MergeList[i].Path == SERVER_PATH + copy.TargetPath)
+                if (activity.MergeList[i].Path == _rootPath + copy.TargetPath)
                     activity.MergeList.RemoveAt(i);
 
             ProcessCopyItem(activityId, copy, true);
@@ -723,7 +735,7 @@ namespace SvnBridge.SourceControl
             UpdateLocalVersion(activityId, item, localPath);
 
             if (copyIsRename)
-                activity.MergeList.Add(new ActivityItem(SERVER_PATH + copyAction.Path, item.ItemType, ActivityItemAction.RenameDelete));
+                activity.MergeList.Add(new ActivityItem(_rootPath + copyAction.Path, item.ItemType, ActivityItemAction.RenameDelete));
 
             if (!copyIsRename)
             {
@@ -737,9 +749,9 @@ namespace SvnBridge.SourceControl
                             if (activity.DeletedItems[i] == path)
                             {
                                 copyIsRename = true;
-                                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + activity.DeletedItems[i] });
+                                _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { _rootPath + activity.DeletedItems[i] });
                                 for (int j = activity.MergeList.Count - 1; j >= 0; j--)
-                                    if (activity.MergeList[j].Path == SERVER_PATH + activity.DeletedItems[i])
+                                    if (activity.MergeList[j].Path == _rootPath + activity.DeletedItems[i])
                                         activity.MergeList.RemoveAt(j);
 
                                 activity.DeletedItems.RemoveAt(i);
@@ -759,9 +771,9 @@ namespace SvnBridge.SourceControl
                     {
                         copyIsRename = true;
                         activity.PostCommitDeletedItems.Add(activity.DeletedItems[i]);
-                        _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { SERVER_PATH + activity.DeletedItems[i] });
+                        _sourceControlSvc.UndoPendingChanges(_serverUrl, _credentials, activityId, new string[] { _rootPath + activity.DeletedItems[i] });
                         for (int j = activity.MergeList.Count - 1; j >= 0; j--)
-                            if (activity.MergeList[j].Path == SERVER_PATH + activity.DeletedItems[i])
+                            if (activity.MergeList[j].Path == _rootPath + activity.DeletedItems[i])
                                 activity.MergeList.RemoveAt(j);
 
                         activity.DeletedItems.RemoveAt(i);
@@ -784,9 +796,9 @@ namespace SvnBridge.SourceControl
 
              _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
             if (copyAction.Rename)
-                activity.MergeList.Add(new ActivityItem(SERVER_PATH + copyAction.TargetPath, item.ItemType, ActivityItemAction.New));
+                activity.MergeList.Add(new ActivityItem(_rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.New));
             else
-                activity.MergeList.Add(new ActivityItem(SERVER_PATH + copyAction.TargetPath, item.ItemType, ActivityItemAction.Branch));
+                activity.MergeList.Add(new ActivityItem(_rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.Branch));
         }
 
         private string GetPropertiesFolderName(string path, ItemType itemType)
@@ -830,7 +842,7 @@ namespace SvnBridge.SourceControl
             pendRequests.Add(PendRequest.Delete(localPath));
             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
 
-            activity.MergeList.Add(new ActivityItem(SERVER_PATH + path, item.ItemType, ActivityItemAction.Deleted));
+            activity.MergeList.Add(new ActivityItem(_rootPath + path, item.ItemType, ActivityItemAction.Deleted));
         }
 
         private ItemProperties ReadPropertiesForItem(string path, ItemType itemType)
@@ -905,7 +917,7 @@ namespace SvnBridge.SourceControl
         private ItemMetaData GetPendingItem(string activityId, string path)
         {
             ItemSpec spec = new ItemSpec();
-            spec.item = SERVER_PATH + path;
+            spec.item = _rootPath + path;
             ExtendedItem[][] items = _sourceControlSvc.QueryItemsExtended(_serverUrl, _credentials, activityId, new ItemSpec[1] { spec }, DeletedState.NonDeleted, ItemType.Any);
             if (items[0].Length == 0)
                 return null;
@@ -930,7 +942,11 @@ namespace SvnBridge.SourceControl
                 item = new ItemMetaData();
 
             item.Id = sourceItem.ItemId;
-            item.Name = sourceItem.RemoteName.Substring(2);
+            if (_rootPath.Length <= sourceItem.RemoteName.Length)
+                item.Name = sourceItem.RemoteName.Substring(_rootPath.Length);
+            else
+                item.Name = "";
+
             item.Author = "unknown";
             item.LastModifiedDate = sourceItem.RemoteDate;
             item.ItemRevision = sourceItem.RemoteChangesetId;
@@ -973,8 +989,8 @@ namespace SvnBridge.SourceControl
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Delete, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
             {
-                string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
-                string changePath = remoteName.Substring(1);
+                string[] nameParts = remoteName.Substring(path.Length).Split('/');
+                string changePath = "/" + remoteName;
                 string folderName = path.Substring(1);
                 FolderMetaData folder = root;
                 for (int i = 0; i < nameParts.Length; i++)
@@ -990,7 +1006,7 @@ namespace SvnBridge.SourceControl
                             else
                                 item = new DeleteFolderMetaData();
 
-                            item.Name = remoteName.Substring(2);
+                            item.Name = remoteName;
                         }
                         else
                         {
@@ -1024,16 +1040,16 @@ namespace SvnBridge.SourceControl
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Add, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
             {
-                if (remoteName.Length == path.Length + 1)
+                if (remoteName.Length == path.Length - 1)
                 {
-                    ItemMetaData item = GetItems(versionTo, remoteName.Substring(2), Recursion.None);
+                    ItemMetaData item = GetItems(versionTo, remoteName, Recursion.None);
                     root.Properties = item.Properties;
                 }
                 else
                 {
                     FolderMetaData folder = root;
                     string itemName = path.Substring(1);
-                    string[] nameParts = remoteName.Substring(2 + path.Length).Split('/');
+                    string[] nameParts = remoteName.Substring(path.Length).Split('/');
                     for (int i = 0; i < nameParts.Length; i++)
                     {
                         bool lastNamePart = false;
@@ -1089,7 +1105,7 @@ namespace SvnBridge.SourceControl
         private bool IsChangeAlreadyCurrentInClientState(ChangeType changeType, string itemPath, int itemRevision, 
             Dictionary<string, int> clientExistingFiles, Dictionary<string, string> clientDeletedFiles)
         {
-            string changePath = itemPath.Substring(1);
+            string changePath = "/" + itemPath;
             if (((changeType & ChangeType.Add) == ChangeType.Add) ||
                 ((changeType & ChangeType.Edit) == ChangeType.Edit))
             {

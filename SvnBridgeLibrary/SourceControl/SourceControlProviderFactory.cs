@@ -16,7 +16,7 @@ namespace SvnBridge.SourceControl
         public static ISourceControlProvider Create(string serverUrl, NetworkCredential credential)
         {
             if (createDelegate == null)
-                return new TFSSourceControlProvider(serverUrl, credential);
+                return new TFSSourceControlProvider(serverUrl, null, credential);
             else
                 return createDelegate(serverUrl, credential);
         }

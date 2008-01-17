@@ -23,9 +23,11 @@ namespace Tests
         [SetUp]
         public void SetUp()
         {
-            _provider = new TFSSourceControlProvider(SERVER_NAME, null);
             _activityId = Guid.NewGuid().ToString();
-            _testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            //_provider = new TFSSourceControlProvider(SERVER_NAME, null, null);
+            //_testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            _provider = new TFSSourceControlProvider(SERVER_NAME, PROJECT_NAME, null);
+            _testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, _testPath);
             Commit();

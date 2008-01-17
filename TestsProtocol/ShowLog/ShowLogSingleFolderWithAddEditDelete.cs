@@ -640,26 +640,26 @@ namespace Tests
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
 
             SourceItemHistory history1 = new SourceItemHistory(5395, "jwanagel", DateTime.Parse("2007-05-16T05:21:26.302105Z"), "Deleted a file");
-            history1.Changes.Add(MakeChange(ChangeType.Delete, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            history1.Changes.Add(MakeChange(ChangeType.Delete, "Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
             histories.Add(history1);
 
             SourceItemHistory history2 = new SourceItemHistory(5394, "jwanagel", DateTime.Parse("2007-05-16T04:37:37.958355Z"), "Added another line");
-            history2.Changes.Add(MakeChange(ChangeType.Edit, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            history2.Changes.Add(MakeChange(ChangeType.Edit, "Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
             histories.Add(history2);
 
             SourceItemHistory history3 = new SourceItemHistory(5393, "jwanagel", DateTime.Parse("2007-05-16T04:17:42.098980Z"), "Updated a file");
-            history3.Changes.Add(MakeChange(ChangeType.Edit, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            history3.Changes.Add(MakeChange(ChangeType.Edit, "Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
             histories.Add(history3);
 
             SourceItemHistory history4 = new SourceItemHistory(5392, "jwanagel", DateTime.Parse("2007-05-16T04:16:43.911480Z"), "Added new file");
-            history4.Changes.Add(MakeChange(ChangeType.Add, "$/Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
+            history4.Changes.Add(MakeChange(ChangeType.Add, "Spikes/SvnFacade/trunk/New Folder 5/Test1.txt"));
             histories.Add(history4);
 
             SourceItemHistory history5 = new SourceItemHistory(5390, "jwanagel", DateTime.Parse("2007-05-14T00:05:54.910225Z"), "Adding New Folder 5");
-            history5.Changes.Add(MakeChange(ChangeType.Add, "$/Spikes/SvnFacade/trunk/New Folder 5"));
+            history5.Changes.Add(MakeChange(ChangeType.Add, "Spikes/SvnFacade/trunk/New Folder 5"));
             histories.Add(history5);
 
-            stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/Spikes/SvnFacade/trunk", histories.ToArray()));
+            stub.Attach(provider.GetLog, new LogItem(@"C:\", "Spikes/SvnFacade/trunk", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5465/Spikes/SvnFacade/trunk/New%20Folder%205 HTTP/1.1\r\n" +

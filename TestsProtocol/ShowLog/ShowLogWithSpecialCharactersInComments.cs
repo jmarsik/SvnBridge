@@ -683,10 +683,10 @@ namespace Tests
                 "}}\n" +
                 "";
             SourceItemHistory history1 = new SourceItemHistory(5527, "jwanagel", DateTime.Parse("2007-07-24T05:18:15.864583Z"), comment);
-            history1.Changes.Add(MakeChange(ChangeType.Add, "$/newFolder2"));
+            history1.Changes.Add(MakeChange(ChangeType.Add, "newFolder2"));
             histories.Add(history1);
 
-            stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder2", histories.ToArray()));
+            stub.Attach(provider.GetLog, new LogItem(@"C:\", "newFolder2", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5527/newFolder2 HTTP/1.1\r\n" +

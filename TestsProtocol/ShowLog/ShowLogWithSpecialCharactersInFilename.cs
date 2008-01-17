@@ -639,11 +639,11 @@ namespace Tests
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
             SourceItemHistory history1 = new SourceItemHistory(5532, "jwanagel", DateTime.Parse("2007-07-25T00:13:14.466022Z"), "1234");
-            history1.Changes.Add(MakeChange(ChangeType.Add, "$/newFolder4"));
-            history1.Changes.Add(MakeChange(ChangeType.Add, "$/newFolder4/A!@#$%^&()~`_-+={[}];',.txt"));
+            history1.Changes.Add(MakeChange(ChangeType.Add, "newFolder4"));
+            history1.Changes.Add(MakeChange(ChangeType.Add, "newFolder4/A!@#$%^&()~`_-+={[}];',.txt"));
             histories.Add(history1);
 
-            stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder4", histories.ToArray()));
+            stub.Attach(provider.GetLog, new LogItem(@"C:\", "newFolder4", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5532/newFolder4 HTTP/1.1\r\n" +

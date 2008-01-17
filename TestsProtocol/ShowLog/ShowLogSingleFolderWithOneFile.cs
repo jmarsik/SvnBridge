@@ -638,15 +638,15 @@ namespace Tests
         public void Test14()
         {
             SourceItemChange change1 = new SourceItemChange();
-            change1.Item = SourceItem.FromRemoteItem(0, ItemType.Folder, "$/Spikes/SvnFacade/trunk/New Folder", 0, 0, DateTime.Now, null);
+            change1.Item = SourceItem.FromRemoteItem(0, ItemType.Folder, "Spikes/SvnFacade/trunk/New Folder", 0, 0, DateTime.Now, null);
             change1.ChangeType = ChangeType.Add;
 
             SourceItemChange change2 = new SourceItemChange();
-            change2.Item = SourceItem.FromRemoteItem(0, ItemType.File, "$/Spikes/SvnFacade/trunk/Test1.txt", 0, 0, DateTime.Now, null);
+            change2.Item = SourceItem.FromRemoteItem(0, ItemType.File, "Spikes/SvnFacade/trunk/Test1.txt", 0, 0, DateTime.Now, null);
             change2.ChangeType = ChangeType.Add;
 
             SourceItemChange change3 = new SourceItemChange();
-            change3.Item = SourceItem.FromRemoteItem(0, ItemType.File, "$/Spikes/SvnFacade/trunk/New Folder/Test2.txt", 0, 0, DateTime.Now, null);
+            change3.Item = SourceItem.FromRemoteItem(0, ItemType.File, "Spikes/SvnFacade/trunk/New Folder/Test2.txt", 0, 0, DateTime.Now, null);
             change3.ChangeType = ChangeType.Add;
             
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
@@ -656,7 +656,7 @@ namespace Tests
             history.Changes.Add(change3);
             histories.Add(history);
 
-            stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/Spikes/SvnFacade/trunk", histories.ToArray()));
+            stub.Attach(provider.GetLog, new LogItem(@"C:\", "Spikes/SvnFacade/trunk", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5465/Spikes/SvnFacade/trunk/New%20Folder HTTP/1.1\r\n" +

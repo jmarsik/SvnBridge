@@ -639,14 +639,14 @@ namespace Tests
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
             SourceItemHistory history1 = new SourceItemHistory(5531, "jwanagel", DateTime.Parse("2007-07-24T07:46:20.635845Z"), "Renamed file");
-            history1.Changes.Add(MakeChange(ChangeType.Rename, "$/newFolder3/NewFileRename.txt", "$/newFolder3/NewFile.txt", 5530));
+            history1.Changes.Add(MakeChange(ChangeType.Rename, "newFolder3/NewFileRename.txt", "newFolder3/NewFile.txt", 5530));
             SourceItemHistory history2 = new SourceItemHistory(5530, "jwanagel", DateTime.Parse("2007-07-24T07:45:44.995448Z"), "1234");
-            history2.Changes.Add(MakeChange(ChangeType.Add, "$/newFolder3"));
-            history2.Changes.Add(MakeChange(ChangeType.Add, "$/newFolder3/NewFile.txt"));
+            history2.Changes.Add(MakeChange(ChangeType.Add, "newFolder3"));
+            history2.Changes.Add(MakeChange(ChangeType.Add, "newFolder3/NewFile.txt"));
             histories.Add(history1);
             histories.Add(history2);
 
-            stub.Attach(provider.GetLog, new LogItem(@"C:\", "$/newFolder2", histories.ToArray()));
+            stub.Attach(provider.GetLog, new LogItem(@"C:\", "newFolder2", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5531/newFolder3 HTTP/1.1\r\n" +
