@@ -22,6 +22,7 @@ namespace SvnBridge.SourceControl
         static Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
         ICredentials _credentials;
         string _serverUrl;
+        string _projectName;
         string _rootPath;
         TFSSourceControlService _sourceControlSvc;
         WebTransferService _webTransferSvc;
@@ -94,13 +95,17 @@ namespace SvnBridge.SourceControl
 
         public TFSSourceControlProvider(string serverUrl, string projectName, NetworkCredential credentials)
         {
-            _serverUrl = serverUrl;
-            _credentials = credentials;
-            if (projectName != null)
-                _rootPath = SERVER_PATH + projectName + "/";
-            else
-                _rootPath = SERVER_PATH;
+            RegistrationWebSvcFactory registrationFactory = new RegistrationWebSvcFactory();
+            FileSystem fileSystem = new FileSystem();
+            RegistrationService registrationSvc = new RegistrationService(registrationFactory);
 
+            _webTransferSvc = new WebTransferService(fileSystem);
+            _sourceControlSvc = new TFSSourceControlService(registrationSvc,
+                                                        new RepositoryWebSvcFactory(registrationFactory),
+                                                        _webTransferSvc,
+                                                        fileSystem);
+
+            _credentials = credentials;
             if (_credentials == null)
             {
                 Uri uri = new Uri(serverUrl);
@@ -115,15 +120,14 @@ namespace SvnBridge.SourceControl
                     _credentials = CredentialCache.DefaultNetworkCredentials;
             }
 
-            RegistrationWebSvcFactory registrationFactory = new RegistrationWebSvcFactory();
-            FileSystem fileSystem = new FileSystem();
-            RegistrationService registrationSvc = new RegistrationService(registrationFactory);
-
-            _webTransferSvc = new WebTransferService(fileSystem);
-            _sourceControlSvc = new TFSSourceControlService(registrationSvc,
-                                                        new RepositoryWebSvcFactory(registrationFactory),
-                                                        _webTransferSvc,
-                                                        fileSystem);
+            _serverUrl = serverUrl;
+            if (projectName != null)
+            {
+                SetServerAndProject(serverUrl, projectName);
+                _rootPath = SERVER_PATH + _projectName + "/";
+            }
+            else
+                _rootPath = SERVER_PATH;
         }
 
         // Methods
@@ -322,13 +326,9 @@ namespace SvnBridge.SourceControl
                 else if (!item.Name.EndsWith("/" + PROP_FOLDER) || item.ItemType != ItemType.Folder || returnPropertyFiles)
                 {
                     if (item.ItemType == ItemType.Folder)
-                    {
                         folders[item.Name.ToLower()] = (FolderMetaData)item;
-                    }
                     if (i == 0)
-                    {
                         firstItem = item;
-                    }
                     else
                     {
                         string folderName = "";
@@ -952,6 +952,25 @@ namespace SvnBridge.SourceControl
             item.ItemRevision = sourceItem.RemoteChangesetId;
             item.DownloadUrl = sourceItem.DownloadUrl;
             return item;
+        }
+
+        static Dictionary<string, string[]> projectServers = new Dictionary<string, string[]>();
+
+        private void SetServerAndProject(string serverUrl, string projectName)
+        {
+            projectName = projectName.ToLower();
+            if (!projectServers.ContainsKey(projectName))
+            {
+                string[] servers = serverUrl.Split(',');
+                foreach (string server in servers)
+                {
+                    SourceItem[] items = _sourceControlSvc.QueryItems(server, _credentials, SERVER_PATH + projectName, RecursionType.None, new LatestVersionSpec(), DeletedState.NonDeleted, ItemType.Any);
+                    if (items.Length > 0)
+                        projectServers[projectName] = new string[] { server, items[0].RemoteName.Substring(SERVER_PATH.Length) };
+                }
+            }
+            _serverUrl = projectServers[projectName][0];
+            _projectName = projectServers[projectName][1];
         }
 
         private void SetItemProperties(Dictionary<string, FolderMetaData> folders,

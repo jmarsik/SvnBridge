@@ -12,8 +12,12 @@ namespace SvnBridge.Handlers
     {
         public void Handle(IHttpContext context, string tfsUrl)
         {
-            ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, GetCredential(context));
+            Handle(context, tfsUrl, null);
+        }
 
+        public void Handle(IHttpContext context, string tfsUrl, string projectName)
+        {
+            ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, projectName, GetCredential(context));
             Handle(context, sourceControlProvider);
         }
 

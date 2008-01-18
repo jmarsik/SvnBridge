@@ -10,6 +10,7 @@ namespace SvnBridge.Net
     public class HttpContextDispatcher
     {
         private string tfsUrl;
+        private bool urlIncludesProjectName;
 
         public HttpContextHandlerBase GetHandler(string httpMethod)
         {
@@ -37,6 +38,11 @@ namespace SvnBridge.Net
             set { tfsUrl = value; }
         }
 
+        public bool URLIncludesProjectName
+        {
+            set { urlIncludesProjectName = value; }
+        }
+
         public void Dispatch(IHttpContext connection)
         {
             if (string.IsNullOrEmpty(TfsUrl))
@@ -48,7 +54,13 @@ namespace SvnBridge.Net
             {
                 try
                 {
-                    handler.Handle(connection, tfsUrl);
+                    if (urlIncludesProjectName)
+                    {
+                        string projectName = connection.Request.Headers["Host"].Split('.')[0];
+                        handler.Handle(connection, tfsUrl, projectName);
+                    }
+                    else
+                        handler.Handle(connection, tfsUrl);
                 }
                 catch (WebException ex)
                 {
