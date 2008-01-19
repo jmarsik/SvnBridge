@@ -13,13 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridge", "SvnBridge\SvnB
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsIntegration", "IntegrationTests\TestsIntegration.csproj", "{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsIntegration", "TestsIntegration\TestsIntegration.csproj", "{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TraceTCP", "Trace2\TraceTCP.csproj", "{8ED37441-BF40-4CE1-A514-27182894CE90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPTrace", "TCPTrace\TCPTrace.csproj", "{8ED37441-BF40-4CE1-A514-27182894CE90}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
