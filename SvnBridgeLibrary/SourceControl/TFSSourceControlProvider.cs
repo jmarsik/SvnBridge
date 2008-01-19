@@ -105,29 +105,17 @@ namespace SvnBridge.SourceControl
                                                         _webTransferSvc,
                                                         fileSystem);
 
-            _credentials = credentials;
-            if (_credentials == null)
-            {
-                Uri uri = new Uri(serverUrl);
-
-                if (uri.Host.ToLowerInvariant().EndsWith("codeplex.com"))
-                {
-                    CredentialCache cache = new CredentialCache();
-                    cache.Add(uri, "Basic", new NetworkCredential("anonymous", null));
-                    _credentials = cache;
-                }
-                else
-                    _credentials = CredentialCache.DefaultNetworkCredentials;
-            }
-
-            _serverUrl = serverUrl;
             if (projectName != null)
             {
-                SetServerAndProject(serverUrl, projectName);
+                SetServerAndProject(serverUrl, credentials, projectName);
                 _rootPath = SERVER_PATH + _projectName + "/";
             }
             else
+            {
+                _serverUrl = serverUrl;
                 _rootPath = SERVER_PATH;
+            }
+            _credentials = GetCredentialsForServer(_serverUrl, credentials);
         }
 
         // Methods
@@ -956,7 +944,7 @@ namespace SvnBridge.SourceControl
 
         static Dictionary<string, string[]> projectServers = new Dictionary<string, string[]>();
 
-        private void SetServerAndProject(string serverUrl, string projectName)
+        private void SetServerAndProject(string serverUrl, NetworkCredential credentials, string projectName)
         {
             projectName = projectName.ToLower();
             if (!projectServers.ContainsKey(projectName))
@@ -964,7 +952,7 @@ namespace SvnBridge.SourceControl
                 string[] servers = serverUrl.Split(',');
                 foreach (string server in servers)
                 {
-                    SourceItem[] items = _sourceControlSvc.QueryItems(server, _credentials, SERVER_PATH + projectName, RecursionType.None, new LatestVersionSpec(), DeletedState.NonDeleted, ItemType.Any);
+                    SourceItem[] items = _sourceControlSvc.QueryItems(server, GetCredentialsForServer(server, credentials), SERVER_PATH + projectName, RecursionType.None, new LatestVersionSpec(), DeletedState.NonDeleted, ItemType.Any);
                     if (items.Length > 0)
                         projectServers[projectName] = new string[] { server, items[0].RemoteName.Substring(SERVER_PATH.Length) };
                 }
@@ -1000,6 +988,25 @@ namespace SvnBridge.SourceControl
                     return item;
 
             return null;
+        }
+
+        private ICredentials GetCredentialsForServer(string tfsUrl, NetworkCredential credentials)
+        {
+            ICredentials result = credentials;
+            if (result == null)
+            {
+                Uri uri = new Uri(tfsUrl);
+
+                if (uri.Host.ToLowerInvariant().EndsWith("codeplex.com"))
+                {
+                    CredentialCache cache = new CredentialCache();
+                    cache.Add(uri, "Basic", new NetworkCredential("anonymous", null));
+                    result = cache;
+                }
+                else
+                    result = CredentialCache.DefaultNetworkCredentials;
+            }
+            return result;
         }
 
         private void ProcessDeletedFile(string path, string remoteName, SourceItemChange change,
@@ -1052,6 +1059,38 @@ namespace SvnBridge.SourceControl
                     }
                 }
             }
+        }
+
+        private ItemMetaData GetItem(int version, int itemId)
+        {
+            SourceItem[] items = _sourceControlSvc.QueryItems(_serverUrl, _credentials, new int[] { itemId }, version);
+            return ConvertSourceItem(items[0]);
+        }
+
+        private bool IsChangeAlreadyCurrentInClientState(ChangeType changeType, string itemPath, int itemRevision, 
+            Dictionary<string, int> clientExistingFiles, Dictionary<string, string> clientDeletedFiles)
+        {
+            string changePath = "/" + itemPath;
+            if (((changeType & ChangeType.Add) == ChangeType.Add) ||
+                ((changeType & ChangeType.Edit) == ChangeType.Edit))
+            {
+                if ((clientExistingFiles.ContainsKey(changePath)) && (clientExistingFiles[changePath] >= itemRevision))
+                    return true;
+
+                foreach (string clientExistingFile in clientExistingFiles.Keys)
+                    if (changePath.StartsWith(clientExistingFile + "/") && (clientExistingFiles[clientExistingFile] >= itemRevision))
+                        return true;
+            }
+            else if ((changeType & ChangeType.Delete) == ChangeType.Delete)
+            {
+                if (clientDeletedFiles.ContainsKey(changePath) || (clientExistingFiles.ContainsKey(changePath) && (clientExistingFiles[changePath] >= itemRevision)))
+                    return true;
+
+                foreach (string clientDeletedFile in clientDeletedFiles.Keys)
+                    if (changePath.StartsWith(clientDeletedFile + "/"))
+                        return true;
+            }
+            return false;
         }
 
         private void ProcessAddedItem(string path, string remoteName, SourceItemChange change, bool propertyChange, FolderMetaData root,
@@ -1113,38 +1152,6 @@ namespace SvnBridge.SourceControl
                     }
                 }
             }
-        }
-
-        private ItemMetaData GetItem(int version, int itemId)
-        {
-            SourceItem[] items = _sourceControlSvc.QueryItems(_serverUrl, _credentials, new int[] { itemId }, version);
-            return ConvertSourceItem(items[0]);
-        }
-
-        private bool IsChangeAlreadyCurrentInClientState(ChangeType changeType, string itemPath, int itemRevision, 
-            Dictionary<string, int> clientExistingFiles, Dictionary<string, string> clientDeletedFiles)
-        {
-            string changePath = "/" + itemPath;
-            if (((changeType & ChangeType.Add) == ChangeType.Add) ||
-                ((changeType & ChangeType.Edit) == ChangeType.Edit))
-            {
-                if ((clientExistingFiles.ContainsKey(changePath)) && (clientExistingFiles[changePath] >= itemRevision))
-                    return true;
-
-                foreach (string clientExistingFile in clientExistingFiles.Keys)
-                    if (changePath.StartsWith(clientExistingFile + "/") && (clientExistingFiles[clientExistingFile] >= itemRevision))
-                        return true;
-            }
-            else if ((changeType & ChangeType.Delete) == ChangeType.Delete)
-            {
-                if (clientDeletedFiles.ContainsKey(changePath) || (clientExistingFiles.ContainsKey(changePath) && (clientExistingFiles[changePath] >= itemRevision)))
-                    return true;
-
-                foreach (string clientDeletedFile in clientDeletedFiles.Keys)
-                    if (changePath.StartsWith(clientDeletedFile + "/"))
-                        return true;
-            }
-            return false;
         }
     }
 }

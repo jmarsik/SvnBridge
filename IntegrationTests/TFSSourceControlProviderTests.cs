@@ -67,5 +67,11 @@ namespace Tests
 
             Assert.IsFalse(result);
         }
+
+        [Test]
+        public void TestCreateProviderWithMultipleTFSUrlsSucceeds()
+        {
+            TFSSourceControlProvider provider = new TFSSourceControlProvider(SERVER_NAME + "," + SERVER_NAME, PROJECT_NAME, null);
+        }
     }
 }
