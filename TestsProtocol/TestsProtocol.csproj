@@ -90,6 +90,7 @@
     <Compile Include="Update\UpdateWithNewFileTest.cs" />
     <Compile Include="Update\UpdateWithNewProperty.cs" />
     <Compile Include="Update\UpdateWithNoNewItems.cs" />
+    <Compile Include="Update\UpdateWithSpecialCharacters.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SvnBridgeLibrary\SvnBridgeLibrary.csproj">
