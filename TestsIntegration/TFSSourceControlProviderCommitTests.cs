@@ -620,6 +620,37 @@ namespace Tests
         }
 
         [Test]
+        public void TestCommitRenameFolderContainingRenamedFileAndNotRenamedFile()
+        {
+            CreateFolder(_testPath + "/A", false);
+            WriteFile(_testPath + "/A/TestA1.txt", "filedata", false);
+            WriteFile(_testPath + "/A/TestB1.txt", "filedata", true);
+
+            _provider.DeleteItem(_activityId, _testPath + "/A");
+            _provider.CopyItem(_activityId, _testPath + "/A", _testPath + "/B");
+            _provider.DeleteItem(_activityId, _testPath + "/B/TestA1.txt");
+            _provider.CopyItem(_activityId, _testPath + "/A/TestA1.txt", _testPath + "/B/TestA2.txt");
+            MergeActivityResponse response = Commit();
+
+            // Assert state of TFS database
+            Assert.IsFalse(_provider.ItemExists(_testPath + "/A"));
+            Assert.IsTrue(_provider.ItemExists(_testPath + "/B"));
+            Assert.IsTrue(_provider.ItemExists(_testPath + "/B/TestA2.txt"));
+            Assert.IsTrue(_provider.ItemExists(_testPath + "/B/TestB1.txt"));
+            // Assert TFS history
+            LogItem log1 = _provider.GetLog(_testPath + "/B", 1, _provider.GetLatestVersion(), Recursion.Full, 1);
+            Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[0].ChangeType);
+            Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[1].ChangeType);
+            Assert.AreEqual(ChangeType.Rename, log1.History[0].Changes[2].ChangeType);
+            // Assert commit output
+            Assert.AreEqual(_provider.GetLatestVersion(), response.Version);
+            Assert.AreEqual(3, response.Items.Count);
+            Assert.IsTrue(ResponseContains(response, _testPath, ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B", ItemType.Folder));
+            Assert.IsTrue(ResponseContains(response, _testPath + "/B/TestA2.txt", ItemType.File));
+        }
+
+        [Test]
         public void TestCommitRenameFolderContainingUpdatedFile()
         {
             CreateFolder(_testPath + "/A", false);
