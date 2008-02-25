@@ -27,10 +27,10 @@ namespace SvnBridge.Handlers
             string expected = "asdf";
             Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
             Assert.AreEqual("text/plain", response.ContentType);
-            Assert.AreEqual(1, getItemsResult.CalledCount);
+            Assert.AreEqual(1, getItemsResult.CallCount);
             Assert.AreEqual(1234, getItemsResult.Parameters[0]);
             Assert.AreEqual("/Foo/Bar.txt", getItemsResult.Parameters[1]);
-            Assert.AreEqual(1, readFileResult.CalledCount);
+            Assert.AreEqual(1, readFileResult.CallCount);
             Assert.AreEqual(item, readFileResult.Parameters[0]);
         }
     }

@@ -40,7 +40,7 @@ namespace SvnBridge.Handlers
             Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
             Assert.AreEqual("text/html", response.ContentType);
             Assert.IsTrue(response.Headers.Contains(new KeyValuePair<string, string>("Location", "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt")));
-            Assert.AreEqual(1, r.CalledCount);
+            Assert.AreEqual(1, r.CallCount);
             Assert.AreEqual("cdfcf93f-8649-5e44-a8ec-b3f40e10e907", r.Parameters[0]);
             Assert.AreEqual("/File.txt", r.Parameters[1]);
             Assert.AreEqual("/FileRenamed.txt", r.Parameters[2]);
@@ -80,7 +80,7 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, r.CalledCount);
+            Assert.AreEqual(1, r.CallCount);
             Assert.AreEqual("15407bc3-2250-aa4c-aa51-4e65b2c824c3", r.Parameters[0]);
             Assert.AreEqual("/B !@#$%^&()_-+={[}];',.~`", r.Parameters[1]);
             Assert.AreEqual("/BB !@#$%^&()_-+={[}];',.~`", r.Parameters[2]);

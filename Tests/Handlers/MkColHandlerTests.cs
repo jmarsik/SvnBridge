@@ -22,7 +22,7 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, r.CalledCount);
+            Assert.AreEqual(1, r.CallCount);
             Assert.AreEqual("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
             Assert.AreEqual("/Spikes/SvnFacade/trunk/Empty", r.Parameters[1]);
         }

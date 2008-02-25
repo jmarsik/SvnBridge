@@ -6,8 +6,49 @@ using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 
+namespace Attach
+{
+    public class MultipleReturnValues
+    {
+        List<object> returnValues = new List<object>();
+
+        public void Add(object value)
+        {
+            returnValues.Add(value);
+        }
+
+        public object[] GetValues()
+        {
+            return returnValues.ToArray();
+        }
+    }
+}
+
 namespace Tests
 {
+    public class MockFramework : AttachFramework
+    {
+        public Results Attach(Delegate method, MultipleReturnValues returnValues)
+        {
+            return base.Attach(method, Return.MultipleValues(returnValues.GetValues()));
+        }
+
+        public Results Attach(Delegate method, Exception exception)
+        {
+            return base.Attach(method, Return.Exception(exception));
+        }
+
+        public Results Attach(Delegate method, object returnValue)
+        {
+            return base.Attach(method, Return.Value(returnValue));
+        }
+
+        public Results Attach(Delegate method)
+        {
+            return base.Attach(method, Return.Nothing);
+        }
+    }
+
     public class MyMocks : MockFramework
     {
         public delegate bool DeleteItem(string activityId, string path);

@@ -13,8 +13,8 @@ namespace Tests
     [TestFixture]
     public class TFSSourceControlProviderTestsBase
     {
-        protected const string SERVER_NAME = "http://codeplex-tfs2:8080";
-        protected const string PROJECT_NAME = "Test05011252";
+        protected const string SERVER_NAME = "http://codeplex-tfs3:8080";
+        protected const string PROJECT_NAME = "SvnBridgeTesting";
         protected string _activityId;
         protected string _testPath;
         protected TFSSourceControlProvider _provider;

@@ -247,7 +247,7 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, results.CalledCount);
+            Assert.AreEqual(1, results.CallCount);
             Assert.AreEqual(1234, results.Parameters[0]);
             Assert.AreEqual("/Foo", results.Parameters[1]);
             Assert.AreEqual(Recursion.OneLevel, results.Parameters[2]);
