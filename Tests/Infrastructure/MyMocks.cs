@@ -6,33 +6,10 @@ using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 
-namespace Attach
-{
-    public class MultipleReturnValues
-    {
-        List<object> returnValues = new List<object>();
-
-        public void Add(object value)
-        {
-            returnValues.Add(value);
-        }
-
-        public object[] GetValues()
-        {
-            return returnValues.ToArray();
-        }
-    }
-}
-
 namespace Tests
 {
     public class MockFramework : AttachFramework
     {
-        public Results Attach(Delegate method, MultipleReturnValues returnValues)
-        {
-            return base.Attach(method, Return.MultipleValues(returnValues.GetValues()));
-        }
-
         public Results Attach(Delegate method, Exception exception)
         {
             return base.Attach(method, Return.Exception(exception));
@@ -40,7 +17,10 @@ namespace Tests
 
         public Results Attach(Delegate method, object returnValue)
         {
-            return base.Attach(method, Return.Value(returnValue));
+            if (returnValue is Return)
+                return base.Attach(method, (Return)returnValue);
+            else
+                return base.Attach(method, Return.Value(returnValue));
         }
 
         public Results Attach(Delegate method)
@@ -66,9 +46,9 @@ namespace Tests
         {
             return base.Attach((Delegate)method, throwException);
         }
-        public Results Attach(ItemExists method, MultipleReturnValues returnValues)
+        public Results Attach(ItemExists method, Return action)
         {
-            return base.Attach((Delegate)method, returnValues);
+            return base.Attach(method, action);
         }
 
         public delegate int GetLatestVersion();
@@ -82,9 +62,9 @@ namespace Tests
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
-        public Results Attach(IsDirectory method, MultipleReturnValues returnValues)
+        public Results Attach(IsDirectory method, Return action)
         {
-            return base.Attach((Delegate)method, returnValues);
+            return base.Attach(method, action);
         }
 
         public delegate void MakeActivity(string activityId);
@@ -133,10 +113,6 @@ namespace Tests
         public Results Attach(ReadFile method, byte[] returnValue)
         {
             return base.Attach((Delegate)method, (byte[])returnValue);
-        }
-        public Results Attach(ReadFile method, MultipleReturnValues returnValues)
-        {
-            return base.Attach((Delegate)method, returnValues);
         }
 
         public delegate void SetCredentials(NetworkCredential credentials);

@@ -412,10 +412,7 @@ namespace Tests
             stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = GetBytes("New file");
             stub.Attach(provider.ReadFile, fileData);
-            MultipleReturnValues returnValues = new MultipleReturnValues();
-            returnValues.Add(true);
-            returnValues.Add(false);
-            stub.Attach(provider.ItemExists, returnValues);
+            stub.Attach(provider.ItemExists, Return.MultipleValues(true, false));
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

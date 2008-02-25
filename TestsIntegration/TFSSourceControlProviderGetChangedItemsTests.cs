@@ -568,5 +568,24 @@ namespace Tests
             Assert.AreEqual(0, folder.Properties.Count);
             Assert.AreEqual(0, folder.Items[0].Properties.Count);
         }
+
+        [Test]
+        public void TestGetChangedItemsAtRootReturnsNothingWhenClientStateAlreadyCurrent()
+        {
+            string path = _testPath + "/TestFile.txt";
+            int versionFrom = _lastCommitRevision;
+            WriteFile(path, "Fun text", true);
+            int versionTo = _lastCommitRevision;
+            UpdateReportData reportData = new UpdateReportData();
+            reportData.Entries = new List<EntryData>();
+            EntryData entry = new EntryData();
+            entry.Rev = versionTo.ToString();
+            entry.path = _testPath.Substring(1) + "/TestFile.txt";
+            reportData.Entries.Add(entry);
+
+            FolderMetaData folder = _provider.GetChangedItems("/", versionFrom, versionTo, reportData);
+
+            Assert.AreEqual(0, folder.Items.Count);
+        }
     }
 }

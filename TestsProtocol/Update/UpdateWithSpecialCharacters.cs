@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SvnBridge.SourceControl;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using System.Text;
+using Attach;
 
 namespace Tests
 {
@@ -433,12 +434,7 @@ namespace Tests
             file3.Author = "jwanagel";
             folder1.Items.Add(file3);
             stub.Attach(provider.GetChangedItems, metadata);
-            Attach.MultipleReturnValues returnValues = new Attach.MultipleReturnValues();
-            returnValues.Add(true);
-            returnValues.Add(false);
-            returnValues.Add(true);
-            returnValues.Add(false);
-            stub.Attach(provider.ItemExists, returnValues);
+            stub.Attach(provider.ItemExists, Return.MultipleValues(true, false, true, false));
             byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
             stub.Attach(provider.ReadFile, fileData);
 

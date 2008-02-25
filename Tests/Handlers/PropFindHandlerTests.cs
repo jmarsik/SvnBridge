@@ -257,10 +257,7 @@ namespace SvnBridge.Handlers
         public void TestPropFindWithDepthOneIncludesFolderAndChildren()
         {
             stub.Attach(provider.ItemExists, true);
-            MultipleReturnValues returnValues = new MultipleReturnValues();
-            returnValues.Add(true);
-            returnValues.Add(false);
-            stub.Attach(provider.IsDirectory, returnValues);
+            stub.Attach(provider.IsDirectory, Return.MultipleValues(true, false));
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Foo";
             stub.Attach(provider.GetItems, folder);

@@ -7,7 +7,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using SvnBridge.Protocol;
 using SvnBridge.Utility;
-using ChangeType=CodePlex.TfsLibrary.RepositoryWebSvc.ChangeType;
+using ChangeType = CodePlex.TfsLibrary.RepositoryWebSvc.ChangeType;
 using SvnBridge.Exceptions;
 
 namespace SvnBridge.SourceControl
@@ -176,15 +176,24 @@ namespace SvnBridge.SourceControl
 
         public FolderMetaData GetChangedItems(string path, int versionFrom, int versionTo, UpdateReportData reportData)
         {
+            if (path.StartsWith("/"))
+                path = path.Substring(1);
+
             Dictionary<string, int> clientExistingFiles = new Dictionary<string, int>();
             if (reportData.Entries != null)
                 foreach (EntryData entryData in reportData.Entries)
-                    clientExistingFiles[path + "/" + entryData.path] = int.Parse(entryData.Rev);
+                    if (string.IsNullOrEmpty(path))
+                        clientExistingFiles["/" + entryData.path] = int.Parse(entryData.Rev);
+                    else
+                        clientExistingFiles["/" + path + "/" + entryData.path] = int.Parse(entryData.Rev);
 
             Dictionary<string, string> clientDeletedFiles = new Dictionary<string, string>();
             if (reportData.Missing != null)
                 foreach (string missingPath in reportData.Missing)
-                    clientDeletedFiles[path + "/" + missingPath] = missingPath;
+                    if (string.IsNullOrEmpty(path))
+                        clientDeletedFiles["/" + missingPath] = missingPath;
+                    else
+                        clientDeletedFiles["/" + path + "/" + missingPath] = missingPath;
 
             FolderMetaData root = (FolderMetaData)GetItems(versionTo, path, Recursion.None);
             if (root != null)
@@ -275,6 +284,9 @@ namespace SvnBridge.SourceControl
 
         private ItemMetaData GetItems(int version, string path, Recursion recursion, bool returnPropertyFiles)
         {
+            if (path.StartsWith("/"))
+                path = path.Substring(1);
+
             Dictionary<string, ItemProperties> properties = new Dictionary<string, ItemProperties>();
             RecursionType recursionType = RecursionType.None;
             switch (recursion)
@@ -300,7 +312,7 @@ namespace SvnBridge.SourceControl
             for (int i = 0; i < items.Length; i++)
             {
                 ItemMetaData item = ConvertSourceItem(items[i]);
-                if (recursion != Recursion.Full && !returnPropertyFiles) 
+                if (recursion != Recursion.Full && !returnPropertyFiles)
                     RetrievePropertiesForItem(item);
 
                 if (item.Name.Contains("/" + PROP_FOLDER + "/") && !returnPropertyFiles)
@@ -335,7 +347,7 @@ namespace SvnBridge.SourceControl
             return firstItem;
         }
 
-        private void UpdateItemRevisionsBasedOnPropertyItemRevisions(Dictionary<string, FolderMetaData> folders, Dictionary<string,int> itemPropertyRevision)
+        private void UpdateItemRevisionsBasedOnPropertyItemRevisions(Dictionary<string, FolderMetaData> folders, Dictionary<string, int> itemPropertyRevision)
         {
             foreach (KeyValuePair<string, int> propertyRevision in itemPropertyRevision)
             {
@@ -396,7 +408,10 @@ namespace SvnBridge.SourceControl
                               int maxCount)
         //                              bool getOriginalNames)
         {
-            string serverPath = _rootPath + path.Substring(1);
+            if (path.StartsWith("/"))
+                path = path.Substring(1);
+
+            string serverPath = _rootPath + path;
             RecursionType recursionType = RecursionType.None;
             switch (recursion)
             {
@@ -605,7 +620,7 @@ namespace SvnBridge.SourceControl
             Activity activity = _activities[activityId];
 
             if (!activity.AddedProperties.ContainsKey(path))
-                activity.AddedProperties[path] = new Dictionary<string,string>();
+                activity.AddedProperties[path] = new Dictionary<string, string>();
 
             activity.AddedProperties[path][property] = value;
         }
@@ -643,7 +658,7 @@ namespace SvnBridge.SourceControl
             _sourceControlSvc.UpdateLocalVersions(_serverUrl, _credentials, activityId, updates);
 
             List<PendRequest> pendRequests = new List<PendRequest>();
-            
+
             bool newFile = true;
             bool addToMergeList = true;
             if (item != null)
@@ -753,7 +768,7 @@ namespace SvnBridge.SourceControl
             }
             if (!copyIsRename)
             {
-                for (int i=activity.DeletedItems.Count-1; i >= 0; i--)
+                for (int i = activity.DeletedItems.Count - 1; i >= 0; i--)
                 {
                     if (copyAction.Path.StartsWith(activity.DeletedItems[i] + "/"))
                     {
@@ -782,7 +797,7 @@ namespace SvnBridge.SourceControl
             else
                 pendRequests.Add(PendRequest.Copy(localPath, localTargetPath));
 
-             _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
+            _sourceControlSvc.PendChanges(_serverUrl, _credentials, activityId, pendRequests);
             if (copyAction.Rename)
                 activity.MergeList.Add(new ActivityItem(_rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.New));
             else
@@ -838,7 +853,7 @@ namespace SvnBridge.SourceControl
             int revision;
             return ReadPropertiesForItem(path, itemType, out revision);
         }
-        
+
         private ItemProperties ReadPropertiesForItem(string path, ItemType itemType, out int revision)
         {
             revision = -1;
@@ -1015,9 +1030,9 @@ namespace SvnBridge.SourceControl
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Delete, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
             {
-                string[] nameParts = remoteName.Substring(path.Length).Split('/');
+                string[] nameParts = remoteName.Substring(path.Length + 1).Split('/');
                 string changePath = "/" + remoteName;
-                string folderName = path.Substring(1);
+                string folderName = path;
                 FolderMetaData folder = root;
                 for (int i = 0; i < nameParts.Length; i++)
                 {
@@ -1067,7 +1082,7 @@ namespace SvnBridge.SourceControl
             return ConvertSourceItem(items[0]);
         }
 
-        private bool IsChangeAlreadyCurrentInClientState(ChangeType changeType, string itemPath, int itemRevision, 
+        private bool IsChangeAlreadyCurrentInClientState(ChangeType changeType, string itemPath, int itemRevision,
             Dictionary<string, int> clientExistingFiles, Dictionary<string, string> clientDeletedFiles)
         {
             string changePath = "/" + itemPath;
@@ -1098,7 +1113,7 @@ namespace SvnBridge.SourceControl
         {
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Add, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
             {
-                if (remoteName.Length == path.Length - 1)
+                if (remoteName.Length == path.Length)
                 {
                     ItemMetaData item = GetItems(versionTo, remoteName, Recursion.None);
                     root.Properties = item.Properties;
@@ -1106,8 +1121,8 @@ namespace SvnBridge.SourceControl
                 else
                 {
                     FolderMetaData folder = root;
-                    string itemName = path.Substring(1);
-                    string[] nameParts = remoteName.Substring(path.Length).Split('/');
+                    string itemName = path;
+                    string[] nameParts = remoteName.Substring(path.Length + 1).Split('/');
                     for (int i = 0; i < nameParts.Length; i++)
                     {
                         bool lastNamePart = false;
