@@ -1,26 +1,23 @@
-using System;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
+using CodePlex.TfsLibrary.ObjectModel;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using SvnBridge;
-using SvnBridge.Handlers;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
-using CodePlex.TfsLibrary.ObjectModel;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace Tests
 {
     public abstract class ProtocolTestsBase
     {
         protected HttpContextDispatcher HttpDispatcher;
-        protected MyMocks stub = new MyMocks();
         protected StubSourceControlProvider provider;
+        protected MyMocks stub = new MyMocks();
 
         [SetUp]
         public virtual void Setup()
@@ -42,24 +39,29 @@ namespace Tests
             byte[] result = new byte[data.Length];
             for (int i = 0; i < data.Length; i++)
             {
-                result[i] = (byte)data[i];
+                result[i] = (byte) data[i];
             }
             return result;
         }
 
-        protected static SourceItemChange MakeChange(ChangeType changeType, string serverPath)
+        protected static SourceItemChange MakeChange(ChangeType changeType,
+                                                     string serverPath)
         {
             return TestHelper.MakeChange(changeType, serverPath);
         }
 
-        protected static SourceItemChange MakeChange(ChangeType changeType, string serverPath, string originalPath, int originalRevision)
+        protected static SourceItemChange MakeChange(ChangeType changeType,
+                                                     string serverPath,
+                                                     string originalPath,
+                                                     int originalRevision)
         {
             return TestHelper.MakeChange(changeType, serverPath, originalPath, originalRevision);
         }
 
-        protected string ProcessRequest(string request, ref string expected)
+        protected string ProcessRequest(string request,
+                                        ref string expected)
         {
-            MemoryStream HttpStream = new MemoryStream(1024 * 64);
+            MemoryStream HttpStream = new MemoryStream(1024*64);
 
             byte[] requestBuffer = GetBytes(request);
             HttpStream.Write(requestBuffer, 0, requestBuffer.Length);
@@ -97,7 +99,9 @@ namespace Tests
                 return value.Remove(startIndex, endIndex - startIndex + 2);
             }
             else
+            {
                 return value;
+            }
         }
 
         private static string RemoveChunkedEncoding(string value)
@@ -130,14 +134,15 @@ namespace Tests
             return Helper.DeserializeXml<T>(xml);
         }
 
-        protected string SerializeResponse<T>(T response, XmlSerializerNamespaces ns)
+        protected string SerializeResponse<T>(T response,
+                                              XmlSerializerNamespaces ns)
         {
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.CloseOutput = false;
             settings.Encoding = Encoding.UTF8;
             StringBuilder xml = new StringBuilder();
             XmlWriter writer = XmlWriter.Create(xml, settings);
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
+            XmlSerializer serializer = new XmlSerializer(typeof (T));
             serializer.Serialize(writer, response, ns);
             writer.Flush();
             return xml.ToString();

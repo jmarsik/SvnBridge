@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Attach;
@@ -25,7 +24,7 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string expected = "asdf";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
             Assert.AreEqual("text/plain", response.ContentType);
             Assert.AreEqual(1, getItemsResult.CallCount);
             Assert.AreEqual(1234, getItemsResult.Parameters[0]);

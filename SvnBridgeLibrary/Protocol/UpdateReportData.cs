@@ -7,22 +7,18 @@ namespace SvnBridge.Protocol
     [XmlRoot("update-report", Namespace = WebDav.Namespaces.SVN)]
     public class UpdateReportData
     {
-        [XmlAttribute("send-all", DataType = "boolean", Form = XmlSchemaForm.Unqualified)]
-        public bool SendAll = false;
+        [XmlElement("entry", Namespace = WebDav.Namespaces.SVN)] public List<EntryData> Entries = null;
 
-        [XmlElement("src-path", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
-        public string SrcPath = null;
+        [XmlElement("missing", Namespace = WebDav.Namespaces.SVN)] public List<string> Missing = null;
 
-        [XmlElement("target-revision", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
-        public string TargetRevision = null;
+        [XmlAttribute("send-all", DataType = "boolean", Form = XmlSchemaForm.Unqualified)] public bool SendAll = false;
 
-        [XmlElement("update-target", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
-        public string UpdateTarget = null;
+        [XmlElement("src-path", Namespace = WebDav.Namespaces.SVN, DataType = "string")] public string SrcPath = null;
 
-        [XmlElement("entry", Namespace = WebDav.Namespaces.SVN)]
-        public List<EntryData> Entries = null;
+        [XmlElement("target-revision", Namespace = WebDav.Namespaces.SVN, DataType = "string")] public string
+            TargetRevision = null;
 
-        [XmlElement("missing", Namespace = WebDav.Namespaces.SVN)]
-        public List<string> Missing = null;
+        [XmlElement("update-target", Namespace = WebDav.Namespaces.SVN, DataType = "string")] public string UpdateTarget
+            = null;
     }
 }

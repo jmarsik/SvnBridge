@@ -5,10 +5,10 @@ namespace SvnBridge.SourceControl
 {
     public class MergeActivityResponse
     {
-        public int Version;
-        public string Creator;
         public DateTime CreationDate;
+        public string Creator;
         public List<MergeActivityResponseItem> Items = new List<MergeActivityResponseItem>();
+        public int Version;
 
         public MergeActivityResponse(int version,
                                      DateTime creationDate,

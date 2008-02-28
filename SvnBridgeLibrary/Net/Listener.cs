@@ -1,9 +1,7 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using SvnBridge.Handlers;
-using System.IO;
-using SvnBridge.Utility;
 
 namespace SvnBridge.Net
 {
@@ -22,11 +20,13 @@ namespace SvnBridge.Net
         {
         }
 
-        public Listener(int port, string tfsUrl) : this((int?) port, tfsUrl)
+        public Listener(int port,
+                        string tfsUrl) : this((int?) port, tfsUrl)
         {
         }
 
-        private Listener(int? port, string tfsUrl)
+        private Listener(int? port,
+                         string tfsUrl)
         {
             this.port = port;
 
@@ -44,7 +44,9 @@ namespace SvnBridge.Net
             set
             {
                 if (isListening)
+                {
                     throw new InvalidOperationException("The port cannot be changed while the listener is listening.");
+                }
 
                 port = value;
             }
@@ -56,7 +58,10 @@ namespace SvnBridge.Net
             set
             {
                 if (isListening)
-                    throw new InvalidOperationException("The TFS server URL cannot be changed while the listener is listening.");
+                {
+                    throw new InvalidOperationException(
+                        "The TFS server URL cannot be changed while the listener is listening.");
+                }
 
                 // validate URI
                 new Uri(value, UriKind.Absolute);
@@ -68,10 +73,14 @@ namespace SvnBridge.Net
         public void Start()
         {
             if (!port.HasValue)
+            {
                 throw new InvalidOperationException("A port must be specified before starting the listener.");
+            }
 
             if (string.IsNullOrEmpty(TfsUrl))
+            {
                 throw new InvalidOperationException("A TFS server URL must be specified before starting the listener.");
+            }
 
             isListening = true;
 
@@ -108,9 +117,11 @@ namespace SvnBridge.Net
             try
             {
                 if (tcpClient != null)
+                {
                     Process(tcpClient);
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 OnListenException(ex);
             }
@@ -126,7 +137,10 @@ namespace SvnBridge.Net
             {
                 connection.Response.OutputStream.Flush();
             }
-            catch (IOException) { /* Ignore error, caused by client cancelling operation */ }
+            catch (IOException)
+            {
+                /* Ignore error, caused by client cancelling operation */
+            }
 
             tcpClient.Close();
         }
@@ -135,6 +149,5 @@ namespace SvnBridge.Net
         {
             ListenError(this, new ListenErrorEventArgs(ex));
         }
-
     }
 }

@@ -5,18 +5,16 @@ namespace SvnBridge.Protocol
     [XmlRoot("merge", Namespace = WebDav.Namespaces.DAV)]
     public class MergeData
     {
-        public MergeData() {}
+        [XmlElement("no-auto-merge", Namespace = WebDav.Namespaces.DAV)] public string NoAutoMerge = null;
 
-        [XmlElement("source", Namespace = WebDav.Namespaces.DAV)]
-        public SourceData Source = null;
+        [XmlElement("no-checkout", Namespace = WebDav.Namespaces.DAV)] public string NoCheckout = null;
 
-        [XmlElement("no-auto-merge", Namespace = WebDav.Namespaces.DAV)]
-        public string NoAutoMerge = null;
+        [XmlElement("prop", Namespace = WebDav.Namespaces.DAV)] public PropData Prop = null;
 
-        [XmlElement("no-checkout", Namespace = WebDav.Namespaces.DAV)]
-        public string NoCheckout = null;
+        [XmlElement("source", Namespace = WebDav.Namespaces.DAV)] public SourceData Source = null;
 
-        [XmlElement("prop", Namespace = WebDav.Namespaces.DAV)]
-        public PropData Prop = null;
+        public MergeData()
+        {
+        }
     }
 }

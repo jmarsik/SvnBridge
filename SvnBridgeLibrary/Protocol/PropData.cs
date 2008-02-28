@@ -8,18 +8,16 @@ namespace SvnBridge.Protocol
     [Serializable]
     public class PropData
     {
-        public PropData() {}
+        [XmlAnyElement()] public List<XmlElement> Properties = new List<XmlElement>();
 
-        [XmlAnyElement()]
-        public List<XmlElement> Properties = new List<XmlElement>();
+        public PropData()
+        {
+        }
 
         public XmlElement FindProperty(string ns,
                                        string name)
         {
-            return Properties.Find(delegate(XmlElement e)
-                                   {
-                                       return e.NamespaceURI == ns && e.LocalName == name;
-                                   });
+            return Properties.Find(delegate(XmlElement e) { return e.NamespaceURI == ns && e.LocalName == name; });
         }
     }
 }

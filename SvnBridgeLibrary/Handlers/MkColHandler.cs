@@ -9,7 +9,8 @@ namespace SvnBridge.Handlers
 {
     public class MkColHandler : HttpContextHandlerBase
     {
-        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context,
+                                       ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -28,18 +29,25 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void MakeCollection(string path, ISourceControlProvider sourceControlProvider)
+        private static void MakeCollection(string path,
+                                           ISourceControlProvider sourceControlProvider)
         {
             if (!path.StartsWith("//"))
+            {
                 path = "/" + path;
-            
+            }
+
             Match match = Regex.Match(path, @"//!svn/wrk/([a-zA-Z0-9\-]+)/?");
             string folderPath = path.Substring(match.Groups[0].Value.Length - 1);
             string activityId = match.Groups[1].Value;
             sourceControlProvider.MakeCollection(activityId, Helper.Decode(folderPath));
         }
 
-        private static void SendCreatedResponse(IHttpRequest request, IHttpResponse response, string path, string server, string port)
+        private static void SendCreatedResponse(IHttpRequest request,
+                                                IHttpResponse response,
+                                                string path,
+                                                string server,
+                                                string port)
         {
             SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
 
@@ -52,13 +60,17 @@ namespace SvnBridge.Handlers
                                      "<h1>Created</h1>\n" +
                                      "<p>Collection /" + path + " has been created.</p>\n" +
                                      "<hr />\n" +
-                                     "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " + port + "</address>\n" +
+                                     "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + server + " Port " +
+                                     port + "</address>\n" +
                                      "</body></html>\n";
 
             WriteToResponse(response, responseContent);
         }
 
-        private static void SendFailureResponse(IHttpResponse response, string path, string server, string port)
+        private static void SendFailureResponse(IHttpResponse response,
+                                                string path,
+                                                string server,
+                                                string port)
         {
             SetResponseSettings(response, "text/html; charset=iso-8859-1", Encoding.UTF8, 405);
 

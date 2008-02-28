@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using SvnBridge.SourceControl;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
@@ -15,12 +13,13 @@ namespace SvnBridge.Handlers
 
         private bool _cancel = false;
         private FolderMetaData _folderInfo;
-        private ISourceControlProvider _sourceControlProvider;
-        private Queue<ItemMetaData> _loadingQueue = new Queue<ItemMetaData>();
         private List<ItemLoader> _itemLoaders = new List<ItemLoader>();
+        private Queue<ItemMetaData> _loadingQueue = new Queue<ItemMetaData>();
         private List<Thread> _loadingThreads = new List<Thread>();
+        private ISourceControlProvider _sourceControlProvider;
 
-        public ItemLoaderManager(FolderMetaData folderInfo, ISourceControlProvider sourceControlProvider)
+        public ItemLoaderManager(FolderMetaData folderInfo,
+                                 ISourceControlProvider sourceControlProvider)
         {
             _folderInfo = folderInfo;
             _sourceControlProvider = sourceControlProvider;
@@ -36,7 +35,9 @@ namespace SvnBridge.Handlers
             QueueItemsInFolder(_folderInfo);
 
             for (int i = 0; i < INITIAL_LOADING_THREADS; i++)
+            {
                 AddLoadingThread();
+            }
 
             bool threadsStillActive;
             do
@@ -45,20 +46,32 @@ namespace SvnBridge.Handlers
 
                 threadsStillActive = false;
                 foreach (Thread thread in _loadingThreads)
+                {
                     if (thread.ThreadState != ThreadState.Stopped)
+                    {
                         threadsStillActive = true;
+                    }
+                }
 
                 int count = CountLoadedItemsInFolder(_folderInfo);
-                if (count < 5 && _loadingThreads.Count < MAX_LOADING_THREADS && (_loadingQueue.Count > 20 || _loadingThreads.Count == 0))
+                if (count < 5 && _loadingThreads.Count < MAX_LOADING_THREADS &&
+                    (_loadingQueue.Count > 20 || _loadingThreads.Count == 0))
+                {
                     AddLoadingThread();
+                }
 
                 if (count > 50 && _loadingThreads.Count > 0)
+                {
                     RemoveLoadingThread();
+                }
 
                 if (_cancel)
+                {
                     foreach (ItemLoader itemLoader in _itemLoaders)
+                    {
                         itemLoader.Cancel();
-
+                    }
+                }
             } while (threadsStillActive || (!_cancel && _loadingQueue.Count > 0));
         }
 
@@ -84,10 +97,16 @@ namespace SvnBridge.Handlers
             foreach (ItemMetaData item in folder.Items)
             {
                 if (item.ItemType == ItemType.Folder)
-                    count += CountLoadedItemsInFolder((FolderMetaData)item);
+                {
+                    count += CountLoadedItemsInFolder((FolderMetaData) item);
+                }
                 else if (!(item is DeleteMetaData))
+                {
                     if (item.DataLoaded)
+                    {
                         count++;
+                    }
+                }
             }
             return count;
         }
@@ -95,11 +114,17 @@ namespace SvnBridge.Handlers
         private void QueueItemsInFolder(FolderMetaData folder)
         {
             foreach (ItemMetaData item in folder.Items)
+            {
                 if (item.ItemType == ItemType.Folder)
-                    QueueItemsInFolder((FolderMetaData)item);
+                {
+                    QueueItemsInFolder((FolderMetaData) item);
+                }
                 else if (!(item is DeleteMetaData))
-                    lock (((ICollection)_loadingQueue).SyncRoot)
+                {
+                    lock (((ICollection) _loadingQueue).SyncRoot)
                         _loadingQueue.Enqueue(item);
+                }
+            }
         }
     }
 }

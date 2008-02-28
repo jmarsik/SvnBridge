@@ -7,9 +7,9 @@ namespace SvnBridge.Nodes
     // Node: <server>/!svn/vcc/default
     public class SvnVccDefaultNode : INode
     {
-        ISourceControlProvider sourceControlProvider;
-        string path;
-        string label;
+        private string label;
+        private string path;
+        private ISourceControlProvider sourceControlProvider;
 
         public SvnVccDefaultNode(ISourceControlProvider sourceControlProvider,
                                  string path,
@@ -20,12 +20,18 @@ namespace SvnBridge.Nodes
             this.label = label;
         }
 
+        #region INode Members
+
         public string Href()
         {
             if (label == null)
+            {
                 return path;
+            }
             else
+            {
                 return "/!svn/bln/" + label;
+            }
         }
 
         public string GetProperty(XmlElement property)
@@ -43,18 +49,20 @@ namespace SvnBridge.Nodes
             }
         }
 
-        string GetCheckedIn(XmlElement property)
+        #endregion
+
+        private string GetCheckedIn(XmlElement property)
         {
             int maxVersion = sourceControlProvider.GetLatestVersion();
             return "<lp1:checked-in><D:href>/!svn/bln/" + maxVersion.ToString() + "</D:href></lp1:checked-in>";
         }
 
-        string GetBaselineCollection(XmlElement property)
+        private string GetBaselineCollection(XmlElement property)
         {
             return "<lp1:baseline-collection><D:href>/!svn/bc/" + label + "/</D:href></lp1:baseline-collection>";
         }
 
-        string GetVersionName(XmlElement property)
+        private string GetVersionName(XmlElement property)
         {
             return "<lp1:version-name>" + label + "</lp1:version-name>";
         }

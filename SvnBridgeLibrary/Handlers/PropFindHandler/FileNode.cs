@@ -8,24 +8,31 @@ namespace SvnBridge.Nodes
 {
     public class FileNode : INode
     {
-        readonly ItemMetaData item;
-        readonly ISourceControlProvider sourceControlProvider;
+        private readonly ItemMetaData item;
+        private readonly ISourceControlProvider sourceControlProvider;
 
-        public FileNode(ItemMetaData item, ISourceControlProvider sourceControlProvider)
+        public FileNode(ItemMetaData item,
+                        ISourceControlProvider sourceControlProvider)
         {
             this.item = item;
             this.sourceControlProvider = sourceControlProvider;
         }
+
+        #region INode Members
 
         public string Href()
         {
             string href = item.Name;
 
             if (!href.StartsWith("/"))
+            {
                 href = "/" + href;
+            }
 
             if (item.ItemType == ItemType.Folder && !href.EndsWith("/"))
+            {
                 href += "/";
+            }
 
             return Helper.Encode(href);
         }
@@ -63,6 +70,8 @@ namespace SvnBridge.Nodes
             }
         }
 
+        #endregion
+
         private string GetContentLength()
         {
             return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>";
@@ -70,7 +79,9 @@ namespace SvnBridge.Nodes
 
         private static string GetVersionControlledConfiguration()
         {
-            return "<lp1:version-controlled-configuration><D:href>" + Constants.VccPath + "</D:href></lp1:version-controlled-configuration>";
+            return
+                "<lp1:version-controlled-configuration><D:href>" + Constants.VccPath +
+                "</D:href></lp1:version-controlled-configuration>";
         }
 
         private string GetResourceType()
@@ -85,13 +96,17 @@ namespace SvnBridge.Nodes
             }
         }
 
-        string GetBaselineRelativePath()
+        private string GetBaselineRelativePath()
         {
             string brl = item.Name;
             if ((brl.Length > 0) && (brl[0] == '/'))
+            {
                 brl = brl.Substring(1);
+            }
             if ((brl.Length > 0) && (brl[brl.Length - 1] == '/'))
+            {
                 brl = brl.Substring(0, brl.Length - 1);
+            }
 
             brl = Helper.EncodeB(brl);
             if (brl.Length > 0)
@@ -99,7 +114,9 @@ namespace SvnBridge.Nodes
                 return "<lp2:baseline-relative-path>" + brl + "</lp2:baseline-relative-path>";
             }
             else
+            {
                 return "<lp2:baseline-relative-path/>";
+            }
         }
 
         private static string GetRepositoryUUID()
@@ -109,7 +126,9 @@ namespace SvnBridge.Nodes
 
         private string GetCheckedIn()
         {
-            return "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true) + "</D:href></lp1:checked-in>";
+            return
+                "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true) +
+                "</D:href></lp1:checked-in>";
         }
 
         private string GetCreatorDisplayName()
@@ -119,7 +138,9 @@ namespace SvnBridge.Nodes
 
         private string GetCreationDate()
         {
-            return "<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate.ToUniversalTime()) + "</lp1:creationdate>";
+            return
+                "<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate.ToUniversalTime()) +
+                "</lp1:creationdate>";
         }
 
         private string GetVersionName()
@@ -134,7 +155,9 @@ namespace SvnBridge.Nodes
 
         private string GetMd5Checksum()
         {
-            return "<lp2:md5-checksum>" + Helper.GetMd5Checksum(sourceControlProvider.ReadFile(item)) + "</lp2:md5-checksum>";
+            return
+                "<lp2:md5-checksum>" + Helper.GetMd5Checksum(sourceControlProvider.ReadFile(item)) +
+                "</lp2:md5-checksum>";
         }
     }
 }

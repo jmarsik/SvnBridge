@@ -8,9 +8,11 @@ namespace SvnBridge.Protocol
     [XmlRoot("multistatus", Namespace = WebDav.Namespaces.DAV)]
     public class MultiStatusData
     {
-        public MultiStatusData() {}
+        [XmlElement("response", Namespace = WebDav.Namespaces.DAV)] public List<ResponseData> Responses =
+            new List<ResponseData>();
 
-        [XmlElement("response", Namespace = WebDav.Namespaces.DAV)]
-        public List<ResponseData> Responses = new List<ResponseData>();
+        public MultiStatusData()
+        {
+        }
     }
 }

@@ -22,9 +22,11 @@ namespace SvnBridge.Views
             startToolStripMenuItem.Enabled = false;
             stopToolStripMenuItem.Enabled = true;
 
-            notifyIcon.ShowBalloonTip(500, "SvnBridge",
+            notifyIcon.ShowBalloonTip(500,
+                                      "SvnBridge",
                                       "Started on port " + presenter.Port + "\r\nForwarding to " +
-                                      presenter.TfsUrl, ToolTipIcon.Info);
+                                      presenter.TfsUrl,
+                                      ToolTipIcon.Info);
         }
 
         public void OnListenerStopped()
@@ -55,7 +57,8 @@ namespace SvnBridge.Views
             presenter.StopListener();
         }
 
-        private void OnExitClicked(object sender, EventArgs e)
+        private void OnExitClicked(object sender,
+                                   EventArgs e)
         {
             Close();
         }
@@ -65,19 +68,22 @@ namespace SvnBridge.Views
             Hide();
         }
 
-        private void OnSettingsClicked(object sender, EventArgs e)
+        private void OnSettingsClicked(object sender,
+                                       EventArgs e)
         {
             SettingsForm settingsView = new SettingsForm();
 
             presenter.ChangeSettings(settingsView);
         }
 
-        private void OnStartClicked(object sender, EventArgs e)
+        private void OnStartClicked(object sender,
+                                    EventArgs e)
         {
             presenter.StartListener();
         }
 
-        private void OnStopClicked(object sender, EventArgs e)
+        private void OnStopClicked(object sender,
+                                   EventArgs e)
         {
             presenter.StopListener();
         }

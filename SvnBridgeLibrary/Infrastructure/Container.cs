@@ -7,7 +7,12 @@ namespace SvnBridge.Infrastructure
 {
     public class Container
     {
-        public delegate object Creator(Container c, IDictionary dependencies);
+        #region Delegates
+
+        public delegate object Creator(Container c,
+                                       IDictionary dependencies);
+
+        #endregion
 
         private readonly Dictionary<string, object> configuration
             = new Dictionary<string, object>();
@@ -25,15 +30,22 @@ namespace SvnBridge.Infrastructure
             Register(typeof (Type), creator);
         }
 
-        public void Register(Type service, Type impl)
+        public void Register(Type service,
+                             Type impl)
         {
-            Register(service, delegate(Container c, IDictionary deps) { return CreateInstance(impl, deps); });
+            Register(service,
+                     delegate(Container c,
+                              IDictionary deps)
+                     { return CreateInstance(impl, deps); });
         }
 
-        public void Register(Type type, Creator creator)
+        public void Register(Type type,
+                             Creator creator)
         {
             if (IsRegistered(type))
+            {
                 throw new InvalidOperationException(type + " was already registered in the container");
+            }
             typeToCreator.Add(type, creator);
         }
 
@@ -47,11 +59,14 @@ namespace SvnBridge.Infrastructure
             return (T) Resolve(typeof (T), dependencies);
         }
 
-        public object Resolve(Type type, IDictionary dependencies)
+        public object Resolve(Type type,
+                              IDictionary dependencies)
         {
             Creator creator;
             if (typeToCreator.TryGetValue(type, out creator) == false)
+            {
                 throw new InvalidOperationException("No component registered for " + type);
+            }
             return creator(this, dependencies);
         }
 
@@ -64,11 +79,14 @@ namespace SvnBridge.Infrastructure
         {
             object value;
             if (configuration.TryGetValue(name, out value))
+            {
                 return value;
+            }
             return null;
         }
 
-        private static object CreateInstance(Type type, IDictionary dictionary)
+        private static object CreateInstance(Type type,
+                                             IDictionary dictionary)
         {
             List<object> args = new List<object>();
             ConstructorInfo[] constructors = type.GetConstructors();
@@ -99,9 +117,13 @@ namespace SvnBridge.Infrastructure
                 }
             }
             if (args.Count > 0)
+            {
                 return Activator.CreateInstance(type, args.ToArray());
+            }
             else
+            {
                 return Activator.CreateInstance(type);
+            }
         }
     }
 }

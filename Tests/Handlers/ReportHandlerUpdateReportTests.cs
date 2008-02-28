@@ -1,18 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Text;
-using NUnit.Framework;
-using SvnBridge.Net;
-using SvnBridge.Stubs;
-using Tests;
-using CodePlex.TfsLibrary.ObjectModel;
-using SvnBridge.SourceControl;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 using System.IO;
+using System.Text;
 using Attach;
-using SvnBridge.Utility;
+using NUnit.Framework;
 using SvnBridge.Infrastructure;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
@@ -20,6 +12,192 @@ namespace SvnBridge.Handlers
     public class ReportHandlerUpdateReportTests : HandlerTestsBase
     {
         protected ReportHandler handler = new ReportHandler();
+
+        [Test]
+        public void TestHandleEncodesDeleteFileElements()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            metadata.Name = "";
+            metadata.ItemRevision = 5734;
+            metadata.Author = "jwanagel";
+            metadata.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
+            DeleteMetaData file1 = new DeleteMetaData();
+            file1.Name = "F !@#$%^&()_-+={[}];',.~`.txt";
+            metadata.Items.Add(file1);
+            stub.Attach(provider.GetChangedItems, metadata);
+            request.Path = "http://localhost:8084/!svn/vcc/default";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+            string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
+
+            Assert.IsTrue(output.Contains("<S:delete-entry name=\"F !@#$%^&amp;()_-+={[}];',.~`.txt\"/>"));
+        }
+
+        [Test]
+        public void TestHandleEncodesDeleteFolderElements()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            metadata.Name = "";
+            metadata.ItemRevision = 5734;
+            metadata.Author = "jwanagel";
+            metadata.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
+            DeleteFolderMetaData folder1 = new DeleteFolderMetaData();
+            folder1.Name = "B !@#$%^&()_-+={[}];',.~`";
+            metadata.Items.Add(folder1);
+            stub.Attach(provider.GetChangedItems, metadata);
+            request.Path = "http://localhost:8084/!svn/vcc/default";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+            string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
+
+            Assert.IsTrue(output.Contains("<S:delete-entry name=\"B !@#$%^&amp;()_-+={[}];',.~`\"/>"));
+        }
+
+        [Test]
+        public void TestHandleEncodesUpdateFileElements()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            metadata.Name = "";
+            metadata.ItemRevision = 5734;
+            metadata.Author = "jwanagel";
+            metadata.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
+            ItemMetaData file1 = new ItemMetaData();
+            file1.Name = "G !@#$%^&()_-+={[}];',.~`.txt";
+            file1.ItemRevision = 5734;
+            file1.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
+            file1.Author = "jwanagel";
+            metadata.Items.Add(file1);
+            stub.Attach(provider.GetChangedItems, metadata);
+            stub.Attach(provider.ItemExists, true);
+            byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
+            stub.Attach(provider.ReadFile, fileData);
+            request.Path = "http://localhost:8084/!svn/vcc/default";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+            string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
+
+            Assert.IsTrue(output.Contains("<S:open-file name=\"G !@#$%^&amp;()_-+={[}];',.~`.txt\" rev=\"5733\">"));
+        }
+
+        [Test]
+        public void VerifyHandleEncodesAddDirectoryCheckedInHrefElements()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            metadata.Name = "Test";
+            metadata.ItemRevision = 5722;
+            metadata.Author = "bradwils";
+            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "Test/B !@#$%^&()_-+={[}];',.~`";
+            folder.ItemRevision = 5722;
+            folder.Author = "bradwils";
+            folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            metadata.Items.Add(folder);
+            stub.Attach(provider.GetItems, metadata);
+            byte[] fileData = Encoding.UTF8.GetBytes("test");
+            stub.Attach(provider.ReadFile, fileData);
+            request.Path = "http://localhost:8084/!svn/vcc/default";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+            string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
+
+            Assert.IsTrue(
+                output.Contains(
+                    "<D:checked-in><D:href>/!svn/ver/5722/Test/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60</D:href></D:checked-in>"));
+        }
+
+        [Test]
+        public void VerifyHandleEncodesAddDirectoryElements()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            metadata.Name = "Test";
+            metadata.ItemRevision = 5722;
+            metadata.Author = "bradwils";
+            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "Test/B !@#$%^&()_-+={[}];',.~`";
+            folder.ItemRevision = 5722;
+            folder.Author = "bradwils";
+            folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            metadata.Items.Add(folder);
+            stub.Attach(provider.GetItems, metadata);
+            byte[] fileData = Encoding.UTF8.GetBytes("test");
+            stub.Attach(provider.ReadFile, fileData);
+            request.Path = "http://localhost:8084/!svn/vcc/default";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+            string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
+
+            Assert.IsTrue(
+                output.Contains(
+                    "<S:add-directory name=\"B !@#$%^&amp;()_-+={[}];',.~`\" bc-url=\"/!svn/bc/5722/Test/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60\">"));
+        }
+
+        [Test]
+        public void VerifyHandleEncodesAddFileCheckedInHrefElements()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            metadata.Name = "Test";
+            metadata.ItemRevision = 5722;
+            metadata.Author = "bradwils";
+            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Test/C !@#$%^&()_-+={[}];',.~`..txt";
+            item.ItemRevision = 5722;
+            item.Author = "bradwils";
+            item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            metadata.Items.Add(item);
+            stub.Attach(provider.GetItems, metadata);
+            byte[] fileData = Encoding.UTF8.GetBytes("test");
+            stub.Attach(provider.ReadFile, fileData);
+            request.Path = "http://localhost:8084/!svn/vcc/default";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+            string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
+
+            Assert.IsTrue(
+                output.Contains(
+                    "<D:checked-in><D:href>/!svn/ver/5722/Test/C%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60..txt</D:href></D:checked-in>"));
+        }
+
+        [Test]
+        public void VerifyHandleEncodesAddFileElements()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            metadata.Name = "Test";
+            metadata.ItemRevision = 5722;
+            metadata.Author = "bradwils";
+            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Test/C !@#$%^&()_-+={[}];',.~`..txt";
+            item.ItemRevision = 5722;
+            item.Author = "bradwils";
+            item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
+            metadata.Items.Add(item);
+            stub.Attach(provider.GetItems, metadata);
+            byte[] fileData = Encoding.UTF8.GetBytes("test");
+            stub.Attach(provider.ReadFile, fileData);
+            request.Path = "http://localhost:8084/!svn/vcc/default";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
+
+            handler.Handle(context, tfsUrl);
+            string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
+
+            Assert.IsTrue(output.Contains("<S:add-file name=\"C !@#$%^&amp;()_-+={[}];',.~`..txt\">"));
+        }
 
         [Test]
         public void VerifyHandleProducesCorrectOutputForBranchedFile()
@@ -39,7 +217,8 @@ namespace SvnBridge.Handlers
             byte[] fileData = Encoding.UTF8.GetBytes("test");
             stub.Attach(provider.ReadFile, fileData);
             request.Path = "http://localhost:8082/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5700</S:target-revision><S:entry rev=\"5699\" ></S:entry></S:update-report>";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5700</S:target-revision><S:entry rev=\"5699\" ></S:entry></S:update-report>";
 
             handler.Handle(context, tfsUrl);
 
@@ -66,7 +245,7 @@ namespace SvnBridge.Handlers
                 "<S:prop></S:prop>\n" +
                 "</S:open-directory>\n" +
                 "</S:update-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
             Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
             Assert.AreEqual(Encoding.UTF8, response.ContentEncoding);
             Assert.AreEqual(200, response.StatusCode);
@@ -89,12 +268,13 @@ namespace SvnBridge.Handlers
             folder.Items[0].Author = "jwanagel";
             folder.Items[0].ItemRevision = 5698;
             folder.Items[0].LastModifiedDate = DateTime.Parse("2007-08-21T00:41:27.680005Z");
-            ((FolderMetaData)folder.Items[0]).Items.Add(new DeleteMetaData());
-            ((FolderMetaData)folder.Items[0]).Items[0].Name = "Test.txt";
+            ((FolderMetaData) folder.Items[0]).Items.Add(new DeleteMetaData());
+            ((FolderMetaData) folder.Items[0]).Items[0].Name = "Test.txt";
             Results r = stub.Attach(provider.GetChangedItems, folder);
             stub.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5698</S:target-revision><S:entry rev=\"5697\" ></S:entry></S:update-report>";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5698</S:target-revision><S:entry rev=\"5697\" ></S:entry></S:update-report>";
 
             handler.Handle(context, tfsUrl);
 
@@ -120,7 +300,7 @@ namespace SvnBridge.Handlers
                 "<S:prop></S:prop>\n" +
                 "</S:open-directory>\n" +
                 "</S:update-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
             Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
             Assert.AreEqual(Encoding.UTF8, response.ContentEncoding);
             Assert.AreEqual(200, response.StatusCode);
@@ -141,7 +321,8 @@ namespace SvnBridge.Handlers
             stub.Attach(provider.GetChangedItems, folder);
             stub.Attach(provider.GetLatestVersion, 5713);
             request.Path = "http://localhost:8085/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8085</S:src-path><S:entry rev=\"5713\" ></S:entry></S:update-report>";
+            request.Input =
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8085</S:src-path><S:entry rev=\"5713\" ></S:entry></S:update-report>";
 
             handler.Handle(context, tfsUrl);
 
@@ -158,180 +339,7 @@ namespace SvnBridge.Handlers
                 "<S:prop></S:prop>\n" +
                 "</S:open-directory>\n" +
                 "</S:update-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray()));
-        }
-
-        [Test]
-        public void VerifyHandleEncodesAddFileElements()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            metadata.Name = "Test";
-            metadata.ItemRevision = 5722;
-            metadata.Author = "bradwils";
-            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            ItemMetaData item = new ItemMetaData();
-            item.Name = "Test/C !@#$%^&()_-+={[}];',.~`..txt";
-            item.ItemRevision = 5722;
-            item.Author = "bradwils";
-            item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            metadata.Items.Add(item);
-            stub.Attach(provider.GetItems, metadata);
-            byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFile, fileData);
-            request.Path = "http://localhost:8084/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
-
-            handler.Handle(context, tfsUrl);
-            string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-
-            Assert.IsTrue(output.Contains("<S:add-file name=\"C !@#$%^&amp;()_-+={[}];',.~`..txt\">"));
-        }
-
-        [Test]
-        public void VerifyHandleEncodesAddFileCheckedInHrefElements()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            metadata.Name = "Test";
-            metadata.ItemRevision = 5722;
-            metadata.Author = "bradwils";
-            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            ItemMetaData item = new ItemMetaData();
-            item.Name = "Test/C !@#$%^&()_-+={[}];',.~`..txt";
-            item.ItemRevision = 5722;
-            item.Author = "bradwils";
-            item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            metadata.Items.Add(item);
-            stub.Attach(provider.GetItems, metadata);
-            byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFile, fileData);
-            request.Path = "http://localhost:8084/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
-
-            handler.Handle(context, tfsUrl);
-            string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-
-            Assert.IsTrue(output.Contains("<D:checked-in><D:href>/!svn/ver/5722/Test/C%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60..txt</D:href></D:checked-in>"));
-        }
-
-        [Test]
-        public void VerifyHandleEncodesAddDirectoryElements()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            metadata.Name = "Test";
-            metadata.ItemRevision = 5722;
-            metadata.Author = "bradwils";
-            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            FolderMetaData folder = new FolderMetaData();
-            folder.Name = "Test/B !@#$%^&()_-+={[}];',.~`";
-            folder.ItemRevision = 5722;
-            folder.Author = "bradwils";
-            folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            metadata.Items.Add(folder);
-            stub.Attach(provider.GetItems, metadata);
-            byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFile, fileData);
-            request.Path = "http://localhost:8084/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
-
-            handler.Handle(context, tfsUrl);
-            string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-
-            Assert.IsTrue(output.Contains("<S:add-directory name=\"B !@#$%^&amp;()_-+={[}];',.~`\" bc-url=\"/!svn/bc/5722/Test/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60\">"));
-        }
-
-        [Test]
-        public void VerifyHandleEncodesAddDirectoryCheckedInHrefElements()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            metadata.Name = "Test";
-            metadata.ItemRevision = 5722;
-            metadata.Author = "bradwils";
-            metadata.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            FolderMetaData folder = new FolderMetaData();
-            folder.Name = "Test/B !@#$%^&()_-+={[}];',.~`";
-            folder.ItemRevision = 5722;
-            folder.Author = "bradwils";
-            folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
-            metadata.Items.Add(folder);
-            stub.Attach(provider.GetItems, metadata);
-            byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFile, fileData);
-            request.Path = "http://localhost:8084/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
-
-            handler.Handle(context, tfsUrl);
-            string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-
-            Assert.IsTrue(output.Contains("<D:checked-in><D:href>/!svn/ver/5722/Test/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60</D:href></D:checked-in>"));
-        }
-
-        [Test]
-        public void TestHandleEncodesDeleteFileElements()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            metadata.Name = "";
-            metadata.ItemRevision = 5734;
-            metadata.Author = "jwanagel";
-            metadata.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
-            DeleteMetaData file1 = new DeleteMetaData();
-            file1.Name = "F !@#$%^&()_-+={[}];',.~`.txt";
-            metadata.Items.Add(file1);
-            stub.Attach(provider.GetChangedItems, metadata);
-            request.Path = "http://localhost:8084/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
-
-            handler.Handle(context, tfsUrl);
-            string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-
-            Assert.IsTrue(output.Contains("<S:delete-entry name=\"F !@#$%^&amp;()_-+={[}];',.~`.txt\"/>"));
-        }
-
-        [Test]
-        public void TestHandleEncodesDeleteFolderElements()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            metadata.Name = "";
-            metadata.ItemRevision = 5734;
-            metadata.Author = "jwanagel";
-            metadata.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
-            DeleteFolderMetaData folder1 = new DeleteFolderMetaData();
-            folder1.Name = "B !@#$%^&()_-+={[}];',.~`";
-            metadata.Items.Add(folder1);
-            stub.Attach(provider.GetChangedItems, metadata);
-            request.Path = "http://localhost:8084/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
-
-            handler.Handle(context, tfsUrl);
-            string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-
-            Assert.IsTrue(output.Contains("<S:delete-entry name=\"B !@#$%^&amp;()_-+={[}];',.~`\"/>"));
-        }
-
-        [Test]
-        public void TestHandleEncodesUpdateFileElements()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            metadata.Name = "";
-            metadata.ItemRevision = 5734;
-            metadata.Author = "jwanagel";
-            metadata.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
-            ItemMetaData file1 = new ItemMetaData();
-            file1.Name = "G !@#$%^&()_-+={[}];',.~`.txt";
-            file1.ItemRevision = 5734;
-            file1.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
-            file1.Author = "jwanagel";
-            metadata.Items.Add(file1);
-            stub.Attach(provider.GetChangedItems, metadata);
-            stub.Attach(provider.ItemExists, true);
-            byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
-            stub.Attach(provider.ReadFile, fileData);
-            request.Path = "http://localhost:8084/!svn/vcc/default";
-            request.Input = "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
-
-            handler.Handle(context, tfsUrl);
-            string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
-
-            Assert.IsTrue(output.Contains("<S:open-file name=\"G !@#$%^&amp;()_-+={[}];',.~`.txt\" rev=\"5733\">"));
+            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
         }
     }
 }

@@ -1,7 +1,7 @@
+using System.Windows.Forms;
 using NUnit.Framework;
 using SvnBridge.Stubs;
 using Assert=CodePlex.NUnitExtensions.Assert;
-using System.Windows.Forms;
 
 namespace SvnBridge.Presenters
 {
@@ -25,6 +25,79 @@ namespace SvnBridge.Presenters
         private ListenerViewPresenter CreatePresenter()
         {
             return new ListenerViewPresenter(stubView, stubListener);
+        }
+
+        [Test]
+        public void TestCancelChangeSettingsDoesntStopListener()
+        {
+            stubListener.Get_Port = 8081;
+            stubListener.Get_TfsUrl = "http://foo";
+            ListenerViewPresenter presenter = CreatePresenter();
+            StubSettingsView stubSettingsView = new StubSettingsView();
+            stubSettingsView.Show_Delegate =
+                delegate
+                {
+                    stubSettingsView.Presenter.Port = 8082;
+                    stubSettingsView.Presenter.TfsUrl = "http://foo";
+                    stubSettingsView.DialogResult_Return = DialogResult.Cancel;
+                };
+
+            presenter.ChangeSettings(stubSettingsView);
+
+            Assert.False(stubListener.Stop_Called);
+        }
+
+        [Test]
+        public void TestChangeSettingsDefaultsToExistingSettings()
+        {
+            stubListener.Get_Port = 8081;
+            stubListener.Get_TfsUrl = "http://foo";
+            ListenerViewPresenter presenter = CreatePresenter();
+            StubSettingsView stubSettingsView = new StubSettingsView();
+
+            presenter.ChangeSettings(stubSettingsView);
+
+            Assert.Equal(stubSettingsView.Presenter.Port, 8081);
+            Assert.Equal(stubSettingsView.Presenter.TfsUrl, "http://foo");
+        }
+
+        [Test]
+        public void TestChangeSettingsWithChangesStopsAndStartsListener()
+        {
+            stubListener.Get_Port = 8081;
+            stubListener.Get_TfsUrl = "http://foo";
+            ListenerViewPresenter presenter = CreatePresenter();
+            StubSettingsView stubSettingsView = new StubSettingsView();
+            stubSettingsView.Show_Delegate =
+                delegate
+                {
+                    stubSettingsView.Presenter.Port = 8082;
+                    stubSettingsView.Presenter.TfsUrl = "http://foo";
+                };
+
+            presenter.ChangeSettings(stubSettingsView);
+
+            Assert.True(stubListener.Stop_Called);
+            Assert.True(stubListener.Start_Called);
+        }
+
+        [Test]
+        public void TestChangeSettingsWithNoChangesDoesntStopListener()
+        {
+            stubListener.Get_Port = 8081;
+            stubListener.Get_TfsUrl = "http://foo";
+            ListenerViewPresenter presenter = CreatePresenter();
+            StubSettingsView stubSettingsView = new StubSettingsView();
+            stubSettingsView.Show_Delegate =
+                delegate
+                {
+                    stubSettingsView.Presenter.Port = 8081;
+                    stubSettingsView.Presenter.TfsUrl = "http://foo";
+                };
+
+            presenter.ChangeSettings(stubSettingsView);
+
+            Assert.False(stubListener.Stop_Called);
         }
 
         [Test]
@@ -105,79 +178,6 @@ namespace SvnBridge.Presenters
             presenter.StopListener();
 
             Assert.True(stubListener.Stop_Called);
-        }
-
-        [Test]
-        public void TestChangeSettingsDefaultsToExistingSettings()
-        {
-            stubListener.Get_Port = 8081;
-            stubListener.Get_TfsUrl = "http://foo";
-            ListenerViewPresenter presenter = CreatePresenter();
-            StubSettingsView stubSettingsView = new StubSettingsView();
-
-            presenter.ChangeSettings(stubSettingsView);
-
-            Assert.Equal(stubSettingsView.Presenter.Port, 8081);
-            Assert.Equal(stubSettingsView.Presenter.TfsUrl, "http://foo");
-        }
-
-        [Test]
-        public void TestChangeSettingsWithNoChangesDoesntStopListener()
-        {
-            stubListener.Get_Port = 8081;
-            stubListener.Get_TfsUrl = "http://foo";
-            ListenerViewPresenter presenter = CreatePresenter();
-            StubSettingsView stubSettingsView = new StubSettingsView();
-            stubSettingsView.Show_Delegate = 
-                delegate
-                {
-                    stubSettingsView.Presenter.Port = 8081;
-                    stubSettingsView.Presenter.TfsUrl = "http://foo";
-                };
-            
-            presenter.ChangeSettings(stubSettingsView);
-
-            Assert.False(stubListener.Stop_Called);
-        }
-
-        [Test]
-        public void TestChangeSettingsWithChangesStopsAndStartsListener()
-        {
-            stubListener.Get_Port = 8081;
-            stubListener.Get_TfsUrl = "http://foo";
-            ListenerViewPresenter presenter = CreatePresenter();
-            StubSettingsView stubSettingsView = new StubSettingsView();
-            stubSettingsView.Show_Delegate =
-                delegate
-                {
-                    stubSettingsView.Presenter.Port = 8082;
-                    stubSettingsView.Presenter.TfsUrl = "http://foo";
-                };
-            
-            presenter.ChangeSettings(stubSettingsView);
-
-            Assert.True(stubListener.Stop_Called);
-            Assert.True(stubListener.Start_Called);
-        }
-
-        [Test]
-        public void TestCancelChangeSettingsDoesntStopListener()
-        {
-            stubListener.Get_Port = 8081;
-            stubListener.Get_TfsUrl = "http://foo";
-            ListenerViewPresenter presenter = CreatePresenter();
-            StubSettingsView stubSettingsView = new StubSettingsView();
-            stubSettingsView.Show_Delegate =
-                delegate
-                {
-                    stubSettingsView.Presenter.Port = 8082;
-                    stubSettingsView.Presenter.TfsUrl = "http://foo";
-                    stubSettingsView.DialogResult_Return = DialogResult.Cancel;
-                };
-
-            presenter.ChangeSettings(stubSettingsView);
-
-            Assert.False(stubListener.Stop_Called);
         }
     }
 }

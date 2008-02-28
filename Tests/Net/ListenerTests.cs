@@ -10,39 +10,10 @@ namespace SvnBridge.Net
         [Test]
         public void SetInvalidTfsUrlThrows()
         {
-            Listener listener = new Listener();        
+            Listener listener = new Listener();
 
             Assert.Throws<UriFormatException>(
-                delegate
-                {
-                    listener.TfsUrl = "foo";
-                });
-        }
-
-        [Test]
-        public void StartWithoutSettingPortThrows()
-        {
-            Listener listener = new Listener();
-            listener.TfsUrl = "http://foo";
-
-            Assert.Throws<InvalidOperationException>(
-                delegate
-                {
-                    listener.Start();
-                });
-        }
-
-        [Test]
-        public void StartWithoutSettingTfsUrlThrows()
-        {
-            Listener listener = new Listener();
-            listener.Port = 8081;
-
-            Assert.Throws<InvalidOperationException>(
-                delegate
-                {
-                    listener.Start();
-                });
+                delegate { listener.TfsUrl = "foo"; });
         }
 
         [Test]
@@ -54,10 +25,7 @@ namespace SvnBridge.Net
             listener.Start();
 
             Assert.Throws<InvalidOperationException>(
-                delegate
-                {
-                    listener.Port = 8082;
-                });
+                delegate { listener.Port = 8082; });
 
             listener.Stop();
         }
@@ -71,12 +39,29 @@ namespace SvnBridge.Net
             listener.Start();
 
             Assert.Throws<InvalidOperationException>(
-                delegate
-                {
-                    listener.TfsUrl = "http://bar";
-                });
+                delegate { listener.TfsUrl = "http://bar"; });
 
             listener.Stop();
+        }
+
+        [Test]
+        public void StartWithoutSettingPortThrows()
+        {
+            Listener listener = new Listener();
+            listener.TfsUrl = "http://foo";
+
+            Assert.Throws<InvalidOperationException>(
+                delegate { listener.Start(); });
+        }
+
+        [Test]
+        public void StartWithoutSettingTfsUrlThrows()
+        {
+            Listener listener = new Listener();
+            listener.Port = 8081;
+
+            Assert.Throws<InvalidOperationException>(
+                delegate { listener.Start(); });
         }
     }
 }

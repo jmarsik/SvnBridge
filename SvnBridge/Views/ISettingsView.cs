@@ -1,5 +1,5 @@
-using SvnBridge.Presenters;
 using System.Windows.Forms;
+using SvnBridge.Presenters;
 
 namespace SvnBridge.Views
 {

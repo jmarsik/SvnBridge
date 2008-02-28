@@ -11,7 +11,7 @@ namespace SvnBridge
     [TestFixture]
     public class BootStrapperTest
     {
-        private MockRepository mocks;
+        #region Setup/Teardown
 
         [SetUp]
         public void TestInitialize()
@@ -24,6 +24,10 @@ namespace SvnBridge
         {
             mocks.VerifyAll();
         }
+
+        #endregion
+
+        private MockRepository mocks;
 
         [Test]
         public void AfterStartingBootStrapper_CanResolveCache_FromContainer()

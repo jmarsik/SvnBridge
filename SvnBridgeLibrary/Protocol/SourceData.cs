@@ -6,9 +6,10 @@ namespace SvnBridge.Protocol
     [Serializable]
     public class SourceData
     {
-        public SourceData() {}
+        [XmlElement("href", Namespace = WebDav.Namespaces.DAV, DataType = "string")] public string Href = null;
 
-        [XmlElement("href", Namespace = WebDav.Namespaces.DAV, DataType = "string")]
-        public string Href = null;
+        public SourceData()
+        {
+        }
     }
 }

@@ -7,6 +7,8 @@ namespace SvnBridge.Protocol
     [XmlType("propname", Namespace = WebDav.Namespaces.DAV)]
     public class PropNameData
     {
-        public PropNameData() {}
+        public PropNameData()
+        {
+        }
     }
 }

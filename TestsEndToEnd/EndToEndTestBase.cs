@@ -10,9 +10,7 @@ namespace TestsEndToEnd
 {
     public class EndToEndTestBase : TFSSourceControlProviderTestsBase
     {
-        private IListener listener;
-        private string checkoutFolder;
-        protected string testUrl;
+        #region Setup/Teardown
 
         public override void SetUp()
         {
@@ -37,10 +35,8 @@ namespace TestsEndToEnd
         public override void TearDown()
         {
             base.TearDown();
-            ForAllFilesInCurrentDirectory(delegate(FileInfo file)
-                                              {
-                                                  file.Attributes = file.Attributes & ~FileAttributes.ReadOnly;
-                                              });
+            ForAllFilesInCurrentDirectory(
+                delegate(FileInfo file) { file.Attributes = file.Attributes & ~FileAttributes.ReadOnly; });
 
             Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
 
@@ -48,12 +44,19 @@ namespace TestsEndToEnd
             listener.Stop();
         }
 
+        #endregion
+
+        private IListener listener;
+        private string checkoutFolder;
+        protected string testUrl;
+
         private static void ForAllFilesInCurrentDirectory(Action<FileInfo> action)
         {
             ForAllFilesIn(Environment.CurrentDirectory, action);
         }
 
-        private static void ForAllFilesIn(string directory, Action<FileInfo> action)
+        private static void ForAllFilesIn(string directory,
+                                          Action<FileInfo> action)
         {
             foreach (string file in Directory.GetFiles(directory))
             {
@@ -68,13 +71,16 @@ namespace TestsEndToEnd
         protected void CheckoutAndChangeDirectory()
         {
             ExecuteCommand("co " + testUrl);
-            Environment.CurrentDirectory = Path.Combine(Environment.CurrentDirectory, testPath.Substring(1)/* remove '/' */);
+            Environment.CurrentDirectory =
+                Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
         }
 
         protected static void TemporaryIgnore(string message)
         {
             if (DateTime.Now < new DateTime(2008, 3, 15))
+            {
                 Assert.Ignore("We are ignoring this for now, because:" + message);
+            }
         }
 
         protected static string ExecuteCommandAndGetError(string command)
@@ -88,7 +94,9 @@ namespace TestsEndToEnd
             Process svn = ExecuteInternal(command);
             string err = svn.StandardError.ReadToEnd();
             if (string.IsNullOrEmpty(err) == false)
+            {
                 throw new InvalidOperationException("Failed to execute command: " + err);
+            }
 
             string output = svn.StandardOutput.ReadToEnd();
             Console.WriteLine(output);

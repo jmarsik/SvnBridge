@@ -8,7 +8,8 @@ namespace SvnBridge.Presenters
         private readonly IListener listener;
         private readonly IListenerView view;
 
-        public ListenerViewPresenter(IListenerView view, IListener listener)
+        public ListenerViewPresenter(IListenerView view,
+                                     IListener listener)
         {
             this.listener = listener;
             this.view = view;
@@ -33,7 +34,8 @@ namespace SvnBridge.Presenters
             settingsViewPresenter.TfsUrl = listener.TfsUrl;
             settingsViewPresenter.Show();
 
-            if ((!settingsViewPresenter.Cancelled) && (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl)))
+            if ((!settingsViewPresenter.Cancelled) &&
+                (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl)))
             {
                 ApplyNewSettings(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl);
             }
@@ -58,7 +60,8 @@ namespace SvnBridge.Presenters
             view.OnListenerStopped();
         }
 
-        private void ApplyNewSettings(int port, string tfsUrl)
+        private void ApplyNewSettings(int port,
+                                      string tfsUrl)
         {
             StopListener();
 
@@ -68,7 +71,8 @@ namespace SvnBridge.Presenters
             StartListener();
         }
 
-        private bool SettingsHaveChanged(int port, string tfsUrl)
+        private bool SettingsHaveChanged(int port,
+                                         string tfsUrl)
         {
             return port != listener.Port || tfsUrl != listener.TfsUrl;
         }

@@ -11,18 +11,20 @@ namespace Trace
 {
     public partial class TraceTCP : Form
     {
-        static bool _keepListening = true;
-        static TcpListener _server;
-        static string _targetServer;
-        static string _targetPort;
+        private static bool _keepListening = true;
+        private static int _lastDirection = 0;
+        private static TcpListener _server;
+        private static string _targetPort;
+        private static string _targetServer;
+        private static int _testCount = 0;
 
         public TraceTCP()
         {
             InitializeComponent();
         }
 
-        void button1_Click(object sender,
-                           EventArgs e)
+        private void button1_Click(object sender,
+                                   EventArgs e)
         {
             txtPort.Enabled = false;
             txtTargetPort.Enabled = false;
@@ -67,11 +69,10 @@ namespace Trace
                 }
                 catch
                 {
-                    System.Threading.Thread.Sleep(100);
+                    Thread.Sleep(100);
                     retry = true;
                 }
-            }
-            while (retry);
+            } while (retry);
         }
 
         public static void WriteTestLogLine(string log)
@@ -89,15 +90,15 @@ namespace Trace
                 Thread newConnection = new Thread(HandleConnection);
                 newConnection.IsBackground = true;
                 threads.Add(newConnection);
-                newConnection.Start(new object[] { client, _targetServer, _targetPort });
+                newConnection.Start(new object[] {client, _targetServer, _targetPort});
             }
         }
 
         public static void HandleConnection(object parameters)
         {
-            TcpClient client = (TcpClient)((object[])parameters)[0];
-            string serverName = (string)((object[])parameters)[1];
-            string port = (string)((object[])parameters)[2];
+            TcpClient client = (TcpClient) ((object[]) parameters)[0];
+            string serverName = (string) ((object[]) parameters)[1];
+            string port = (string) ((object[]) parameters)[2];
             NetworkStream clientStream = client.GetStream();
 
             TcpClient server = new TcpClient(serverName, int.Parse(port));
@@ -119,14 +120,15 @@ namespace Trace
             Thread copyOutput = new Thread(CopyStream);
             copyOutput.IsBackground = true;
 
-            copyInput.Start(new object[] { input, output, 1 });
-            copyOutput.Start(new object[] { output, input, 2 });
+            copyInput.Start(new object[] {input, output, 1});
+            copyOutput.Start(new object[] {output, input, 2});
 
             copyInput.Join();
             copyOutput.Join();
         }
 
-        public static void WriteLog(byte[] buffer, int count)
+        public static void WriteLog(byte[] buffer,
+                                    int count)
         {
             bool retry;
             do
@@ -149,17 +151,16 @@ namespace Trace
                 catch
                 {
                     retry = true;
-                    System.Threading.Thread.Sleep(100);
+                    Thread.Sleep(100);
                 }
-            }
-            while (retry);
+            } while (retry);
         }
 
         public static void CopyStream(object parameters)
         {
-            Stream input = (Stream)((object[])parameters)[0];
-            Stream output = (Stream)((object[])parameters)[1];
-            int direction = (int)((object[])parameters)[2];
+            Stream input = (Stream) ((object[]) parameters)[0];
+            Stream output = (Stream) ((object[]) parameters)[1];
+            int direction = (int) ((object[]) parameters)[2];
             byte[] buffer = new byte[5000];
             int count;
             try
@@ -175,14 +176,11 @@ namespace Trace
                     output.Write(buffer, 0, count);
                 }
             }
-            catch(Exception e )
+            catch (Exception e)
             {
-                MessageBox.Show("Failed to copy stream: " + e.Message);    
+                MessageBox.Show("Failed to copy stream: " + e.Message);
             }
         }
-
-        static int _lastDirection = 0;
-        static int _testCount = 0;
 
         public static void WriteTest(byte[] buffer,
                                      int count,
@@ -231,7 +229,9 @@ namespace Trace
             for (int i = 0; i < count; i++)
             {
                 if (buffer[i] == 0)
+                {
                     output.Append("\\0");
+                }
                 else if (buffer[i] == 10)
                 {
                     output.Append("\\n");
@@ -242,17 +242,29 @@ namespace Trace
                     }
                 }
                 else if (buffer[i] == 13)
+                {
                     output.Append("\\r");
+                }
                 else if (buffer[i] == 34)
+                {
                     output.Append("\\\"");
+                }
                 else if (buffer[i] == 34)
+                {
                     output.Append("\\\"");
+                }
                 else if (buffer[i] == 92)
+                {
                     output.Append("\\\\");
+                }
                 else if (buffer[i] < 32 || buffer[i] > 126)
+                {
                     output.Append("\\u00" + string.Format("{0:X2}", buffer[i]));
+                }
                 else
+                {
                     output.Append(Encoding.UTF8.GetString(buffer, i, 1));
+                }
             }
             WriteTestLog(output.ToString());
             _lastDirection = direction;

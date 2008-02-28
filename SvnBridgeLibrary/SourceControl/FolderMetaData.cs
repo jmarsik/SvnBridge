@@ -14,10 +14,7 @@ namespace SvnBridge.SourceControl
 
         public override ItemType ItemType
         {
-            get
-            {
-                return ItemType.Folder;
-            }
+            get { return ItemType.Folder; }
         }
     }
 }

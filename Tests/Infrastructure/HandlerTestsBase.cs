@@ -1,23 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using Tests;
-using SvnBridge.Stubs;
-using SvnBridge.SourceControl;
 using System.Collections.Specialized;
-using SvnBridge.Net;
 using System.IO;
+using NUnit.Framework;
+using SvnBridge.SourceControl;
+using SvnBridge.Stubs;
+using Tests;
 
 namespace SvnBridge.Infrastructure
 {
     public abstract class HandlerTestsBase
     {
-        protected MyMocks stub = new MyMocks();
-        protected StubSourceControlProvider provider;
         protected StubHttpContext context;
+        protected StubSourceControlProvider provider;
         protected StubHttpRequest request;
         protected StubHttpResponse response;
+        protected MyMocks stub = new MyMocks();
         protected string tfsUrl;
 
         [SetUp]

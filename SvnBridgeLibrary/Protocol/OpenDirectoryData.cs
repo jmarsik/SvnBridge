@@ -6,21 +6,21 @@ namespace SvnBridge.Protocol
 {
     public class OpenDirectoryData
     {
-        public OpenDirectoryData() {}
+        [XmlElement("add-directory", Namespace = WebDav.Namespaces.SVN)] public List<AddDirectoryData> AddDirectory =
+            new List<AddDirectoryData>();
 
-        [XmlAttribute("rev", DataType = "string", Form = XmlSchemaForm.Unqualified)]
-        public string Rev = null;
+        [XmlElement("add-file", Namespace = WebDav.Namespaces.SVN)] public List<AddFileData> AddFile =
+            new List<AddFileData>();
 
-        [XmlElement("checked-in", Namespace = WebDav.Namespaces.DAV)]
-        public CheckedInData CheckedIn = null;
+        [XmlElement("checked-in", Namespace = WebDav.Namespaces.DAV)] public CheckedInData CheckedIn = null;
 
-        [XmlElement("set-prop", Namespace = WebDav.Namespaces.SVN)]
-        public List<SetPropData> SetProp = new List<SetPropData>();
+        [XmlAttribute("rev", DataType = "string", Form = XmlSchemaForm.Unqualified)] public string Rev = null;
 
-        [XmlElement("add-file", Namespace = WebDav.Namespaces.SVN)]
-        public List<AddFileData> AddFile = new List<AddFileData>();
+        [XmlElement("set-prop", Namespace = WebDav.Namespaces.SVN)] public List<SetPropData> SetProp =
+            new List<SetPropData>();
 
-        [XmlElement("add-directory", Namespace = WebDav.Namespaces.SVN)]
-        public List<AddDirectoryData> AddDirectory = new List<AddDirectoryData>();
+        public OpenDirectoryData()
+        {
+        }
     }
 }

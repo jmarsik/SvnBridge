@@ -1,15 +1,15 @@
-using SvnBridge.Views;
 using System.Windows.Forms;
+using SvnBridge.Views;
 
 namespace SvnBridge.Presenters
 {
     public class SettingsViewPresenter
     {
+        private readonly ISettingsView view;
         private bool cancelled;
         private int port;
         private string tfsUrl;
-        private readonly ISettingsView view;
-        
+
         public SettingsViewPresenter(ISettingsView view)
         {
             this.view = view;
@@ -22,9 +22,13 @@ namespace SvnBridge.Presenters
             get
             {
                 if (view.DialogResult == DialogResult.Cancel)
+                {
                     return true;
+                }
                 else
+                {
                     return false;
+                }
             }
         }
 
@@ -39,7 +43,7 @@ namespace SvnBridge.Presenters
             get { return tfsUrl; }
             set { tfsUrl = value; }
         }
-        
+
         public void Show()
         {
             view.Show();

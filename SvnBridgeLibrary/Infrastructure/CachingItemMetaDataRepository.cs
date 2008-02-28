@@ -8,34 +8,43 @@ namespace SvnBridge.Infrastructure
 {
     public class CachingItemMetaDataRepository : IItemMetaDataRepository
     {
-        private readonly ISourceControlProvider svc;
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof (UpdateReportData));
         private readonly ICache cache;
+        private readonly ISourceControlProvider svc;
 
-        static readonly XmlSerializer serializer = new XmlSerializer(typeof(UpdateReportData));
-
-        public CachingItemMetaDataRepository(ISourceControlProvider svc, ICache cache)
+        public CachingItemMetaDataRepository(ISourceControlProvider svc,
+                                             ICache cache)
         {
             this.svc = svc;
             this.cache = cache;
         }
 
-        public ItemMetaData GetItems(int version, string path, Recursion recursion)
+        #region IItemMetaDataRepository Members
+
+        public ItemMetaData GetItems(int version,
+                                     string path,
+                                     Recursion recursion)
         {
-            string cacheKey = version+"-"+path+"-"+recursion;
+            string cacheKey = version + "-" + path + "-" + recursion;
 
             object cached = cache.Get(cacheKey);
-            if(cached != null)
+            if (cached != null)
+            {
                 return (ItemMetaData) cached;
+            }
             ItemMetaData items = svc.GetItems(version, path, recursion);
             cache.Set(cacheKey, items);
-            
+
             return items;
         }
 
-        public FolderMetaData GetChangedItems(string path, int versionFrom, int versionTo, UpdateReportData reportData)
+        public FolderMetaData GetChangedItems(string path,
+                                              int versionFrom,
+                                              int versionTo,
+                                              UpdateReportData reportData)
         {
             string reportDataAsKey;
-            using(StringWriter sw = new StringWriter())
+            using (StringWriter sw = new StringWriter())
             {
                 serializer.Serialize(sw, reportData);
                 reportDataAsKey = sw.GetStringBuilder().ToString();
@@ -44,11 +53,15 @@ namespace SvnBridge.Infrastructure
 
             object cached = cache.Get(cacheKey);
             if (cached != null)
+            {
                 return (FolderMetaData) cached;
+            }
 
             FolderMetaData items = svc.GetChangedItems(path, versionFrom, versionTo, reportData);
             cache.Set(cacheKey, items);
             return items;
         }
+
+        #endregion
     }
 }

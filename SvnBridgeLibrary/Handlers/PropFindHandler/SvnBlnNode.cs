@@ -5,8 +5,8 @@ namespace SvnBridge.Nodes
 {
     public class SvnBlnNode : INode
     {
-        string path;
-        int version;
+        private string path;
+        private int version;
 
         public SvnBlnNode(string path,
                           int version)
@@ -14,6 +14,8 @@ namespace SvnBridge.Nodes
             this.path = path;
             this.version = version;
         }
+
+        #region INode Members
 
         public string Href()
         {
@@ -33,12 +35,16 @@ namespace SvnBridge.Nodes
             }
         }
 
-        string GetBaselineCollection(XmlElement property)
+        #endregion
+
+        private string GetBaselineCollection(XmlElement property)
         {
-            return "<lp1:baseline-collection><D:href>/!svn/bc/" + version.ToString() + "/</D:href></lp1:baseline-collection>";
+            return
+                "<lp1:baseline-collection><D:href>/!svn/bc/" + version.ToString() +
+                "/</D:href></lp1:baseline-collection>";
         }
 
-        string GetVersionName(XmlElement property)
+        private string GetVersionName(XmlElement property)
         {
             return "<lp1:version-name>" + version.ToString() + "</lp1:version-name>";
         }

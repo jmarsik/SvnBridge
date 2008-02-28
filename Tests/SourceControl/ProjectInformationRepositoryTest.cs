@@ -12,9 +12,7 @@ namespace SvnBridge.SourceControl
     [TestFixture]
     public class ProjectInformationRepositoryTest
     {
-        private MockRepository mocks;
-        private ITFSSourceControlService sourceControlService;
-        private ICache cache;
+        #region Setup/Teardown
 
         [SetUp]
         public void TestInitialize()
@@ -30,16 +28,32 @@ namespace SvnBridge.SourceControl
             mocks.VerifyAll();
         }
 
+        #endregion
+
+        private MockRepository mocks;
+        private ITFSSourceControlService sourceControlService;
+        private ICache cache;
+
         [Test]
         public void GetProjectInforation_WillQueryServerForProject()
         {
             string serverUrl = "http://codeplex-tfs3:8080";
-            sourceControlService.QueryItems(null, null, null, RecursionType.None, null, DeletedState.Any,
+            sourceControlService.QueryItems(null,
+                                            null,
+                                            null,
+                                            RecursionType.None,
+                                            null,
+                                            DeletedState.Any,
                                             ItemType.Any);
             SourceItem sourceItem = new SourceItem();
             sourceItem.RemoteName = "$/test";
-            LastCall.Constraints(Is.Equal(serverUrl), Is.Anything(), Is.Anything(), Is.Anything(), Is.Anything(),
-                                 Is.Anything(), Is.Anything())
+            LastCall.Constraints(Is.Equal(serverUrl),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything())
                 .Return(new SourceItem[] {sourceItem,});
 
 
@@ -55,12 +69,22 @@ namespace SvnBridge.SourceControl
         public void GetProjectInforation_WillReturnRemoteProjectName()
         {
             string serverUrl = "http://codeplex-tfs3:8080";
-            sourceControlService.QueryItems(null, null, null, RecursionType.None, null, DeletedState.Any,
+            sourceControlService.QueryItems(null,
+                                            null,
+                                            null,
+                                            RecursionType.None,
+                                            null,
+                                            DeletedState.Any,
                                             ItemType.Any);
             SourceItem sourceItem = new SourceItem();
             sourceItem.RemoteName = "$/test";
-            LastCall.Constraints(Is.Equal(serverUrl), Is.Anything(), Is.Anything(), Is.Anything(), Is.Anything(),
-                                 Is.Anything(), Is.Anything())
+            LastCall.Constraints(Is.Equal(serverUrl),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything())
                 .Return(new SourceItem[] {sourceItem,});
 
 
@@ -82,11 +106,21 @@ namespace SvnBridge.SourceControl
             SourceItem sourceItem = new SourceItem();
             sourceItem.RemoteName = "$/test";
 
-            sourceControlService.QueryItems(null, null, null, RecursionType.None, null, DeletedState.Any,
+            sourceControlService.QueryItems(null,
+                                            null,
+                                            null,
+                                            RecursionType.None,
+                                            null,
+                                            DeletedState.Any,
                                             ItemType.Any);
             LastCall.IgnoreArguments().Repeat.Twice().Return(new SourceItem[0]);
 
-            sourceControlService.QueryItems(null, null, null, RecursionType.None, null, DeletedState.Any,
+            sourceControlService.QueryItems(null,
+                                            null,
+                                            null,
+                                            RecursionType.None,
+                                            null,
+                                            DeletedState.Any,
                                             ItemType.Any);
 
             LastCall.IgnoreArguments().Return(new SourceItem[] {sourceItem});
@@ -97,6 +131,19 @@ namespace SvnBridge.SourceControl
                 new ProjectInformationRepository(cache, sourceControlService, multiServers);
 
             repository.GetProjectLocation(null, "as");
+        }
+
+        [Test]
+        [ExpectedException(typeof (InvalidOperationException),
+            ExpectedMessage = "Could not find project 'blah' in: http://not.used")]
+        public void IfProjectNotFound_WillThrow()
+        {
+            mocks.ReplayAll();
+
+            IProjectInformationRepository repository =
+                new ProjectInformationRepository(cache, sourceControlService, "http://not.used");
+
+            repository.GetProjectLocation(null, "blah");
         }
 
         [Test]
@@ -117,13 +164,23 @@ namespace SvnBridge.SourceControl
         public void WillSetInCacheAfterFindingFromServer()
         {
             string serverUrl = "http://codeplex-tfs3:8080";
-            sourceControlService.QueryItems(null, null, null, RecursionType.None, null, DeletedState.Any,
+            sourceControlService.QueryItems(null,
+                                            null,
+                                            null,
+                                            RecursionType.None,
+                                            null,
+                                            DeletedState.Any,
                                             ItemType.Any);
             SourceItem sourceItem = new SourceItem();
             sourceItem.RemoteName = "$/test";
-            LastCall.Constraints(Is.Equal(serverUrl), Is.Anything(), Is.Anything(), Is.Anything(), Is.Anything(),
-                                 Is.Anything(), Is.Anything())
-                .Return(new SourceItem[] { sourceItem, });
+            LastCall.Constraints(Is.Equal(serverUrl),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything(),
+                                 Is.Anything())
+                .Return(new SourceItem[] {sourceItem,});
 
             cache.Set(null, null);
             LastCall.IgnoreArguments();
@@ -137,19 +194,6 @@ namespace SvnBridge.SourceControl
                 repository.GetProjectLocation(CredentialCache.DefaultCredentials, "blah");
 
             Assert.AreEqual("test", location.RemoteProjectName);
-        }
-
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException),
-            ExpectedMessage = "Could not find project 'blah' in: http://not.used")]
-        public void IfProjectNotFound_WillThrow()
-        {
-            mocks.ReplayAll();
-
-            IProjectInformationRepository repository =
-                new ProjectInformationRepository(cache, sourceControlService, "http://not.used");
-
-            repository.GetProjectLocation(null, "blah");
         }
     }
 }

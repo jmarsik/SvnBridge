@@ -5,9 +5,10 @@ namespace SvnBridge.Protocol
     [XmlRoot("set", Namespace = WebDav.Namespaces.DAV)]
     public class SetData
     {
-        public SetData() {}
+        [XmlElement("prop", Namespace = WebDav.Namespaces.DAV)] public PropData Prop = new PropData();
 
-        [XmlElement("prop", Namespace = WebDav.Namespaces.DAV)]
-        public PropData Prop = new PropData();
+        public SetData()
+        {
+        }
     }
 }

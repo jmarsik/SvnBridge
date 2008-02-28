@@ -1,5 +1,4 @@
 using System.IO;
-using System.Net;
 using System.Text;
 
 namespace SvnBridge.Net
@@ -12,7 +11,9 @@ namespace SvnBridge.Net
         bool SendChunked { get; set; }
         int StatusCode { get; set; }
 
-        void AppendHeader(string name, string value);
+        void AppendHeader(string name,
+                          string value);
+
         void ClearHeaders();
         void Close();
     }

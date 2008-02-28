@@ -1,8 +1,10 @@
+using System;
+using System.Runtime.Serialization;
+
 namespace SvnBridge.Infrastructure
 {
-
-    [global::System.Serializable]
-    public class CircuitTrippedException : System.Exception
+    [Serializable]
+    public class CircuitTrippedException : Exception
     {
         //
         // For guidelines regarding the creation of new exception types, see
@@ -11,12 +13,24 @@ namespace SvnBridge.Infrastructure
         //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dncscol/html/csharp07192001.asp
         //
 
-        public CircuitTrippedException() { }
-        public CircuitTrippedException(string message) : base(message) { }
-        public CircuitTrippedException(string message, System.Exception inner) : base(message, inner) { }
+        public CircuitTrippedException()
+        {
+        }
+
+        public CircuitTrippedException(string message) : base(message)
+        {
+        }
+
+        public CircuitTrippedException(string message,
+                                       Exception inner) : base(message, inner)
+        {
+        }
+
         protected CircuitTrippedException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
-            : base(info, context) { }
+            SerializationInfo info,
+            StreamingContext context)
+            : base(info, context)
+        {
+        }
     }
 }

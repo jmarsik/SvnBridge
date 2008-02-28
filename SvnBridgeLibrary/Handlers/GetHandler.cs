@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text;
 using SvnBridge.Net;
@@ -9,7 +8,8 @@ namespace SvnBridge.Handlers
 {
     public class GetHandler : HttpContextHandlerBase
     {
-        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context,
+                                       ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;

@@ -4,8 +4,8 @@ namespace SvnBridge.SourceControl
 {
     public class MergeActivityResponseItem
     {
-        public ItemType Type;
         public string Path;
+        public ItemType Type;
 
         public MergeActivityResponseItem(ItemType type,
                                          string path)

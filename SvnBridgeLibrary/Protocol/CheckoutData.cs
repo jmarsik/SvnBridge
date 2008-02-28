@@ -5,9 +5,10 @@ namespace SvnBridge.Protocol
     [XmlRoot("checkout", Namespace = WebDav.Namespaces.DAV)]
     public class CheckoutData
     {
-        public CheckoutData() {}
+        [XmlElement("activity-set", Namespace = WebDav.Namespaces.DAV)] public ActivitySetData ActivitySet = null;
 
-        [XmlElement("activity-set", Namespace = WebDav.Namespaces.DAV)]
-        public ActivitySetData ActivitySet = null;
+        public CheckoutData()
+        {
+        }
     }
 }

@@ -5,5 +5,7 @@ namespace SvnBridge.Protocol
 {
     [Serializable]
     [XmlRoot("get-locks-report", Namespace = WebDav.Namespaces.SVN)]
-    public class GetLocksReportData {}
+    public class GetLocksReportData
+    {
+    }
 }

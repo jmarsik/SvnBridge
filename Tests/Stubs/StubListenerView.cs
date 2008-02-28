@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using SvnBridge.Presenters;
 using SvnBridge.Views;
 
@@ -8,12 +5,14 @@ namespace SvnBridge.Stubs
 {
     public class StubListenerView : IListenerView
     {
-        public ListenerViewPresenter Set_Presenter;
+        public string ListenerErrorMessage;
+        public bool OnListenerError_Called;
         public bool OnListenerStarted_Called;
         public bool OnListenerStopped_Called;
-        public bool OnListenerError_Called;
-        public string ListenerErrorMessage;
+        public ListenerViewPresenter Set_Presenter;
         public bool Show_Called;
+
+        #region IListenerView Members
 
         public ListenerViewPresenter Presenter
         {
@@ -40,5 +39,7 @@ namespace SvnBridge.Stubs
         {
             Show_Called = true;
         }
+
+        #endregion
     }
 }

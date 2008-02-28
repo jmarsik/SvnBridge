@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Specialized;
 using System.IO;
-using SvnBridge.Net;
 using System.Text;
+using SvnBridge.Net;
 
 namespace SvnBridge.Stubs
 {
@@ -12,6 +12,31 @@ namespace SvnBridge.Stubs
         private string httpMethod;
         private Stream inputStream;
         private Uri url;
+
+        public string Input
+        {
+            set { inputStream = new MemoryStream(Encoding.Default.GetBytes(value)); }
+        }
+
+        public string Path
+        {
+            set
+            {
+                string path = value;
+                if (path.Length > path.IndexOf("/", path.IndexOf("://") + 3) + 1)
+                {
+                    if (path.Substring(path.IndexOf("/", path.IndexOf("://") + 3), 2) == "//")
+                    {
+                        path = path.Remove(path.IndexOf("/", path.IndexOf("://") + 3), 1);
+                    }
+                }
+
+                url = new Uri(path);
+                headers["Host"] = url.Authority;
+            }
+        }
+
+        #region IHttpRequest Members
 
         public NameValueCollection Headers
         {
@@ -23,11 +48,6 @@ namespace SvnBridge.Stubs
         {
             get { return httpMethod; }
             set { httpMethod = value; }
-        }
-
-        public string Input
-        {
-            set { inputStream = new MemoryStream(Encoding.Default.GetBytes(value)); }
         }
 
         public Stream InputStream
@@ -42,18 +62,6 @@ namespace SvnBridge.Stubs
             set { url = value; }
         }
 
-        public string Path
-        {
-            set
-            {
-                string path = value;
-                if (path.Length > path.IndexOf("/", path.IndexOf("://") + 3) + 1)
-                    if (path.Substring(path.IndexOf("/", path.IndexOf("://") + 3), 2) == "//")
-                        path = path.Remove(path.IndexOf("/", path.IndexOf("://") + 3), 1);
-                
-                url = new Uri(path);
-                headers["Host"] = url.Authority;
-            }
-        }
+        #endregion
     }
 }

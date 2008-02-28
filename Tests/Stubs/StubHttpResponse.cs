@@ -8,9 +8,9 @@ namespace SvnBridge.Stubs
 {
     public class StubHttpResponse : IHttpResponse
     {
+        private readonly List<KeyValuePair<string, string>> headers;
         private Encoding contentEncoding;
         private string contentType;
-        private readonly List<KeyValuePair<string, string>> headers;
         private Stream outputStream;
         private bool sendChunked;
         private int statusCode;
@@ -57,7 +57,8 @@ namespace SvnBridge.Stubs
             set { statusCode = value; }
         }
 
-        public void AppendHeader(string name, string value)
+        public void AppendHeader(string name,
+                                 string value)
         {
             headers.Add(new KeyValuePair<string, string>(name, value));
         }

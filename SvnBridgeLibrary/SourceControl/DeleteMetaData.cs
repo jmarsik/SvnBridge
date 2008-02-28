@@ -1,4 +1,6 @@
 namespace SvnBridge.SourceControl
 {
-    public class DeleteMetaData : ItemMetaData {}
+    public class DeleteMetaData : ItemMetaData
+    {
+    }
 }

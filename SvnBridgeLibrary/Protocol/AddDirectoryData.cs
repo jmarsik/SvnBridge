@@ -6,24 +6,23 @@ namespace SvnBridge.Protocol
 {
     public class AddDirectoryData
     {
-        public AddDirectoryData() {}
+        [XmlElement("add-directory", Namespace = WebDav.Namespaces.SVN)] public List<AddDirectoryData> AddDirectory =
+            new List<AddDirectoryData>();
 
-        [XmlAttribute("name", DataType = "string", Form = XmlSchemaForm.Unqualified)]
-        public string Name = null;
+        [XmlElement("add-file", Namespace = WebDav.Namespaces.SVN)] public List<AddFileData> AddFile =
+            new List<AddFileData>();
 
-        [XmlAttribute("bc-url", DataType = "string", Form = XmlSchemaForm.Unqualified)]
-        public string BcUrl = null;
+        [XmlAttribute("bc-url", DataType = "string", Form = XmlSchemaForm.Unqualified)] public string BcUrl = null;
 
-        [XmlElement("checked-in", Namespace = WebDav.Namespaces.DAV)]
-        public CheckedInData CheckedIn = null;
+        [XmlElement("checked-in", Namespace = WebDav.Namespaces.DAV)] public CheckedInData CheckedIn = null;
 
-        [XmlElement("set-prop", Namespace = WebDav.Namespaces.SVN)]
-        public List<SetPropData> SetProp = new List<SetPropData>();
+        [XmlAttribute("name", DataType = "string", Form = XmlSchemaForm.Unqualified)] public string Name = null;
 
-        [XmlElement("add-file", Namespace = WebDav.Namespaces.SVN)]
-        public List<AddFileData> AddFile = new List<AddFileData>();
+        [XmlElement("set-prop", Namespace = WebDav.Namespaces.SVN)] public List<SetPropData> SetProp =
+            new List<SetPropData>();
 
-        [XmlElement("add-directory", Namespace = WebDav.Namespaces.SVN)]
-        public List<AddDirectoryData> AddDirectory = new List<AddDirectoryData>();
+        public AddDirectoryData()
+        {
+        }
     }
 }

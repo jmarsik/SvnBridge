@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using SvnBridge.Infrastructure;
-using NUnit.Framework;
 using Attach;
+using NUnit.Framework;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Handlers
 {

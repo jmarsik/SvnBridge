@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Web;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
 
@@ -10,20 +9,27 @@ namespace SvnBridge.Handlers
 {
     public abstract class HttpContextHandlerBase
     {
-        public void Handle(IHttpContext context, string tfsUrl)
+        public void Handle(IHttpContext context,
+                           string tfsUrl)
         {
             Handle(context, tfsUrl, null);
         }
 
-        public void Handle(IHttpContext context, string tfsUrl, string projectName)
+        public void Handle(IHttpContext context,
+                           string tfsUrl,
+                           string projectName)
         {
-            ISourceControlProvider sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, projectName, GetCredential(context));
+            ISourceControlProvider sourceControlProvider =
+                SourceControlProviderFactory.Create(tfsUrl, projectName, GetCredential(context));
             Handle(context, sourceControlProvider);
         }
 
-        public virtual void Cancel() { }
+        public virtual void Cancel()
+        {
+        }
 
-        protected abstract void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider);
+        protected abstract void Handle(IHttpContext context,
+                                       ISourceControlProvider sourceControlProvider);
 
         private static NetworkCredential GetCredential(IHttpContext context)
         {
@@ -45,20 +51,28 @@ namespace SvnBridge.Handlers
                     return new NetworkCredential(username, password, domain);
                 }
                 else
+                {
                     return new NetworkCredential(username, password);
+                }
             }
             else
+            {
                 return null;
+            }
         }
 
-        protected static void SetResponseSettings(IHttpResponse response, string contentType, Encoding contentEncoding, int status)
+        protected static void SetResponseSettings(IHttpResponse response,
+                                                  string contentType,
+                                                  Encoding contentEncoding,
+                                                  int status)
         {
             response.ContentType = contentType;
             response.ContentEncoding = contentEncoding;
             response.StatusCode = status;
         }
 
-        protected static void WriteToResponse(IHttpResponse response, string content)
+        protected static void WriteToResponse(IHttpResponse response,
+                                              string content)
         {
             using (StreamWriter writer = new StreamWriter(response.OutputStream))
             {

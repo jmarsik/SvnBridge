@@ -28,14 +28,15 @@ namespace Trace2.Properties
     [GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "2.0.0.0")]
     [DebuggerNonUserCode()]
     [CompilerGenerated()]
-    class Resources
+    internal class Resources
     {
-        static ResourceManager resourceMan;
-
-        static CultureInfo resourceCulture;
+        private static CultureInfo resourceCulture;
+        private static ResourceManager resourceMan;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {}
+        internal Resources()
+        {
+        }
 
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
@@ -47,7 +48,8 @@ namespace Trace2.Properties
             {
                 if ((resourceMan == null))
                 {
-                    ResourceManager temp = new ResourceManager("Trace2.Properties.Resources", typeof(Resources).Assembly);
+                    ResourceManager temp =
+                        new ResourceManager("Trace2.Properties.Resources", typeof (Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -42,7 +42,9 @@ namespace SvnBridge.Net
             get
             {
                 if (url == null)
+                {
                     BuildUrl();
+                }
 
                 return url;
             }
@@ -55,9 +57,13 @@ namespace SvnBridge.Net
             string host = Headers["host"];
 
             if (!String.IsNullOrEmpty(host) && !path.StartsWith("http"))
+            {
                 url = new Uri(String.Format("http://{0}{1}", host, path));
+            }
             else
+            {
                 url = new Uri(path);
+            }
         }
 
         private void ParseRequest(Stream stream)
@@ -79,7 +85,8 @@ namespace SvnBridge.Net
             ReadMessageBody(stream, buffer);
         }
 
-        private static string ReadLine(Stream stream, MemoryStream buffer)
+        private static string ReadLine(Stream stream,
+                                       MemoryStream buffer)
         {
             int offset = (int) buffer.Position;
 
@@ -91,7 +98,9 @@ namespace SvnBridge.Net
                 int byteRead = buffer.ReadByte();
 
                 if (byteRead == -1)
+                {
                     ReadToBuffer(stream, buffer);
+                }
                 else
                 {
                     previousByte = nextByte;
@@ -102,7 +111,8 @@ namespace SvnBridge.Net
             return Encoding.ASCII.GetString(buffer.GetBuffer(), offset, (int) buffer.Position - offset - 2);
         }
 
-        private static void ReadToBuffer(Stream stream, MemoryStream buffer)
+        private static void ReadToBuffer(Stream stream,
+                                         MemoryStream buffer)
         {
             int originalPosition = (int) buffer.Position;
 
@@ -113,7 +123,9 @@ namespace SvnBridge.Net
             int availableCapacity = buffer.Capacity - (int) buffer.Length;
 
             if (availableCapacity < bytesRead)
+            {
                 buffer.Capacity += (bytesRead - availableCapacity);
+            }
 
             buffer.Position = buffer.Length;
 
@@ -122,7 +134,8 @@ namespace SvnBridge.Net
             buffer.Position = originalPosition;
         }
 
-        private void ReadMessageBody(Stream stream, MemoryStream buffer)
+        private void ReadMessageBody(Stream stream,
+                                     MemoryStream buffer)
         {
             int contentLength = GetContentLength();
 
@@ -161,7 +174,9 @@ namespace SvnBridge.Net
             httpMethod = startLineParts[0].ToLowerInvariant();
             path = startLineParts[1];
             if (path.StartsWith("//"))
+            {
                 path = path.Substring(1);
+            }
         }
 
         private void ParseHeaderLine(string headerLine)

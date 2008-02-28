@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using SvnBridge.Utility;
-using System.Collections.Specialized;
 
 namespace SvnBridge.Net
 {
@@ -18,7 +16,10 @@ namespace SvnBridge.Net
         protected Stream stream;
         protected MemoryStream streamBuffer = new MemoryStream();
 
-        public ListenerResponseStream(ListenerRequest request, ListenerResponse response, Stream stream, int maxKeepAliveConnections)
+        public ListenerResponseStream(ListenerRequest request,
+                                      ListenerResponse response,
+                                      Stream stream,
+                                      int maxKeepAliveConnections)
         {
             this.request = request;
             this.response = response;
@@ -75,12 +76,15 @@ namespace SvnBridge.Net
             }
         }
 
-        public override int Read(byte[] buffer, int offset, int count)
+        public override int Read(byte[] buffer,
+                                 int offset,
+                                 int count)
         {
             throw new NotSupportedException();
         }
 
-        public override long Seek(long offset, SeekOrigin origin)
+        public override long Seek(long offset,
+                                  SeekOrigin origin)
         {
             throw new NotSupportedException();
         }
@@ -90,7 +94,9 @@ namespace SvnBridge.Net
             throw new NotSupportedException();
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        public override void Write(byte[] buffer,
+                                   int offset,
+                                   int count)
         {
             if (response.SendChunked)
             {
@@ -157,13 +163,19 @@ namespace SvnBridge.Net
                         continue;
                     }
                     else
+                    {
                         writer.WriteLine("{0}: {1}", header.Key, header.Value);
+                    }
                 }
 
                 if (!response.SendChunked)
+                {
                     writer.WriteLine("Content-Length: {0}", streamBuffer.Length);
+                }
                 else
+                {
                     writer.WriteLine("Transfer-Encoding: chunked");
+                }
 
                 string[] connectionHeaderParts = request.Headers["Connection"].Split(',');
                 foreach (string directive in connectionHeaderParts)
@@ -178,7 +190,9 @@ namespace SvnBridge.Net
                 writer.WriteLine("Content-Type: {0}", response.ContentType);
 
                 if (!String.IsNullOrEmpty(xPadHeader))
+                {
                     writer.WriteLine("X-Pad: {0}", xPadHeader);
+                }
 
                 writer.WriteLine("");
 

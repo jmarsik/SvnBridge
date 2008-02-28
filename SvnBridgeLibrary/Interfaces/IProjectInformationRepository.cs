@@ -1,12 +1,11 @@
-using CodePlex.TfsLibrary.ObjectModel;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
-using SvnBridge.SourceControl;
 using System.Net;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Interfaces
 {
     public interface IProjectInformationRepository
     {
-        ProjectLocationInformation GetProjectLocation(ICredentials credentials,string projectName);
+        ProjectLocationInformation GetProjectLocation(ICredentials credentials,
+                                                      string projectName);
     }
 }

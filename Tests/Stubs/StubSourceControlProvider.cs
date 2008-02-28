@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
@@ -8,7 +7,10 @@ namespace Tests
 {
     public class StubSourceControlProvider : ISourceControlProvider
     {
-        public virtual ItemMetaData GetItemInActivity(string activityId, string path)
+        #region ISourceControlProvider Members
+
+        public virtual ItemMetaData GetItemInActivity(string activityId,
+                                                      string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
@@ -18,12 +20,15 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void SetActivityComment(string activityId, string comment)
+        public virtual void SetActivityComment(string activityId,
+                                               string comment)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool WriteFile(string activityId, string path, byte[] fileData)
+        public virtual bool WriteFile(string activityId,
+                                      string path,
+                                      byte[] fileData)
         {
             throw new Exception("The method or operation is not implemented.");
         }
@@ -48,17 +53,24 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual LogItem GetLog(string path, int versionFrom, int versionTo, Recursion recursion, int maxCount)
+        public virtual LogItem GetLog(string path,
+                                      int versionFrom,
+                                      int versionTo,
+                                      Recursion recursion,
+                                      int maxCount)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual ItemMetaData GetItems(int version, string path, Recursion recursion)
+        public virtual ItemMetaData GetItems(int version,
+                                             string path,
+                                             Recursion recursion)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool IsDirectory(int version, string path)
+        public virtual bool IsDirectory(int version,
+                                        string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
@@ -68,34 +80,47 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void MakeCollection(string activityId, string path)
+        public virtual void MakeCollection(string activityId,
+                                           string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool ItemExists(string path, int version)
+        public virtual bool ItemExists(string path,
+                                       int version)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void SetProperty(string activityId, string path, string property, string value)
+        public virtual void SetProperty(string activityId,
+                                        string path,
+                                        string property,
+                                        string value)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool DeleteItem(string activityId, string path)
+        public virtual bool DeleteItem(string activityId,
+                                       string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual FolderMetaData GetChangedItems(string path, int versionFrom, int VersionTo, UpdateReportData reportData)
+        public virtual FolderMetaData GetChangedItems(string path,
+                                                      int versionFrom,
+                                                      int VersionTo,
+                                                      UpdateReportData reportData)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void CopyItem(string activityId, string path, string targetPath)
+        public virtual void CopyItem(string activityId,
+                                     string path,
+                                     string targetPath)
         {
             throw new Exception("The method or operation is not implemented.");
         }
+
+        #endregion
     }
 }

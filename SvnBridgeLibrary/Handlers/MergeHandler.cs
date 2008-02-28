@@ -1,17 +1,18 @@
 using System.IO;
 using System.Text;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Exceptions;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
-using SvnBridge.Exceptions;
 
 namespace SvnBridge.Handlers
 {
     public class MergeHandler : HttpContextHandlerBase
     {
-        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context,
+                                       ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -46,7 +47,8 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void WriteMergeResponse(MergeActivityResponse mergeResponse, StreamWriter output)
+        private void WriteMergeResponse(MergeActivityResponse mergeResponse,
+                                        StreamWriter output)
         {
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<D:merge-response xmlns:D=\"DAV:\">\n");
@@ -77,7 +79,8 @@ namespace SvnBridge.Handlers
                 {
                     output.Write("<D:resourcetype/>\n");
                 }
-                output.Write("<D:checked-in><D:href>/!svn/ver/" + mergeResponse.Version.ToString() + Helper.Encode(item.Path, true) + "</D:href></D:checked-in>\n");
+                output.Write("<D:checked-in><D:href>/!svn/ver/" + mergeResponse.Version.ToString() +
+                             Helper.Encode(item.Path, true) + "</D:href></D:checked-in>\n");
                 output.Write("</D:prop>\n");
                 output.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
                 output.Write("</D:propstat>\n");

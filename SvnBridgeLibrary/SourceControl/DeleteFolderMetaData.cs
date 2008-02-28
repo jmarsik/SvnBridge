@@ -1,4 +1,6 @@
 namespace SvnBridge.SourceControl
 {
-    public class DeleteFolderMetaData : FolderMetaData {}
+    public class DeleteFolderMetaData : FolderMetaData
+    {
+    }
 }

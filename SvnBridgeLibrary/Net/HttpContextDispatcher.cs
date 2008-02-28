@@ -1,9 +1,9 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using CodePlex.TfsLibrary;
 using SvnBridge.Handlers;
-using System.IO;
 
 namespace SvnBridge.Net
 {
@@ -11,26 +11,6 @@ namespace SvnBridge.Net
     {
         private string tfsUrl;
         private bool urlIncludesProjectName;
-
-        public HttpContextHandlerBase GetHandler(string httpMethod)
-        {
-            switch (httpMethod.ToLowerInvariant())
-            {
-                case "checkout": return new CheckOutHandler();
-                case "copy": return new CopyHandler();
-                case "delete": return new DeleteHandler();
-                case "merge": return new MergeHandler();
-                case "mkactivity": return new MkActivityHandler();
-                case "mkcol": return new MkColHandler();
-                case "options": return new OptionsHandler();
-                case "propfind": return new PropFindHandler();
-                case "proppatch": return new PropPatchHandler();
-                case "put": return new PutHandler();
-                case "report": return new ReportHandler();
-                case "get": return new GetHandler();
-                default: return null;
-            }
-        }
 
         public string TfsUrl
         {
@@ -43,10 +23,46 @@ namespace SvnBridge.Net
             set { urlIncludesProjectName = value; }
         }
 
+        public HttpContextHandlerBase GetHandler(string httpMethod)
+        {
+            switch (httpMethod.ToLowerInvariant())
+            {
+                case "checkout":
+                    return new CheckOutHandler();
+                case "copy":
+                    return new CopyHandler();
+                case "delete":
+                    return new DeleteHandler();
+                case "merge":
+                    return new MergeHandler();
+                case "mkactivity":
+                    return new MkActivityHandler();
+                case "mkcol":
+                    return new MkColHandler();
+                case "options":
+                    return new OptionsHandler();
+                case "propfind":
+                    return new PropFindHandler();
+                case "proppatch":
+                    return new PropPatchHandler();
+                case "put":
+                    return new PutHandler();
+                case "report":
+                    return new ReportHandler();
+                case "get":
+                    return new GetHandler();
+                default:
+                    return null;
+            }
+        }
+
         public void Dispatch(IHttpContext connection)
         {
             if (string.IsNullOrEmpty(TfsUrl))
-                throw new InvalidOperationException("A TFS server URL must be specified before connections can be dispatched.");
+            {
+                throw new InvalidOperationException(
+                    "A TFS server URL must be specified before connections can be dispatched.");
+            }
 
             HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
 
@@ -60,16 +76,22 @@ namespace SvnBridge.Net
                         handler.Handle(connection, tfsUrl, projectName);
                     }
                     else
+                    {
                         handler.Handle(connection, tfsUrl);
+                    }
                 }
                 catch (WebException ex)
                 {
                     HttpWebResponse response = ex.Response as HttpWebResponse;
 
                     if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
                         SendUnauthorizedResponse(connection);
+                    }
                     else
+                    {
                         throw;
+                    }
                 }
                 catch (NetworkAccessDeniedException)
                 {
@@ -82,7 +104,9 @@ namespace SvnBridge.Net
                 }
             }
             else
+            {
                 SendUnsupportedMethodResponse(connection);
+            }
         }
 
         private static void SendUnauthorizedResponse(IHttpContext connection)
@@ -109,7 +133,8 @@ namespace SvnBridge.Net
                              "browser doesn't understand how to supply\n" +
                              "the credentials required.</p>\n" +
                              "<hr>\n" +
-                             "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " + request.Url.Port +
+                             "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " +
+                             request.Url.Port +
                              "</address>\n" +
                              "</body></html>\n";
 
@@ -126,7 +151,8 @@ namespace SvnBridge.Net
 
             response.ContentType = "text/html";
 
-            response.AppendHeader("Allow", "PROPFIND, REPORT, OPTIONS, MKACTIVITY, CHECKOUT, PROPPATCH, PUT, MERGE, DELETE, MKCOL");
+            response.AppendHeader("Allow",
+                                  "PROPFIND, REPORT, OPTIONS, MKACTIVITY, CHECKOUT, PROPPATCH, PUT, MERGE, DELETE, MKCOL");
 
             string content =
                 @"

@@ -7,6 +7,8 @@ namespace SvnBridge.Protocol
     [XmlType("allprop", Namespace = WebDav.Namespaces.DAV)]
     public class AllPropData
     {
-        public AllPropData() {}
+        public AllPropData()
+        {
+        }
     }
 }

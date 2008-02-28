@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Runtime.Serialization;
 
 namespace SvnBridge.Exceptions
 {
-    [global::System.Serializable]
+    [Serializable]
     public class ConflictException : Exception
     {
         //
@@ -14,12 +13,24 @@ namespace SvnBridge.Exceptions
         //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dncscol/html/csharp07192001.asp
         //
 
-        public ConflictException() { }
-        public ConflictException(string message) : base(message) { }
-        public ConflictException(string message, Exception inner) : base(message, inner) { }
+        public ConflictException()
+        {
+        }
+
+        public ConflictException(string message) : base(message)
+        {
+        }
+
+        public ConflictException(string message,
+                                 Exception inner) : base(message, inner)
+        {
+        }
+
         protected ConflictException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
-            : base(info, context) { }
+            SerializationInfo info,
+            StreamingContext context)
+            : base(info, context)
+        {
+        }
     }
 }

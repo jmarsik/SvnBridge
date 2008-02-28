@@ -1,17 +1,14 @@
+using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Xml;
-using System.Xml.Serialization;
+using CodePlex.TfsLibrary.ObjectModel;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
-using System;
-using System.Threading;
-using CodePlex.TfsLibrary.ObjectModel;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
-using System.Collections.Generic;
-using System.Collections;
 
 namespace SvnBridge.Handlers
 {
@@ -24,7 +21,8 @@ namespace SvnBridge.Handlers
             itemLoaderManager.Cancel();
         }
 
-        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context,
+                                       ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -74,7 +72,6 @@ namespace SvnBridge.Handlers
                 }
                 else
                 {
-
                     throw new Exception("Unrecognized report name: " + reader.LocalName);
                 }
             }
@@ -85,51 +82,75 @@ namespace SvnBridge.Handlers
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<S:get-locks-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
             writer.Write("</S:get-locks-report>\n");
-
         }
-        
-        private void GetLocationsReport(ISourceControlProvider sourceControlProvider, GetLocationsReportData getLocationsReport, string path, StreamWriter output)
+
+        private void GetLocationsReport(ISourceControlProvider sourceControlProvider,
+                                        GetLocationsReportData getLocationsReport,
+                                        string path,
+                                        StreamWriter output)
         {
             if (path.IndexOf('/', 9) > -1)
+            {
                 path = path.Substring(path.IndexOf('/', 9));
+            }
             else
+            {
                 path = "/";
+            }
 
             ItemMetaData item = sourceControlProvider.GetItems(
-                int.Parse(getLocationsReport.LocationRevision), 
-                path, 
+                int.Parse(getLocationsReport.LocationRevision),
+                path,
                 Recursion.None);
 
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
-            if(item != null)
+            if (item != null)
             {
                 output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + path + "\"/>\n");
             }
             output.Write("</S:get-locations-report>\n");
         }
 
-        private  void UpdateReport(ISourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output)
+        private void UpdateReport(ISourceControlProvider sourceControlProvider,
+                                  UpdateReportData updatereport,
+                                  StreamWriter output)
         {
             Uri srcPathUri = null;
             if (!String.IsNullOrEmpty(updatereport.SrcPath))
+            {
                 srcPathUri = new Uri(updatereport.SrcPath);
+            }
             else
+            {
                 srcPathUri = new Uri("/");
+            }
 
             string basePath = "/" + srcPathUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
 
             FolderMetaData metadata;
             int targetRevision;
             if (updatereport.TargetRevision != null)
+            {
                 targetRevision = int.Parse(updatereport.TargetRevision);
+            }
             else
+            {
                 targetRevision = sourceControlProvider.GetLatestVersion();
+            }
 
             if (updatereport.Entries[0].StartEmpty)
-                metadata = (FolderMetaData)sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
+            {
+                metadata = (FolderMetaData) sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
+            }
             else
-                metadata = sourceControlProvider.GetChangedItems(basePath, int.Parse(updatereport.Entries[0].Rev), targetRevision, updatereport);
+            {
+                metadata =
+                    sourceControlProvider.GetChangedItems(basePath,
+                                                          int.Parse(updatereport.Entries[0].Rev),
+                                                          targetRevision,
+                                                          updatereport);
+            }
 
             itemLoaderManager = new ItemLoaderManager(metadata, sourceControlProvider);
             Thread loadData = new Thread(itemLoaderManager.Start);
@@ -138,23 +159,29 @@ namespace SvnBridge.Handlers
             UpdateReportService updateReportService = new UpdateReportService(sourceControlProvider);
 
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-            output.Write("<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
+            output.Write(
+                "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
             output.Write("<S:target-revision rev=\"" + targetRevision + "\"/>\n");
             updateReportService.ProcessUpdateReportForDirectory(updatereport, metadata, output, true);
             output.Write("</S:update-report>\n");
         }
 
-        private void LogReport(ISourceControlProvider sourceControlProvider, LogReportData logreport, string path, StreamWriter output)
+        private void LogReport(ISourceControlProvider sourceControlProvider,
+                               LogReportData logreport,
+                               string path,
+                               StreamWriter output)
         {
             string serverPath = "/";
-            if (path.IndexOf('/',9) > -1)
+            if (path.IndexOf('/', 9) > -1)
+            {
                 serverPath = path.Substring(path.IndexOf('/', 9));
+            }
 
             LogItem logItem = sourceControlProvider.GetLog(
-                serverPath, 
-                int.Parse(logreport.EndRevision), 
-                int.Parse(logreport.StartRevision), 
-                Recursion.Full, 
+                serverPath,
+                int.Parse(logreport.EndRevision),
+                int.Parse(logreport.StartRevision),
+                Recursion.Full,
                 int.Parse(logreport.Limit ?? "100000"));
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:log-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
@@ -170,24 +197,39 @@ namespace SvnBridge.Handlers
                 foreach (SourceItemChange change in history.Changes)
                 {
                     if ((change.ChangeType & ChangeType.Add) == ChangeType.Add)
+                    {
                         output.Write("<S:added-path>/" + Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
+                    }
                     else if ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit)
-                        output.Write("<S:modified-path>/" + Helper.EncodeB(change.Item.RemoteName) + "</S:modified-path>\n");
+                    {
+                        output.Write("<S:modified-path>/" + Helper.EncodeB(change.Item.RemoteName) +
+                                     "</S:modified-path>\n");
+                    }
                     else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
-                        output.Write("<S:deleted-path>/" + Helper.EncodeB(change.Item.RemoteName) + "</S:deleted-path>\n");
+                    {
+                        output.Write("<S:deleted-path>/" + Helper.EncodeB(change.Item.RemoteName) +
+                                     "</S:deleted-path>\n");
+                    }
                     else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
-                        output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) + "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" + Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
-                        output.Write("<S:deleted-path>/" + Helper.EncodeB(renamedItem.OriginalRemoteName) + "</S:deleted-path>\n");
+                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
+                        output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
+                                     "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
+                                     Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
+                        output.Write("<S:deleted-path>/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
+                                     "</S:deleted-path>\n");
                     }
                     else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
-                        output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) + "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" + Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
+                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
+                        output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
+                                     "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
+                                     Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
                     }
                     else
+                    {
                         throw new InvalidOperationException("Unrecognized change type " + change.ChangeType);
+                    }
                 }
 
                 output.Write("</S:log-item>\n");

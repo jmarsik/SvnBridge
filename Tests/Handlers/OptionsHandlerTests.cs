@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Attach;
 using NUnit.Framework;
 using SvnBridge.Infrastructure;

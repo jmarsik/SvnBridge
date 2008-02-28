@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace SvnBridge.SourceControl
 {
@@ -11,10 +8,7 @@ namespace SvnBridge.SourceControl
 
         public override List<ItemMetaData> Items
         {
-            get
-            {
-                return RealFolder.Items;
-            }
+            get { return RealFolder.Items; }
         }
     }
 }

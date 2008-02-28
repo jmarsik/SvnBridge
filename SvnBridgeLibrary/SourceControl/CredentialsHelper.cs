@@ -5,10 +5,13 @@ namespace SvnBridge.SourceControl
 {
     public static class CredentialsHelper
     {
-        public static ICredentials GetCredentialsForServer(string tfsUrl, ICredentials credentials)
+        public static ICredentials GetCredentialsForServer(string tfsUrl,
+                                                           ICredentials credentials)
         {
             if (credentials != null)
+            {
                 return credentials;
+            }
 
             Uri uri = new Uri(tfsUrl);
 

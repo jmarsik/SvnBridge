@@ -15,7 +15,7 @@ namespace Tests
         public void Test1()
         {
             stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
-
+            
             string request =
                 "PROPFIND /newFolder3 HTTP/1.1\r\n" +
                 "Host: localhost:8082\r\n" +

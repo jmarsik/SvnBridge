@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using CodePlex.TfsLibrary.ObjectModel;
@@ -14,8 +13,8 @@ namespace SvnBridge
 {
     public class BootStrapper
     {
-        private readonly string[] componentInterfacesNamespace;
         private readonly Assembly[] assemblies;
+        private readonly string[] componentInterfacesNamespace;
 
         private readonly Type[] representiveComponents = new Type[]
             {
@@ -37,10 +36,14 @@ namespace SvnBridge
             foreach (Type type in representiveComponents)
             {
                 if (asms.Contains(type.Assembly) == false)
+                {
                     asms.Add(type.Assembly);
+                }
 
-                if (type.IsInterface)// we perform auto registration for interface only
+                if (type.IsInterface) // we perform auto registration for interface only
+                {
                     names.Add(type.Namespace);
+                }
             }
 
             componentInterfacesNamespace = names.ToArray();
@@ -54,13 +57,17 @@ namespace SvnBridge
                 foreach (Type type in assembly.GetTypes())
                 {
                     if (ValidTypeForRegistration(type) == false)
+                    {
                         continue;
+                    }
 
 
                     foreach (Type interfaceType in type.GetInterfaces())
                     {
                         if (IoC.Container.IsRegistered(interfaceType))
+                        {
                             continue;
+                        }
 
                         IoC.Container.Register(interfaceType, type);
                     }
@@ -71,21 +78,27 @@ namespace SvnBridge
         private bool IsValidInterface(Type interfaceType)
         {
             return Array.IndexOf(componentInterfacesNamespace, interfaceType.Namespace) != -1 &&
-                Array.IndexOf(assemblies, interfaceType.Assembly) != -1;
+                   Array.IndexOf(assemblies, interfaceType.Assembly) != -1;
         }
 
 
         private bool ValidTypeForRegistration(Type type)
         {
             if (type.IsInterface || type.IsAbstract)
+            {
                 return false;
+            }
             if (Array.IndexOf(representiveComponents, type) != -1)
+            {
                 return true;
+            }
             Type[] interfaces = type.GetInterfaces();
             foreach (Type interfaceType in interfaces)
             {
                 if (IsValidInterface(interfaceType))
+                {
                     return true;
+                }
             }
             return false;
         }

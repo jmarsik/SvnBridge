@@ -15,7 +15,8 @@ namespace SvnBridge.Handlers
 {
     public class PropFindHandler : HttpContextHandlerBase
     {
-        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context,
+                                       ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -42,7 +43,12 @@ namespace SvnBridge.Handlers
                 }
                 else if (propfind.Prop != null)
                 {
-                    HandleProp(sourceControlProvider, requestPath, depthHeader, labelHeader, propfind.Prop, response.OutputStream);
+                    HandleProp(sourceControlProvider,
+                               requestPath,
+                               depthHeader,
+                               labelHeader,
+                               propfind.Prop,
+                               response.OutputStream);
                 }
                 else
                 {
@@ -55,9 +61,10 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteFileNotFoundResponse(IHttpRequest request, IHttpResponse response)
+        private static void WriteFileNotFoundResponse(IHttpRequest request,
+                                                      IHttpResponse response)
         {
-            response.StatusCode = (int)HttpStatusCode.NotFound;
+            response.StatusCode = (int) HttpStatusCode.NotFound;
             response.ContentType = "text/html; charset=iso-8859-1";
 
             string responseContent =
@@ -76,30 +83,41 @@ namespace SvnBridge.Handlers
             WriteToResponse(response, responseContent);
         }
 
-        private static FolderMetaData GetFolderInfo(ISourceControlProvider sourceControlProvider, string depth, string path, int? version)
+        private static FolderMetaData GetFolderInfo(ISourceControlProvider sourceControlProvider,
+                                                    string depth,
+                                                    string path,
+                                                    int? version)
         {
             if (depth == "0")
             {
                 FolderMetaData folderInfo = new FolderMetaData();
-                ItemMetaData item = GetItems(sourceControlProvider, version.HasValue ? version.Value : -1, path, Recursion.None);
+                ItemMetaData item =
+                    GetItems(sourceControlProvider, version.HasValue ? version.Value : -1, path, Recursion.None);
                 folderInfo.Items.Add(item);
                 return folderInfo;
             }
             else if (depth == "1")
             {
-                return (FolderMetaData)GetItems(sourceControlProvider, version.Value, path, Recursion.OneLevel);
+                return (FolderMetaData) GetItems(sourceControlProvider, version.Value, path, Recursion.OneLevel);
             }
             else
+            {
                 throw new InvalidOperationException(String.Format("Depth not supported: {0}", depth));
+            }
         }
 
-        private static ItemMetaData GetItems(ISourceControlProvider sourceControlProvider, int version, string path, Recursion recursion)
+        private static ItemMetaData GetItems(ISourceControlProvider sourceControlProvider,
+                                             int version,
+                                             string path,
+                                             Recursion recursion)
         {
             // Make sure path is decoded
             return sourceControlProvider.GetItems(version, Helper.Decode(path), recursion);
         }
 
-        private static void HandleAllProp(ISourceControlProvider sourceControlProvider, string requestPath, Stream outputStream)
+        private static void HandleAllProp(ISourceControlProvider sourceControlProvider,
+                                          string requestPath,
+                                          Stream outputStream)
         {
             string revision = requestPath.Split('/')[3];
             string path = requestPath.Substring(9 + revision.Length);
@@ -107,18 +125,26 @@ namespace SvnBridge.Handlers
             ItemMetaData item = GetItems(sourceControlProvider, int.Parse(revision), path, Recursion.None);
 
             if (item == null)
+            {
                 throw new InvalidOperationException("There is no item " + requestPath + " in revision " + revision);
+            }
 
             using (StreamWriter writer = new StreamWriter(outputStream))
             {
                 if (item.ItemType == ItemType.Folder)
+                {
                     WriteAllPropForFolder(writer, requestPath, item);
+                }
                 else
+                {
                     WriteAllPropForItem(writer, requestPath, item, sourceControlProvider.ReadFile(item));
+                }
             }
         }
 
-        private static void WriteAllPropForFolder(TextWriter writer, string requestPath, ItemMetaData item)
+        private static void WriteAllPropForFolder(TextWriter writer,
+                                                  string requestPath,
+                                                  ItemMetaData item)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
@@ -128,10 +154,14 @@ namespace SvnBridge.Handlers
             writer.Write("<D:prop>\n");
             writer.Write("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>\n");
             writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
-            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") + "</lp1:creationdate>\n");
-            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
-            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>\n");
-            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath + "</D:href></lp1:version-controlled-configuration>\n");
+            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") +
+                         "</lp1:creationdate>\n");
+            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
+                         "</lp1:getlastmodified>\n");
+            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
+                         "</D:href></lp1:checked-in>\n");
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath +
+                         "</D:href></lp1:version-controlled-configuration>\n");
             writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
             writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
             writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
@@ -146,7 +176,10 @@ namespace SvnBridge.Handlers
             writer.Write("</D:multistatus>\n");
         }
 
-        private static void WriteAllPropForItem(TextWriter writer, string requestPath, ItemMetaData item, byte[] itemData)
+        private static void WriteAllPropForItem(TextWriter writer,
+                                                string requestPath,
+                                                ItemMetaData item,
+                                                byte[] itemData)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
@@ -156,10 +189,14 @@ namespace SvnBridge.Handlers
             writer.Write("<D:prop>\n");
             writer.Write("<lp1:getcontenttype>text/plain</lp1:getcontenttype>\n");
             writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
-            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") + "</lp1:creationdate>\n");
-            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
-            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) + "</D:href></lp1:checked-in>\n");
-            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath + "</D:href></lp1:version-controlled-configuration>\n");
+            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") +
+                         "</lp1:creationdate>\n");
+            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
+                         "</lp1:getlastmodified>\n");
+            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
+                         "</D:href></lp1:checked-in>\n");
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath +
+                         "</D:href></lp1:version-controlled-configuration>\n");
             writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
             writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
             writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
@@ -190,16 +227,28 @@ namespace SvnBridge.Handlers
             Stream outputStream)
         {
             if (requestPath == "/!svn/vcc/default")
+            {
                 WriteVccResponse(sourceControlProvider, requestPath, labelHeader, data, outputStream);
+            }
             else if (requestPath.StartsWith("/!svn/bln/"))
+            {
                 WriteBlnResponse(requestPath, data, outputStream);
+            }
             else if (requestPath.StartsWith("/!svn/bc/"))
+            {
                 WriteBcResponse(sourceControlProvider, requestPath, depthHeader, data, outputStream);
+            }
             else
+            {
                 WritePathResponse(sourceControlProvider, requestPath, depthHeader, data, outputStream);
+            }
         }
 
-        private static void WriteVccResponse(ISourceControlProvider sourceControlProvider, string requestPath, string label, PropData data, Stream outputStream)
+        private static void WriteVccResponse(ISourceControlProvider sourceControlProvider,
+                                             string requestPath,
+                                             string label,
+                                             PropData data,
+                                             Stream outputStream)
         {
             INode node = new SvnVccDefaultNode(sourceControlProvider, requestPath, label);
 
@@ -212,7 +261,9 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteBlnResponse(string requestPath, PropData data, Stream outputStream)
+        private static void WriteBlnResponse(string requestPath,
+                                             PropData data,
+                                             Stream outputStream)
         {
             INode node = new SvnBlnNode(requestPath, int.Parse(requestPath.Substring(10)));
 
@@ -225,13 +276,19 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteBcResponse(ISourceControlProvider sourceControlProvider, string requestPath, string depthHeader, PropData data, Stream outputStream)
+        private static void WriteBcResponse(ISourceControlProvider sourceControlProvider,
+                                            string requestPath,
+                                            string depthHeader,
+                                            PropData data,
+                                            Stream outputStream)
         {
             int version = int.Parse(requestPath.Split('/')[3]);
             string path = requestPath.Substring(9 + version.ToString().Length);
 
             if (!sourceControlProvider.ItemExists(Helper.Decode(path), version))
+            {
                 throw new FileNotFoundException();
+            }
 
             FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depthHeader, path, version);
 
@@ -260,10 +317,16 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WritePathResponse(ISourceControlProvider sourceControlProvider, string requestPath, string depth, PropData data, Stream outputStream)
+        private static void WritePathResponse(ISourceControlProvider sourceControlProvider,
+                                              string requestPath,
+                                              string depth,
+                                              PropData data,
+                                              Stream outputStream)
         {
             if (!sourceControlProvider.ItemExists(Helper.Decode(requestPath), -1))
+            {
                 throw new FileNotFoundException("Unable to find file in the source control repository", requestPath);
+            }
 
             FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depth, requestPath, null);
 
@@ -284,26 +347,39 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteMultiStatusStart(TextWriter writer, bool hasMultipleProperties)
+        private static void WriteMultiStatusStart(TextWriter writer,
+                                                  bool hasMultipleProperties)
         {
             if (hasMultipleProperties)
-                writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n");
+            {
+                writer.Write(
+                    "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n");
+            }
             else
+            {
                 writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
+            }
         }
 
-        private static void WriteProperties(INode node, IEnumerable<XmlElement> properties, TextWriter output)
+        private static void WriteProperties(INode node,
+                                            IEnumerable<XmlElement> properties,
+                                            TextWriter output)
         {
             WriteProperties(node, properties, output, false);
         }
 
-        private static void WriteProperties(INode node, IEnumerable<XmlElement> properties, TextWriter output, bool isFolder)
+        private static void WriteProperties(INode node,
+                                            IEnumerable<XmlElement> properties,
+                                            TextWriter output,
+                                            bool isFolder)
         {
             bool writeGetContentLengthForFolder = isFolder && PropertiesContains(properties, "getcontentlength");
 
             output.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\"");
             if (writeGetContentLengthForFolder)
+            {
                 output.Write(" xmlns:g0=\"DAV:\"");
+            }
             output.Write(">\n");
             output.Write("<D:href>" + node.Href() + "</D:href>\n");
 
@@ -314,7 +390,9 @@ namespace SvnBridge.Handlers
             {
                 XmlElement property = doc.CreateElement(prop.LocalName, prop.NamespaceURI);
                 if (!(isFolder && prop.LocalName == "getcontentlength"))
+                {
                     propertyResults.Add(node.GetProperty(property));
+                }
             }
 
             output.Write("<D:propstat>\n");
@@ -340,12 +418,15 @@ namespace SvnBridge.Handlers
             output.Write("</D:response>\n");
         }
 
-        private static bool PropertiesContains(IEnumerable<XmlElement> properties, string propertyName)
+        private static bool PropertiesContains(IEnumerable<XmlElement> properties,
+                                               string propertyName)
         {
             foreach (XmlElement property in properties)
             {
                 if (property.LocalName == propertyName)
+                {
                     return true;
+                }
             }
 
             return false;

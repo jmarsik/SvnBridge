@@ -8,6 +8,8 @@ namespace SvnBridge.Infrastructure
     [TestFixture]
     public class CircuitBreakerTest
     {
+        #region Setup/Teardown
+
         [SetUp]
         public void Setup()
         {
@@ -22,11 +24,29 @@ namespace SvnBridge.Infrastructure
             Clock.FrozenCurrentTime = null;
         }
 
+        #endregion
+
         [Test]
-        public void CanCreateProxyForInterface()
+        [ExpectedException(typeof (CircuitTrippedException),
+            ExpectedMessage =
+            @"The component SvnBridge.Infrastructure.FooImpl has had more than 10 failures in a 5 minutes period.
+The circuit breaker for this component has been tripped and will be in effect until 01/01/2000 00:15:00"
+            )]
+        public void AfterTenException_InLessThan_FiveMinutes_TripCircuit()
         {
             IFoo foo = CircuitBreaker.For<IFoo, FooImpl>();
-            Assert.IsNotNull(foo);
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    foo.Throw();
+                }
+                catch
+                {
+                }
+            }
+
+            foo.Throw();
         }
 
         [Test]
@@ -34,6 +54,13 @@ namespace SvnBridge.Infrastructure
         {
             IFoo foo = CircuitBreaker.For<IFoo, FooImpl>();
             Assert.AreEqual(2, foo.ReturnTwo());
+        }
+
+        [Test]
+        public void CanCreateProxyForInterface()
+        {
+            IFoo foo = CircuitBreaker.For<IFoo, FooImpl>();
+            Assert.IsNotNull(foo);
         }
 
         [Test]
@@ -53,29 +80,9 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-        [Test]
-        [ExpectedException(typeof(CircuitTrippedException),
-           ExpectedMessage = @"The component SvnBridge.Infrastructure.FooImpl has had more than 10 failures in a 5 minutes period.
-The circuit breaker for this component has been tripped and will be in effect until 01/01/2000 00:15:00")]
-        public void AfterTenException_InLessThan_FiveMinutes_TripCircuit()
-        {
-            IFoo foo = CircuitBreaker.For<IFoo, FooImpl>();
-            for (int i = 0; i < 10; i++)
-            {
-                try
-                {
-                    foo.Throw();
-                }
-                catch
-                { }
-            }
-
-            foo.Throw();
-        }
-
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException),
+        [ExpectedException(typeof (InvalidOperationException),
             ExpectedMessage = "blah")]
         public void WhenCircuitBreakerHasBeenTripped_ItWillResetItself_After_15_Minutes()
         {
@@ -87,7 +94,8 @@ The circuit breaker for this component has been tripped and will be in effect un
                     foo.Throw();
                 }
                 catch
-                { }
+                {
+                }
             }
 
             Clock.FrozenCurrentTime = Clock.Now.AddMinutes(15);
@@ -95,9 +103,11 @@ The circuit breaker for this component has been tripped and will be in effect un
         }
 
         [Test]
-        [ExpectedException(typeof(CircuitTrippedException),
-           ExpectedMessage = @"The component SvnBridge.Infrastructure.FooImpl has had more than 10 failures in a 5 minutes period.
-The circuit breaker for this component has been tripped and will be in effect until 01/01/2000 00:15:00")]
+        [ExpectedException(typeof (CircuitTrippedException),
+            ExpectedMessage =
+            @"The component SvnBridge.Infrastructure.FooImpl has had more than 10 failures in a 5 minutes period.
+The circuit breaker for this component has been tripped and will be in effect until 01/01/2000 00:15:00"
+            )]
         public void WhenCircuitBreakerHasTripped_AllMethodOfObject_AreBlocked()
         {
             IFoo foo = CircuitBreaker.For<IFoo, FooImpl>();
@@ -108,10 +118,11 @@ The circuit breaker for this component has been tripped and will be in effect un
                     foo.Throw();
                 }
                 catch
-                { }
+                {
+                }
             }
 
-            foo.ReturnTwo(); 
+            foo.ReturnTwo();
         }
     }
 
@@ -123,6 +134,8 @@ The circuit breaker for this component has been tripped and will be in effect un
 
     public class FooImpl : IFoo
     {
+        #region IFoo Members
+
         public int ReturnTwo()
         {
             return 2;
@@ -132,5 +145,7 @@ The circuit breaker for this component has been tripped and will be in effect un
         {
             throw new InvalidOperationException("blah");
         }
+
+        #endregion
     }
 }

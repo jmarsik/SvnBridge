@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace SvnBridge.Infrastructure
 {
@@ -19,7 +18,8 @@ namespace SvnBridge.Infrastructure
         }
 
 
-        public static object Resolve(Type type, IDictionary dependencies)
+        public static object Resolve(Type type,
+                                     IDictionary dependencies)
         {
             return Container.Resolve(type, dependencies);
         }

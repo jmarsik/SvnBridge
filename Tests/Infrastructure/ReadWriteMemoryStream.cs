@@ -5,18 +5,8 @@ namespace Tests.Infrastructure
 {
     public class ReadWriteMemoryStream : Stream
     {
-        MemoryStream inputStream = new MemoryStream();
-        MemoryStream outputStream = new MemoryStream();
-
-        public void SetInput(byte[] input)
-        {
-            inputStream = new MemoryStream(input);
-        }
-
-        public byte[] GetOutput()
-        {
-            return outputStream.ToArray();
-        }
+        private MemoryStream inputStream = new MemoryStream();
+        private MemoryStream outputStream = new MemoryStream();
 
         public override bool CanRead
         {
@@ -33,11 +23,6 @@ namespace Tests.Infrastructure
             get { throw new Exception("The method or operation is not implemented."); }
         }
 
-        public override void Flush()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
         public override long Length
         {
             get { throw new Exception("The method or operation is not implemented."); }
@@ -47,6 +32,21 @@ namespace Tests.Infrastructure
         {
             get { throw new Exception("The method or operation is not implemented."); }
             set { throw new Exception("The method or operation is not implemented."); }
+        }
+
+        public void SetInput(byte[] input)
+        {
+            inputStream = new MemoryStream(input);
+        }
+
+        public byte[] GetOutput()
+        {
+            return outputStream.ToArray();
+        }
+
+        public override void Flush()
+        {
+            throw new Exception("The method or operation is not implemented.");
         }
 
         public override int Read(byte[] buffer,

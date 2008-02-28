@@ -5,7 +5,13 @@ namespace SvnBridge.Protocol
 {
     public class SetPropData
     {
-        public SetPropData() {}
+        [XmlAttribute("name", DataType = "string", Form = XmlSchemaForm.Unqualified)] public string Name = null;
+
+        [XmlText(DataType = "string")] public string Value = null;
+
+        public SetPropData()
+        {
+        }
 
         public SetPropData(string name,
                            string value)
@@ -13,11 +19,5 @@ namespace SvnBridge.Protocol
             Name = name;
             Value = value;
         }
-
-        [XmlAttribute("name", DataType = "string", Form = XmlSchemaForm.Unqualified)]
-        public string Name = null;
-
-        [XmlText(DataType = "string")]
-        public string Value = null;
     }
 }

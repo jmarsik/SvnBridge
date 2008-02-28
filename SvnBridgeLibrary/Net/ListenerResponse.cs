@@ -13,7 +13,8 @@ namespace SvnBridge.Net
         private bool sendChunked;
         private int statusCode;
 
-        public ListenerResponse(ListenerRequest request, Stream stream)
+        public ListenerResponse(ListenerRequest request,
+                                Stream stream)
         {
             headers = new List<KeyValuePair<string, string>>();
             outputStream = new ListenerResponseStream(request, this, stream, 100);
@@ -26,7 +27,8 @@ namespace SvnBridge.Net
 
         #region IHttpResponse Members
 
-        public void AppendHeader(string name, string value)
+        public void AppendHeader(string name,
+                                 string value)
         {
             headers.Add(new KeyValuePair<string, string>(name, value));
         }

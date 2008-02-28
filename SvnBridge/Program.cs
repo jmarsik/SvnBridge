@@ -21,20 +21,27 @@ namespace SvnBridge
             int? port = null;
 
             if (args.Length > 0)
+            {
                 tfsUrl = args[0];
+            }
 
             if (args.Length > 1)
             {
                 int tmp;
                 if (int.TryParse(args[1], out tmp))
+                {
                     port = tmp;
+                }
             }
 
             if (!String.IsNullOrEmpty(tfsUrl) || TryGetSettings(ref tfsUrl, ref port))
+            {
                 Run(tfsUrl, port ?? 8081);
+            }
         }
 
-        private static bool TryGetSettings(ref string tfsUrl, ref int? port)
+        private static bool TryGetSettings(ref string tfsUrl,
+                                           ref int? port)
         {
             SettingsForm view = new SettingsForm();
             SettingsViewPresenter presenter = new SettingsViewPresenter(view);
@@ -44,15 +51,16 @@ namespace SvnBridge
 
             if (!presenter.Cancelled)
             {
-                tfsUrl = Settings.Default.TfsUrl   = presenter.TfsUrl;
-                port   = Settings.Default.TfsPort  = presenter.Port;
+                tfsUrl = Settings.Default.TfsUrl = presenter.TfsUrl;
+                port = Settings.Default.TfsPort = presenter.Port;
                 Settings.Default.Save();
             }
 
             return !presenter.Cancelled;
         }
 
-        private static void Run(string tfsUrl, int port)
+        private static void Run(string tfsUrl,
+                                int port)
         {
             IListener listener = ListenerFactory.Create();
 

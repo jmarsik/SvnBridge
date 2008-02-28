@@ -1,4 +1,3 @@
-using System.Security.Principal;
 using SvnBridge.Net;
 
 namespace SvnBridge.Stubs
@@ -8,7 +7,7 @@ namespace SvnBridge.Stubs
         internal IHttpRequest RequestProperty;
         internal IHttpResponse ResponseProperty;
 
-        #region IConnection Members
+        #region IHttpContext Members
 
         public IHttpRequest Request
         {

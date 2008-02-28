@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using NUnit.Framework;
 
 namespace TestsEndToEnd
@@ -8,22 +6,22 @@ namespace TestsEndToEnd
     public class LogTest : EndToEndTestBase
     {
         [Test]
-        public void CanGetLogOfAllChanges_WithoutLimit()
+        public void CanAskForLogOfItemThatDoesNotExists()
         {
-            CheckoutAndChangeDirectory();
-
-            string actual = ExecuteCommand("log");
-            // we want to verify that we can execute it, not verify the contet
-            Assert.IsFalse(string.IsNullOrEmpty(actual));
+            string command = ExecuteCommandAndGetError("log " + testUrl + " --revision 1");
+            Assert.AreEqual("svn: Unable to find repository location for 'http://localhost:9090/SvnBridgeTesting" +
+                            testPath
+                            + "' in revision 1\r\n",
+                            command);
         }
 
         [Test]
         public void CanGetLogByUrl()
         {
             int revision = CreateFolder(testPath + "/Test4", true);
-            string command = ExecuteCommand("log "+ testUrl + " --revision " + revision);
+            string command = ExecuteCommand("log " + testUrl + " --revision " + revision);
             Assert.IsTrue(
-                command.Contains("r"+revision), "does not contains revision"
+                command.Contains("r" + revision), "does not contains revision"
                 );
             Assert.IsTrue(
                 command.Contains("A /SvnBridgeTesting" + testPath + "/Test4"),
@@ -32,12 +30,13 @@ namespace TestsEndToEnd
         }
 
         [Test]
-        public void CanAskForLogOfItemThatDoesNotExists()
+        public void CanGetLogOfAllChanges_WithoutLimit()
         {
-            string command = ExecuteCommandAndGetError("log " + testUrl + " --revision 1");
-            Assert.AreEqual("svn: Unable to find repository location for 'http://localhost:9090/SvnBridgeTesting" +
-                testPath
-                + "' in revision 1\r\n", command);           
+            CheckoutAndChangeDirectory();
+
+            string actual = ExecuteCommand("log");
+            // we want to verify that we can execute it, not verify the contet
+            Assert.IsFalse(string.IsNullOrEmpty(actual));
         }
     }
 }

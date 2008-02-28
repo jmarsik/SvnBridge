@@ -9,17 +9,14 @@ namespace SvnBridge.Infrastructure
     [TestFixture]
     public class CachingItemMetaDataRepositoryTest
     {
-        private ICache mockCache;
-        private ISourceControlProvider mockSourceControlProvider;
-        private MockRepository mocks;
-        private CachingItemMetaDataRepository repository;
+        #region Setup/Teardown
 
         [SetUp]
         public void TestInitialize()
         {
             mocks = new MockRepository();
-            mockCache = this.mocks.DynamicMock<ICache>();
-            mockSourceControlProvider = this.mocks.DynamicMock<ISourceControlProvider>();
+            mockCache = mocks.DynamicMock<ICache>();
+            mockSourceControlProvider = mocks.DynamicMock<ISourceControlProvider>();
 
             repository = new CachingItemMetaDataRepository(mockSourceControlProvider, mockCache);
         }
@@ -30,30 +27,24 @@ namespace SvnBridge.Infrastructure
             mocks.VerifyAll();
         }
 
-        [Test]
-        public void GetItems_WhenCannotFindItemInCache_WillGoToSourceCodeProvider()
-        {
-            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(null);
+        #endregion
 
-            mockSourceControlProvider.GetItems(5, "blah", Recursion.Full);
-            LastCall.Return(new ItemMetaData());
+        private ICache mockCache;
+        private ISourceControlProvider mockSourceControlProvider;
+        private MockRepository mocks;
+        private CachingItemMetaDataRepository repository;
+
+        [Test]
+        public void GetChangedItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
+        {
+            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new FolderMetaData());
+
+            UpdateReportData reportData = new UpdateReportData();
+            DoNotExpect.Call(mockSourceControlProvider.GetChangedItems("blah", 5, 10, reportData));
 
             mocks.ReplayAll();
 
-            ItemMetaData items = this.repository.GetItems(5, "blah", Recursion.Full);
-            Assert.IsNotNull(items);
-        }
-
-        [Test]
-        public void GetItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
-        {
-            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new ItemMetaData());
-
-            DoNotExpect.Call(mockSourceControlProvider.GetItems(5, "blah", Recursion.Full));
-
-            mocks.ReplayAll();
-
-            ItemMetaData items = repository.GetItems(5, "blah", Recursion.Full);
+            FolderMetaData items = repository.GetChangedItems("blah", 5, 10, reportData);
             Assert.IsNotNull(items);
         }
 
@@ -73,16 +64,29 @@ namespace SvnBridge.Infrastructure
         }
 
         [Test]
-        public void GetChangedItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
+        public void GetItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
         {
-            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new FolderMetaData());
+            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new ItemMetaData());
 
-            UpdateReportData reportData = new UpdateReportData();
-            DoNotExpect.Call(mockSourceControlProvider.GetChangedItems("blah", 5, 10, reportData));
+            DoNotExpect.Call(mockSourceControlProvider.GetItems(5, "blah", Recursion.Full));
 
             mocks.ReplayAll();
 
-            FolderMetaData items = repository.GetChangedItems("blah", 5, 10, reportData);
+            ItemMetaData items = repository.GetItems(5, "blah", Recursion.Full);
+            Assert.IsNotNull(items);
+        }
+
+        [Test]
+        public void GetItems_WhenCannotFindItemInCache_WillGoToSourceCodeProvider()
+        {
+            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(null);
+
+            mockSourceControlProvider.GetItems(5, "blah", Recursion.Full);
+            LastCall.Return(new ItemMetaData());
+
+            mocks.ReplayAll();
+
+            ItemMetaData items = repository.GetItems(5, "blah", Recursion.Full);
             Assert.IsNotNull(items);
         }
     }

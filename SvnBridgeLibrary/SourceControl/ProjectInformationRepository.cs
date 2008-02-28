@@ -3,19 +3,18 @@ using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
-using SvnBridge.SourceControl;
 
 namespace SvnBridge.SourceControl
 {
     public class ProjectInformationRepository : IProjectInformationRepository
     {
-        private readonly ICache cache;
         private readonly ITFSSourceControlService _sourceControlSvc;
+        private readonly ICache cache;
         private readonly string serverUrl;
 
         public ProjectInformationRepository(
             ICache cache,
-            ITFSSourceControlService _sourceControlSvc, 
+            ITFSSourceControlService _sourceControlSvc,
             string serverUrl)
         {
             this.cache = cache;
@@ -23,31 +22,42 @@ namespace SvnBridge.SourceControl
             this.serverUrl = serverUrl;
         }
 
-        public ProjectLocationInformation GetProjectLocation(ICredentials credentials, string projectName)
+        #region IProjectInformationRepository Members
+
+        public ProjectLocationInformation GetProjectLocation(ICredentials credentials,
+                                                             string projectName)
         {
             string cacheKey = "GetProjectLocation-" + projectName;
             object cached = cache.Get(cacheKey);
             if (cached != null)
-                return (ProjectLocationInformation)cached;
+            {
+                return (ProjectLocationInformation) cached;
+            }
 
             projectName = projectName.ToLower();
             string[] servers = serverUrl.Split(',');
             foreach (string server in servers)
             {
                 SourceItem[] items =
-                    _sourceControlSvc.QueryItems(server, CredentialsHelper.GetCredentialsForServer(server, credentials),
-                                                 Constants.ServerRootPath + projectName, RecursionType.None,
-                                                 new LatestVersionSpec(), DeletedState.NonDeleted, ItemType.Any);
+                    _sourceControlSvc.QueryItems(server,
+                                                 CredentialsHelper.GetCredentialsForServer(server, credentials),
+                                                 Constants.ServerRootPath + projectName,
+                                                 RecursionType.None,
+                                                 new LatestVersionSpec(),
+                                                 DeletedState.NonDeleted,
+                                                 ItemType.Any);
                 if (items != null && items.Length > 0)
                 {
                     string remoteProjectName = items[0].RemoteName.Substring(Constants.ServerRootPath.Length);
                     ProjectLocationInformation information = new ProjectLocationInformation(remoteProjectName, server);
                     cache.Set(cacheKey, information);
                     return information;
-                };
-
+                }
+                ;
             }
             throw new InvalidOperationException("Could not find project '" + projectName + "' in: " + serverUrl);
         }
+
+        #endregion
     }
 }

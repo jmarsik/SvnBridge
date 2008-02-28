@@ -6,7 +6,8 @@ namespace SvnBridge.Handlers
 {
     public class MkActivityHandler : HttpContextHandlerBase
     {
-        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context,
+                                       ISourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -28,7 +29,8 @@ namespace SvnBridge.Handlers
                                      "<h1>Created</h1>\n" +
                                      "<p>Activity " + path + " has been created.</p>\n" +
                                      "<hr />\n" +
-                                     "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host + " Port " + request.Url.Port + "</address>\n" +
+                                     "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host +
+                                     " Port " + request.Url.Port + "</address>\n" +
                                      "</body></html>\n";
 
             WriteToResponse(response, responseContent);

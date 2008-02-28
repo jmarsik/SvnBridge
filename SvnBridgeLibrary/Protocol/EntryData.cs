@@ -5,15 +5,15 @@ namespace SvnBridge.Protocol
 {
     public class EntryData
     {
-        public EntryData() {}
+        [XmlText()] public string path;
 
-        [XmlAttribute("rev", DataType = "string", Form = XmlSchemaForm.Unqualified)]
-        public string Rev = null;
+        [XmlAttribute("rev", DataType = "string", Form = XmlSchemaForm.Unqualified)] public string Rev = null;
 
-        [XmlAttribute("start-empty", DataType = "boolean", Form = XmlSchemaForm.Unqualified)]
-        public bool StartEmpty = false;
+        [XmlAttribute("start-empty", DataType = "boolean", Form = XmlSchemaForm.Unqualified)] public bool StartEmpty =
+            false;
 
-        [XmlText()]
-        public string path;
+        public EntryData()
+        {
+        }
     }
 }

@@ -17,7 +17,6 @@ namespace TestsEndToEnd
             Assert.IsTrue(
                 output.Contains("A    test2.txt")
                 );
-
         }
 
         [Test]

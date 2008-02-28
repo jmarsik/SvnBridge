@@ -16,9 +16,9 @@ namespace Trace2.Properties
 {
     [CompilerGenerated()]
     [GeneratedCode("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "8.0.0.0")]
-    sealed partial class Settings : ApplicationSettingsBase
+    internal sealed partial class Settings : ApplicationSettingsBase
     {
-        static Settings defaultInstance = ((Settings)(Synchronized(new Settings())));
+        private static Settings defaultInstance = ((Settings) (Synchronized(new Settings())));
 
         public static Settings Default
         {
