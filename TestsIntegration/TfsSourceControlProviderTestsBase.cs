@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using CodePlex.TfsLibrary.Utility;
 using NUnit.Framework;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Exceptions;
+using CodePlex.TfsLibrary.RegistrationWebSvc;
 
 namespace Tests
 {
@@ -26,7 +28,18 @@ namespace Tests
             _activityId = Guid.NewGuid().ToString();
             //_provider = new TFSSourceControlProvider(SERVER_NAME, null, null);
             //_testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            _provider = new TFSSourceControlProvider(SERVER_NAME, PROJECT_NAME, null);
+            RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
+            FileSystem system = new FileSystem();
+            RegistrationService service = new RegistrationService(factory);
+            RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
+            WebTransferService webTransferService = new WebTransferService(system);
+            TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
+                                                                                          factory1,
+                                                                                          webTransferService,
+                                                                                          system);
+            _provider = new TFSSourceControlProvider(SERVER_NAME, PROJECT_NAME, null,
+                webTransferService, tfsSourceControlService,
+                new ProjectInformationRepository(tfsSourceControlService, SERVER_NAME));
             _testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, _testPath);
