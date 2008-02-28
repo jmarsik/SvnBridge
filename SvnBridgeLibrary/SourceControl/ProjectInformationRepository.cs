@@ -9,17 +9,27 @@ namespace SvnBridge.SourceControl
 {
     public class ProjectInformationRepository : IProjectInformationRepository
     {
-        private readonly TFSSourceControlService _sourceControlSvc;
+        private readonly ICache cache;
+        private readonly ITFSSourceControlService _sourceControlSvc;
         private readonly string serverUrl;
 
-        public ProjectInformationRepository(TFSSourceControlService _sourceControlSvc, string serverUrl)
+        public ProjectInformationRepository(
+            ICache cache,
+            ITFSSourceControlService _sourceControlSvc, 
+            string serverUrl)
         {
+            this.cache = cache;
             this._sourceControlSvc = _sourceControlSvc;
             this.serverUrl = serverUrl;
         }
 
         public ProjectLocationInformation GetProjectLocation(ICredentials credentials, string projectName)
         {
+            string cacheKey = "GetProjectLocation-" + projectName;
+            object cached = cache.Get(cacheKey);
+            if (cached != null)
+                return (ProjectLocationInformation)cached;
+
             projectName = projectName.ToLower();
             string[] servers = serverUrl.Split(',');
             foreach (string server in servers)
@@ -28,10 +38,12 @@ namespace SvnBridge.SourceControl
                     _sourceControlSvc.QueryItems(server, CredentialsHelper.GetCredentialsForServer(server, credentials),
                                                  Constants.ServerRootPath + projectName, RecursionType.None,
                                                  new LatestVersionSpec(), DeletedState.NonDeleted, ItemType.Any);
-                if (items.Length > 0)
+                if (items != null && items.Length > 0)
                 {
                     string remoteProjectName = items[0].RemoteName.Substring(Constants.ServerRootPath.Length);
-                    return new ProjectLocationInformation(remoteProjectName, server);
+                    ProjectLocationInformation information = new ProjectLocationInformation(remoteProjectName, server);
+                    cache.Set(cacheKey, information);
+                    return information;
                 };
 
             }

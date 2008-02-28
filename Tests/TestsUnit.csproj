@@ -97,6 +97,7 @@
     <Compile Include="Net\ListenerTests.cs" />
     <Compile Include="Presenters\SettingsViewPresenterTests.cs" />
     <Compile Include="Infrastructure\MyMocks.cs" />
+    <Compile Include="SourceControl\ProjectInformationRepositoryTest.cs" />
     <Compile Include="Stubs\StubSourceControlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\ProtocolTestsBase.cs" />

@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
-using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using CodePlex.TfsLibrary.Utility;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 using SvnBridge.Utility;
@@ -24,7 +22,7 @@ namespace SvnBridge.SourceControl
         readonly string _serverUrl;
         readonly string _projectName;
         readonly string _rootPath;
-        readonly TFSSourceControlService _sourceControlSvc;
+        readonly ITFSSourceControlService _sourceControlSvc;
         readonly IWebTransferService _webTransferSvc;
 
         class Activity
@@ -98,7 +96,7 @@ namespace SvnBridge.SourceControl
             string projectName, 
             ICredentials credentials, 
             IWebTransferService webTransferService, 
-            TFSSourceControlService tfsSourceControlService,
+            ITFSSourceControlService tfsSourceControlService,
             IProjectInformationRepository projectInformationRepository)
         {
             _webTransferSvc = webTransferService;

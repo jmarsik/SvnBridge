@@ -5,6 +5,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using NUnit.Framework;
+using SvnBridge.Cache;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Exceptions;
@@ -84,7 +85,7 @@ namespace Tests
                                                                                           system);
             TFSSourceControlProvider provider = new TFSSourceControlProvider(SERVER_NAME + "," + SERVER_NAME, 
                 PROJECT_NAME, null, webTransferService, tfsSourceControlService,
-                new ProjectInformationRepository(tfsSourceControlService, SERVER_NAME));
+                new ProjectInformationRepository(new NullCache(), tfsSourceControlService, SERVER_NAME));
         }
     }
 }

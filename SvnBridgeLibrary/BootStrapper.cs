@@ -27,9 +27,7 @@ namespace SvnBridge
                 typeof (IRegistrationService),
                 typeof (IFileSystem),
                 typeof (IWebTransferService),
-
-                // concrete types
-                typeof (TFSSourceControlService)
+                typeof (ITFSSourceControlService)
             };
 
         public BootStrapper()
@@ -41,7 +39,7 @@ namespace SvnBridge
                 if (asms.Contains(type.Assembly) == false)
                     asms.Add(type.Assembly);
 
-                if(type.IsInterface)// we perform auto registration for interface only
+                if (type.IsInterface)// we perform auto registration for interface only
                     names.Add(type.Namespace);
             }
 
@@ -75,13 +73,9 @@ namespace SvnBridge
             Type selected = null;
             foreach (Type interfaceType in type.GetInterfaces())
             {
+                // this gives us the most derived interface
                 if (IsValidInterface(interfaceType))
                 {
-                    if (selected != null)
-                    {
-                        throw new InvalidOperationException("The component " + type +
-                                                            " implements more than a single interface. SoC violation.");
-                    }
                     selected = interfaceType;
                 }
             }
@@ -90,10 +84,11 @@ namespace SvnBridge
 
         private bool IsValidInterface(Type interfaceType)
         {
-            return Array.IndexOf(componentInterfacesNamespace, interfaceType.Namespace) != -1;
+            return Array.IndexOf(componentInterfacesNamespace, interfaceType.Namespace) != -1 &&
+                Array.IndexOf(assemblies, interfaceType.Assembly) != -1;
         }
 
-      
+
         private bool ValidTypeForRegistration(Type type)
         {
             if (type.IsInterface || type.IsAbstract)

@@ -1,7 +1,7 @@
 using System.Web;
 using SvnBridge.Interfaces;
 
-namespace SvnBridge.Infrastructure
+namespace SvnBridge.Cache
 {
     public class WebCache : ICache
     {

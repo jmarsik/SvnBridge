@@ -69,7 +69,7 @@
           <AutoAssignPort>False</AutoAssignPort>
           <DevelopmentServerPort>3737</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost</IISUrl>
+          <IISUrl>http://localhost/svnbridge</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
         </WebProjectProperties>
       </FlavorProperties>

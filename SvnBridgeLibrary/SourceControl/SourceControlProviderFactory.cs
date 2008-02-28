@@ -3,6 +3,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
+using SvnBridge.Cache;
 
 namespace SvnBridge.SourceControl
 {
@@ -32,7 +33,7 @@ namespace SvnBridge.SourceControl
                                                                                               system);
                 return new TFSSourceControlProvider(serverUrl, projectName, credential, webTransferService,
                                                  tfsSourceControlService,
-                                                 new ProjectInformationRepository(tfsSourceControlService, serverUrl));
+                                                 new ProjectInformationRepository(new WebCache(), tfsSourceControlService, serverUrl));
             }
             else
                 return createDelegate(serverUrl, credential);

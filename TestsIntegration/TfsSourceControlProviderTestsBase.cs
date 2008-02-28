@@ -5,6 +5,8 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using NUnit.Framework;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Exceptions;
@@ -39,7 +41,7 @@ namespace Tests
                                                                                           system);
             _provider = new TFSSourceControlProvider(SERVER_NAME, PROJECT_NAME, null,
                 webTransferService, tfsSourceControlService,
-                new ProjectInformationRepository(tfsSourceControlService, SERVER_NAME));
+                 IoC.Resolve<IProjectInformationRepository>());
             _testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, _testPath);

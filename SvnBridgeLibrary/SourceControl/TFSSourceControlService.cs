@@ -9,7 +9,7 @@ using CodePlex.TfsLibrary;
 
 namespace SvnBridge.SourceControl
 {
-    public class TFSSourceControlService : SourceControlService
+    public class TFSSourceControlService : SourceControlService, ITFSSourceControlService
     {
         readonly IRepositoryWebSvcFactory _webSvcFactory;
 

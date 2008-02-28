@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BootStrapper.cs" />
+    <Compile Include="Cache\NullCache.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
@@ -53,7 +54,7 @@
     <Compile Include="Infrastructure\CachingItemMetaDataRepository.cs" />
     <Compile Include="Infrastructure\Container.cs" />
     <Compile Include="Infrastructure\IoC.cs" />
-    <Compile Include="Infrastructure\WebCache.cs" />
+    <Compile Include="Cache\WebCache.cs" />
     <Compile Include="Interfaces\ICache.cs" />
     <Compile Include="Interfaces\IItemMetaDataRepository.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Handlers\ReportHandler\ItemLoaderManager.cs" />
     <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
     <Compile Include="Interfaces\IProjectInformationRepository.cs" />
+    <Compile Include="SourceControl\ITFSSourceControlService.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
     <Compile Include="SourceControl\ProjectInformationRepository.cs" />
     <Compile Include="Net\ListenerContext.cs" />
