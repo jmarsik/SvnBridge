@@ -132,7 +132,7 @@ namespace SvnBridge.Utility
             return xml.ToArray();
         }
 
-       
+
         public static string GetMd5Checksum(byte[] data)
         {
             MD5 md5 = MD5.Create();
@@ -146,28 +146,46 @@ namespace SvnBridge.Utility
 
         private static string Encode(string[] encoded, string[] decoded, string value, bool capitalize)
         {
+            if (value == null)
+                return value;
+
             for (int i = 0; i < decoded.Length; i++)
+            {
                 if (capitalize && decoded[i] != "&")
+                {
                     value = value.Replace(decoded[i], encoded[i].ToUpper());
+                }
                 else
+                {
                     value = value.Replace(decoded[i], encoded[i]);
+                }
+            }
 
             return value;
         }
 
         private static string Decode(string value, bool capitalize)
         {
+            if (value == null)
+                return value;
+
             for (int i = ENCODED.Length - 1; i >= 0; i--)
+            {
                 if (capitalize)
+                {
                     value = value.Replace(ENCODED[i].ToUpper(), DECODED[i]);
+                }
                 else
+                {
                     value = value.Replace(ENCODED[i], DECODED[i]);
+                }
+            }
 
             return value;
         }
 
-        static readonly string[] DECODED = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`", "&" };
-        static readonly string[] ENCODED = new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;" };
+        static readonly string[] DECODED = new string[ ] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`", "&" };
+        static readonly string[] ENCODED = new string[ ] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;" };
 
         public static string Encode(string value)
         {
@@ -197,8 +215,8 @@ namespace SvnBridge.Utility
             return Decode(value, false);
         }
 
-        static readonly string[] DECODED_C = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`" };
-        static readonly string[] ENCODED_C = new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60" };
+        static readonly string[] DECODED_C = new string[ ] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`" };
+        static readonly string[] ENCODED_C = new string[ ] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60" };
 
         public static string EncodeC(string value)
         {
