@@ -101,7 +101,7 @@ namespace SvnBridge.Handlers
             output.Write("</S:get-locations-report>\n");
         }
 
-        private void UpdateReport(ISourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output)
+        private  void UpdateReport(ISourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output)
         {
             Uri srcPathUri = null;
             if (!String.IsNullOrEmpty(updatereport.SrcPath))

@@ -65,7 +65,7 @@ namespace SvnBridge.Handlers
                 {
                     byte[] newData = SvnDiffEngine.ApplySvnDiff(diff, sourceData, sourceDataStartIndex);
                     sourceDataStartIndex += newData.Length;
-                    Helper.ReDim(ref fileData, fileData.Length + newData.Length);
+                    Array.Resize(ref fileData, fileData.Length + newData.Length);
                     Array.Copy(newData, 0, fileData, fileData.Length - newData.Length, newData.Length);
                 }
                 if (Helper.GetMd5Checksum(fileData) != resultHash)

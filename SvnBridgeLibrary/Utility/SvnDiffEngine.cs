@@ -22,7 +22,7 @@ namespace SvnBridge.Utility
             while (instruction != null)
             {
                 if (targetIndex + (int)instruction.Length > buffer.Length)
-                    Helper.ReDim(ref buffer, buffer.Length + (int)instruction.Length + BUFFER_EXPAND_SIZE);
+                    Array.Resize(ref buffer, buffer.Length + (int)instruction.Length + BUFFER_EXPAND_SIZE);
 
                 switch (instruction.OpCode)
                 {
@@ -50,7 +50,7 @@ namespace SvnBridge.Utility
                 instruction = ReadInstruction(instructionReader);
             }
 
-            Helper.ReDim(ref buffer, targetIndex);
+            Array.Resize(ref buffer, targetIndex);
             return buffer;
         }
 

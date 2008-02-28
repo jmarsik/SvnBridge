@@ -41,11 +41,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BootStrapper.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
+    <Compile Include="Infrastructure\CircuitBreaker.cs" />
+    <Compile Include="Infrastructure\CircuitTrippedException.cs" />
+    <Compile Include="Infrastructure\Clock.cs" />
+    <Compile Include="Infrastructure\CachingItemMetaDataRepository.cs" />
+    <Compile Include="Infrastructure\Container.cs" />
+    <Compile Include="Infrastructure\IoC.cs" />
+    <Compile Include="Infrastructure\WebCache.cs" />
+    <Compile Include="Interfaces\ICache.cs" />
+    <Compile Include="Interfaces\IItemMetaDataRepository.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />
     <Compile Include="Handlers\MkActivityHandler.cs" />
     <Compile Include="Handlers\MkColHandler.cs" />
@@ -60,6 +70,9 @@
     <Compile Include="Handlers\ReportHandler\ItemLoader.cs" />
     <Compile Include="Handlers\ReportHandler\ItemLoaderManager.cs" />
     <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
+    <Compile Include="Interfaces\IProjectInformationRepository.cs" />
+    <Compile Include="SourceControl\ProjectLocationInformation.cs" />
+    <Compile Include="SourceControl\ProjectInformationRepository.cs" />
     <Compile Include="Net\ListenerContext.cs" />
     <Compile Include="Net\HttpContextDispatcher.cs" />
     <Compile Include="Net\ListenerRequest.cs" />
@@ -112,6 +125,7 @@
     <Compile Include="Protocol\UpdatedSetData.cs" />
     <Compile Include="Protocol\UpdateReportData.cs" />
     <Compile Include="Protocol\UpdateReportResponseData.cs" />
+    <Compile Include="SourceControl\CredentialsHelper.cs" />
     <Compile Include="SourceControl\DeleteFolderMetaData.cs" />
     <Compile Include="SourceControl\DeleteMetaData.cs" />
     <Compile Include="SourceControl\FolderMetaData.cs" />

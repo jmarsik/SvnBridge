@@ -132,22 +132,7 @@ namespace SvnBridge.Utility
             return xml.ToArray();
         }
 
-        public static void ReDim(ref byte[] arr,
-                                 int length)
-        {
-            byte[] arrTemp = new byte[length];
-            if (length > arr.Length)
-            {
-                Array.Copy(arr, 0, arrTemp, 0, arr.Length);
-                arr = arrTemp;
-            }
-            else
-            {
-                Array.Copy(arr, 0, arrTemp, 0, length);
-                arr = arrTemp;
-            }
-        }
-
+       
         public static string GetMd5Checksum(byte[] data)
         {
             MD5 md5 = MD5.Create();

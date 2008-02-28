@@ -7,8 +7,6 @@ namespace SvnBridge.Protocol
     [XmlRoot("update-report", Namespace = WebDav.Namespaces.SVN)]
     public class UpdateReportData
     {
-        public UpdateReportData() {}
-
         [XmlAttribute("send-all", DataType = "boolean", Form = XmlSchemaForm.Unqualified)]
         public bool SendAll = false;
 

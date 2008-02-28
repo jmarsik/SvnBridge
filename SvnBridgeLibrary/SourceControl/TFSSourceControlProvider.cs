@@ -5,6 +5,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
+using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 using SvnBridge.Utility;
 using ChangeType = CodePlex.TfsLibrary.RepositoryWebSvc.ChangeType;
@@ -14,35 +15,34 @@ namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlProvider : ISourceControlProvider
     {
-        const string SERVER_PATH = "$/";
         const string LOCAL_PREFIX = @"C:\";
         const string PROP_FOLDER = "..svnbridge";
         const string FOLDER_PROP_FILE = ".svnbridge";
 
-        static Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
-        ICredentials _credentials;
-        string _serverUrl;
-        string _projectName;
-        string _rootPath;
-        TFSSourceControlService _sourceControlSvc;
-        WebTransferService _webTransferSvc;
+        static readonly Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
+        readonly ICredentials _credentials;
+        readonly string _serverUrl;
+        readonly string _projectName;
+        readonly string _rootPath;
+        readonly TFSSourceControlService _sourceControlSvc;
+        readonly IWebTransferService _webTransferSvc;
 
         class Activity
         {
             public string Comment;
-            public List<ActivityItem> MergeList = new List<ActivityItem>();
-            public List<string> DeletedItems = new List<string>();
-            public List<string> PostCommitDeletedItems = new List<string>();
-            public List<CopyAction> CopiedItems = new List<CopyAction>();
-            public List<string> Collections = new List<string>();
-            public Dictionary<string, Dictionary<string, string>> AddedProperties = new Dictionary<string, Dictionary<string, string>>();
-            public Dictionary<string, List<string>> RemovedProperties = new Dictionary<string, List<string>>();
+            public readonly List<ActivityItem> MergeList = new List<ActivityItem>();
+            public readonly List<string> DeletedItems = new List<string>();
+            public readonly List<string> PostCommitDeletedItems = new List<string>();
+            public readonly List<CopyAction> CopiedItems = new List<CopyAction>();
+            public readonly List<string> Collections = new List<string>();
+            public readonly Dictionary<string, Dictionary<string, string>> AddedProperties = new Dictionary<string, Dictionary<string, string>>();
+            public readonly Dictionary<string, List<string>> RemovedProperties = new Dictionary<string, List<string>>();
         }
 
         class CopyAction
         {
-            public string Path;
-            public string TargetPath;
+            public readonly string Path;
+            public readonly string TargetPath;
             public bool Rename;
 
             public CopyAction(string path, string targetPath, bool rename)
@@ -64,9 +64,9 @@ namespace SvnBridge.SourceControl
 
         class ActivityItem
         {
-            public string Path;
-            public ItemType FileType;
-            public ActivityItemAction Action;
+            public readonly string Path;
+            public readonly ItemType FileType;
+            public readonly ActivityItemAction Action;
 
             public ActivityItem(string path, ItemType fileType, ActivityItemAction action)
             {
@@ -93,29 +93,30 @@ namespace SvnBridge.SourceControl
             public List<Property> Properties = new List<Property>();
         }
 
-        public TFSSourceControlProvider(string serverUrl, string projectName, NetworkCredential credentials)
+        public TFSSourceControlProvider(
+            string serverUrl, 
+            string projectName, 
+            ICredentials credentials, 
+            IWebTransferService webTransferService, 
+            TFSSourceControlService tfsSourceControlService,
+            IProjectInformationRepository projectInformationRepository)
         {
-            RegistrationWebSvcFactory registrationFactory = new RegistrationWebSvcFactory();
-            FileSystem fileSystem = new FileSystem();
-            RegistrationService registrationSvc = new RegistrationService(registrationFactory);
-
-            _webTransferSvc = new WebTransferService(fileSystem);
-            _sourceControlSvc = new TFSSourceControlService(registrationSvc,
-                                                        new RepositoryWebSvcFactory(registrationFactory),
-                                                        _webTransferSvc,
-                                                        fileSystem);
+            _webTransferSvc = webTransferService;
+            _sourceControlSvc = tfsSourceControlService;
 
             if (projectName != null)
             {
-                SetServerAndProject(serverUrl, credentials, projectName);
-                _rootPath = SERVER_PATH + _projectName + "/";
+                ProjectLocationInformation location = projectInformationRepository.GetProjectLocation(credentials, projectName);
+                _projectName = location.RemoteProjectName;
+                _serverUrl = location.ServerUrl;
+                _rootPath = Constants.ServerRootPath + _projectName + "/";
             }
             else
             {
                 _serverUrl = serverUrl;
-                _rootPath = SERVER_PATH;
+                _rootPath = Constants.ServerRootPath;
             }
-            _credentials = GetCredentialsForServer(_serverUrl, credentials);
+            _credentials = CredentialsHelper.GetCredentialsForServer(_serverUrl, credentials);
         }
 
         // Methods
@@ -957,27 +958,8 @@ namespace SvnBridge.SourceControl
             return item;
         }
 
-        static Dictionary<string, string[]> projectServers = new Dictionary<string, string[]>();
-
-        private void SetServerAndProject(string serverUrl, NetworkCredential credentials, string projectName)
-        {
-            projectName = projectName.ToLower();
-            if (!projectServers.ContainsKey(projectName))
-            {
-                string[] servers = serverUrl.Split(',');
-                foreach (string server in servers)
-                {
-                    SourceItem[] items = _sourceControlSvc.QueryItems(server, GetCredentialsForServer(server, credentials), SERVER_PATH + projectName, RecursionType.None, new LatestVersionSpec(), DeletedState.NonDeleted, ItemType.Any);
-                    if (items.Length > 0)
-                        projectServers[projectName] = new string[] { server, items[0].RemoteName.Substring(SERVER_PATH.Length) };
-                }
-            }
-            _serverUrl = projectServers[projectName][0];
-            _projectName = projectServers[projectName][1];
-        }
-
-        private void SetItemProperties(Dictionary<string, FolderMetaData> folders,
-                                  Dictionary<string, ItemProperties> properties)
+        private void SetItemProperties(IDictionary<string, FolderMetaData> folders,
+                                  IDictionary<string, ItemProperties> properties)
         {
             foreach (KeyValuePair<string, ItemProperties> itemProperties in properties)
             {
@@ -1003,25 +985,6 @@ namespace SvnBridge.SourceControl
                     return item;
 
             return null;
-        }
-
-        private ICredentials GetCredentialsForServer(string tfsUrl, NetworkCredential credentials)
-        {
-            ICredentials result = credentials;
-            if (result == null)
-            {
-                Uri uri = new Uri(tfsUrl);
-
-                if (uri.Host.ToLowerInvariant().EndsWith("codeplex.com"))
-                {
-                    CredentialCache cache = new CredentialCache();
-                    cache.Add(uri, "Basic", new NetworkCredential("anonymous", null));
-                    result = cache;
-                }
-                else
-                    result = CredentialCache.DefaultNetworkCredentials;
-            }
-            return result;
         }
 
         private void ProcessDeletedFile(string path, string remoteName, SourceItemChange change,

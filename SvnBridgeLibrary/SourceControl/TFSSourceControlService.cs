@@ -11,12 +11,13 @@ namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlService : SourceControlService
     {
-        IRepositoryWebSvcFactory _webSvcFactory;
+        readonly IRepositoryWebSvcFactory _webSvcFactory;
 
         public TFSSourceControlService(IRegistrationService registrationService,
                                     IRepositoryWebSvcFactory webSvcFactory,
                                     IWebTransferService webTransferService,
-                                    IFileSystem fileSystem) : base(registrationService, webSvcFactory, webTransferService, fileSystem)
+                                    IFileSystem fileSystem) 
+            : base(registrationService, webSvcFactory, webTransferService, fileSystem)
         {
             _webSvcFactory = webSvcFactory;
         }
