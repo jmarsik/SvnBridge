@@ -1,3 +1,4 @@
+using System;
 using SvnBridge.Net;
 
 namespace SvnBridge.Stubs
@@ -15,6 +16,8 @@ namespace SvnBridge.Stubs
         public StartDelegate Start_Delegate;
         public bool Stop_Called;
         public StopDelegate Stop_Delegate;
+
+        public event EventHandler<ListenErrorEventArgs> ListenError;
 
         public int Port
         {
@@ -42,6 +45,16 @@ namespace SvnBridge.Stubs
                 Stop_Delegate();
 
             Stop_Called = true;
+        }
+
+        public bool ListenErrorHasDelegate()
+        {
+            return ListenError != null;
+        }
+
+        public void RaiseListenErrorEvent(string message)
+        {
+            ListenError(this, new ListenErrorEventArgs(new Exception(message)));
         }
     }
 }

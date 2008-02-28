@@ -8,6 +8,7 @@ namespace SvnBridge.Views
         
         void OnListenerStarted();
         void OnListenerStopped();
+        void OnListenerError(string message);
         void Show();
     }
 }

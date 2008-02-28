@@ -44,6 +44,7 @@
     <Compile Include="BootStrapper.cs" />
     <Compile Include="Cache\NullCache.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Exceptions\RepositoryUnavailableException.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Handlers\ReportHandler\ItemLoaderManager.cs" />
     <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
     <Compile Include="Interfaces\IProjectInformationRepository.cs" />
+    <Compile Include="ListenErrorEventArgs.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
     <Compile Include="SourceControl\ProjectInformationRepository.cs" />

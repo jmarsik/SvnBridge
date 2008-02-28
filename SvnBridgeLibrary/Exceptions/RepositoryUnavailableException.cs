@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SvnBridge.Exceptions
 {
     [global::System.Serializable]
-    public class ConflictException : Exception
+    public class RepositoryUnavailableException : Exception
     {
         //
         // For guidelines regarding the creation of new exception types, see
@@ -14,12 +12,12 @@ namespace SvnBridge.Exceptions
         //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dncscol/html/csharp07192001.asp
         //
 
-        public ConflictException() { }
-        public ConflictException(string message) : base(message) { }
-        public ConflictException(string message, Exception inner) : base(message, inner) { }
-        protected ConflictException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
+        public RepositoryUnavailableException() { }
+        public RepositoryUnavailableException(string message) : base(message) { }
+        public RepositoryUnavailableException(string message, Exception inner) : base(message, inner) { }
+        protected RepositoryUnavailableException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
             : base(info, context) { }
     }
 }

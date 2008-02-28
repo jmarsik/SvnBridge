@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using SvnBridge.Presenters;
 
@@ -33,6 +34,12 @@ namespace SvnBridge.Views
             stopToolStripMenuItem.Enabled = false;
 
             notifyIcon.ShowBalloonTip(500, "SvnBridge", "Stopped", ToolTipIcon.Info);
+        }
+
+        public void OnListenerError(string message)
+        {
+            Trace.TraceError(message);
+            notifyIcon.ShowBalloonTip(1000, "SvnBridge", message, ToolTipIcon.Error);
         }
 
         public ListenerViewPresenter Presenter

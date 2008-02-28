@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using SvnBridge.Handlers;
 using System.IO;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Net
 {
@@ -34,6 +35,8 @@ namespace SvnBridge.Net
         }
 
         #region IListener Members
+
+        public event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
 
         public int Port
         {
@@ -102,8 +105,15 @@ namespace SvnBridge.Net
 
             listener.BeginAcceptTcpClient(Accept, null);
 
-            if (tcpClient != null)
-                Process(tcpClient);
+            try
+            {
+                if (tcpClient != null)
+                    Process(tcpClient);
+            }
+            catch(Exception ex)
+            {
+                OnListenException(ex);
+            }
         }
 
         private void Process(TcpClient tcpClient)
@@ -120,5 +130,11 @@ namespace SvnBridge.Net
 
             tcpClient.Close();
         }
+
+        private void OnListenException(Exception ex)
+        {
+            ListenError(this, new ListenErrorEventArgs(ex));
+        }
+
     }
 }
