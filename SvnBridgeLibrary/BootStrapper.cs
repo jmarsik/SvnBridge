@@ -56,30 +56,16 @@ namespace SvnBridge
                     if (ValidTypeForRegistration(type) == false)
                         continue;
 
-                    Type interfaceType = GetInterfaceType(type);
 
-                    if (IoC.Container.IsRegistered(interfaceType))
-                        continue;
+                    foreach (Type interfaceType in type.GetInterfaces())
+                    {
+                        if (IoC.Container.IsRegistered(interfaceType))
+                            continue;
 
-                    IoC.Container.Register(interfaceType, type);
+                        IoC.Container.Register(interfaceType, type);
+                    }
                 }
             }
-        }
-
-        private Type GetInterfaceType(Type type)
-        {
-            if (Array.IndexOf(representiveComponents, type) != -1)
-                return type;
-            Type selected = null;
-            foreach (Type interfaceType in type.GetInterfaces())
-            {
-                // this gives us the most derived interface
-                if (IsValidInterface(interfaceType))
-                {
-                    selected = interfaceType;
-                }
-            }
-            return selected;
         }
 
         private bool IsValidInterface(Type interfaceType)

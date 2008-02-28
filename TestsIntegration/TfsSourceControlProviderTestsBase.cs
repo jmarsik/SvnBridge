@@ -5,6 +5,8 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using NUnit.Framework;
+using SvnBridge;
+using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
@@ -25,7 +27,7 @@ namespace Tests
         protected int _lastCommitRevision;
 
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
             _activityId = Guid.NewGuid().ToString();
             //_provider = new TFSSourceControlProvider(SERVER_NAME, null, null);
@@ -41,7 +43,7 @@ namespace Tests
                                                                                           system);
             _provider = new TFSSourceControlProvider(SERVER_NAME, PROJECT_NAME, null,
                 webTransferService, tfsSourceControlService,
-                 IoC.Resolve<IProjectInformationRepository>());
+                 new ProjectInformationRepository(new NullCache(),tfsSourceControlService, SERVER_NAME));
             _testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, _testPath);
@@ -49,7 +51,7 @@ namespace Tests
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             Commit();
             DeleteItem(_testPath, false);

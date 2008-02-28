@@ -27,10 +27,7 @@ namespace SvnBridge.Infrastructure
 
         public void Register(Type service, Type impl)
         {
-            Register(service, delegate(Container c, IDictionary deps)
-                                  {
-                                      return CreateInstance(impl, deps);
-                                  });
+            Register(service, delegate(Container c, IDictionary deps) { return CreateInstance(impl, deps); });
         }
 
         public void Register(Type type, Creator creator)
@@ -81,9 +78,17 @@ namespace SvnBridge.Infrastructure
                 {
                     try
                     {
-                        object arg = dictionary[info.Name] ??
-                                     IoC.Container.TryGetConfiguration(info.Name) ??
-                                     IoC.Resolve(info.ParameterType, dictionary);
+                        object arg = null;
+                        if (dictionary.Contains(info.Name))
+                        {
+                            arg = dictionary[info.Name];
+                        }
+                        else
+                        {
+                            arg =
+                                IoC.Container.TryGetConfiguration(info.Name) ??
+                                IoC.Resolve(info.ParameterType, dictionary);
+                        }
                         args.Add(arg);
                     }
                     catch (Exception e)

@@ -5,14 +5,16 @@ namespace SvnBridge.Cache
 {
     public class WebCache : ICache
     {
+        readonly System.Web.Caching.Cache cache = HttpRuntime.Cache;
+
         public object Get(string key)
         {
-            return HttpContext.Current.Cache[key];
+            return cache[key];
         }
 
         public void Set(string key, object obj)
         {
-            HttpContext.Current.Cache[key] = obj;
+            cache[key] = obj;
         }
     }
 }
