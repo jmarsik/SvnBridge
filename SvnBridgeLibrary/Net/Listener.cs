@@ -55,9 +55,8 @@ namespace SvnBridge.Net
                 if (isListening)
                     throw new InvalidOperationException("The TFS server URL cannot be changed while the listener is listening.");
 
-                Uri validUri;
-                if (!Uri.TryCreate(value, UriKind.Absolute, out validUri))
-                    throw new UriFormatException();
+                // validate URI
+                new Uri(value, UriKind.Absolute);
 
                 dispatcher.TfsUrl = value;
             }

@@ -263,7 +263,7 @@ namespace SvnBridge.Handlers
         private static void WritePathResponse(ISourceControlProvider sourceControlProvider, string requestPath, string depth, PropData data, Stream outputStream)
         {
             if (!sourceControlProvider.ItemExists(Helper.Decode(requestPath), -1))
-                throw new FileNotFoundException();
+                throw new FileNotFoundException("Unable to find file in the source control repository", requestPath);
 
             FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depth, requestPath, null);
 

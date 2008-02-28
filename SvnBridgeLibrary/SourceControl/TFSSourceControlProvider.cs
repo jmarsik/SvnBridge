@@ -111,7 +111,7 @@ namespace SvnBridge.SourceControl
             }
             else
             {
-                _serverUrl = serverUrl;
+                _serverUrl = serverUrl.Split(',')[0];
                 _rootPath = Constants.ServerRootPath;
             }
             _credentials = CredentialsHelper.GetCredentialsForServer(_serverUrl, credentials);
@@ -331,11 +331,9 @@ namespace SvnBridge.SourceControl
                     else
                     {
                         string folderName = "";
-                        string filename = item.Name;
                         if (item.Name.IndexOf('/') != -1)
                         {
                             folderName = GetFolderName(item.Name).ToLower();
-                            filename = item.Name.Substring(folderName.Length + 1);
                         }
                         folders[folderName].Items.Add(item);
                     }
@@ -991,7 +989,6 @@ namespace SvnBridge.SourceControl
             if (!IsChangeAlreadyCurrentInClientState(ChangeType.Delete, remoteName, change.Item.RemoteChangesetId, clientExistingFiles, clientDeletedFiles))
             {
                 string[] nameParts = remoteName.Substring(path.Length + 1).Split('/');
-                string changePath = "/" + remoteName;
                 string folderName = path;
                 FolderMetaData folder = root;
                 for (int i = 0; i < nameParts.Length; i++)
