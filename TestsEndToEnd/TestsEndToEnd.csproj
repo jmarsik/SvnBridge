@@ -34,7 +34,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EndToEndTestBase.cs" />
     <Compile Include="ListItemTest.cs" />
+    <Compile Include="LogTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

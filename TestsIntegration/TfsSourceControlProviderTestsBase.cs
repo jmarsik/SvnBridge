@@ -22,7 +22,7 @@ namespace Tests
         protected const string SERVER_NAME = "http://codeplex-tfs3:8080";
         protected const string PROJECT_NAME = "SvnBridgeTesting";
         protected string _activityId;
-        protected string _testPath;
+        protected string testPath;
         protected TFSSourceControlProvider _provider;
         protected int _lastCommitRevision;
 
@@ -31,7 +31,7 @@ namespace Tests
         {
             _activityId = Guid.NewGuid().ToString();
             //_provider = new TFSSourceControlProvider(SERVER_NAME, null, null);
-            //_testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            //testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
             FileSystem system = new FileSystem();
             RegistrationService service = new RegistrationService(factory);
@@ -44,9 +44,9 @@ namespace Tests
             _provider = new TFSSourceControlProvider(SERVER_NAME, PROJECT_NAME, null,
                 webTransferService, tfsSourceControlService,
                  new ProjectInformationRepository(new NullCache(),tfsSourceControlService, SERVER_NAME));
-            _testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
-            _provider.MakeCollection(_activityId, _testPath);
+            _provider.MakeCollection(_activityId, testPath);
             Commit();
         }
 
@@ -54,7 +54,7 @@ namespace Tests
         public virtual void TearDown()
         {
             Commit();
-            DeleteItem(_testPath, false);
+            DeleteItem(testPath, false);
             _provider.MergeActivity(_activityId);
             _provider.DeleteActivity(_activityId);
         }
@@ -124,12 +124,13 @@ namespace Tests
                 Commit();
         }
 
-        protected void CreateFolder(string path,
+        protected int CreateFolder(string path,
                         bool commit)
         {
             _provider.MakeCollection(_activityId, path);
             if (commit)
-                Commit();
+                return Commit().Version;
+            return -1;
         }
 
         protected string ReadFile(string path)

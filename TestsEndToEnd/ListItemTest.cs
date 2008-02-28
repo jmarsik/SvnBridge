@@ -1,4 +1,7 @@
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Xml;
 using NUnit.Framework;
 using SvnBridge;
 using SvnBridge.Net;
@@ -7,46 +10,100 @@ using Tests;
 namespace TestsEndToEnd
 {
     [TestFixture]
-    public class ListItemTest : TFSSourceControlProviderTestsBase
+    public class ListItemTest : EndToEndTestBase
     {
-        private IListener listener;
-
-        public override void SetUp()
+        [Test]
+        public void CanListSingleFolder()
         {
-            base.SetUp();
-
-            new BootStrapper().Start();
-
-            listener = ListenerFactory.Create();
-            this.listener.TfsUrl = "http://codeplex-tfs3:8080";
-            this.listener.Port = 9090;
-            this.listener.Start();
-        }
-
-        public override void TearDown()
-        {
-            base.TearDown();
-            listener.Stop();
+            CreateFolder(testPath + "/TestFolder", true);
+            string actual = ExecuteCommand("list " + testUrl);
+            string expected = @"TestFolder/
+";
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
-        public void CanListFiles()
+        public void CanListFolders()
         {
-            CreateFolder(_testPath + "/TestFolder", true);
-            string actual = ExecuteCommand("list http://localhost:9090/SvnBridgeTesting" + _testPath);
-            Assert.AreEqual("TestFolder/\r\n", actual);
+            CreateFolder(testPath + "/TestFolder1", true);
+            CreateFolder(testPath + "/TestFolder2", true);
 
+            string actual = ExecuteCommand("list " + testUrl);
+            string expected = @"TestFolder1/
+TestFolder2/
+";
+            Assert.AreEqual(expected, actual);
         }
 
-        private static string ExecuteCommand(string command)
+        [Test]
+        public void CanListFoldersAndFilesRecursively()
         {
-            ProcessStartInfo psi = new ProcessStartInfo("svn", command);
-            psi.RedirectStandardOutput = true;
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
-            Process svn = Process.Start(psi);
-            svn.WaitForExit(1000);
-            return svn.StandardOutput.ReadToEnd();
+            CreateFolder(testPath + "/TestFolder1", true);
+            CreateFolder(testPath + "/TestFolder2", true);
+            WriteFile(testPath + "/TestFolder2/text.txt", "blah", true);
+
+            string actual = ExecuteCommand("list " + testUrl+ " --recursive");
+            string expected = @"TestFolder1/
+TestFolder2/
+TestFolder2/text.txt
+";
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void CanListFolderAndFile()
+        {
+            CreateFolder(testPath + "/TestFolder1", true);
+            WriteFile(testPath + "/test.txt", "blah", true);
+
+            string actual = ExecuteCommand("list " + testUrl);
+            string expected = @"TestFolder1/
+test.txt
+";
+            Assert.AreEqual(expected, actual);
+        }
+
+
+        [Test]
+        public void CanListPreviousVersion()
+        {
+            int version = CreateFolder(testPath + "/TestFolder1", true);
+            WriteFile(testPath + "/test.txt", "blah", true);// here we create a new version
+
+            string actual = ExecuteCommand("list " + testUrl + " --revision "+version);
+            string expected = @"TestFolder1/
+";
+            Assert.AreEqual(expected, actual);
+        }
+
+
+        [Test]
+        public void CanListPreviousVersionUsingDate()
+        {
+            TemporaryIgnore("SvnBridge doesn't support dated-rev-report");
+
+            CreateFolder(testPath + "/TestFolder1", true);
+            DateTime commitDate = DateTime.Now;
+
+            WriteFile(testPath + "/test.txt", "blah", true);// here we create a new version
+
+            string actual = ExecuteCommand("list " + testUrl + " --revision {" + commitDate.ToString("yyyyMMddTHHmmss") + "}" );
+            string expected = @"TestFolder1/
+";
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void CanListPreviousVersion_UsingPrev()
+        {
+            CreateFolder(testPath + "/TestFolder1", true);
+            WriteFile(testPath + "/test.txt", "blah", true);// here we create a new version
+            string output = ExecuteCommand("co " + testUrl);
+            Console.WriteLine(output);
+            string actual = ExecuteCommand("list " + Path.GetFileName(testUrl) + " --revision PREV");
+            string expected = @"TestFolder1/
+";
+            Assert.AreEqual(expected, actual);
         }
     }
 }

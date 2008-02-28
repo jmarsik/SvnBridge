@@ -405,7 +405,6 @@ namespace SvnBridge.SourceControl
                               int versionTo,
                               Recursion recursion,
                               int maxCount)
-        //                              bool getOriginalNames)
         {
             if (path.StartsWith("/"))
                 path = path.Substring(1);

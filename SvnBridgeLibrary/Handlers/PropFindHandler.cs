@@ -57,7 +57,7 @@ namespace SvnBridge.Handlers
 
         private static void WriteFileNotFoundResponse(IHttpRequest request, IHttpResponse response)
         {
-            response.StatusCode = (int) HttpStatusCode.NotFound;
+            response.StatusCode = (int)HttpStatusCode.NotFound;
             response.ContentType = "text/html; charset=iso-8859-1";
 
             string responseContent =
@@ -105,6 +105,9 @@ namespace SvnBridge.Handlers
             string path = requestPath.Substring(9 + revision.Length);
 
             ItemMetaData item = GetItems(sourceControlProvider, int.Parse(revision), path, Recursion.None);
+
+            if (item == null)
+                throw new InvalidOperationException("There is no item " + requestPath + " in revision " + revision);
 
             using (StreamWriter writer = new StreamWriter(outputStream))
             {

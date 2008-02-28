@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using SvnBridge.Net;
 using SvnBridge.Presenters;
+using SvnBridge.Properties;
 using SvnBridge.Views;
 
 namespace SvnBridge
@@ -13,32 +14,39 @@ namespace SvnBridge
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            
+
+            new BootStrapper().Start();
+
             string tfsUrl = null;
-            int port = 8081;
+            int? port = null;
 
             if (args.Length > 0)
                 tfsUrl = args[0];
 
             if (args.Length > 1)
-                int.TryParse(args[1], out port);
+            {
+                int tmp;
+                if (int.TryParse(args[1], out tmp))
+                    port = tmp;
+            }
 
             if (!String.IsNullOrEmpty(tfsUrl) || TryGetSettings(ref tfsUrl, ref port))
-                Run(tfsUrl, port);
+                Run(tfsUrl, port ?? 8081);
         }
 
-        private static bool TryGetSettings(ref string tfsUrl, ref int port)
+        private static bool TryGetSettings(ref string tfsUrl, ref int? port)
         {
             SettingsForm view = new SettingsForm();
             SettingsViewPresenter presenter = new SettingsViewPresenter(view);
-            presenter.TfsUrl = tfsUrl;
-            presenter.Port = port;
+            presenter.TfsUrl = tfsUrl ?? Settings.Default.TfsUrl;
+            presenter.Port = port ?? Settings.Default.TfsPort;
             presenter.Show();
 
             if (!presenter.Cancelled)
             {
-                tfsUrl = presenter.TfsUrl;
-                port = presenter.Port;
+                tfsUrl = Settings.Default.TfsUrl   = presenter.TfsUrl;
+                port   = Settings.Default.TfsPort  = presenter.Port;
+                Settings.Default.Save();
             }
 
             return !presenter.Cancelled;

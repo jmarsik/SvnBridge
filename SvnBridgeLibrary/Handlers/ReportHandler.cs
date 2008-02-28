@@ -95,9 +95,14 @@ namespace SvnBridge.Handlers
             else
                 path = "/";
 
+            ItemMetaData item = sourceControlProvider.GetItems(int.Parse(getLocationsReport.LocationRevision), path, Recursion.None);
+
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
-            output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + path + "\"/>\n");
+            if(item != null)
+            {
+                output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + path + "\"/>\n");
+            }
             output.Write("</S:get-locations-report>\n");
         }
 
@@ -142,7 +147,12 @@ namespace SvnBridge.Handlers
             if (path.IndexOf('/',9) > -1)
                 serverPath = path.Substring(path.IndexOf('/', 9));
 
-            LogItem logItem = sourceControlProvider.GetLog(serverPath, int.Parse(logreport.EndRevision), int.Parse(logreport.StartRevision), Recursion.Full, int.Parse(logreport.Limit));
+            LogItem logItem = sourceControlProvider.GetLog(
+                serverPath, 
+                int.Parse(logreport.EndRevision), 
+                int.Parse(logreport.StartRevision), 
+                Recursion.Full, 
+                int.Parse(logreport.Limit ?? "100000"));
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:log-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
 

@@ -19,9 +19,9 @@ namespace Tests
         [Test]
         public void TestItemExistsReturnsTrueIfFileExists()
         {
-            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
+            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
 
-            bool result = _provider.ItemExists(_testPath + "/TestFile.txt");
+            bool result = _provider.ItemExists(testPath + "/TestFile.txt");
 
             Assert.IsTrue(result);
         }
@@ -29,7 +29,7 @@ namespace Tests
         [Test]
         public void TestItemExistsReturnsFalseIfFileDoesNotExist()
         {
-            bool result = _provider.ItemExists(_testPath + "/TestFile.txt");
+            bool result = _provider.ItemExists(testPath + "/TestFile.txt");
 
             Assert.IsFalse(result);
         }
@@ -38,9 +38,9 @@ namespace Tests
         public void TestItemExistsReturnsFalseIfFileDoesNotExistInSpecifiedVersion()
         {
             int version = _lastCommitRevision;
-            WriteFile(_testPath + "/TestFile.txt", "Fun text", true);
+            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
             
-            bool result = _provider.ItemExists(_testPath + "/TestFile.txt", version);
+            bool result = _provider.ItemExists(testPath + "/TestFile.txt", version);
 
             Assert.IsFalse(result);
         }
@@ -48,17 +48,17 @@ namespace Tests
         [Test, ExpectedException(typeof(FolderAlreadyExistsException))]
         public void TestAddFolderThatAlreadyExistsThrowsException()
         {
-            CreateFolder(_testPath + "/New Folder", true);
+            CreateFolder(testPath + "/New Folder", true);
 
-            _provider.MakeCollection(_activityId, _testPath + "/New Folder");
+            _provider.MakeCollection(_activityId, testPath + "/New Folder");
         }
 
         [Test]
         public void TestDeleteItemReturnsTrueWhenFileExists()
         {
-            WriteFile(_testPath + "/File.txt", "filedata", true);
+            WriteFile(testPath + "/File.txt", "filedata", true);
 
-            bool result = _provider.DeleteItem(_activityId, _testPath + "/File.txt");
+            bool result = _provider.DeleteItem(_activityId, testPath + "/File.txt");
 
             Assert.IsTrue(result);
         }
@@ -66,7 +66,7 @@ namespace Tests
         [Test]
         public void TestDeleteItemReturnsFalseIfFileDoesNotExist()
         {
-            bool result = _provider.DeleteItem(_activityId, _testPath + "/NotHere.txt");
+            bool result = _provider.DeleteItem(_activityId, testPath + "/NotHere.txt");
 
             Assert.IsFalse(result);
         }

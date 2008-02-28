@@ -155,7 +155,7 @@ namespace SvnBridge.Utility
             return value;
         }
 
-        private static string Decode(string[] encoded, string[] decoded, string value, bool capitalize)
+        private static string Decode(string value, bool capitalize)
         {
             for (int i = ENCODED.Length - 1; i >= 0; i--)
                 if (capitalize)
@@ -181,7 +181,7 @@ namespace SvnBridge.Utility
 
         public static string Decode(string value)
         {
-            return Decode(ENCODED, DECODED, value, false);
+            return Decode(value, false);
         }
 
         static readonly string[] DECODED_B = new string[] { "&", "<", ">" };
@@ -194,7 +194,7 @@ namespace SvnBridge.Utility
 
         public static string DecodeB(string value)
         {
-            return Decode(ENCODED_B, DECODED_B, value, false);
+            return Decode(value, false);
         }
 
         static readonly string[] DECODED_C = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`" };
@@ -207,7 +207,7 @@ namespace SvnBridge.Utility
 
         public static string DecodeC(string value)
         {
-            return Decode(ENCODED_C, DECODED_C, value, true);
+            return Decode(value, true);
         }
 
         public static string FormatDate(DateTime date)
