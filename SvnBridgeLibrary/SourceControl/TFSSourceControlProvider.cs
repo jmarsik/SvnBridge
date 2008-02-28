@@ -92,10 +92,10 @@ namespace SvnBridge.SourceControl
         }
 
         public TFSSourceControlProvider(
-            string serverUrl, 
-            string projectName, 
-            ICredentials credentials, 
-            IWebTransferService webTransferService, 
+            string serverUrl,
+            string projectName,
+            ICredentials credentials,
+            IWebTransferService webTransferService,
             ITFSSourceControlService tfsSourceControlService,
             IProjectInformationRepository projectInformationRepository)
         {
@@ -636,7 +636,9 @@ namespace SvnBridge.SourceControl
 
             do
             {
-                existingPath = existingPath.Substring(0, existingPath.LastIndexOf('/'));
+                int lastIndexOf = existingPath.LastIndexOf('/');
+                if (lastIndexOf != -1)
+                    existingPath = existingPath.Substring(0, lastIndexOf);
                 item = GetItems(-1, existingPath, Recursion.None, true);
             }
             while (item == null);

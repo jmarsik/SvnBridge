@@ -11,7 +11,7 @@ namespace TestsEndToEnd
     public class EndToEndTestBase : TFSSourceControlProviderTestsBase
     {
         private IListener listener;
-        protected string checkoutFolder;
+        private string checkoutFolder;
         protected string testUrl;
 
         public override void SetUp()
