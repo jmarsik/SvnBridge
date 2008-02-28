@@ -30,5 +30,14 @@ namespace TestsEndToEnd
                 "does not contains created folder"
                 );
         }
+
+        [Test]
+        public void CanAskForLogOfItemThatDoesNotExists()
+        {
+            string command = ExecuteCommandAndGetError("log " + testUrl + " --revision 1");
+            Assert.AreEqual("svn: Unable to find repository location for 'http://localhost:9090/SvnBridgeTesting" +
+                testPath
+                + "' in revision 1\r\n", command);           
+        }
     }
 }

@@ -95,7 +95,10 @@ namespace SvnBridge.Handlers
             else
                 path = "/";
 
-            ItemMetaData item = sourceControlProvider.GetItems(int.Parse(getLocationsReport.LocationRevision), path, Recursion.None);
+            ItemMetaData item = sourceControlProvider.GetItems(
+                int.Parse(getLocationsReport.LocationRevision), 
+                path, 
+                Recursion.None);
 
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");

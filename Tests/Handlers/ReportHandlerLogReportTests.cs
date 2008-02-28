@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
 using NUnit.Framework;
+using Rhino.Mocks;
 using SvnBridge.Net;
 using SvnBridge.Stubs;
 using Tests;
@@ -164,6 +165,7 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleOutputForGetLocationsReportOnRoot()
         {
+            stub.Attach(provider.GetItems, new ItemMetaData());
             request.Path = "http://localhost:8082/!svn/bc/5696";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><S:get-locations xmlns:S=\"svn:\" xmlns:D=\"DAV:\"><S:path></S:path><S:peg-revision>5696</S:peg-revision><S:location-revision>5597</S:location-revision></S:get-locations>";
 
@@ -183,6 +185,8 @@ namespace SvnBridge.Handlers
         [Test]
         public void VerifyHandleOutputForGetLocationsReportOnSubFolder()
         {
+            stub.Attach(provider.GetItems, new ItemMetaData());
+
             request.Path = "http://localhost:8082/!svn/bc/5696/Folder1";
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><S:get-locations xmlns:S=\"svn:\" xmlns:D=\"DAV:\"><S:path></S:path><S:peg-revision>5696</S:peg-revision><S:location-revision>5573</S:location-revision></S:get-locations>";
 

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Xml;
 using NUnit.Framework;
 using SvnBridge;
@@ -98,12 +99,24 @@ test.txt
         {
             CreateFolder(testPath + "/TestFolder1", true);
             WriteFile(testPath + "/test.txt", "blah", true);// here we create a new version
-            string output = ExecuteCommand("co " + testUrl);
-            Console.WriteLine(output);
-            string actual = ExecuteCommand("list " + Path.GetFileName(testUrl) + " --revision PREV");
-            string expected = @"TestFolder1/
+            CheckoutAndChangeDirectory();
+            WriteFile(testPath + "/test.txt", "foo", true);
+            ExecuteCommand("update");
+            string actual = ExecuteCommand("list test.txt --revision PREV");
+            string expected = @"test.txt
 ";
             Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void CanListPreviousVersion_WhenDirectoryDoesNotExists()
+        {
+            CheckoutAndChangeDirectory();
+            string actual = ExecuteCommandAndGetError("list --revision PREV");
+            string expected = @"svn: Unable to find repository location for '' in revision";
+            Assert.IsTrue(
+                actual.StartsWith(expected)
+                );
         }
     }
 }

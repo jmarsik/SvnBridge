@@ -29,9 +29,9 @@ namespace TestsEndToEnd
             Environment.CurrentDirectory = Path.Combine(Path.GetTempPath(), checkoutFolder);
             Console.WriteLine("cd " + checkoutFolder);
             listener = ListenerFactory.Create();
-            this.listener.TfsUrl = "http://codeplex-tfs3:8080";
-            this.listener.Port = 9090;
-            this.listener.Start();
+            listener.TfsUrl = "http://codeplex-tfs3:8080";
+            listener.Port = 9090;
+            listener.Start();
         }
 
         public override void TearDown()
@@ -41,9 +41,9 @@ namespace TestsEndToEnd
                                               {
                                                   file.Attributes = file.Attributes & ~FileAttributes.ReadOnly;
                                               });
-            
+
             Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
-            
+
             Directory.Delete(checkoutFolder, true);
             listener.Stop();
         }
@@ -77,7 +77,25 @@ namespace TestsEndToEnd
                 Assert.Ignore("We are ignoring this for now, because:" + message);
         }
 
+        protected static string ExecuteCommandAndGetError(string command)
+        {
+            Process svn = ExecuteInternal(command);
+            return svn.StandardError.ReadToEnd();
+        }
+
         protected static string ExecuteCommand(string command)
+        {
+            Process svn = ExecuteInternal(command);
+            string err = svn.StandardError.ReadToEnd();
+            if (string.IsNullOrEmpty(err) == false)
+                throw new InvalidOperationException("Failed to execute command: " + err);
+
+            string output = svn.StandardOutput.ReadToEnd();
+            Console.WriteLine(output);
+            return output;
+        }
+
+        private static Process ExecuteInternal(string command)
         {
             Console.WriteLine("svn " + command);
             ProcessStartInfo psi = new ProcessStartInfo("svn", command);
@@ -87,11 +105,7 @@ namespace TestsEndToEnd
             psi.UseShellExecute = false;
             Process svn = Process.Start(psi);
             svn.WaitForExit(1000);
-            string err = svn.StandardError.ReadToEnd();
-            if (string.IsNullOrEmpty(err) == false)
-                throw new InvalidOperationException("Failed to execute command: " + err);
-
-            return svn.StandardOutput.ReadToEnd();
+            return svn;
         }
     }
 }
