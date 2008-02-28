@@ -40,7 +40,7 @@ namespace Trace
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 7;
-            this.button1.Text = "button1";
+            this.button1.Text = "Start";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -50,7 +50,7 @@ namespace Trace
             this.txtTargetPort.Name = "txtTargetPort";
             this.txtTargetPort.Size = new System.Drawing.Size(100, 20);
             this.txtTargetPort.TabIndex = 6;
-            this.txtTargetPort.Text = "8081";
+            this.txtTargetPort.Text = "8080";
             // 
             // txtTargetServer
             // 
@@ -58,7 +58,7 @@ namespace Trace
             this.txtTargetServer.Name = "txtTargetServer";
             this.txtTargetServer.Size = new System.Drawing.Size(100, 20);
             this.txtTargetServer.TabIndex = 5;
-            this.txtTargetServer.Text = "localhost";
+            this.txtTargetServer.Text = "codeplex-tfs3";
             // 
             // txtPort
             // 
@@ -66,7 +66,7 @@ namespace Trace
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(100, 20);
             this.txtPort.TabIndex = 4;
-            this.txtPort.Text = "8084";
+            this.txtPort.Text = "9090";
             // 
             // TraceTCP
             // 

@@ -162,15 +162,22 @@ namespace Trace
             int direction = (int)((object[])parameters)[2];
             byte[] buffer = new byte[5000];
             int count;
-            while ((count = input.Read(buffer, 0, buffer.Length)) != 0)
+            try
             {
-                //string data = Encoding.Default.GetString(buffer, 0, count);
-                //if (data.StartsWith("PUT //"))
-                //    System.Threading.Thread.Sleep(500);
+                while (input.CanRead && (count = input.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    //string data = Encoding.Default.GetString(buffer, 0, count);
+                    //if (data.StartsWith("PUT //"))
+                    //    System.Threading.Thread.Sleep(500);
 
-                WriteTest(buffer, count, direction);
-                WriteLog(buffer, count);
-                output.Write(buffer, 0, count);
+                    WriteTest(buffer, count, direction);
+                    WriteLog(buffer, count);
+                    output.Write(buffer, 0, count);
+                }
+            }
+            catch(Exception e )
+            {
+                MessageBox.Show("Failed to copy stream: " + e.Message);    
             }
         }
 
