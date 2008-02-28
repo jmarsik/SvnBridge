@@ -41,6 +41,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Rhino.Mocks, Version=3.4.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Rhino.Mocks.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web.Services" />
@@ -66,6 +70,7 @@
     <Compile Include="Assert\SameException.cs" />
     <Compile Include="Assert\ThrowsException.cs" />
     <Compile Include="Assert\TrueException.cs" />
+    <Compile Include="BootStrapperTest.cs" />
     <Compile Include="FileNodeTests.cs" />
     <Compile Include="Handlers\CheckoutHandlerTests.cs" />
     <Compile Include="Handlers\CopyHandlerTests.cs" />
@@ -83,6 +88,8 @@
     <Compile Include="Handlers\ReportHandlerLogReportTests.cs" />
     <Compile Include="Handlers\ReportHandlerUpdateReportTests.cs" />
     <Compile Include="Handlers\ReportHandler\ItemLoaderTests.cs" />
+    <Compile Include="Infrastructure\CachingItemMetaDataRepositoryTest.cs" />
+    <Compile Include="Infrastructure\CircuitBreakerTest.cs" />
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
     <Compile Include="Infrastructure\TestHelper.cs" />
