@@ -10,112 +10,257 @@ namespace SvnBridge.SourceControl
     {
         private readonly ISourceControlProvider sourceControlProvider;
         private readonly ISourceControlUtility sourceControlUtility;
-        public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider, ISourceControlUtility sourceControlUtility)
+
+        private readonly IDictionary<ItemMetaData, bool> additionForPropertyChangeOnly =
+            new Dictionary<ItemMetaData, bool>();
+
+        public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider,
+                                    ISourceControlUtility sourceControlUtility)
         {
             this.sourceControlProvider = sourceControlProvider;
             this.sourceControlUtility = sourceControlUtility;
         }
 
-        private void CalculateChangeBetweenVersions(string path,
+        private void CalculateChangeBetweenVersions(string checkoutRootPath,
                                                     FolderMetaData root,
-                                                    int versionTo,
-                                                    int versionFrom,
+                                                    int sourceVersion,
+                                                    int targetVersion,
                                                     IDictionary<string, int> clientExistingFiles,
                                                     IDictionary<string, string> clientDeletedFiles)
         {
-            versionFrom++;
-            int lastVersion = versionTo + 1;
-            while (versionFrom != lastVersion)
-            {
-                LogItem logItem = sourceControlProvider.GetLog(path, versionFrom, lastVersion - 1, Recursion.Full, 256);
-                if (logItem.History.Length == 0)
-                {
-                    lastVersion = versionFrom;
-                }
+            bool updatingForwardInTime = sourceVersion <= targetVersion;
+            int lastVersion = sourceVersion;
 
-                foreach (SourceItemHistory history in logItem.History)
+            while (targetVersion != lastVersion)
+            {
+                int previousLoopLastVersion = lastVersion;
+                LogItem logItem =
+                    sourceControlProvider.GetLog(checkoutRootPath,
+                                                 Math.Min(lastVersion, targetVersion) + 1,
+                                                 Math.Max(lastVersion, targetVersion),
+                                                 Recursion.Full, 256);
+
+                foreach (SourceItemHistory history in
+                    SortHistories(updatingForwardInTime, logItem.History))
                 {
                     lastVersion = history.ChangeSetID;
+                    if (updatingForwardInTime == false)
+                    {
+                        lastVersion -= 1;
+                    }
+                    // we need to go over the changeset in reverse order so we will process
+                    // all the files first, and build the folder hierarchy that way
                     for (int i = history.Changes.Count - 1; i >= 0; i--)
                     {
                         SourceItemChange change = history.Changes[i];
-                        if (((change.ChangeType & ChangeType.Add) == ChangeType.Add) ||
-                            ((change.ChangeType & ChangeType.Edit) == ChangeType.Edit) ||
-                            ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch))
+
+                        if (IsAddOperation(change, updatingForwardInTime))
                         {
-                            if (!change.Item.RemoteName.EndsWith("/" + Constants.PROP_FOLDER))
-                            {
-                                string remoteName = change.Item.RemoteName;
-                                bool propertyChange = false;
-                                if (remoteName.Contains("/" + Constants.PROP_FOLDER + "/"))
-                                {
-                                    propertyChange = true;
-                                    if (remoteName.EndsWith("/" + Constants.PROP_FOLDER + "/" + Constants.FOLDER_PROP_FILE))
-                                    {
-                                        remoteName =
-                                            remoteName.Substring(0,
-                                                                 remoteName.IndexOf("/" + Constants.PROP_FOLDER + "/" +
-                                                                                   Constants.FOLDER_PROP_FILE));
-                                    }
-                                    else
-                                    {
-                                        remoteName = remoteName.Replace("/" + Constants.PROP_FOLDER + "/", "/");
-                                    }
-                                }
-                                ProcessAddedItem(path,
-                                                 remoteName,
-                                                 change,
-                                                 propertyChange,
-                                                 root,
-                                                 versionTo,
-                                                 clientExistingFiles,
-                                                 clientDeletedFiles);
-                            }
+                            PerformAdd(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
+                                       clientDeletedFiles);
                         }
-                        else if ((change.ChangeType & ChangeType.Delete) == ChangeType.Delete)
+                        else if (IsEditOperation(change))
                         {
-                            if (!change.Item.RemoteName.EndsWith("/" + Constants.PROP_FOLDER) &&
-                                !change.Item.RemoteName.Contains("/" + Constants.PROP_FOLDER + "/"))
-                            {
-                                ProcessDeletedFile(path,
-                                                   change.Item.RemoteName,
-                                                   change,
-                                                   root,
-                                                   versionTo,
-                                                   clientExistingFiles,
-                                                   clientDeletedFiles);
-                            }
+                            PerformAdd(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
+                                       clientDeletedFiles);
                         }
-                        else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
+                        else if (IsDeleteOperation(change, updatingForwardInTime))
                         {
-                            ItemMetaData oldItem = sourceControlUtility.GetItem(history.ChangeSetID - 1, change.Item.ItemId);
-                            ProcessDeletedFile(path,
-                                               oldItem.Name,
-                                               change,
-                                               root,
-                                               versionTo,
-                                               clientExistingFiles,
-                                               clientDeletedFiles);
-                            ProcessAddedItem(path,
-                                             change.Item.RemoteName,
-                                             change,
-                                             false,
-                                             root,
-                                             versionTo,
-                                             clientExistingFiles,
-                                             clientDeletedFiles);
+                            PerformDelete(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
+                                          clientDeletedFiles);
+                        }
+                        else if (IsRenameOperation(change))
+                        {
+                            PerformRename(targetVersion, checkoutRootPath, history, change, root, clientExistingFiles,
+                                          clientDeletedFiles, updatingForwardInTime);
                         }
                         else
                         {
-                            throw new InvalidOperationException("Unrecognized change type " + change.ChangeType);
+                            throw new NotSupportedException("Unsupported change type " + change.ChangeType);
                         }
                     }
+                }
+                // No change was made, break out
+                if (previousLoopLastVersion == lastVersion)
+                {
+                    break;
                 }
             }
         }
 
+        private void PerformAdd(int targetVersion,
+                                string checkoutRootPath,
+                                SourceItemChange change,
+                                FolderMetaData root,
+                                IDictionary<string, int> clientExistingFiles,
+                                IDictionary<string, string> clientDeletedFiles)
+        {
+            if (change.Item.RemoteName.EndsWith("/" + Constants.PROP_FOLDER))
+            {
+                return;
+            }
+            ItemInformation itemInformation = GetItemInformation(change);
+
+            ProcessAddedItem(checkoutRootPath,
+                             itemInformation.RemoteName,
+                             change,
+                             itemInformation.PropertyChange,
+                             root,
+                             targetVersion,
+                             clientExistingFiles,
+                             clientDeletedFiles);
+        }
+
+        private void PerformDelete(int targetVersion,
+                                   string checkoutRootPath,
+                                   SourceItemChange change,
+                                   FolderMetaData root,
+                                   IDictionary<string, int> clientExistingFiles,
+                                   IDictionary<string, string> clientDeletedFiles)
+        {
+            // we ignore it here because this only happens when the related item
+            // is delete, and at any rate, this is a SvnBridge implementation detail
+            // which the client is not concerned about
+            if (change.Item.RemoteName.EndsWith("/" + Constants.PROP_FOLDER) ||
+                change.Item.RemoteName.Contains("/" + Constants.PROP_FOLDER + "/"))
+            {
+                return;
+            }
+            ProcessDeletedFile(checkoutRootPath,
+                               change.Item.RemoteName,
+                               change,
+                               root,
+                               targetVersion,
+                               clientExistingFiles,
+                               clientDeletedFiles);
+        }
+
+        private void PerformRename(int targetVersion,
+                                   string checkoutRootPath,
+                                   SourceItemHistory history,
+                                   SourceItemChange change,
+                                   FolderMetaData root,
+                                   IDictionary<string, int> clientExistingFiles,
+                                   IDictionary<string, string> clientDeletedFiles,
+                                   bool updatingForwardInTime)
+        {
+            if (updatingForwardInTime)
+            {
+                ItemMetaData oldItem =
+                    sourceControlUtility.GetItem(history.ChangeSetID - 1, change.Item.ItemId);
+
+                ProcessDeletedFile(checkoutRootPath,
+                                   oldItem.Name,
+                                   change,
+                                   root,
+                                   targetVersion,
+                                   clientExistingFiles,
+                                   clientDeletedFiles);
+                ProcessAddedItem(checkoutRootPath,
+                                 change.Item.RemoteName,
+                                 change,
+                                 false,
+                                 root,
+                                 targetVersion,
+                                 clientExistingFiles,
+                                 clientDeletedFiles);
+            }
+            else
+            {
+                ItemMetaData oldItem =
+                    sourceControlUtility.GetItem(history.ChangeSetID - 1, change.Item.ItemId);
+
+                ProcessAddedItem(checkoutRootPath,
+                                 oldItem.Name,
+                                 change,
+                                 false,
+                                 root,
+                                 targetVersion,
+                                 clientExistingFiles,
+                                 clientDeletedFiles);
+
+                ProcessDeletedFile(checkoutRootPath,
+                                   change.Item.RemoteName,
+                                   change,
+                                   root,
+                                   targetVersion,
+                                   clientExistingFiles,
+                                   clientDeletedFiles);
+            }
+        }
+
+        private static ItemInformation GetItemInformation(SourceItemChange change)
+        {
+            string remoteName = change.Item.RemoteName;
+            bool propertyChange = false;
+            if (remoteName.Contains("/" + Constants.PROP_FOLDER + "/"))
+            {
+                propertyChange = true;
+                if (remoteName.EndsWith("/" + Constants.PROP_FOLDER + "/" + Constants.FOLDER_PROP_FILE))
+                {
+                    remoteName =
+                        remoteName.Substring(0,
+                                             remoteName.IndexOf("/" + Constants.PROP_FOLDER + "/" +
+                                                                Constants.FOLDER_PROP_FILE));
+                }
+                else
+                {
+                    remoteName = remoteName.Replace("/" + Constants.PROP_FOLDER + "/", "/");
+                }
+            }
+            return new ItemInformation(propertyChange, remoteName);
+        }
+
+        private static bool IsRenameOperation(SourceItemChange change)
+        {
+            return (change.ChangeType & ChangeType.Rename) == ChangeType.Rename;
+        }
+
+        private static bool IsDeleteOperation(SourceItemChange change, bool updatingForwardInTime)
+        {
+            if (updatingForwardInTime == false)
+            {
+                return IsAddOperation(change, true);
+            }
+            return (change.ChangeType & ChangeType.Delete) == ChangeType.Delete;
+        }
+
+        private static bool IsAddOperation(SourceItemChange change, bool updatingForwardInTime)
+        {
+            if (updatingForwardInTime == false)
+            {
+                return IsDeleteOperation(change, true);
+            }
+            return ((change.ChangeType & ChangeType.Add) == ChangeType.Add) ||
+                   ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch);
+        }
+
+        private static bool IsEditOperation(SourceItemChange change)
+        {
+            return (change.ChangeType & ChangeType.Edit) == ChangeType.Edit;
+        }
+
+        private static IList<SourceItemHistory> SortHistories(bool updatingForwardInTime,
+                                                              IEnumerable<SourceItemHistory> items)
+        {
+            List<SourceItemHistory> histories = new List<SourceItemHistory>(items);
+
+            histories.Sort(delegate(SourceItemHistory x, SourceItemHistory y)
+            {
+                if (updatingForwardInTime)
+                {
+                    return x.ChangeSetID.CompareTo(y.ChangeSetID);
+                }
+                else
+                {
+                    return y.ChangeSetID.CompareTo(x.ChangeSetID);
+                }
+            });
+            return histories;
+        }
+
         private static Dictionary<string, string> GetClientDeletedFiles(string path,
-                                                                 UpdateReportData reportData)
+                                                                        UpdateReportData reportData)
         {
             Dictionary<string, string> clientDeletedFiles = new Dictionary<string, string>();
             if (reportData.Missing != null)
@@ -136,7 +281,7 @@ namespace SvnBridge.SourceControl
         }
 
         private static Dictionary<string, int> GetClientExistingFiles(string path,
-                                                              UpdateReportData reportData)
+                                                                      UpdateReportData reportData)
         {
             Dictionary<string, int> clientExistingFiles = new Dictionary<string, int>();
             if (reportData.Entries != null)
@@ -156,151 +301,123 @@ namespace SvnBridge.SourceControl
             return clientExistingFiles;
         }
 
-        public void CalculateDiff(string path,
+        public void CalculateDiff(string checkoutRootPath,
                                   int versionTo,
                                   int versionFrom,
                                   FolderMetaData root,
                                   UpdateReportData updateReportData)
         {
-            Dictionary<string, int> clientExistingFiles = GetClientExistingFiles(path, updateReportData);
-            Dictionary<string, string> clientDeletedFiles = GetClientDeletedFiles(path, updateReportData);
-            CalculateChangeBetweenVersions(path, root, versionTo, versionFrom, clientExistingFiles, clientDeletedFiles);
+            Dictionary<string, int> clientExistingFiles = GetClientExistingFiles(checkoutRootPath, updateReportData);
+            Dictionary<string, string> clientDeletedFiles = GetClientDeletedFiles(checkoutRootPath, updateReportData);
+            CalculateChangeBetweenVersions(checkoutRootPath,
+                                           root,
+                                           versionFrom,
+                                           versionTo,
+                                           clientExistingFiles,
+                                           clientDeletedFiles);
+            FlattenDeletedFolders(root);
         }
 
-        private void ProcessAddedItem(string path,
-                                     string remoteName,
-                                     SourceItemChange change,
-                                     bool propertyChange,
-                                     FolderMetaData root,
-                                     int versionTo,
-                                     IDictionary<string, int> clientExistingFiles,
-                                     IDictionary<string, string> clientDeletedFiles)
+        /// <summary>
+        /// This method ensures that we are not sending useless deletes to the client
+        /// if a folder is to be deleted, all its children are as well, which we remove
+        /// at this phase.
+        /// </summary>
+        /// <param name="parentFolder"></param>
+        private static void FlattenDeletedFolders(FolderMetaData parentFolder)
         {
-            if (
-                !IsChangeAlreadyCurrentInClientState(ChangeType.Add,
-                                                     remoteName,
-                                                     change.Item.RemoteChangesetId,
-                                                     clientExistingFiles,
-                                                     clientDeletedFiles))
+            foreach (ItemMetaData item in parentFolder.Items)
             {
-                if (remoteName.Length == path.Length)
+                FolderMetaData folder = item as FolderMetaData;
+                if (folder == null)
                 {
-                    ItemMetaData item = sourceControlProvider.GetItems(versionTo, remoteName, Recursion.None);
-                    root.Properties = item.Properties;
+                    continue;
+                }
+                if (folder is DeleteFolderMetaData)
+                {
+                    folder.Items.Clear();
                 }
                 else
                 {
-                    FolderMetaData folder = root;
-                    string itemName = path;
-                    string[] nameParts = remoteName.Substring(path.Length + 1).Split('/');
-                    for (int i = 0; i < nameParts.Length; i++)
-                    {
-                        bool lastNamePart = false;
-                        if (i == nameParts.Length - 1)
-                        {
-                            lastNamePart = true;
-                        }
-
-                        itemName += "/" + nameParts[i];
-                        ItemMetaData item = sourceControlUtility.FindItem(folder, itemName);
-                        if (item == null)
-                        {
-                            item = sourceControlProvider.GetItems(versionTo, itemName, Recursion.None);
-                            if (!lastNamePart)
-                            {
-                                StubFolderMetaData stubFolder = new StubFolderMetaData();
-                                stubFolder.RealFolder = (FolderMetaData)item;
-                                stubFolder.Name = item.Name;
-                                stubFolder.ItemRevision = item.Revision;
-                                stubFolder.LastModifiedDate = item.LastModifiedDate;
-                                stubFolder.Author = item.Author;
-                                item = stubFolder;
-                            }
-                            folder.Items.Add(item);
-                        }
-                        else if ((item is StubFolderMetaData) && lastNamePart)
-                        {
-                            folder.Items.Remove(item);
-                            folder.Items.Add(((StubFolderMetaData)item).RealFolder);
-                        }
-                        else if ((item is DeleteFolderMetaData) && !lastNamePart)
-                        {
-                            return;
-                        }
-                        else if (((item is DeleteFolderMetaData) || (item is DeleteMetaData)) &&
-                                 ((change.ChangeType & ChangeType.Add) == ChangeType.Add))
-                        {
-                            if (!propertyChange)
-                            {
-                                folder.Items.Remove(item);
-                            }
-                        }
-                        if (!lastNamePart)
-                        {
-                            folder = (FolderMetaData)item;
-                        }
-                    }
+                    FlattenDeletedFolders(folder);
                 }
+
             }
         }
 
-        private void ProcessDeletedFile(string path,
-                                     string remoteName,
-                                     SourceItemChange change,
-                                     FolderMetaData root,
-                                     int versionTo,
-                                     IDictionary<string, int> clientExistingFiles,
-                                     IDictionary<string, string> clientDeletedFiles)
+        private void ProcessAddedItem(string checkoutRootPath,
+                                      string remoteName,
+                                      SourceItemChange change,
+                                      bool propertyChange,
+                                      FolderMetaData root,
+                                      int targetVersion,
+                                      IDictionary<string, int> clientExistingFiles,
+                                      IDictionary<string, string> clientDeletedFiles)
         {
-            if (
-                !IsChangeAlreadyCurrentInClientState(ChangeType.Delete,
-                                                     remoteName,
-                                                     change.Item.RemoteChangesetId,
-                                                     clientExistingFiles,
-                                                     clientDeletedFiles))
+            bool alreadyInClientCurrentState = IsChangeAlreadyCurrentInClientState(ChangeType.Add,
+                                                                                   remoteName,
+                                                                                   change.Item.RemoteChangesetId,
+                                                                                   clientExistingFiles,
+                                                                                   clientDeletedFiles);
+            if (alreadyInClientCurrentState)
             {
-                string[] nameParts = remoteName.Substring(path.Length + 1).Split('/');
-                string folderName = path;
+                return;
+            }
+
+            if (string.Equals(remoteName, checkoutRootPath, StringComparison.InvariantCultureIgnoreCase))
+            {
+                ItemMetaData item = sourceControlProvider.GetItems(targetVersion, remoteName, Recursion.None);
+                root.Properties = item.Properties;
+            }
+            else
+            {
                 FolderMetaData folder = root;
+                string itemName = checkoutRootPath;
+                string[] nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split('/');
                 for (int i = 0; i < nameParts.Length; i++)
                 {
-                    folderName += "/" + nameParts[i];
-                    ItemMetaData item = sourceControlUtility.FindItem(folder, folderName);
+                    bool lastNamePart = false;
+                    if (i == nameParts.Length - 1)
+                    {
+                        lastNamePart = true;
+                    }
+
+                    itemName += "/" + nameParts[i];
+                    ItemMetaData item = sourceControlUtility.FindItem(folder, itemName);
                     if (item == null)
                     {
-                        if (i == nameParts.Length - 1)
+                        item = sourceControlProvider.GetItems(change.Item.RemoteChangesetId, itemName, Recursion.None);
+                        if (!lastNamePart)
                         {
-                            if (change.Item.ItemType == ItemType.File)
-                            {
-                                item = new DeleteMetaData();
-                            }
-                            else
-                            {
-                                item = new DeleteFolderMetaData();
-                            }
-
-                            item.Name = remoteName;
-                        }
-                        else
-                        {
-                            item = sourceControlProvider.GetItems(versionTo, folderName, Recursion.None);
-                            if (item == null)
-                            {
-                                item = new DeleteFolderMetaData();
-                                item.Name = folderName;
-                            }
+                            StubFolderMetaData stubFolder = new StubFolderMetaData();
+                            stubFolder.RealFolder = (FolderMetaData)item;
+                            stubFolder.Name = item.Name;
+                            stubFolder.ItemRevision = item.Revision;
+                            stubFolder.LastModifiedDate = item.LastModifiedDate;
+                            stubFolder.Author = item.Author;
+                            item = stubFolder;
                         }
                         folder.Items.Add(item);
-                        if (i != nameParts.Length - 1)
-                        {
-                            folder = (FolderMetaData)item;
-                        }
+                        SetAdditionForPropertyChangeOnly(item, propertyChange);
                     }
-                    else if (item is DeleteFolderMetaData)
+                    else if ((item is StubFolderMetaData) && lastNamePart)
+                    {
+                        folder.Items.Remove(item);
+                        folder.Items.Add(((StubFolderMetaData)item).RealFolder);
+                    }
+                    else if ((item is DeleteFolderMetaData) && !lastNamePart)
                     {
                         return;
                     }
-                    if (i != nameParts.Length - 1)
+                    else if (((item is DeleteFolderMetaData) || (item is DeleteMetaData)) &&
+                             ((change.ChangeType & ChangeType.Add) == ChangeType.Add))
+                    {
+                        if (!propertyChange)
+                        {
+                            folder.Items.Remove(item);
+                        }
+                    }
+                    if (!lastNamePart)
                     {
                         folder = (FolderMetaData)item;
                     }
@@ -308,12 +425,115 @@ namespace SvnBridge.SourceControl
             }
         }
 
+        private void SetAdditionForPropertyChangeOnly(ItemMetaData item, bool propertyChange)
+        {
+            if (item == null)
+                return;
+            if (propertyChange == false)
+            {
+                additionForPropertyChangeOnly[item] = propertyChange;
+            }
+            else
+            {
+                if (additionForPropertyChangeOnly.ContainsKey(item) == false)
+                    additionForPropertyChangeOnly[item] = propertyChange;
+            }
+        }
+
+        private void ProcessDeletedFile(string checkoutRootPath,
+                                        string remoteName,
+                                        SourceItemChange change,
+                                        FolderMetaData root,
+                                        int targetVersion,
+                                        IDictionary<string, int> clientExistingFiles,
+                                        IDictionary<string, string> clientDeletedFiles)
+        {
+            bool alreadyChangedInCurrentClientState = IsChangeAlreadyCurrentInClientState(ChangeType.Delete,
+                                                                                          remoteName,
+                                                                                          change.Item.RemoteChangesetId,
+                                                                                          clientExistingFiles,
+                                                                                          clientDeletedFiles);
+            if (alreadyChangedInCurrentClientState)
+            {
+                return;
+            }
+
+            string[] nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split('/');
+            string folderName = checkoutRootPath;
+            FolderMetaData folder = root;
+            for (int i = 0; i < nameParts.Length; i++)
+            {
+                bool isLastNamePart = i == nameParts.Length - 1;
+                folderName += "/" + nameParts[i];
+                ItemMetaData item = sourceControlUtility.FindItem(folder, folderName);
+                if (item == null)
+                {
+                    if (isLastNamePart)
+                    {
+                        if (change.Item.ItemType == ItemType.File)
+                        {
+                            item = new DeleteMetaData();
+                        }
+                        else
+                        {
+                            item = new DeleteFolderMetaData();
+                        }
+
+                        item.Name = remoteName;
+                    }
+                    else
+                    {
+                        item = sourceControlProvider.GetItems(targetVersion, folderName, Recursion.None);
+                        if (item == null)
+                        {
+                            item = new DeleteFolderMetaData();
+                            item.Name = folderName;
+                        }
+                    }
+                    folder.Items.Add(item);
+                    if (i != nameParts.Length - 1)
+                    {
+                        folder = (FolderMetaData)item;
+                    }
+                }
+                else if (item is DeleteFolderMetaData)
+                {
+                    return;
+                }
+                else if (isLastNamePart)// we need to revert the item addition
+                {
+                    if (item is StubFolderMetaData)
+                    {
+                        DeleteFolderMetaData removeFolder = new DeleteFolderMetaData();
+                        removeFolder.Name = item.Name;
+                        folder.Items.Remove(item);
+                        folder.Items.Add(removeFolder);
+                    }
+                    else if (additionForPropertyChangeOnly.ContainsKey(item) && additionForPropertyChangeOnly[item])
+                    {
+                        ItemMetaData removeFolder = item is FolderMetaData ? (ItemMetaData)new DeleteFolderMetaData() : new DeleteMetaData();
+                        removeFolder.Name = item.Name;
+                        folder.Items.Remove(item);
+                        folder.Items.Add(removeFolder);
+                    }
+                    else
+                    {
+                        folder.Items.Remove(item);
+                    }
+                }
+                if (isLastNamePart == false)
+                {
+                    folder = (FolderMetaData)item;
+                }
+            }
+        }
+
 
         private static bool IsChangeAlreadyCurrentInClientState(ChangeType changeType,
-                                                         string itemPath,
-                                                         int itemRevision,
-                                                         IDictionary<string, int> clientExistingFiles,
-                                                         IDictionary<string, string> clientDeletedFiles)
+                                                                string itemPath,
+                                                                int itemRevision,
+                                                                IDictionary<string, int> clientExistingFiles,
+                                                                IDictionary<string, string> clientDeletedFiles)
         {
             string changePath = "/" + itemPath;
             if (((changeType & ChangeType.Add) == ChangeType.Add) ||
@@ -351,5 +571,22 @@ namespace SvnBridge.SourceControl
             }
             return false;
         }
+
+        #region Nested type: ItemInformation
+
+        private class ItemInformation
+        {
+            public bool PropertyChange;
+            public string RemoteName;
+
+            public ItemInformation(bool propertyChange,
+                                   string remoteName)
+            {
+                PropertyChange = propertyChange;
+                RemoteName = remoteName;
+            }
+        }
+
+        #endregion
     }
 }

@@ -2,8 +2,16 @@
 _ReSharper.SvnBridge
 SvnBridge.resharper
 SvnBridge.resharper.user
+3rdParty
+BuildResults.xml
+TestsProtocol.results.xml
+TestsUnit.results.xml
 </Value></Property><Property><Name>ignore</Name><Value>*.suo
 _ReSharper.SvnBridge
 SvnBridge.resharper
 SvnBridge.resharper.user
+3rdParty
+BuildResults.xml
+TestsProtocol.results.xml
+TestsUnit.results.xml
 </Value></Property></Properties></ItemProperties>

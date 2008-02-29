@@ -4,6 +4,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
+using IntegrationTests.Properties;
 using NUnit.Framework;
 using SvnBridge.Cache;
 using SvnBridge.SourceControl;
@@ -11,7 +12,7 @@ using SvnBridge.SourceControl;
 namespace Tests
 {
     [TestFixture]
-    public class TFSSourceControlProviderTestsBase
+    public abstract class TFSSourceControlProviderTestsBase
     {
         #region Setup/Teardown
 
@@ -19,8 +20,6 @@ namespace Tests
         public virtual void SetUp()
         {
             _activityId = Guid.NewGuid().ToString();
-            //_provider = new TFSSourceControlProvider(SERVER_NAME, null, null);
-            //testPath = "/" + PROJECT_NAME + "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
             FileSystem system = new FileSystem();
             RegistrationService service = new RegistrationService(factory);
@@ -30,14 +29,14 @@ namespace Tests
                                                                                           factory1,
                                                                                           webTransferService,
                                                                                           system);
-            _provider = new TFSSourceControlProvider(SERVER_NAME,
+            _provider = new TFSSourceControlProvider(ServerUrl,
                                                      PROJECT_NAME,
                                                      null,
                                                      webTransferService,
                                                      tfsSourceControlService,
                                                      new ProjectInformationRepository(new NullCache(),
                                                                                       tfsSourceControlService,
-                                                                                      SERVER_NAME));
+                                                                                      ServerUrl));
             testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, testPath);
@@ -55,7 +54,7 @@ namespace Tests
 
         #endregion
 
-        protected const string SERVER_NAME = "http://codeplex-tfs3:8080";
+        protected static string ServerUrl = Settings.Default.ServerUrl;
         protected const string PROJECT_NAME = "SvnBridgeTesting";
         protected string _activityId;
         protected string testPath;

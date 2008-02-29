@@ -16,6 +16,8 @@ namespace SvnBridge.SourceControl
             RemoteName = item.RemoteName;
             RemoteDate = item.RemoteDate;
             DownloadUrl = item.DownloadUrl;
+            RemoteChangesetId = item.RemoteChangesetId;
+            LocalChangesetId = item.LocalChangesetId;
             OriginalRemoteName = originalRemoteName;
             OriginalRevision = originalRevision;
         }

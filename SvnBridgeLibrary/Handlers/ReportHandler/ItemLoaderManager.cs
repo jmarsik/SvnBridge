@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using CodePlex.TfsLibrary;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.SourceControl;
 
@@ -21,6 +22,8 @@ namespace SvnBridge.Handlers
         public ItemLoaderManager(FolderMetaData folderInfo,
                                  ISourceControlProvider sourceControlProvider)
         {
+            Guard.ArgumentNotNull(folderInfo, "folderInfo");
+            Guard.ArgumentNotNull(sourceControlProvider, "sourceControlProvider");
             _folderInfo = folderInfo;
             _sourceControlProvider = sourceControlProvider;
         }

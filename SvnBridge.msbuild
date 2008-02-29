@@ -17,9 +17,9 @@
 
 	<Target Name="Test" DependsOnTargets="UnitTest;ProtocolTest" />
 
-  <Target Name="Zip" DependsOnTargets="Merge">
-    <Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip Merge\SvnBridge.exe"/>
-  </Target>
+	<Target Name="Zip" DependsOnTargets="Merge">
+		<Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip Merge\SvnBridge.exe"/>
+	</Target>
 
 	<!-- Individiual targets -->
 
@@ -32,25 +32,32 @@
 	</Target>
 
 	<Target Name="UnitTest" DependsOnTargets="Build">
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe Tests\bin\$(BuildType)\Tests.dll /noshadow /xml=TestsUnit.results.xml "/>
+		<Exec Command="$(CodePlex3rdParty)\nunit-console.exe Tests\bin\$(BuildType)\Tests.dll /noshadow /xml=TestsUnit.results.xml "/>
 	</Target>
 
-  <Target Name="ProtocolTest" DependsOnTargets="Build">
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe TestsProtocol\bin\$(BuildType)\TestsProtocol.dll /noshadow /xml=TestsProtocol.results.xml "/>
-  </Target>
+	<Target Name="ProtocolTest" DependsOnTargets="Build">
+		<Exec Command="$(CodePlex3rdParty)\nunit-console.exe TestsProtocol\bin\$(BuildType)\TestsProtocol.dll /noshadow /xml=TestsProtocol.results.xml "/>
+	</Target>
 
-  <Target Name="IntegrationTest" DependsOnTargets="Build">
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe IntegrationTests\bin\$(BuildType)\IntegrationTests.dll /noshadow /xml=TestsIntegration.results.xml "/>
-  </Target>
+	<Target Name="EndToEndTest" DependsOnTargets="Build">
+		<Exec Command="$(CodePlex3rdParty)\nunit-console.exe TestsEndToEnd\bin\$(BuildType)\TestsEndToEnd.dll /noshadow /xml=TestsEndToEnd.results.xml "/>
+	</Target>
+	
+	<Target Name="IntegrationTest" DependsOnTargets="Build">
+		<Exec Command="$(CodePlex3rdParty)\nunit-console.exe TestsIntegration\bin\$(BuildType)\TestsIntegration.dll /noshadow /xml=IntegrationTests.results.xml "/>
+	</Target>
 
+	<Target Name="TestAll" DependsOnTargets="UnitTest;ProtocolTest;IntegrationTest;EndToEndTest">
+	</Target>
+	
 	<Target Name="SetVersionNumber">
-    <Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeLibrary\Properties\AssemblyInfo.cs"/>
-    <Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\Properties\AssemblyInfo.cs"/>
-  </Target>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeLibrary\Properties\AssemblyInfo.cs"/>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\Properties\AssemblyInfo.cs"/>
+	</Target>
 
-  <Target Name="Merge">
-    <MakeDir Directories="Merge"/>
-    <Exec Command="$(CodePlex3rdParty)\ilmerge.exe /out:Merge\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnFacade.Library.dll"/>
-  </Target>
+	<Target Name="Merge">
+		<MakeDir Directories="Merge"/>
+		<Exec Command="$(CodePlex3rdParty)\ilmerge.exe /out:Merge\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnFacade.Library.dll"/>
+	</Target>
 
 </Project>

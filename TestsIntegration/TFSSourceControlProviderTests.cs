@@ -32,7 +32,7 @@ namespace Tests
                                                                                           factory1,
                                                                                           webTransferService,
                                                                                           system);
-            TFSSourceControlProvider provider = new TFSSourceControlProvider(SERVER_NAME + "," + SERVER_NAME,
+            TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
                                                                              PROJECT_NAME,
                                                                              null,
                                                                              webTransferService,
@@ -40,7 +40,7 @@ namespace Tests
                                                                              new ProjectInformationRepository(
                                                                                  new NullCache(),
                                                                                  tfsSourceControlService,
-                                                                                 SERVER_NAME));
+                                                                                 ServerUrl));
         }
 
         [Test]
