@@ -22,7 +22,6 @@ namespace TestsEndToEnd
         [Test]
         public void CanUpdateWorkingCopyToPreviousVersion()
         {
-            TemporaryIgnore("We do not support versioning backward at the moment");
             CheckoutAndChangeDirectory();
             File.WriteAllText("test.txt", "hab");
             ExecuteCommand("commit -m blah");

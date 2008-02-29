@@ -21,27 +21,33 @@ namespace SvnBridge.Utility
             SvnDiffInstruction instruction = ReadInstruction(instructionReader);
             while (instruction != null)
             {
-                if (targetIndex + (int)instruction.Length > buffer.Length)
-                    Array.Resize(ref buffer, buffer.Length + (int)instruction.Length + BUFFER_EXPAND_SIZE);
+                if (targetIndex + (int) instruction.Length > buffer.Length)
+                {
+                    Array.Resize(ref buffer, buffer.Length + (int) instruction.Length + BUFFER_EXPAND_SIZE);
+                }
 
                 switch (instruction.OpCode)
                 {
                     case SvnDiffInstructionOpCode.CopyFromSource:
-                        Array.Copy(source, (int)instruction.Offset + sourceDataStartIndex, buffer, targetIndex, (int)instruction.Length);
-                        targetIndex += (int)instruction.Length;
+                        Array.Copy(source,
+                                   (int) instruction.Offset + sourceDataStartIndex,
+                                   buffer,
+                                   targetIndex,
+                                   (int) instruction.Length);
+                        targetIndex += (int) instruction.Length;
                         break;
 
                     case SvnDiffInstructionOpCode.CopyFromTarget:
                         // Cannot use Array.Copy because Offset + Length may be greater then starting targetIndex
-                        for (int i = 0; i < (int)instruction.Length; i++)
+                        for (int i = 0; i < (int) instruction.Length; i++)
                         {
-                            buffer[targetIndex] = buffer[(int)instruction.Offset + i];
+                            buffer[targetIndex] = buffer[(int) instruction.Offset + i];
                             targetIndex++;
                         }
                         break;
 
                     case SvnDiffInstructionOpCode.CopyFromNewData:
-                        byte[] newData = dataReader.ReadBytes((int)instruction.Length);
+                        byte[] newData = dataReader.ReadBytes((int) instruction.Length);
                         Array.Copy(newData, 0, buffer, targetIndex, newData.Length);
                         targetIndex += newData.Length;
                         break;
@@ -63,7 +69,7 @@ namespace SvnBridge.Utility
 
                 svnDiff.SourceViewOffset = 0;
                 svnDiff.SourceViewLength = 0;
-                svnDiff.TargetViewLength = (ulong)bytes.Length;
+                svnDiff.TargetViewLength = (ulong) bytes.Length;
 
                 MemoryStream instructionStream = new MemoryStream();
                 BinaryWriter instructionWriter = new BinaryWriter(instructionStream);
@@ -77,7 +83,7 @@ namespace SvnBridge.Utility
 
                 SvnDiffInstruction instruction = new SvnDiffInstruction();
                 instruction.OpCode = SvnDiffInstructionOpCode.CopyFromNewData;
-                instruction.Length = (ulong)bytes.Length;
+                instruction.Length = (ulong) bytes.Length;
 
                 WriteInstruction(instructionWriter, instruction);
                 instructionWriter.Flush();
@@ -87,18 +93,20 @@ namespace SvnBridge.Utility
             return svnDiff;
         }
 
-        static SvnDiffInstruction ReadInstruction(BinaryReaderEOF reader)
+        private static SvnDiffInstruction ReadInstruction(BinaryReaderEOF reader)
         {
             if (reader.EOF)
+            {
                 return null;
+            }
 
             SvnDiffInstruction instruction = new SvnDiffInstruction();
 
             byte opCodeAndLength = reader.ReadByte();
 
-            instruction.OpCode = (SvnDiffInstructionOpCode)((opCodeAndLength & 0xC0) >> 6);
+            instruction.OpCode = (SvnDiffInstructionOpCode) ((opCodeAndLength & 0xC0) >> 6);
 
-            byte length = (byte)(opCodeAndLength & 0x3F);
+            byte length = (byte) (opCodeAndLength & 0x3F);
             if (length == 0)
             {
                 instruction.Length = SvnDiffParser.ReadInt(reader);
@@ -117,15 +125,15 @@ namespace SvnBridge.Utility
             return instruction;
         }
 
-        static void WriteInstruction(BinaryWriter writer,
-                                     SvnDiffInstruction instruction)
+        private static void WriteInstruction(BinaryWriter writer,
+                                             SvnDiffInstruction instruction)
         {
-            byte opCodeAndLength = (byte)((int)instruction.OpCode << 6);
+            byte opCodeAndLength = (byte) ((int) instruction.OpCode << 6);
             int bytesWritten = 0;
 
             if ((instruction.Length & 0x3F) == instruction.Length)
             {
-                opCodeAndLength |= (byte)(instruction.Length & 0x3F);
+                opCodeAndLength |= (byte) (instruction.Length & 0x3F);
 
                 writer.Write(opCodeAndLength);
             }

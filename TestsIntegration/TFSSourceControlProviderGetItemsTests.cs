@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Tests;
-using SvnBridge.SourceControl;
 using NUnit.Framework;
+using SvnBridge.SourceControl;
+using Tests;
 
 namespace IntegrationTests
 {
@@ -11,43 +8,22 @@ namespace IntegrationTests
     public class TFSSourceControlProviderGetItemsTests : TFSSourceControlProviderTestsBase
     {
         [Test]
-        public void TestGetItemsOnFolderReturnsPropertiesForFolder()
+        public void TestGetItemInActivityReturnsCorrectItemIfIsInRenamedFolder()
         {
-            string ignore = "*.bad\n";
-            SetProperty(testPath, "ignore", ignore, true);
+            CreateFolder(testPath + "/A", false);
+            WriteFile(testPath + "/A/Test.txt", "filedata", true);
+            DeleteItem(testPath + "/A", false);
+            CopyItem(testPath + "/A", testPath + "/B", false);
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
+            ItemMetaData item = _provider.GetItemInActivity(_activityId, testPath + "/B/Test.txt");
 
-            Assert.AreEqual(ignore, item.Properties["ignore"]);
+            Assert.AreEqual(testPath.Substring(1) + "/A/Test.txt", item.Name);
         }
 
         [Test]
-        public void TestGetItemsOnFolderReturnsPropertiesForFileWithinFolder()
+        public void TestGetItemsForRootSucceeds()
         {
-            string mimeType = "application/octet-stream";
-            string path = testPath + "/TestFile.txt";
-            WriteFile(path, "Fun text", false);
-            SetProperty(path, "mime-type", mimeType, true);
-
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
-
-            Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
-        }
-
-        [Test]
-        public void TestGetItemsWithAllRecursionLevelsReturnsPropertyForFolder()
-        {
-            CreateFolder(testPath + "/Folder1", false);
-            string ignore = "*.bad\n";
-            SetProperty(testPath + "/Folder1", "ignore", ignore, true);
-
-            FolderMetaData item1 = (FolderMetaData)_provider.GetItems(-1, testPath + "/Folder1", Recursion.Full);
-            FolderMetaData item2 = (FolderMetaData)_provider.GetItems(-1, testPath + "/Folder1", Recursion.OneLevel);
-            FolderMetaData item3 = (FolderMetaData)_provider.GetItems(-1, testPath + "/Folder1", Recursion.None);
-
-            Assert.AreEqual(ignore, item1.Properties["ignore"]);
-            Assert.AreEqual(ignore, item2.Properties["ignore"]);
-            Assert.AreEqual(ignore, item3.Properties["ignore"]);
+            FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, "", Recursion.OneLevel);
         }
 
         [Test]
@@ -74,10 +50,53 @@ namespace IntegrationTests
         }
 
         [Test]
-        public void TestGetItemsForRootSucceeds()
+        public void TestGetItemsOnFolderReturnsPropertiesForFileWithinFolder()
         {
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, "", Recursion.OneLevel);
+            string mimeType = "application/octet-stream";
+            string path = testPath + "/TestFile.txt";
+            WriteFile(path, "Fun text", false);
+            SetProperty(path, "mime-type", mimeType, true);
+
+            FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+
+            Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
         }
+
+        [Test]
+        public void TestGetItemsOnFolderReturnsPropertiesForFolder()
+        {
+            string ignore = "*.bad\n";
+            SetProperty(testPath, "ignore", ignore, true);
+
+            FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+
+            Assert.AreEqual(ignore, item.Properties["ignore"]);
+        }
+
+        [Test]
+        public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFileAndRecursionIsFull()
+        {
+            WriteFile(testPath + "/Test.txt", "whee", true);
+            SetProperty(testPath + "/Test.txt", "prop1", "val1", true);
+            int revision = _lastCommitRevision;
+
+            FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+
+            Assert.AreEqual(revision, item.Items[0].Revision);
+        }
+
+        [Test]
+        public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFolderAndRecursionIsFull()
+        {
+            CreateFolder(testPath + "/Folder1", true);
+            SetProperty(testPath + "/Folder1", "prop1", "val1", true);
+            int revision = _lastCommitRevision;
+
+            FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+
+            Assert.AreEqual(revision, item.Items[0].Revision);
+        }
+
         [Test]
         public void TestGetItemsReturnsCorrectRevisionWhenPropertyIsAdded()
         {
@@ -104,40 +123,19 @@ namespace IntegrationTests
         }
 
         [Test]
-        public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFolderAndRecursionIsFull()
+        public void TestGetItemsWithAllRecursionLevelsReturnsPropertyForFolder()
         {
-            CreateFolder(testPath + "/Folder1", true);
-            SetProperty(testPath + "/Folder1", "prop1", "val1", true);
-            int revision = _lastCommitRevision;
+            CreateFolder(testPath + "/Folder1", false);
+            string ignore = "*.bad\n";
+            SetProperty(testPath + "/Folder1", "ignore", ignore, true);
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
+            FolderMetaData item1 = (FolderMetaData) _provider.GetItems(-1, testPath + "/Folder1", Recursion.Full);
+            FolderMetaData item2 = (FolderMetaData) _provider.GetItems(-1, testPath + "/Folder1", Recursion.OneLevel);
+            FolderMetaData item3 = (FolderMetaData) _provider.GetItems(-1, testPath + "/Folder1", Recursion.None);
 
-            Assert.AreEqual(revision, item.Items[0].Revision);
-        }
-
-        [Test]
-        public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFileAndRecursionIsFull()
-        {
-            WriteFile(testPath + "/Test.txt", "whee", true);
-            SetProperty(testPath + "/Test.txt", "prop1", "val1", true);
-            int revision = _lastCommitRevision;
-
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
-
-            Assert.AreEqual(revision, item.Items[0].Revision);
-        }
-
-        [Test]
-        public void TestGetItemInActivityReturnsCorrectItemIfIsInRenamedFolder()
-        {
-            CreateFolder(testPath + "/A", false);
-            WriteFile(testPath + "/A/Test.txt", "filedata", true);
-            DeleteItem(testPath + "/A", false);
-            CopyItem(testPath + "/A", testPath + "/B", false);
-
-            ItemMetaData item = _provider.GetItemInActivity(_activityId, testPath + "/B/Test.txt");
-
-            Assert.AreEqual(testPath.Substring(1) + "/A/Test.txt", item.Name);
+            Assert.AreEqual(ignore, item1.Properties["ignore"]);
+            Assert.AreEqual(ignore, item2.Properties["ignore"]);
+            Assert.AreEqual(ignore, item3.Properties["ignore"]);
         }
     }
 }

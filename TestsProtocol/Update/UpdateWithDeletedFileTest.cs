@@ -1,6 +1,5 @@
 using System;
 using CodePlex.TfsLibrary;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using SvnBridge.SourceControl;
 
@@ -12,7 +11,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +

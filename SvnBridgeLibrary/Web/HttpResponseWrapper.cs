@@ -46,7 +46,8 @@ namespace SvnBridge.Web
             set { response.StatusCode = value; }
         }
 
-        public void AppendHeader(string name, string value)
+        public void AppendHeader(string name,
+                                 string value)
         {
             response.AppendHeader(name, value);
         }

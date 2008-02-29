@@ -1,16 +1,28 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Net.Sockets;
 
 namespace SvnBridge.Utility
 {
     public static class Helper
     {
+        private static readonly string[] DECODED = new string[] {"%", "#", " ", "^", "{", "[", "}", "]", ";", "`", "&"};
+        private static readonly string[] DECODED_B = new string[] {"&", "<", ">"};
+        private static readonly string[] DECODED_C = new string[] {"%", "#", " ", "^", "{", "[", "}", "]", ";", "`"};
+
+        private static readonly string[] ENCODED =
+            new string[] {"%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;"};
+
+        private static readonly string[] ENCODED_B = new string[] {"&amp;", "&lt;", "&gt;"};
+
+        private static readonly string[] ENCODED_C =
+            new string[] {"%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60"};
+
         public static XmlReaderSettings InitializeNewXmlReaderSettings()
         {
             XmlReaderSettings readerSettings = new XmlReaderSettings();
@@ -20,20 +32,20 @@ namespace SvnBridge.Utility
 
         public static T DeserializeXml<T>(XmlReader reader)
         {
-            XmlSerializer requestSerializer = new XmlSerializer(typeof(T));
-            return (T)requestSerializer.Deserialize(reader);
+            XmlSerializer requestSerializer = new XmlSerializer(typeof (T));
+            return (T) requestSerializer.Deserialize(reader);
         }
 
         public static T DeserializeXml<T>(string xml)
         {
             XmlReader reader = XmlReader.Create(new StringReader(xml), InitializeNewXmlReaderSettings());
-            return (T)DeserializeXml<T>(reader);
+            return (T) DeserializeXml<T>(reader);
         }
 
         public static T DeserializeXml<T>(byte[] xml)
         {
             XmlReader reader = XmlReader.Create(new MemoryStream(xml), InitializeNewXmlReaderSettings());
-            return (T)DeserializeXml<T>(reader);
+            return (T) DeserializeXml<T>(reader);
         }
 
         public static T DeserializeXml<T>(Stream requestStream)
@@ -49,7 +61,9 @@ namespace SvnBridge.Utility
             int portAsInt;
 
             if (!int.TryParse(port, out portAsInt))
+            {
                 return false;
+            }
 
             return IsValidPort(portAsInt);
         }
@@ -95,7 +109,9 @@ namespace SvnBridge.Utility
                 HttpWebResponse response = e.Response as HttpWebResponse;
 
                 if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
+                {
                     return true;
+                }
 
                 return false;
             }
@@ -125,7 +141,7 @@ namespace SvnBridge.Utility
             settings.Encoding = Encoding.UTF8;
             MemoryStream xml = new MemoryStream();
             XmlWriter writer = XmlWriter.Create(xml, settings);
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
+            XmlSerializer serializer = new XmlSerializer(typeof (T));
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
             serializer.Serialize(writer, request, ns);
             writer.Flush();
@@ -139,15 +155,22 @@ namespace SvnBridge.Utility
             StringBuilder sb = new StringBuilder();
 
             foreach (byte b in md5.ComputeHash(data))
+            {
                 sb.Append(b.ToString("x2").ToLower());
+            }
 
             return sb.ToString();
         }
 
-        private static string Encode(string[] encoded, string[] decoded, string value, bool capitalize)
+        private static string Encode(string[] encoded,
+                                     string[] decoded,
+                                     string value,
+                                     bool capitalize)
         {
             if (value == null)
+            {
                 return value;
+            }
 
             for (int i = 0; i < decoded.Length; i++)
             {
@@ -164,10 +187,13 @@ namespace SvnBridge.Utility
             return value;
         }
 
-        private static string Decode(string value, bool capitalize)
+        private static string Decode(string value,
+                                     bool capitalize)
         {
             if (value == null)
+            {
                 return value;
+            }
 
             for (int i = ENCODED.Length - 1; i >= 0; i--)
             {
@@ -184,15 +210,13 @@ namespace SvnBridge.Utility
             return value;
         }
 
-        static readonly string[] DECODED = new string[ ] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`", "&" };
-        static readonly string[] ENCODED = new string[ ] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;" };
-
         public static string Encode(string value)
         {
             return Encode(value, false);
         }
 
-        public static string Encode(string value, bool capitalize)
+        public static string Encode(string value,
+                                    bool capitalize)
         {
             return Encode(ENCODED, DECODED, value, capitalize);
         }
@@ -201,9 +225,6 @@ namespace SvnBridge.Utility
         {
             return Decode(value, false);
         }
-
-        static readonly string[] DECODED_B = new string[] { "&", "<", ">" };
-        static readonly string[] ENCODED_B = new string[] { "&amp;", "&lt;", "&gt;" };
 
         public static string EncodeB(string value)
         {
@@ -214,9 +235,6 @@ namespace SvnBridge.Utility
         {
             return Decode(value, false);
         }
-
-        static readonly string[] DECODED_C = new string[ ] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`" };
-        static readonly string[] ENCODED_C = new string[ ] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60" };
 
         public static string EncodeC(string value)
         {

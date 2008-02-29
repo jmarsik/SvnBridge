@@ -13,8 +13,12 @@ namespace SvnBridge.Web
             dispatcher = new HttpContextDispatcher();
             dispatcher.TfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
             if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
+            {
                 dispatcher.URLIncludesProjectName = true;
+            }
         }
+
+        #region IHttpHandler Members
 
         public bool IsReusable
         {
@@ -26,5 +30,7 @@ namespace SvnBridge.Web
             dispatcher.Dispatch(new HttpContextWrapper(context));
             context.Response.OutputStream.Close();
         }
+
+        #endregion
     }
 }

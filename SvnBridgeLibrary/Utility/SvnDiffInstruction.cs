@@ -6,11 +6,11 @@ namespace SvnBridge.Utility
         CopyFromTarget = 1,
         CopyFromNewData = 2
     }
-    
+
     public class SvnDiffInstruction
     {
-        public SvnDiffInstructionOpCode OpCode;
         public ulong Length;
         public ulong Offset;
+        public SvnDiffInstructionOpCode OpCode;
     }
 }

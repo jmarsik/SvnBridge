@@ -1,30 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using CodePlex.TfsLibrary.ObjectModel;
+using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using NUnit.Framework;
-using SvnBridge;
 using SvnBridge.Cache;
-using SvnBridge.Infrastructure;
-using SvnBridge.Interfaces;
-using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
-using SvnBridge.Exceptions;
-using CodePlex.TfsLibrary.RegistrationWebSvc;
 
 namespace Tests
 {
     [TestFixture]
     public class TFSSourceControlProviderTestsBase
     {
-        protected const string SERVER_NAME = "http://codeplex-tfs3:8080";
-        protected const string PROJECT_NAME = "SvnBridgeTesting";
-        protected string _activityId;
-        protected string testPath;
-        protected TFSSourceControlProvider _provider;
-        protected int _lastCommitRevision;
+        #region Setup/Teardown
 
         [SetUp]
         public virtual void SetUp()
@@ -41,9 +30,14 @@ namespace Tests
                                                                                           factory1,
                                                                                           webTransferService,
                                                                                           system);
-            _provider = new TFSSourceControlProvider(SERVER_NAME, PROJECT_NAME, null,
-                webTransferService, tfsSourceControlService,
-                 new ProjectInformationRepository(new NullCache(),tfsSourceControlService, SERVER_NAME));
+            _provider = new TFSSourceControlProvider(SERVER_NAME,
+                                                     PROJECT_NAME,
+                                                     null,
+                                                     webTransferService,
+                                                     tfsSourceControlService,
+                                                     new ProjectInformationRepository(new NullCache(),
+                                                                                      tfsSourceControlService,
+                                                                                      SERVER_NAME));
             testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, testPath);
@@ -59,31 +53,44 @@ namespace Tests
             _provider.DeleteActivity(_activityId);
         }
 
+        #endregion
+
+        protected const string SERVER_NAME = "http://codeplex-tfs3:8080";
+        protected const string PROJECT_NAME = "SvnBridgeTesting";
+        protected string _activityId;
+        protected string testPath;
+        protected TFSSourceControlProvider _provider;
+        protected int _lastCommitRevision;
+
         protected void UpdateFile(string path,
-                        string fileData,
-                        bool commit)
+                                  string fileData,
+                                  bool commit)
         {
             byte[] data = Encoding.Default.GetBytes(fileData);
             _provider.WriteFile(_activityId, path, data);
             if (commit)
+            {
                 Commit();
+            }
         }
 
         protected bool WriteFile(string path,
-                        string fileData,
-                        bool commit)
+                                 string fileData,
+                                 bool commit)
         {
             byte[] data = Encoding.Default.GetBytes(fileData);
             return WriteFile(path, data, commit);
         }
 
         protected bool WriteFile(string path,
-                        byte[] fileData,
-                        bool commit)
+                                 byte[] fileData,
+                                 bool commit)
         {
             bool created = _provider.WriteFile(_activityId, path, fileData);
             if (commit)
+            {
                 Commit();
+            }
             return created;
         }
 
@@ -97,39 +104,53 @@ namespace Tests
         }
 
         protected void DeleteItem(string path,
-                        bool commit)
+                                  bool commit)
         {
             _provider.DeleteItem(_activityId, path);
             if (commit)
+            {
                 Commit();
+            }
         }
 
-        protected void CopyItem(string path, string newPath, bool commit)
+        protected void CopyItem(string path,
+                                string newPath,
+                                bool commit)
         {
             _provider.CopyItem(_activityId, path, newPath);
             if (commit)
+            {
                 Commit();
+            }
         }
 
-        protected void RenameItem(string path, string newPath, bool commit)
+        protected void RenameItem(string path,
+                                  string newPath,
+                                  bool commit)
         {
             MoveItem(path, newPath, commit);
         }
 
-        protected void MoveItem(string path, string newPath, bool commit)
+        protected void MoveItem(string path,
+                                string newPath,
+                                bool commit)
         {
             DeleteItem(path, false);
             CopyItem(path, newPath, false);
             if (commit)
+            {
                 Commit();
+            }
         }
 
         protected int CreateFolder(string path,
-                        bool commit)
+                                   bool commit)
         {
             _provider.MakeCollection(_activityId, path);
             if (commit)
+            {
                 return Commit().Version;
+            }
             return -1;
         }
 
@@ -139,11 +160,16 @@ namespace Tests
             return GetString(_provider.ReadFile(item));
         }
 
-        protected void SetProperty(string path, string name, string value, bool commit)
+        protected void SetProperty(string path,
+                                   string name,
+                                   string value,
+                                   bool commit)
         {
             _provider.SetProperty(_activityId, path, name, value);
             if (commit)
+            {
                 Commit();
+            }
         }
 
         protected string GetString(byte[] data)
@@ -156,12 +182,18 @@ namespace Tests
             return Encoding.Default.GetBytes(data);
         }
 
-        protected bool ResponseContains(MergeActivityResponse response, string path, ItemType itemType)
+        protected bool ResponseContains(MergeActivityResponse response,
+                                        string path,
+                                        ItemType itemType)
         {
             bool found = false;
             foreach (MergeActivityResponseItem item in response.Items)
+            {
                 if ((item.Path == path) && (item.Type == itemType))
+                {
                     found = true;
+                }
+            }
 
             return found;
         }

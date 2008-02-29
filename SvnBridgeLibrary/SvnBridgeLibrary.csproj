@@ -74,6 +74,12 @@
     <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
     <Compile Include="Interfaces\IProjectInformationRepository.cs" />
     <Compile Include="ListenErrorEventArgs.cs" />
+    <Compile Include="SourceControl\Dto\Activity.cs" />
+    <Compile Include="SourceControl\Dto\ActivityItem.cs" />
+    <Compile Include="SourceControl\Dto\ActivityItemAction.cs" />
+    <Compile Include="SourceControl\Dto\CopyAction.cs" />
+    <Compile Include="SourceControl\Dto\ItemProperties.cs" />
+    <Compile Include="SourceControl\Dto\Property.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
     <Compile Include="SourceControl\ProjectInformationRepository.cs" />

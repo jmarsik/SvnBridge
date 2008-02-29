@@ -1,8 +1,6 @@
-using System;
 using CodePlex.TfsLibrary;
 using NUnit.Framework;
 using SvnBridge.SourceControl;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace Tests
 {
@@ -12,7 +10,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /newFolder HTTP/1.1\r\n" +
@@ -53,6 +51,148 @@ namespace Tests
                 "<hr>\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void Test10()
+        {
+            stub.Attach(provider.ItemExists, false);
+
+            string request =
+                "PROPFIND /newFolder HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Length: 300\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "Depth: 0\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
+
+            string expected =
+                "HTTP/1.1 404 Not Found\r\n" +
+                "Date: Wed, 11 Jul 2007 00:47:11 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Content-Length: 299\r\n" +
+                "Content-Type: text/html; charset=iso-8859-1\r\n" +
+                "\r\n" +
+                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
+                "<html><head>\n" +
+                "<title>404 Not Found</title>\n" +
+                "</head><body>\n" +
+                "<h1>Not Found</h1>\n" +
+                "<p>The requested URL /newFolder was not found on this server.</p>\n" +
+                "<hr>\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
+                "</body></html>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void Test11()
+        {
+            stub.Attach(provider.ItemExists, true);
+            FolderMetaData folder = new FolderMetaData();
+            folder.Name = "";
+            stub.Attach(provider.GetItems, folder);
+
+            string request =
+                "PROPFIND / HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Length: 300\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "Depth: 0\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
+
+            string expected =
+                "HTTP/1.1 207 Multi-Status\r\n" +
+                "Date: Wed, 11 Jul 2007 00:47:11 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Content-Length: 629\r\n" +
+                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
+                "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
+                "<D:href>/</D:href>\n" +
+                "<D:propstat>\n" +
+                "<D:prop>\n" +
+                "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
+                "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n" +
+                "<lp2:baseline-relative-path/>\n" +
+                "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
+                "</D:prop>\n" +
+                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
+                "</D:propstat>\n" +
+                "</D:response>\n" +
+                "</D:multistatus>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void Test12()
+        {
+            FolderMetaData metadata = new FolderMetaData();
+            DeleteMetaData deletedFile = new DeleteMetaData();
+            deletedFile.Name = "zxvc.txt";
+            metadata.Items.Add(deletedFile);
+            stub.Attach(provider.GetChangedItems, metadata);
+
+            string request =
+                "REPORT /!svn/vcc/default HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Length: 239\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "Accept-Encoding: svndiff1;q=0.9,svndiff;q=0.8\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082/newFolder</S:src-path><S:target-revision>5513</S:target-revision><S:update-target>zxvc.txt</S:update-target><S:entry rev=\"5512\" ></S:entry></S:update-report>";
+
+            string expected =
+                "HTTP/1.1 200 OK\r\n" +
+                "Date: Wed, 11 Jul 2007 00:47:12 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Transfer-Encoding: chunked\r\n" +
+                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
+                "\r\n" +
+                "132\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n" +
+                "<S:target-revision rev=\"5513\"/>\n" +
+                "<S:open-directory rev=\"5512\">\n" +
+                "<S:delete-entry name=\"zxvc.txt\"/>\n" +
+                "<S:prop></S:prop>\n" +
+                "</S:open-directory>\n" +
+                "</S:update-report>\n" +
+                "\r\n" +
+                "0\r\n" +
+                "\r\n";
 
             string actual = ProcessRequest(request, ref expected);
 
@@ -420,148 +560,6 @@ namespace Tests
                 "</D:propstat>\n" +
                 "</D:response>\n" +
                 "</D:multistatus>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        public void Test10()
-        {
-            stub.Attach(provider.ItemExists, false);
-
-            string request =
-                "PROPFIND /newFolder HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Content-Length: 300\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "Depth: 0\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
-
-            string expected =
-                "HTTP/1.1 404 Not Found\r\n" +
-                "Date: Wed, 11 Jul 2007 00:47:11 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 299\r\n" +
-                "Content-Type: text/html; charset=iso-8859-1\r\n" +
-                "\r\n" +
-                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
-                "<html><head>\n" +
-                "<title>404 Not Found</title>\n" +
-                "</head><body>\n" +
-                "<h1>Not Found</h1>\n" +
-                "<p>The requested URL /newFolder was not found on this server.</p>\n" +
-                "<hr>\n" +
-                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
-                "</body></html>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        public void Test11()
-        {
-            stub.Attach(provider.ItemExists, true);
-            FolderMetaData folder = new FolderMetaData();
-            folder.Name = "";
-            stub.Attach(provider.GetItems, folder);
-
-            string request =
-                "PROPFIND / HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Content-Length: 300\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "Depth: 0\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
-
-            string expected =
-                "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Wed, 11 Jul 2007 00:47:11 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 629\r\n" +
-                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
-                "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/</D:href>\n" +
-                "<D:propstat>\n" +
-                "<D:prop>\n" +
-                "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
-                "<lp1:resourcetype><D:collection/></lp1:resourcetype>\n" +
-                "<lp2:baseline-relative-path/>\n" +
-                "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
-                "</D:prop>\n" +
-                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
-                "</D:propstat>\n" +
-                "</D:response>\n" +
-                "</D:multistatus>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        public void Test12()
-        {
-            FolderMetaData metadata = new FolderMetaData();
-            DeleteMetaData deletedFile = new DeleteMetaData();
-            deletedFile.Name = "zxvc.txt";
-            metadata.Items.Add(deletedFile);
-            stub.Attach(provider.GetChangedItems, metadata);
-
-            string request =
-                "REPORT /!svn/vcc/default HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Content-Length: 239\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "Accept-Encoding: svndiff1;q=0.9,svndiff;q=0.8\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082/newFolder</S:src-path><S:target-revision>5513</S:target-revision><S:update-target>zxvc.txt</S:update-target><S:entry rev=\"5512\" ></S:entry></S:update-report>";
-
-            string expected =
-                "HTTP/1.1 200 OK\r\n" +
-                "Date: Wed, 11 Jul 2007 00:47:12 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Transfer-Encoding: chunked\r\n" +
-                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
-                "\r\n" +
-                "132\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n" +
-                "<S:target-revision rev=\"5513\"/>\n" +
-                "<S:open-directory rev=\"5512\">\n" +
-                "<S:delete-entry name=\"zxvc.txt\"/>\n" +
-                "<S:prop></S:prop>\n" +
-                "</S:open-directory>\n" +
-                "</S:update-report>\n" +
-                "\r\n" +
-                "0\r\n" +
-                "\r\n";
 
             string actual = ProcessRequest(request, ref expected);
 

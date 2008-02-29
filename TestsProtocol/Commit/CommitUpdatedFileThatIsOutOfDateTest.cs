@@ -1,5 +1,4 @@
 using CodePlex.TfsLibrary;
-using CodePlex.TfsLibrary.RepositoryWebSvc;
 using NUnit.Framework;
 using SvnBridge.SourceControl;
 
@@ -11,7 +10,7 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists)provider.ItemExists, new NetworkAccessDeniedException());
+            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -51,6 +50,33 @@ namespace Tests
                 "<hr>\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void Test10()
+        {
+            stub.Attach(provider.DeleteActivity);
+
+            string request =
+                "DELETE /!svn/act/0329c97a-0357-0348-a531-542a68b6ed04 HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n";
+
+            string expected =
+                "HTTP/1.1 204 No Content\r\n" +
+                "Date: Sat, 23 Jun 2007 22:41:44 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Content-Length: 0\r\n" +
+                "Content-Type: text/plain\r\n" +
+                "\r\n";
 
             string actual = ProcessRequest(request, ref expected);
 
@@ -395,33 +421,6 @@ namespace Tests
                 "The version resource does not correspond to the resource within the transaction.  Either the requested version resource is out of date (needs to be updated), or the requested version resource is newer than the transaction root (restart the commit).\n" +
                 "</m:human-readable>\n" +
                 "</D:error>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        public void Test10()
-        {
-            stub.Attach(provider.DeleteActivity);
-
-            string request =
-                "DELETE /!svn/act/0329c97a-0357-0348-a531-542a68b6ed04 HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n";
-
-            string expected =
-                "HTTP/1.1 204 No Content\r\n" +
-                "Date: Sat, 23 Jun 2007 22:41:44 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 0\r\n" +
-                "Content-Type: text/plain\r\n" +
-                "\r\n";
 
             string actual = ProcessRequest(request, ref expected);
 
