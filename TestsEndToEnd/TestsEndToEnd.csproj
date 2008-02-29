@@ -34,6 +34,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommitTest.cs" />
     <Compile Include="EndToEndTestBase.cs" />
     <Compile Include="IntegrationsTests.cs" />
     <Compile Include="ListItemTest.cs" />

@@ -12,9 +12,9 @@ namespace TestsEndToEnd
         {
             CheckoutAndChangeDirectory();
             File.WriteAllText("test.txt", "hab");
-            ExecuteCommand("commit -m blah");
+            Svn("commit -m blah");
             WriteFile(testPath + "/test2.txt", "blah", true);
-            string output = ExecuteCommand("update");
+            string output = Svn("update");
             Assert.IsTrue(
                 output.Contains("A    test2.txt")
                 );
@@ -25,10 +25,10 @@ namespace TestsEndToEnd
         {
             CheckoutAndChangeDirectory();
             File.WriteAllText("test.txt", "hab");
-            ExecuteCommand("add test.txt");
-            ExecuteCommand("commit -m blah");
-            ExecuteCommand("update");
-            ExecuteCommand("update test.txt --revision PREV");
+            Svn("add test.txt");
+            Svn("commit -m blah");
+            Svn("update");
+            Svn("update test.txt --revision PREV");
         }
 
         [Test]
@@ -37,10 +37,10 @@ namespace TestsEndToEnd
             CheckoutAndChangeDirectory();
             Directory.CreateDirectory("foo");
             File.WriteAllText("foo/test.txt", "hab");
-            ExecuteCommand("add foo");
-            ExecuteCommand("commit -m blah");
-            ExecuteCommand("update");
-            ExecuteCommand("update foo --revision PREV");
+            Svn("add foo");
+            Svn("commit -m blah");
+            Svn("update");
+            Svn("update foo --revision PREV");
         }
 
         [Test]
@@ -50,23 +50,23 @@ namespace TestsEndToEnd
 
             // v 1.0
             File.WriteAllText("test.txt", "hab");
-            ExecuteCommand("add test.txt");
-            ExecuteCommand("commit -m blah");
+            Svn("add test.txt");
+            Svn("commit -m blah");
 
             // v 2.0
             File.WriteAllText("test2.txt", "hab");
-            ExecuteCommand("add test2.txt");
-            ExecuteCommand("commit -m blah");
+            Svn("add test2.txt");
+            Svn("commit -m blah");
 
             // v 3.0
             File.WriteAllText("test.txt", "hab123");
-            ExecuteCommand("commit -m blah");
+            Svn("commit -m blah");
 
             int previousVersion = _provider.GetLatestVersion() -1 ;
 
-            ExecuteCommand("update");
+            Svn("update");
 
-            ExecuteCommand("update test.txt --revision " + previousVersion);
+            Svn("update test.txt --revision " + previousVersion);
 
             Assert.AreEqual("hab", File.ReadAllText("test.txt"));
         }

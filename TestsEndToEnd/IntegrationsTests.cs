@@ -18,9 +18,9 @@ namespace TestsEndToEnd
         {
             CheckoutAndChangeDirectory();
             File.WriteAllText("test.txt", "blah");
-            ExecuteCommand("add test.txt");
-            ExecuteCommand("commit -m test");
-            ExecuteCommand("update");
+            Svn("add test.txt");
+            Svn("commit -m test");
+            Svn("update");
         }
     }
 }

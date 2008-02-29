@@ -12,7 +12,7 @@ namespace TestsEndToEnd
             CreateFolder(testPath + "/TestFolder1", true);
             WriteFile(testPath + "/test.txt", "blah", true);
 
-            string actual = ExecuteCommand("list " + testUrl);
+            string actual = Svn("list " + testUrl);
             string expected = @"TestFolder1/
 test.txt
 ";
@@ -25,7 +25,7 @@ test.txt
             CreateFolder(testPath + "/TestFolder1", true);
             CreateFolder(testPath + "/TestFolder2", true);
 
-            string actual = ExecuteCommand("list " + testUrl);
+            string actual = Svn("list " + testUrl);
             string expected = @"TestFolder1/
 TestFolder2/
 ";
@@ -39,7 +39,7 @@ TestFolder2/
             CreateFolder(testPath + "/TestFolder2", true);
             WriteFile(testPath + "/TestFolder2/text.txt", "blah", true);
 
-            string actual = ExecuteCommand("list " + testUrl + " --recursive");
+            string actual = Svn("list " + testUrl + " --recursive");
             string expected = @"TestFolder1/
 TestFolder2/
 TestFolder2/text.txt
@@ -54,7 +54,7 @@ TestFolder2/text.txt
             int version = CreateFolder(testPath + "/TestFolder1", true);
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
 
-            string actual = ExecuteCommand("list " + testUrl + " --revision " + version);
+            string actual = Svn("list " + testUrl + " --revision " + version);
             string expected = @"TestFolder1/
 ";
             Assert.AreEqual(expected, actual);
@@ -68,8 +68,8 @@ TestFolder2/text.txt
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
             CheckoutAndChangeDirectory();
             WriteFile(testPath + "/test.txt", "foo", true);
-            ExecuteCommand("update");
-            string actual = ExecuteCommand("list test.txt --revision PREV");
+            Svn("update");
+            string actual = Svn("list test.txt --revision PREV");
             string expected = @"test.txt
 ";
             Assert.AreEqual(expected, actual);
@@ -97,7 +97,7 @@ TestFolder2/text.txt
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
 
             string actual =
-                ExecuteCommand("list " + testUrl + " --revision {" + commitDate.ToString("yyyyMMddTHHmmss") + "}");
+                Svn("list " + testUrl + " --revision {" + commitDate.ToString("yyyyMMddTHHmmss") + "}");
             string expected = @"TestFolder1/
 ";
             Assert.AreEqual(expected, actual);
@@ -107,7 +107,7 @@ TestFolder2/text.txt
         public void CanListSingleFolder()
         {
             CreateFolder(testPath + "/TestFolder", true);
-            string actual = ExecuteCommand("list " + testUrl);
+            string actual = Svn("list " + testUrl);
             string expected = @"TestFolder/
 ";
             Assert.AreEqual(expected, actual);

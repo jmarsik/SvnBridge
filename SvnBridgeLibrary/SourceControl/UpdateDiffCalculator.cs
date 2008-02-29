@@ -53,13 +53,7 @@ namespace SvnBridge.SourceControl
                     for (int i = history.Changes.Count - 1; i >= 0; i--)
                     {
                         SourceItemChange change = history.Changes[i];
-
                         if (IsAddOperation(change, updatingForwardInTime))
-                        {
-                            PerformAdd(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
-                                       clientDeletedFiles);
-                        }
-                        else if (IsEditOperation(change))
                         {
                             PerformAdd(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
                                        clientDeletedFiles);
@@ -68,6 +62,15 @@ namespace SvnBridge.SourceControl
                         {
                             PerformDelete(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
                                           clientDeletedFiles);
+                        }
+                        else if (IsEditOperation(change))
+                        {
+                            if (updatingForwardInTime == false)
+                            {
+                                change.Item.RemoteChangesetId -= 1;// we turn the edit around, basically
+                            }
+                            PerformAdd(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
+                                       clientDeletedFiles);
                         }
                         else if (IsRenameOperation(change))
                         {

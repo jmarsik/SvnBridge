@@ -19,7 +19,7 @@ namespace TestsEndToEnd
         public void CanGetLogByUrl()
         {
             int revision = CreateFolder(testPath + "/Test4", true);
-            string command = ExecuteCommand("log " + testUrl + " --revision " + revision);
+            string command = Svn("log " + testUrl + " --revision " + revision);
             Assert.IsTrue(
                 command.Contains("r" + revision), "does not contains revision"
                 );
@@ -34,7 +34,7 @@ namespace TestsEndToEnd
         {
             CheckoutAndChangeDirectory();
 
-            string actual = ExecuteCommand("log");
+            string actual = Svn("log");
             // we want to verify that we can execute it, not verify the contet
             Assert.IsFalse(string.IsNullOrEmpty(actual));
         }

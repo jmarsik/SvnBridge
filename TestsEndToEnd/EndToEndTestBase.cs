@@ -74,7 +74,7 @@ namespace TestsEndToEnd
 
         protected void CheckoutAndChangeDirectory()
         {
-            ExecuteCommand("co " + testUrl);
+            Svn("co " + testUrl);
             Environment.CurrentDirectory =
                 Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
         }
@@ -93,7 +93,7 @@ namespace TestsEndToEnd
             return svn.StandardError.ReadToEnd();
         }
 
-        protected static string ExecuteCommand(string command)
+        protected static string Svn(string command)
         {
             Process svn = ExecuteInternal(command);
             string err = svn.StandardError.ReadToEnd();
