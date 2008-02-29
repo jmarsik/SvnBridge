@@ -80,6 +80,8 @@
     <Compile Include="SourceControl\Dto\CopyAction.cs" />
     <Compile Include="SourceControl\Dto\ItemProperties.cs" />
     <Compile Include="SourceControl\Dto\Property.cs" />
+    <Compile Include="SourceControl\ICredentialsProvider.cs" />
+    <Compile Include="SourceControl\ISourceControlUtility.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
     <Compile Include="SourceControl\ProjectInformationRepository.cs" />
@@ -147,12 +149,14 @@
     <Compile Include="SourceControl\MergeActivityResponseItem.cs" />
     <Compile Include="SourceControl\Recursion.cs" />
     <Compile Include="SourceControl\RenamedSourceItem.cs" />
+    <Compile Include="SourceControl\SourceControlUtility.cs" />
     <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
     <Compile Include="SourceControl\StubFolderMetaData.cs" />
     <Compile Include="SourceControl\TFSSourceControlService.cs" />
     <Compile Include="SourceControl\TFSSourceControlProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SourceControl\UpdateDiffCalculator.cs" />
     <Compile Include="Utility\BinaryReaderEOF.cs" />
     <Compile Include="Utility\SvnDiff.cs" />
     <Compile Include="Utility\SvnDiffEngine.cs" />
