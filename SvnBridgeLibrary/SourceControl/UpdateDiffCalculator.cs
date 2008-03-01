@@ -14,6 +14,9 @@ namespace SvnBridge.SourceControl
         private readonly IDictionary<ItemMetaData, bool> additionForPropertyChangeOnly =
             new Dictionary<ItemMetaData, bool>();
 
+        private Dictionary<string, int> clientExistingFiles;
+        private Dictionary<string, string> clientDeletedFiles;
+
         public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider,
                                     ISourceControlUtility sourceControlUtility)
         {
@@ -21,12 +24,27 @@ namespace SvnBridge.SourceControl
             this.sourceControlUtility = sourceControlUtility;
         }
 
+        public void CalculateDiff(string checkoutRootPath,
+                                  int versionTo,
+                                  int versionFrom,
+                                  FolderMetaData root,
+                                  UpdateReportData updateReportData)
+        {
+            clientExistingFiles = GetClientExistingFiles(checkoutRootPath, updateReportData);
+            clientDeletedFiles = GetClientDeletedFiles(checkoutRootPath, updateReportData);
+            CalculateChangeBetweenVersions(checkoutRootPath,
+                                           root,
+                                           versionFrom,
+                                           versionTo);
+
+
+            FlattenDeletedFolders(root);
+        }
+
         private void CalculateChangeBetweenVersions(string checkoutRootPath,
                                                     FolderMetaData root,
                                                     int sourceVersion,
-                                                    int targetVersion,
-                                                    IDictionary<string, int> clientExistingFiles,
-                                                    IDictionary<string, string> clientDeletedFiles)
+                                                    int targetVersion)
         {
             bool updatingForwardInTime = sourceVersion <= targetVersion;
             int lastVersion = sourceVersion;
@@ -55,13 +73,11 @@ namespace SvnBridge.SourceControl
                         SourceItemChange change = history.Changes[i];
                         if (IsAddOperation(change, updatingForwardInTime))
                         {
-                            PerformAdd(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
-                                       clientDeletedFiles);
+                            PerformAdd(targetVersion, checkoutRootPath, change, root);
                         }
                         else if (IsDeleteOperation(change, updatingForwardInTime))
                         {
-                            PerformDelete(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
-                                          clientDeletedFiles);
+                            PerformDelete(targetVersion, checkoutRootPath, change, root);
                         }
                         else if (IsEditOperation(change))
                         {
@@ -69,13 +85,11 @@ namespace SvnBridge.SourceControl
                             {
                                 change.Item.RemoteChangesetId -= 1;// we turn the edit around, basically
                             }
-                            PerformAdd(targetVersion, checkoutRootPath, change, root, clientExistingFiles,
-                                       clientDeletedFiles);
+                            PerformAdd(targetVersion, checkoutRootPath, change, root);
                         }
                         else if (IsRenameOperation(change))
                         {
-                            PerformRename(targetVersion, checkoutRootPath, history, change, root, clientExistingFiles,
-                                          clientDeletedFiles, updatingForwardInTime);
+                            PerformRename(targetVersion, checkoutRootPath, history, change, root, updatingForwardInTime);
                         }
                         else
                         {
@@ -94,9 +108,7 @@ namespace SvnBridge.SourceControl
         private void PerformAdd(int targetVersion,
                                 string checkoutRootPath,
                                 SourceItemChange change,
-                                FolderMetaData root,
-                                IDictionary<string, int> clientExistingFiles,
-                                IDictionary<string, string> clientDeletedFiles)
+                                FolderMetaData root)
         {
             if (change.Item.RemoteName.EndsWith("/" + Constants.PROP_FOLDER))
             {
@@ -109,17 +121,13 @@ namespace SvnBridge.SourceControl
                              change,
                              itemInformation.PropertyChange,
                              root,
-                             targetVersion,
-                             clientExistingFiles,
-                             clientDeletedFiles);
+                             targetVersion);
         }
 
         private void PerformDelete(int targetVersion,
                                    string checkoutRootPath,
                                    SourceItemChange change,
-                                   FolderMetaData root,
-                                   IDictionary<string, int> clientExistingFiles,
-                                   IDictionary<string, string> clientDeletedFiles)
+                                   FolderMetaData root)
         {
             // we ignore it here because this only happens when the related item
             // is delete, and at any rate, this is a SvnBridge implementation detail
@@ -133,9 +141,7 @@ namespace SvnBridge.SourceControl
                                change.Item.RemoteName,
                                change,
                                root,
-                               targetVersion,
-                               clientExistingFiles,
-                               clientDeletedFiles);
+                               targetVersion);
         }
 
         private void PerformRename(int targetVersion,
@@ -143,8 +149,6 @@ namespace SvnBridge.SourceControl
                                    SourceItemHistory history,
                                    SourceItemChange change,
                                    FolderMetaData root,
-                                   IDictionary<string, int> clientExistingFiles,
-                                   IDictionary<string, string> clientDeletedFiles,
                                    bool updatingForwardInTime)
         {
             if (updatingForwardInTime)
@@ -156,17 +160,13 @@ namespace SvnBridge.SourceControl
                                    oldItem.Name,
                                    change,
                                    root,
-                                   targetVersion,
-                                   clientExistingFiles,
-                                   clientDeletedFiles);
+                                   targetVersion);
                 ProcessAddedItem(checkoutRootPath,
                                  change.Item.RemoteName,
                                  change,
                                  false,
                                  root,
-                                 targetVersion,
-                                 clientExistingFiles,
-                                 clientDeletedFiles);
+                                 targetVersion);
             }
             else
             {
@@ -178,17 +178,13 @@ namespace SvnBridge.SourceControl
                                  change,
                                  false,
                                  root,
-                                 targetVersion,
-                                 clientExistingFiles,
-                                 clientDeletedFiles);
+                                 targetVersion);
 
                 ProcessDeletedFile(checkoutRootPath,
                                    change.Item.RemoteName,
                                    change,
                                    root,
-                                   targetVersion,
-                                   clientExistingFiles,
-                                   clientDeletedFiles);
+                                   targetVersion);
             }
         }
 
@@ -304,22 +300,6 @@ namespace SvnBridge.SourceControl
             return clientExistingFiles;
         }
 
-        public void CalculateDiff(string checkoutRootPath,
-                                  int versionTo,
-                                  int versionFrom,
-                                  FolderMetaData root,
-                                  UpdateReportData updateReportData)
-        {
-            Dictionary<string, int> clientExistingFiles = GetClientExistingFiles(checkoutRootPath, updateReportData);
-            Dictionary<string, string> clientDeletedFiles = GetClientDeletedFiles(checkoutRootPath, updateReportData);
-            CalculateChangeBetweenVersions(checkoutRootPath,
-                                           root,
-                                           versionFrom,
-                                           versionTo,
-                                           clientExistingFiles,
-                                           clientDeletedFiles);
-            FlattenDeletedFolders(root);
-        }
 
         /// <summary>
         /// This method ensures that we are not sending useless deletes to the client
@@ -353,9 +333,7 @@ namespace SvnBridge.SourceControl
                                       SourceItemChange change,
                                       bool propertyChange,
                                       FolderMetaData root,
-                                      int targetVersion,
-                                      IDictionary<string, int> clientExistingFiles,
-                                      IDictionary<string, string> clientDeletedFiles)
+                                      int targetVersion)
         {
             bool alreadyInClientCurrentState = IsChangeAlreadyCurrentInClientState(ChangeType.Add,
                                                                                    remoteName,
@@ -447,9 +425,7 @@ namespace SvnBridge.SourceControl
                                         string remoteName,
                                         SourceItemChange change,
                                         FolderMetaData root,
-                                        int targetVersion,
-                                        IDictionary<string, int> clientExistingFiles,
-                                        IDictionary<string, string> clientDeletedFiles)
+                                        int targetVersion)
         {
             bool alreadyChangedInCurrentClientState = IsChangeAlreadyCurrentInClientState(ChangeType.Delete,
                                                                                           remoteName,
@@ -579,8 +555,8 @@ namespace SvnBridge.SourceControl
 
         private class ItemInformation
         {
-            public bool PropertyChange;
-            public string RemoteName;
+            public readonly bool PropertyChange;
+            public readonly string RemoteName;
 
             public ItemInformation(bool propertyChange,
                                    string remoteName)

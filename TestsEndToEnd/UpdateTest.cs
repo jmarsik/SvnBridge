@@ -70,5 +70,21 @@ namespace TestsEndToEnd
 
             Assert.AreEqual("hab", File.ReadAllText("test.txt"));
         }
+
+        [Test]
+        public void WhenFileInFolderIsInPreviousVersionAndUpdatingToLatestShouldUpdateFile()
+        {
+            CheckoutAndChangeDirectory();
+
+            CreateFolder(testPath + "/TestFolder1", true);
+            WriteFile(testPath + "/TestFolder1/blah.txt", "abc", true);
+            UpdateFile(testPath + "/TestFolder1/blah.txt", "def", true);
+
+            Svn("update");
+            Svn("update TestFolder1/blah.txt --revision PREV");
+            Assert.AreEqual("abc", File.ReadAllText("TestFolder1/blah.txt"));
+            Svn("update");
+            Assert.AreEqual("def", File.ReadAllText("TestFolder1/blah.txt"));
+        }
     }
 }
