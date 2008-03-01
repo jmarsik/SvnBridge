@@ -132,11 +132,6 @@ namespace SvnBridge.SourceControl
                 root.Properties.Clear();
             }
 
-            if (versionFrom == versionTo)
-            {
-                return root;
-            }
-
             // the item doesn't exist and the reques was for a specific version
             if (root == null && reportData.UpdateTarget != null)
             {

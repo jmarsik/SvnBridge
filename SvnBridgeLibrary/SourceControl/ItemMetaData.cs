@@ -17,6 +17,17 @@ namespace SvnBridge.SourceControl
         public Dictionary<string, string> Properties = new Dictionary<string, string>();
         public int PropertyRevision;
 
+        public ItemMetaData()
+        {
+
+        }
+
+
+        public ItemMetaData(string name)
+        {
+            Name = name;
+        }
+
         public virtual ItemType ItemType
         {
             get { return ItemType.File; }

@@ -32,13 +32,70 @@ namespace SvnBridge.SourceControl
         {
             clientExistingFiles = GetClientExistingFiles(checkoutRootPath, updateReportData);
             clientDeletedFiles = GetClientDeletedFiles(checkoutRootPath, updateReportData);
-            CalculateChangeBetweenVersions(checkoutRootPath,
+            if (versionFrom != versionTo)
+            {
+                CalculateChangeBetweenVersions(checkoutRootPath,
                                            root,
                                            versionFrom,
                                            versionTo);
+            }
 
+            // Partial fix for UpdateTest.WhenFileInFolderIsInPreviousVersionAndUpdatingToLatestShouldUpdateFile
+            // it make that test pass but others are failing, so I am leaving it to Monday
+
+            //if (updateReportData.Entries != null)
+            //{
+            //    foreach (EntryData data in updateReportData.Entries)
+            //    {
+            //        if (data.path == null)
+            //            continue; //we already went over the root;
+            //        versionFrom = int.Parse(data.Rev);
+            //        if (versionFrom != versionTo)
+            //        {
+            //            ItemMetaData item = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo);
+            //            if (item is FolderMetaData)
+            //                ((FolderMetaData) item).Items.Clear();
+
+            //            CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, root,
+            //                                           versionFrom, versionTo);
+            //        }
+            //    }
+            //}
 
             FlattenDeletedFolders(root);
+        }
+
+        private ItemMetaData FindItemOrCreateItem(FolderMetaData root, string pathRoot, string path, int targetVersion)
+        {
+            FolderMetaData folder = root;
+            string[] parts = path.Split('/');
+            string itemName = pathRoot;
+            ItemMetaData item = null;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                itemName += "/" + parts[i];
+                item = sourceControlUtility.FindItem(root, parts[i]);
+                bool lastNamePart = i == parts.Length - 1;
+                if (item == null)
+                {
+                    if (lastNamePart)
+                    {
+                        item = sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
+                        folder.Items.Add(item);
+                    }
+                    else
+                    {
+                        FolderMetaData subFolder = (FolderMetaData)sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
+                        item = subFolder;
+                        folder.Items.Add(subFolder);
+                    }
+                }
+                if (lastNamePart == false)
+                {
+                    folder = (FolderMetaData)item;
+                }
+            }
+            return item;
         }
 
         private void CalculateChangeBetweenVersions(string checkoutRootPath,

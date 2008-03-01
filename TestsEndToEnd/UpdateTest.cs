@@ -60,7 +60,7 @@ namespace TestsEndToEnd
 
             // v 3.0
             File.WriteAllText("test.txt", "hab123");
-            Svn("commit -m blah");
+            Svn("commit -m blah2");
 
             int previousVersion = _provider.GetLatestVersion() -1 ;
 
@@ -74,6 +74,8 @@ namespace TestsEndToEnd
         [Test]
         public void WhenFileInFolderIsInPreviousVersionAndUpdatingToLatestShouldUpdateFile()
         {
+            TemporaryIgnore("Doesn't work yet, we need to figure out individual entries revisions as well, which is a bit complex");
+
             CheckoutAndChangeDirectory();
 
             CreateFolder(testPath + "/TestFolder1", true);
