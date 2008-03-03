@@ -74,8 +74,6 @@ namespace TestsEndToEnd
         [Test]
         public void WhenFileInFolderIsInPreviousVersionAndUpdatingToLatestShouldUpdateFile()
         {
-            TemporaryIgnore("Doesn't work yet, we need to figure out individual entries revisions as well, which is a bit complex");
-
             CheckoutAndChangeDirectory();
 
             CreateFolder(testPath + "/TestFolder1", true);

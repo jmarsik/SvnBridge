@@ -80,6 +80,7 @@
     <Compile Include="SourceControl\Dto\CopyAction.cs" />
     <Compile Include="SourceControl\Dto\ItemProperties.cs" />
     <Compile Include="SourceControl\Dto\Property.cs" />
+    <Compile Include="SourceControl\FindOrCreateResults.cs" />
     <Compile Include="SourceControl\ICredentialsProvider.cs" />
     <Compile Include="SourceControl\ISourceControlUtility.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />

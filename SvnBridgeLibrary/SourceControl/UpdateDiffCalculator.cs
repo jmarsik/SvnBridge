@@ -40,33 +40,31 @@ namespace SvnBridge.SourceControl
                                            versionTo);
             }
 
-            // Partial fix for UpdateTest.WhenFileInFolderIsInPreviousVersionAndUpdatingToLatestShouldUpdateFile
-            // it make that test pass but others are failing, so I am leaving it to Monday
+            if (updateReportData.Entries != null)
+            {
+                foreach (EntryData data in updateReportData.Entries)
+                {
+                    if (data.path == null)
+                        continue; //we already went over the root;
+                    versionFrom = int.Parse(data.Rev);
+                    if (versionFrom != versionTo)
+                    {
+                        FindOrCreateResults results = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo);
 
-            //if (updateReportData.Entries != null)
-            //{
-            //    foreach (EntryData data in updateReportData.Entries)
-            //    {
-            //        if (data.path == null)
-            //            continue; //we already went over the root;
-            //        versionFrom = int.Parse(data.Rev);
-            //        if (versionFrom != versionTo)
-            //        {
-            //            ItemMetaData item = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo);
-            //            if (item is FolderMetaData)
-            //                ((FolderMetaData) item).Items.Clear();
-
-            //            CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, root,
-            //                                           versionFrom, versionTo);
-            //        }
-            //    }
-            //}
+                        bool changed = CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, root,
+                                                       versionFrom, versionTo);
+                        if(changed == false)
+                            results.RevertAddition();
+                    }
+                }
+            }
 
             FlattenDeletedFolders(root);
         }
 
-        private ItemMetaData FindItemOrCreateItem(FolderMetaData root, string pathRoot, string path, int targetVersion)
+        private FindOrCreateResults FindItemOrCreateItem(FolderMetaData root, string pathRoot, string path, int targetVersion)
         {
+            FindOrCreateResults results = new FindOrCreateResults();
             FolderMetaData folder = root;
             string[] parts = path.Split('/');
             string itemName = pathRoot;
@@ -81,13 +79,18 @@ namespace SvnBridge.SourceControl
                     if (lastNamePart)
                     {
                         item = sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
-                        folder.Items.Add(item);
                     }
                     else
                     {
                         FolderMetaData subFolder = (FolderMetaData)sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
                         item = subFolder;
-                        folder.Items.Add(subFolder);
+                    }
+
+                    folder.Items.Add(item);
+                    if(results.FirstItemAdded==null)
+                    {
+                        results.FirstItemAdded = item;
+                        results.FirstItemAddedFolder = folder;
                     }
                 }
                 if (lastNamePart == false)
@@ -95,17 +98,18 @@ namespace SvnBridge.SourceControl
                     folder = (FolderMetaData)item;
                 }
             }
-            return item;
+            results.Item = item;
+            return results;
         }
 
-        private void CalculateChangeBetweenVersions(string checkoutRootPath,
+        private bool CalculateChangeBetweenVersions(string checkoutRootPath,
                                                     FolderMetaData root,
                                                     int sourceVersion,
                                                     int targetVersion)
         {
             bool updatingForwardInTime = sourceVersion <= targetVersion;
             int lastVersion = sourceVersion;
-
+            bool changed = false;
             while (targetVersion != lastVersion)
             {
                 int previousLoopLastVersion = lastVersion;
@@ -118,6 +122,7 @@ namespace SvnBridge.SourceControl
                 foreach (SourceItemHistory history in
                     SortHistories(updatingForwardInTime, logItem.History))
                 {
+                    changed = true;
                     lastVersion = history.ChangeSetID;
                     if (updatingForwardInTime == false)
                     {
@@ -160,6 +165,7 @@ namespace SvnBridge.SourceControl
                     break;
                 }
             }
+            return changed;
         }
 
         private void PerformAdd(int targetVersion,
