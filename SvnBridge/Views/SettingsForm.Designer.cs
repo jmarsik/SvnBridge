@@ -35,6 +35,7 @@ namespace SvnBridge.Views
             this.txtTfsUrl = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.proxyButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // okButton
@@ -99,6 +100,16 @@ namespace SvnBridge.Views
             this.label3.TabIndex = 4;
             this.label3.Text = "(1-65535)";
             // 
+            // proxyButton
+            // 
+            this.proxyButton.Location = new System.Drawing.Point(19, 71);
+            this.proxyButton.Name = "proxyButton";
+            this.proxyButton.Size = new System.Drawing.Size(75, 23);
+            this.proxyButton.TabIndex = 7;
+            this.proxyButton.Text = "Proxy...";
+            this.proxyButton.UseVisualStyleBackColor = true;
+            this.proxyButton.Click += new System.EventHandler(this.OnProxyButtonClicked);
+            // 
             // SettingsForm
             // 
             this.AcceptButton = this.okButton;
@@ -106,6 +117,7 @@ namespace SvnBridge.Views
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(329, 101);
+            this.Controls.Add(this.proxyButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtTfsUrl);
@@ -133,5 +145,6 @@ namespace SvnBridge.Views
         private System.Windows.Forms.TextBox txtTfsUrl;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button proxyButton;
     }
 }

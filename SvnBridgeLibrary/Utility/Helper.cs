@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using SvnBridge.Net;
 
 namespace SvnBridge.Utility
 {
@@ -89,12 +90,17 @@ namespace SvnBridge.Utility
             return inUse;
         }
 
-        public static bool IsValidTFSUrl(string url)
+        public static bool IsValidTFSUrl(string url, ProxyInformation proxyInformation)
         {
             try
             {
                 WebRequest request = WebRequest.Create(url + "/Services/v1.0/Registration.asmx");
                 request.Credentials = CredentialCache.DefaultNetworkCredentials;
+                request.Proxy = ListenerFactory.CreateProxy(proxyInformation);
+                if(proxyInformation.UseProxy)
+                {
+                    
+                }
                 request.Timeout = 20000;
 
                 using (WebResponse response = request.GetResponse())

@@ -97,6 +97,7 @@ namespace SvnBridge.Net
             isListening = false;
         }
 
+        
         #endregion
 
         private void Accept(IAsyncResult asyncResult)

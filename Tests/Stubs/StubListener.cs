@@ -54,6 +54,7 @@ namespace SvnBridge.Stubs
             Stop_Called = true;
         }
 
+       
         #endregion
 
         public bool ListenErrorHasDelegate()

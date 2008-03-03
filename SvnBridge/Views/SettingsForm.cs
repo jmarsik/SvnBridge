@@ -8,6 +8,7 @@ namespace SvnBridge.Views
     public partial class SettingsForm : Form, ISettingsView
     {
         private SettingsViewPresenter presenter;
+        private readonly ProxySettings proxySettings = new ProxySettings();
 
         public SettingsForm()
         {
@@ -29,6 +30,19 @@ namespace SvnBridge.Views
         }
 
         #endregion
+
+        private void OnProxyButtonClicked(object sender, EventArgs e)
+        {
+            proxySettings.SetInformation(presenter.ProxyInformation);
+            if(proxySettings.ShowDialog(this)!=DialogResult.OK)
+                return;
+            presenter.ProxyInformation.UseProxy = string.IsNullOrEmpty(proxySettings.ProxyUrl) == false;
+            presenter.ProxyInformation.Url = proxySettings.ProxyUrl;
+            presenter.ProxyInformation.Port = proxySettings.Port;
+            presenter.ProxyInformation.Username = proxySettings.Username;
+            presenter.ProxyInformation.Password = proxySettings.Password;
+            presenter.ProxyInformation.UseDefaultCredentails = proxySettings.UseDefaultCredentials;
+        }
 
         private void OnOkButtonClicked(object sender,
                                        EventArgs e)
@@ -69,7 +83,7 @@ namespace SvnBridge.Views
             }
 
             Cursor = Cursors.WaitCursor;
-            bool validTfsUrl = Helper.IsValidTFSUrl(txtTfsUrl.Text);
+            bool validTfsUrl = Helper.IsValidTFSUrl(txtTfsUrl.Text, presenter.ProxyInformation);
             Cursor = Cursors.Default;
             if (!validTfsUrl)
             {

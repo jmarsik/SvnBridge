@@ -29,7 +29,7 @@ namespace SvnBridge.Presenters
 
         public void ChangeSettings(ISettingsView settingsView)
         {
-            SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView);
+            SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView, new ProxyInformation());
             settingsViewPresenter.Port = listener.Port;
             settingsViewPresenter.TfsUrl = listener.TfsUrl;
             settingsViewPresenter.Show();

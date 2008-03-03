@@ -1,18 +1,26 @@
 using System.Windows.Forms;
+using SvnBridge.Net;
 using SvnBridge.Views;
 
 namespace SvnBridge.Presenters
 {
     public class SettingsViewPresenter
     {
+        readonly ProxyInformation proxyInformation;
+
+        public ProxyInformation ProxyInformation
+        {
+            get { return proxyInformation; }
+        }
+
         private readonly ISettingsView view;
-        private bool cancelled;
         private int port;
         private string tfsUrl;
 
-        public SettingsViewPresenter(ISettingsView view)
+        public SettingsViewPresenter(ISettingsView view, ProxyInformation proxyInformation)
         {
             this.view = view;
+            this.proxyInformation = proxyInformation;
 
             view.Presenter = this;
         }

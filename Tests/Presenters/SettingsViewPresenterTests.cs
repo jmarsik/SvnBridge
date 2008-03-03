@@ -1,5 +1,6 @@
 using System.Windows.Forms;
 using NUnit.Framework;
+using SvnBridge.Net;
 using SvnBridge.Stubs;
 using Assert=CodePlex.NUnitExtensions.Assert;
 
@@ -22,7 +23,7 @@ namespace SvnBridge.Presenters
 
         private SettingsViewPresenter CreatePresenter()
         {
-            return new SettingsViewPresenter(stubView);
+            return new SettingsViewPresenter(stubView, new ProxyInformation());
         }
 
         [Test]

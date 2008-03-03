@@ -11,5 +11,5 @@ namespace SvnBridge.Net
 
         void Start();
         void Stop();
-    }
+   }
 }
