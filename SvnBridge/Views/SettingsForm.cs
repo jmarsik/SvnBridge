@@ -59,7 +59,7 @@ namespace SvnBridge.Views
                 return;
             }
 
-            if (Helper.IsPortInUse(int.Parse(txtPortNumber.Text)))
+            if (Helper.IsPortInUseOnLocalHost(int.Parse(txtPortNumber.Text)))
             {
                 MessageBox.Show(
                     "The port number appears to already be in use. Please choose a different port.",
