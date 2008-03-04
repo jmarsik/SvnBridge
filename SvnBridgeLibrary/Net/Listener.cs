@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -12,16 +13,19 @@ namespace SvnBridge.Net
         private TcpListener listener;
         private int? port;
 
-        public Listener() : this(null, null)
+        public Listener()
+            : this(null, null)
         {
         }
 
-        public Listener(int port) : this((int?) port, null)
+        public Listener(int port)
+            : this((int?)port, null)
         {
         }
 
         public Listener(int port,
-                        string tfsUrl) : this((int?) port, tfsUrl)
+                        string tfsUrl)
+            : this((int?)port, tfsUrl)
         {
         }
 
@@ -97,7 +101,7 @@ namespace SvnBridge.Net
             isListening = false;
         }
 
-        
+
         #endregion
 
         private void Accept(IAsyncResult asyncResult)
@@ -131,19 +135,54 @@ namespace SvnBridge.Net
         private void Process(TcpClient tcpClient)
         {
             IHttpContext connection = new ListenerContext(tcpClient.GetStream());
-
-            dispatcher.Dispatch(connection);
-
             try
             {
-                connection.Response.OutputStream.Flush();
-            }
-            catch (IOException)
-            {
-                /* Ignore error, caused by client cancelling operation */
-            }
+                try
+                {
+                    dispatcher.Dispatch(connection);
+                }
+                catch (Exception exception)
+                {
+                    connection.Response.StatusCode = 500;
+                    using (StreamWriter sw = new StreamWriter(connection.Response.OutputStream))
+                    {
+                        Guid guid = Guid.NewGuid();
 
-            tcpClient.Close();
+                        string message = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                                   "<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n" +
+                                   "<C:error/>\n" +
+                                   "<m:human-readable errcode=\"160024\">\n" +
+                                   "Failed to process a request. Failure id: " + guid + Environment.NewLine +
+                                   exception +
+                                   "</m:human-readable>\n" +
+                                   "</D:error>\n";
+                        sw.Write(message);
+
+                        LogError(guid, exception);
+                    }
+                    throw;
+                }
+
+                try
+                {
+                    connection.Response.OutputStream.Flush();
+                }
+                catch (IOException)
+                {
+                    /* Ignore error, caused by client cancelling operation */
+                }
+            }
+            finally
+            {
+                tcpClient.Close();
+            }
+        }
+
+        private static void LogError(Guid guid, Exception e)
+        {
+            EventLog.WriteEntry("SvnBridge",
+                "Error on handling request. Error id: " + guid + Environment.NewLine + e.ToString(),
+                EventLogEntryType.Error);
         }
 
         private void OnListenException(Exception ex)

@@ -55,7 +55,7 @@ namespace SvnBridge.Handlers
                 output.Write("<S:set-prop name=\"svn:entry:uuid\">" + Constants.RepositoryUuid + "</S:set-prop>\n");
                 foreach (KeyValuePair<string, string> property in item.Properties)
                 {
-                    output.Write("<S:set-prop name=\"svn:" + property.Key + "\">" + property.Value + "</S:set-prop>\n");
+                    output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" + property.Value + "</S:set-prop>\n");
                 }
 
                 while (!item.DataLoaded)
@@ -135,7 +135,7 @@ namespace SvnBridge.Handlers
                     output.Write("<S:set-prop name=\"svn:entry:uuid\">" + Constants.RepositoryUuid + "</S:set-prop>\n");
                     foreach (KeyValuePair<string, string> property in folder.Properties)
                     {
-                        output.Write("<S:set-prop name=\"svn:" + property.Key + "\">" + property.Value +
+                        output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" + property.Value +
                                      "</S:set-prop>\n");
                     }
                 }

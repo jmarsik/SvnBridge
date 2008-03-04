@@ -105,7 +105,7 @@ namespace SvnBridge.Handlers
 
             Assert.AreEqual("be05cf36-7514-3f4d-81ea-7822f7b1dfe7", r.Parameters[0]);
             Assert.AreEqual("/Folder1", r.Parameters[1]);
-            Assert.AreEqual("ignore", r.Parameters[2]);
+            Assert.AreEqual("svn:ignore", r.Parameters[2]);
             Assert.AreEqual("*.bad\n", r.Parameters[3]);
         }
 

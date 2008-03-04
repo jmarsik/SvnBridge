@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
@@ -16,7 +17,12 @@ namespace SvnBridge.Handlers
             IHttpResponse response = context.Response;
 
             string path = GetPath(request);
-            PropertyUpdateData data = Helper.DeserializeXml<PropertyUpdateData>(request.InputStream);
+            string correctXml;
+            using(StreamReader sr = new StreamReader(request.InputStream))
+            {
+                correctXml = BrokenXml.Escape(sr.ReadToEnd());
+            }
+            PropertyUpdateData data = Helper.DeserializeXml<PropertyUpdateData>(correctXml);
             SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 207);
 
             using (StreamWriter output = new StreamWriter(response.OutputStream))
@@ -25,10 +31,10 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void PropPatch(ISourceControlProvider sourceControlProvider,
+        private static void PropPatch(ISourceControlProvider sourceControlProvider,
                                PropertyUpdateData request,
                                string path,
-                               StreamWriter output)
+                               TextWriter output)
         {
             string activityPath = path.Substring(10);
             if (activityPath.StartsWith("/"))
@@ -57,9 +63,12 @@ namespace SvnBridge.Handlers
                     break;
                 default:
                     string itemPath = Helper.Decode(activityPath.Substring(activityPath.IndexOf('/')));
+                    string propertyName = request.Set.Prop.Properties[0].LocalName;
+                    if (request.Set.Prop.Properties[0].NamespaceURI == WebDav.Namespaces.TIGRISSVN)
+                        propertyName = "svn:" + propertyName;
                     sourceControlProvider.SetProperty(activityId,
                                                       itemPath,
-                                                      request.Set.Prop.Properties[0].LocalName,
+                                                      propertyName,
                                                       request.Set.Prop.Properties[0].InnerText);
                     output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
                     output.Write(

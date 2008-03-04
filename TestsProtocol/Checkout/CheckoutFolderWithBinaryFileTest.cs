@@ -761,7 +761,7 @@ namespace Tests
             item.ItemRevision = 5479;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2007-06-18T08:04:51.247115Z");
-            item.Properties["mime-type"] = "application/octet-stream";
+            item.Properties["svn:mime-type"] = "application/octet-stream";
             metadata.Items.Add(item);
             stub.Attach(provider.GetItems, metadata);
             byte[] fileData =

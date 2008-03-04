@@ -406,7 +406,7 @@ namespace Tests
             folder.ItemRevision = 5551;
             folder.Author = "jwanagel";
             folder.LastModifiedDate = DateTime.Parse("2007-08-08T20:54:17.904624Z");
-            folder.Properties["ignore"] = "*.ignore3\n";
+            folder.Properties["svn:ignore"] = "*.ignore3\n";
             metadata.Items.Add(folder);
             stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = GetBytes("New file");

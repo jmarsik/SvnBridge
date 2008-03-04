@@ -20,20 +20,23 @@ namespace TestsEndToEnd
 
             new BootStrapper().Start();
 
-            checkoutFolder = Path.GetTempFileName();
-            File.Delete(checkoutFolder);
-            Directory.CreateDirectory(checkoutFolder);
+            CreateTempFolder();
 
             Environment.CurrentDirectory = Path.Combine(Path.GetTempPath(), checkoutFolder);
             Console.WriteLine("cd " + checkoutFolder);
             listener = ListenerFactory.Create();
-            listener.ListenError+=delegate(object sender, ListenErrorEventArgs e)
-            {
-                Console.WriteLine(e.Exception);
-            };
+            listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
             listener.TfsUrl = "http://codeplex-tfs3:8080";
             listener.Port = 9090;
             listener.Start();
+        }
+
+        private void CreateTempFolder()
+        {
+            checkoutFolder = Path.GetTempFileName();
+            File.Delete(checkoutFolder);
+            Directory.CreateDirectory(checkoutFolder);
+            Console.WriteLine("md " + checkoutFolder);
         }
 
         public override void TearDown()
@@ -44,7 +47,7 @@ namespace TestsEndToEnd
 
             Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
 
-            Directory.Delete(checkoutFolder, true);
+            // Directory.Delete(checkoutFolder, true);
             listener.Stop();
         }
 
@@ -77,6 +80,18 @@ namespace TestsEndToEnd
             Svn("co " + testUrl);
             Environment.CurrentDirectory =
                 Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
+        }
+
+
+        protected void CheckoutAgainAndChangeDirectory()
+        {
+            CreateTempFolder();
+            Environment.CurrentDirectory = checkoutFolder;
+            Console.WriteLine("cd " +checkoutFolder);
+            Svn("co " + testUrl);
+            Environment.CurrentDirectory = 
+                Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
+            Console.WriteLine("cd " + Environment.CurrentDirectory);
         }
 
         protected static void TemporaryIgnore(string message)
