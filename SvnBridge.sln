@@ -49,6 +49,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsEndToEnd", "TestsEndTo
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsRequiringTfsClient", "TestsRequiringTfsClient\TestsRequiringTfsClient.csproj", "{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +93,10 @@ Global
 		{7913B9B3-9BDA-48D9-8928-4F46E1CF0E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7913B9B3-9BDA-48D9-8928-4F46E1CF0E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7913B9B3-9BDA-48D9-8928-4F46E1CF0E1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

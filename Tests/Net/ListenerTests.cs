@@ -20,7 +20,7 @@ namespace SvnBridge.Net
         public void SetPortAfterStartThrows()
         {
             Listener listener = new Listener();
-            listener.Port = 8081;
+            listener.Port = 10011;
             listener.TfsUrl = "http://foo";
             listener.Start();
 
@@ -34,7 +34,7 @@ namespace SvnBridge.Net
         public void SetTfsUrlAfterStartThrows()
         {
             Listener listener = new Listener();
-            listener.Port = 8081;
+            listener.Port = 10011;
             listener.TfsUrl = "http://foo";
             listener.Start();
 
@@ -58,7 +58,7 @@ namespace SvnBridge.Net
         public void StartWithoutSettingTfsUrlThrows()
         {
             Listener listener = new Listener();
-            listener.Port = 8081;
+            listener.Port = 10011;
 
             Assert.Throws<InvalidOperationException>(
                 delegate { listener.Start(); });

@@ -87,7 +87,10 @@ namespace SvnBridge.SourceControl
         {
             try
             {
-                return (Repository) _webSvcFactory.Create(tfsUrl, credentials);
+                Repository repository = (Repository) _webSvcFactory.Create(tfsUrl, credentials);
+                repository.PreAuthenticate = true;
+                repository.UnsafeAuthenticatedConnectionSharing = true;
+                return repository;
             }
             catch (SoapException soapEx)
             {

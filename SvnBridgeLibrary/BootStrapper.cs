@@ -26,7 +26,8 @@ namespace SvnBridge
                 typeof (IRegistrationService),
                 typeof (IFileSystem),
                 typeof (IWebTransferService),
-                typeof (ITFSSourceControlService)
+                typeof (ITFSSourceControlService),
+                typeof (IAssociateWorkItemWithChangeSet)
             };
 
         public BootStrapper()

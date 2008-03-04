@@ -6,6 +6,7 @@ using NUnit.Framework;
 using SvnBridge.Cache;
 using SvnBridge.Exceptions;
 using SvnBridge.SourceControl;
+using SvnBridge.Infrastructure;
 
 namespace Tests
 {
@@ -40,7 +41,8 @@ namespace Tests
                                                                              new ProjectInformationRepository(
                                                                                  new NullCache(),
                                                                                  tfsSourceControlService,
-                                                                                 ServerUrl));
+                                                                                 ServerUrl),
+                                                                                 new AssociateWorkItemWithChangeSet(ServerUrl, null));
         }
 
         [Test]

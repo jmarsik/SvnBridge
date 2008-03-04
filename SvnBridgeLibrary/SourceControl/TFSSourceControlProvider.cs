@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.RegularExpressions;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Exceptions;
+using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl.Dto;
@@ -13,6 +15,8 @@ namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
     {
+        private static readonly Regex associatedWorkItems = new Regex(@"Work ?Items?:? (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
+
         private readonly ISourceControlUtility sourceControlHelper;
         private static readonly Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
         private readonly ICredentials credentials;
@@ -21,17 +25,20 @@ namespace SvnBridge.SourceControl
         private readonly string serverUrl;
         private readonly ITFSSourceControlService sourceControlService;
         private readonly IWebTransferService webTransferService;
+        private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
 
         public TFSSourceControlProvider(
             string serverUrl,
             string projectName,
             ICredentials credentials,
             IWebTransferService webTransferService,
-            ITFSSourceControlService tfsSourceControlService,
-            IProjectInformationRepository projectInformationRepository)
+            ITFSSourceControlService sourceControlService,
+            IProjectInformationRepository projectInformationRepository,
+            IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet)
         {
             this.webTransferService = webTransferService;
-            sourceControlService = tfsSourceControlService;
+            this.sourceControlService = sourceControlService;
+            this.associateWorkItemWithChangeSet = associateWorkItemWithChangeSet;
 
             if (projectName != null)
             {
@@ -47,7 +54,7 @@ namespace SvnBridge.SourceControl
                 rootPath = Constants.ServerRootPath;
             }
             this.credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, credentials);
-            sourceControlHelper = new SourceControlUtility(sourceControlService, this, rootPath, serverUrl);
+            sourceControlHelper = new SourceControlUtility(this.sourceControlService, this, rootPath, serverUrl);
         }
 
         #region ISourceControlProvider Members
@@ -125,7 +132,7 @@ namespace SvnBridge.SourceControl
                 path = path.Substring(1);
             }
 
-            FolderMetaData root = (FolderMetaData) GetItems(versionTo, path, Recursion.None);
+            FolderMetaData root = (FolderMetaData)GetItems(versionTo, path, Recursion.None);
 
             if (root != null)
             {
@@ -148,7 +155,7 @@ namespace SvnBridge.SourceControl
             return root;
         }
 
-        
+
 
         public ItemMetaData GetItemInActivity(string activityId,
                                               string path)
@@ -235,7 +242,7 @@ namespace SvnBridge.SourceControl
                             sourceControlService.QueryBranches(serverUrl,
                                                             credentials,
                                                             null,
-                                                            new ItemSpec[] {spec},
+                                                            new ItemSpec[] { spec },
                                                             branchChangeset);
                         string oldName =
                             branches[0][branches[0].GetUpperBound(0)].BranchFromItem.item.Substring(rootPath.Length);
@@ -285,7 +292,7 @@ namespace SvnBridge.SourceControl
                                              credentials,
                                              null,
                                              null,
-                                             new ItemSpec[1] {spec},
+                                             new ItemSpec[1] { spec },
                                              versionSpec,
                                              DeletedState.NonDeleted,
                                              ItemType.Any,
@@ -342,7 +349,8 @@ namespace SvnBridge.SourceControl
             UpdateProperties(activityId);
 
             List<string> commitServerList = new List<string>();
-            foreach (ActivityItem item in _activities[activityId].MergeList)
+            Activity activity = _activities[activityId];
+            foreach (ActivityItem item in activity.MergeList)
             {
                 if (item.Action != ActivityItemAction.RenameDelete)
                 {
@@ -380,7 +388,25 @@ namespace SvnBridge.SourceControl
                                              _activities[activityId].Comment,
                                              commitServerList);
             }
+            AssociateWorkItemsWithChangeSet(activity.Comment, changesetId);
             return GenerateMergeResponse(activityId, changesetId);
+        }
+
+        public void AssociateWorkItemsWithChangeSet(string comment, int changesetId)
+        {
+            MatchCollection matches = associatedWorkItems.Matches(comment ?? "" );
+            foreach (Match match in matches)
+            {
+                Group group = match.Groups[1];
+                string[] workItemIds = group.Value.Split(new char[]{','},StringSplitOptions.RemoveEmptyEntries);
+                foreach (string workItemId in workItemIds)
+                {
+                    int id;
+                    if(int.TryParse(workItemId, out id)==false)
+                        continue;
+                    associateWorkItemWithChangeSet.Associate(id, changesetId);
+                }
+            }
         }
 
         public byte[] ReadFile(ItemMetaData item)
@@ -418,7 +444,7 @@ namespace SvnBridge.SourceControl
 
         #endregion
 
-       
+
 
         private ItemMetaData GetItems(int version,
                                       string path,
@@ -480,7 +506,7 @@ namespace SvnBridge.SourceControl
                 {
                     if (item.ItemType == ItemType.Folder)
                     {
-                        folders[item.Name.ToLower()] = (FolderMetaData) item;
+                        folders[item.Name.ToLower()] = (FolderMetaData)item;
                     }
                     if (i == 0)
                     {
@@ -536,7 +562,7 @@ namespace SvnBridge.SourceControl
                 sourceControlService.UndoPendingChanges(serverUrl,
                                                      credentials,
                                                      activityId,
-                                                     new string[] {rootPath + path});
+                                                     new string[] { rootPath + path });
                 activity.DeletedItems.Remove(path);
                 for (int j = activity.MergeList.Count - 1; j >= 0; j--)
                 {
@@ -728,7 +754,7 @@ namespace SvnBridge.SourceControl
             sourceControlService.UndoPendingChanges(serverUrl,
                                                  credentials,
                                                  activityId,
-                                                 new string[] {rootPath + copy.TargetPath});
+                                                 new string[] { rootPath + copy.TargetPath });
             for (int i = activity.MergeList.Count - 1; i >= 0; i--)
             {
                 if (activity.MergeList[i].Path == rootPath + copy.TargetPath)
@@ -796,7 +822,7 @@ namespace SvnBridge.SourceControl
                                 sourceControlService.UndoPendingChanges(serverUrl,
                                                                      credentials,
                                                                      activityId,
-                                                                     new string[] {rootPath + activity.DeletedItems[i]});
+                                                                     new string[] { rootPath + activity.DeletedItems[i] });
                                 for (int j = activity.MergeList.Count - 1; j >= 0; j--)
                                 {
                                     if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
@@ -825,7 +851,7 @@ namespace SvnBridge.SourceControl
                         sourceControlService.UndoPendingChanges(serverUrl,
                                                              credentials,
                                                              activityId,
-                                                             new string[] {rootPath + activity.DeletedItems[i]});
+                                                             new string[] { rootPath + activity.DeletedItems[i] });
                         for (int j = activity.MergeList.Count - 1; j >= 0; j--)
                         {
                             if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
@@ -1031,7 +1057,7 @@ namespace SvnBridge.SourceControl
                 sourceControlService.QueryItemsExtended(serverUrl,
                                                      credentials,
                                                      activityId,
-                                                     new ItemSpec[1] {spec},
+                                                     new ItemSpec[1] { spec },
                                                      DeletedState.NonDeleted,
                                                      ItemType.Any);
             if (items[0].Length == 0)
@@ -1052,7 +1078,7 @@ namespace SvnBridge.SourceControl
             }
         }
 
-      
+
 
         private void SetItemProperties(IDictionary<string, FolderMetaData> folders,
                                        IDictionary<string, ItemProperties> properties)

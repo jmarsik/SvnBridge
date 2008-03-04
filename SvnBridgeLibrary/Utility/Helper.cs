@@ -74,10 +74,10 @@ namespace SvnBridge.Utility
             return (port >= 1 && port <= 65535);
         }
 
-        public static bool IsPortInUse(int port)
+        public static bool IsPortInUseOnLocalHost(int port)
         {
             bool inUse = false;
-            TcpListener listener = new TcpListener(IPAddress.Any, port);
+            TcpListener listener = new TcpListener(IPAddress.Loopback, port);
             try
             {
                 listener.Start();

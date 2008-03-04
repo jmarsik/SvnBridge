@@ -49,12 +49,14 @@
     <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
+    <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />
     <Compile Include="Infrastructure\BrokenXml.cs" />
     <Compile Include="Infrastructure\CircuitBreaker.cs" />
     <Compile Include="Infrastructure\CircuitTrippedException.cs" />
     <Compile Include="Infrastructure\Clock.cs" />
     <Compile Include="Infrastructure\CachingItemMetaDataRepository.cs" />
     <Compile Include="Infrastructure\Container.cs" />
+    <Compile Include="Infrastructure\IAssociateWorkItemWithChangeset.cs" />
     <Compile Include="Infrastructure\IoC.cs" />
     <Compile Include="Cache\WebCache.cs" />
     <Compile Include="Interfaces\ICache.cs" />
@@ -177,6 +179,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Infrastructure\AssociateWorkItemWithChangeSetMessage.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

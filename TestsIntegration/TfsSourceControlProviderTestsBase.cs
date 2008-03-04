@@ -7,6 +7,7 @@ using CodePlex.TfsLibrary.Utility;
 using IntegrationTests.Properties;
 using NUnit.Framework;
 using SvnBridge.Cache;
+using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 
 namespace Tests
@@ -36,7 +37,8 @@ namespace Tests
                                                      tfsSourceControlService,
                                                      new ProjectInformationRepository(new NullCache(),
                                                                                       tfsSourceControlService,
-                                                                                      ServerUrl));
+                                                                                      ServerUrl),
+                                                                                      new AssociateWorkItemWithChangeSet(ServerUrl, null));
             testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, testPath);

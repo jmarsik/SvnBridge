@@ -162,19 +162,27 @@ namespace SvnBridge.Net
                     }
                     throw;
                 }
-
-                try
+                finally
                 {
-                    connection.Response.OutputStream.Flush();
+                    FlushConnection(connection);
                 }
-                catch (IOException)
-                {
-                    /* Ignore error, caused by client cancelling operation */
-                }
+                
             }
             finally
             {
                 tcpClient.Close();
+            }
+        }
+
+        private void FlushConnection(IHttpContext connection)
+        {
+            try
+            {
+                connection.Response.OutputStream.Flush();
+            }
+            catch (IOException)
+            {
+                /* Ignore error, caused by client cancelling operation */
             }
         }
 
