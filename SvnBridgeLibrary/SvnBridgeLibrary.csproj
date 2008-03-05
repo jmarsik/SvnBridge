@@ -77,6 +77,7 @@
     <Compile Include="Handlers\ReportHandler\UpdateReportService.cs" />
     <Compile Include="Interfaces\IProjectInformationRepository.cs" />
     <Compile Include="ListenErrorEventArgs.cs" />
+    <Compile Include="Net\FinishedHandlingEventArgs.cs" />
     <Compile Include="Net\ProxyInformation.cs" />
     <Compile Include="SourceControl\Dto\Activity.cs" />
     <Compile Include="SourceControl\Dto\ActivityItem.cs" />

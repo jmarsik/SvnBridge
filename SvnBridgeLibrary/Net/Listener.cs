@@ -41,6 +41,7 @@ namespace SvnBridge.Net
         #region IListener Members
 
         public event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
+        public event EventHandler<FinishedHandlingEventArgs> FinishedHandling = delegate { };
 
         public int Port
         {
@@ -137,6 +138,7 @@ namespace SvnBridge.Net
             IHttpContext connection = new ListenerContext(tcpClient.GetStream());
             try
             {
+                DateTime start = DateTime.Now;
                 try
                 {
                     dispatcher.Dispatch(connection);
@@ -165,8 +167,11 @@ namespace SvnBridge.Net
                 finally
                 {
                     FlushConnection(connection);
+                    TimeSpan duration = DateTime.Now-start;
+                    FinishedHandling(this, new FinishedHandlingEventArgs(duration,
+                        connection.Request.HttpMethod,
+                        connection.Request.Url.AbsoluteUri));
                 }
-                
             }
             finally
             {
@@ -174,7 +179,7 @@ namespace SvnBridge.Net
             }
         }
 
-        private void FlushConnection(IHttpContext connection)
+        private static void FlushConnection(IHttpContext connection)
         {
             try
             {

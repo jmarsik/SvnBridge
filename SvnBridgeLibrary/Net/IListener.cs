@@ -8,8 +8,9 @@ namespace SvnBridge.Net
         string TfsUrl { get; set; }
 
         event EventHandler<ListenErrorEventArgs> ListenError;
+        event EventHandler<FinishedHandlingEventArgs> FinishedHandling;
 
         void Start();
         void Stop();
-   }
+    }
 }

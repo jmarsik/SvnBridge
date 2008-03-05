@@ -21,6 +21,7 @@ namespace SvnBridge.Stubs
         #region IListener Members
 
         public event EventHandler<ListenErrorEventArgs> ListenError;
+        public event EventHandler<FinishedHandlingEventArgs> FinishedHandling;
 
         public int Port
         {

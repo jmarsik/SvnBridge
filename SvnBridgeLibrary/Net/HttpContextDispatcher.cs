@@ -63,7 +63,6 @@ namespace SvnBridge.Net
                 throw new InvalidOperationException(
                     "A TFS server URL must be specified before connections can be dispatched.");
             }
-
             HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
 
             if (handler != null)
@@ -116,7 +115,7 @@ namespace SvnBridge.Net
 
             response.ClearHeaders();
 
-            response.StatusCode = (int) HttpStatusCode.Unauthorized;
+            response.StatusCode = (int)HttpStatusCode.Unauthorized;
             response.ContentType = "text/html; charset=iso-8859-1";
 
             response.AppendHeader("WWW-Authenticate", "Basic realm=\"CodePlex Subversion Repository\"");
@@ -147,7 +146,7 @@ namespace SvnBridge.Net
         {
             IHttpResponse response = connection.Response;
 
-            response.StatusCode = (int) HttpStatusCode.MethodNotAllowed;
+            response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
 
             response.ContentType = "text/html";
 

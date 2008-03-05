@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading;
 using NUnit.Framework;
 using SvnBridge;
 using SvnBridge.Net;
@@ -15,8 +17,8 @@ namespace TestsEndToEnd
         public override void SetUp()
         {
             base.SetUp();
-
-            testUrl = "http://localhost:9090/SvnBridgeTesting" + testPath;
+            int port = new Random().Next(1024, short.MaxValue);
+            testUrl = "http://localhost:"+ port+ "/SvnBridgeTesting" + testPath;
 
             new BootStrapper().Start();
 
@@ -27,7 +29,7 @@ namespace TestsEndToEnd
             listener = ListenerFactory.Create();
             listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
             listener.TfsUrl = "http://codeplex-tfs3:8080";
-            listener.Port = 9090;
+            listener.Port = port;
             listener.Start();
         }
 
@@ -41,19 +43,20 @@ namespace TestsEndToEnd
 
         public override void TearDown()
         {
+            listener.Stop();
+
             base.TearDown();
             ForAllFilesInCurrentDirectory(
                 delegate(FileInfo file) { file.Attributes = file.Attributes & ~FileAttributes.ReadOnly; });
 
             Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
 
-            // Directory.Delete(checkoutFolder, true);
-            listener.Stop();
+            Directory.Delete(checkoutFolder, true);
         }
 
         #endregion
 
-        private IListener listener;
+        protected IListener listener;
         private string checkoutFolder;
         protected string testUrl;
 
@@ -104,25 +107,42 @@ namespace TestsEndToEnd
 
         protected static string ExecuteCommandAndGetError(string command)
         {
-            Process svn = ExecuteInternal(command);
-            return svn.StandardError.ReadToEnd();
+            string err = null;
+            ExecuteInternal(command,delegate(Process svn)
+            {
+                err = svn.StandardError.ReadToEnd();
+            });
+            return err;
         }
 
         protected static string Svn(string command)
         {
-            Process svn = ExecuteInternal(command);
-            string err = svn.StandardError.ReadToEnd();
+            StringBuilder output = new StringBuilder();
+            string err = null;
+            ExecuteInternal(command,delegate(Process svn)
+            {
+                ThreadPool.QueueUserWorkItem(delegate
+                {
+                    err = svn.StandardError.ReadToEnd();
+                });
+                ThreadPool.QueueUserWorkItem(delegate
+                {
+                    string line;
+                    while((line = svn.StandardOutput.ReadLine())!=null)
+                    {
+                        Console.WriteLine(line);
+                        output.AppendLine(line);
+                    }
+                });
+            });
             if (string.IsNullOrEmpty(err) == false)
             {
                 throw new InvalidOperationException("Failed to execute command: " + err);
             }
-
-            string output = svn.StandardOutput.ReadToEnd();
-            Console.WriteLine(output);
-            return output;
+            return output.ToString();
         }
 
-        private static Process ExecuteInternal(string command)
+        private static void ExecuteInternal(string command, Action<Process> process)
         {
             Console.WriteLine("svn " + command);
             ProcessStartInfo psi = new ProcessStartInfo("svn", command);
@@ -131,8 +151,8 @@ namespace TestsEndToEnd
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
             Process svn = Process.Start(psi);
-            svn.WaitForExit(1000);
-            return svn;
+            process(svn);
+            svn.WaitForExit();
         }
     }
 }

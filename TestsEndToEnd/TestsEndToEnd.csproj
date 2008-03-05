@@ -38,6 +38,7 @@
     <Compile Include="EndToEndTestBase.cs" />
     <Compile Include="IntegrationsTests.cs" />
     <Compile Include="ListItemTest.cs" />
+    <Compile Include="LoadTest.cs" />
     <Compile Include="LogTest.cs" />
     <Compile Include="PropertiesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
