@@ -9,7 +9,7 @@
 		<Update xmlns="http://schemas.microsoft.com/TeamFoundation/2005/06/WorkItemTracking/ClientServices/03">
 			<package>
 				<Package Product="http://codeplex-tfs3:8080/WorkItemTracking/v1.0/ClientService.asmx" xmlns="">
-					<UpdateWorkItem WorkItemID="{WorkItemId}" Revision="1" ObjectType="WorkItem">
+					<UpdateWorkItem WorkItemID="{WorkItemId}" Revision="{RevisionId}" ObjectType="WorkItem">
 						<ComputedColumns>
 							<ComputedColumn Column="System.RevisedDate" />
 							<ComputedColumn Column="System.ChangedDate" />
