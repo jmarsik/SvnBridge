@@ -52,7 +52,6 @@ namespace SvnBridge.Infrastructure
             request.ContentType =
                 "application/soap+xml; charset=utf-8; action=\"http://schemas.microsoft.com/TeamFoundation/2005/06/WorkItemTracking/ClientServices/03/Update\"";
 
-            request.Credentials = credentials;
             request.Method = "POST";
             using (Stream stream = request.GetRequestStream())
             {
@@ -89,7 +88,6 @@ namespace SvnBridge.Infrastructure
             request.ContentType =
                    "application/soap+xml; charset=utf-8; action=\"http://schemas.microsoft.com/TeamFoundation/2005/06/WorkItemTracking/ClientServices/03/GetWorkItem\"";
 
-            request.Credentials = CredentialCache.DefaultNetworkCredentials;
             request.Method = "POST";
             using (Stream stream = request.GetRequestStream())
             {
@@ -127,6 +125,7 @@ namespace SvnBridge.Infrastructure
             HttpWebRequest request =
                 (HttpWebRequest)
                 WebRequest.Create(serverUrl + "/WorkItemTracking/v1.0/ClientService.asmx");
+            request.Credentials = credentials;
             request.UserAgent = "Team Foundation (SvnBridge)";
             request.Headers.Add("X-TFS-Version", "1.0.0.0");
             return request;
