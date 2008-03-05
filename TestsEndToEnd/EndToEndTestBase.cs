@@ -17,8 +17,8 @@ namespace TestsEndToEnd
         public override void SetUp()
         {
             base.SetUp();
-            int port = new Random().Next(1024, short.MaxValue);
-            testUrl = "http://localhost:"+ port+ "/SvnBridgeTesting" + testPath;
+            port = new Random().Next(1024, short.MaxValue);
+            testUrl = "http://localhost:"+ this.port+ "/SvnBridgeTesting" + testPath;
 
             new BootStrapper().Start();
 
@@ -29,7 +29,7 @@ namespace TestsEndToEnd
             listener = ListenerFactory.Create();
             listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
             listener.TfsUrl = "http://codeplex-tfs3:8080";
-            listener.Port = port;
+            listener.Port = this.port;
             listener.Start();
         }
 
@@ -59,6 +59,7 @@ namespace TestsEndToEnd
         protected IListener listener;
         private string checkoutFolder;
         protected string testUrl;
+        protected int port;
 
         private static void ForAllFilesInCurrentDirectory(Action<FileInfo> action)
         {

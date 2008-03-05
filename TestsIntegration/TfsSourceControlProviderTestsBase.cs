@@ -38,7 +38,8 @@ namespace Tests
                                                      new ProjectInformationRepository(new NullCache(),
                                                                                       tfsSourceControlService,
                                                                                       ServerUrl),
-                                                                                      new AssociateWorkItemWithChangeSet(ServerUrl, null));
+                                                                                      new AssociateWorkItemWithChangeSet(ServerUrl, null),
+                                                                                      new ConsoleLogger());
             testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, testPath);

@@ -55,8 +55,10 @@
     <Compile Include="Infrastructure\CircuitTrippedException.cs" />
     <Compile Include="Infrastructure\Clock.cs" />
     <Compile Include="Infrastructure\CachingItemMetaDataRepository.cs" />
+    <Compile Include="Infrastructure\ConsoleLogger.cs" />
     <Compile Include="Infrastructure\Container.cs" />
     <Compile Include="Infrastructure\IAssociateWorkItemWithChangeset.cs" />
+    <Compile Include="Infrastructure\ILogger.cs" />
     <Compile Include="Infrastructure\IoC.cs" />
     <Compile Include="Cache\WebCache.cs" />
     <Compile Include="Interfaces\ICache.cs" />

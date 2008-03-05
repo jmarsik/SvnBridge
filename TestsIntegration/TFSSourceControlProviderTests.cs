@@ -42,7 +42,8 @@ namespace Tests
                                                                                  new NullCache(),
                                                                                  tfsSourceControlService,
                                                                                  ServerUrl),
-                                                                                 new AssociateWorkItemWithChangeSet(ServerUrl, null));
+                                                                                 new AssociateWorkItemWithChangeSet(ServerUrl, null),
+                                                                                 new ConsoleLogger());
         }
 
         [Test]

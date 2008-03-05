@@ -23,6 +23,7 @@ namespace SvnBridge.SourceControl
         private readonly string projectName;
         private readonly string rootPath;
         private readonly string serverUrl;
+        private readonly ILogger logger;
         private readonly ITFSSourceControlService sourceControlService;
         private readonly IWebTransferService webTransferService;
         private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
@@ -34,9 +35,10 @@ namespace SvnBridge.SourceControl
             IWebTransferService webTransferService,
             ITFSSourceControlService sourceControlService,
             IProjectInformationRepository projectInformationRepository,
-            IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet)
+            IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger)
         {
             this.webTransferService = webTransferService;
+            this.logger = logger;
             this.sourceControlService = sourceControlService;
             this.associateWorkItemWithChangeSet = associateWorkItemWithChangeSet;
 
@@ -404,9 +406,26 @@ namespace SvnBridge.SourceControl
                     int id;
                     if(int.TryParse(workItemId, out id)==false)
                         continue;
-                    associateWorkItemWithChangeSet.Associate(id, changesetId);
+                    try
+                    {
+                        associateWorkItemWithChangeSet.Associate(id, changesetId);
+                    }
+                    catch (Exception e)
+                    {
+                        // we can't realy raise an error here, because 
+                        // we would fail the commit from the client side, while the changes
+                        // were already committed to the SCM.
+                        // since we consider associating with work items nice but not essential,
+                        // we will log the error and ignore it.
+                        LogError("Failed to associate work item with changeset", e);
+                    }
                 }
             }
+        }
+
+        private void LogError(string message, Exception exception)
+        {
+            logger.Error(message, exception);
         }
 
         public byte[] ReadFile(ItemMetaData item)

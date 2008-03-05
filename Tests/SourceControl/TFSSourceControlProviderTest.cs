@@ -25,7 +25,8 @@ namespace SvnBridge.SourceControl
                 mocks.Stub<IWebTransferService>(),
                 mocks.Stub<ITFSSourceControlService>(),
                 mocks.Stub<IProjectInformationRepository>(),
-                associateWorkItemWithChangeSet
+                associateWorkItemWithChangeSet,
+                new ConsoleLogger()
                 );
         }
 

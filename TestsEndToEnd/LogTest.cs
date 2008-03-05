@@ -9,7 +9,7 @@ namespace TestsEndToEnd
         public void CanAskForLogOfItemThatDoesNotExists()
         {
             string command = ExecuteCommandAndGetError("log " + testUrl + " --revision 1");
-            Assert.AreEqual("svn: Unable to find repository location for 'http://localhost:9090/SvnBridgeTesting" +
+            Assert.AreEqual("svn: Unable to find repository location for 'http://localhost:" + port + "/SvnBridgeTesting" +
                             testPath
                             + "' in revision 1\r\n",
                             command);
