@@ -15,7 +15,7 @@ namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
     {
-        private static readonly Regex associatedWorkItems = new Regex(@"Work ?Items?:? (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex associatedWorkItems = new Regex(@"Work ?Items?: (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
 
         private readonly ISourceControlUtility sourceControlHelper;
         private static readonly Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();

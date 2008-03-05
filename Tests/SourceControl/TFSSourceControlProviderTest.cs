@@ -76,5 +76,21 @@ Work Items: 15, 16
 Work Item: 17";
             provider.AssociateWorkItemsWithChangeSet(comment, 15); 
         }
+
+        [Test]
+        public void WillRecognizeWorkItemsIfWorkItemAppearsPreviouslyInText()
+        {
+            associateWorkItemWithChangeSet.Associate(15, 15);
+            associateWorkItemWithChangeSet.Associate(16, 15);
+            associateWorkItemWithChangeSet.Associate(17, 15);
+            associateWorkItemWithChangeSet.Associate(81, 15);
+            mocks.ReplayAll();
+            string comment = @"Adding work items support and fixing
+other issues with workitems
+Solved Work Items: 15, 16
+Fixed WorkItem: 17
+Assoicate with workitem: 81";
+            provider.AssociateWorkItemsWithChangeSet(comment, 15); 
+        }
     }
 }

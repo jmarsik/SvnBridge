@@ -1,17 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?><ItemProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Properties><Property><Name>ignore</Name><Value>*.suo
-_ReSharper.SvnBridge
-SvnBridge.resharper
-SvnBridge.resharper.user
-3rdParty
-BuildResults.xml
-TestsProtocol.results.xml
-TestsUnit.results.xml
-</Value></Property><Property><Name>ignore</Name><Value>*.suo
-_ReSharper.SvnBridge
-SvnBridge.resharper
-SvnBridge.resharper.user
-3rdParty
-BuildResults.xml
-TestsProtocol.results.xml
-TestsUnit.results.xml
+﻿<?xml version="1.0" encoding="utf-8"?><ItemProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Properties><Property><Name>ignore</Name><Value>_ReSharper.SvnBridge
+SvnBridge.suo
+</Value></Property><Property><Name>ignore</Name><Value>_ReSharper.SvnBridge
+SvnBridge.suo
 </Value></Property><Property><Name>bugtraq__COLON__label</Name><Value>Work Item:</Value></Property></Properties></ItemProperties>

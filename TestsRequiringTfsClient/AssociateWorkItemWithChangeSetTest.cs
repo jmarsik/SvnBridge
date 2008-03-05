@@ -53,5 +53,25 @@ namespace TestsRequiringTfsClient
             Assert.AreEqual("Fixed", item.State);
             Assert.AreEqual("Fixed", item.Reason);
         }
+
+        [Test]
+        public void CanAssociateWithWorkItemAfterWorkItemHasBeenModified()
+        {
+            IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
+               new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialCache.DefaultCredentials);
+
+            WorkItem item = store.GetWorkItem(workItemId);
+            item.History = "test foo";
+            item.Save();
+
+            Assert.AreEqual(2, item.Revision);
+
+            associateWorkItemWithChangeSet.Associate(workItemId, changesetId);
+
+            item = store.GetWorkItem(workItemId);
+
+            Assert.AreEqual("Fixed", item.State);
+            Assert.AreEqual("Fixed", item.Reason);
+        }
     }
 }
