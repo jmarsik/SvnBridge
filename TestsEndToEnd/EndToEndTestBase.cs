@@ -51,7 +51,7 @@ namespace TestsEndToEnd
 
             Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
 
-            Directory.Delete(checkoutFolder, true);
+            //Directory.Delete(checkoutFolder, true);
         }
 
         #endregion

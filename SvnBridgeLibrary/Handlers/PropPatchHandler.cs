@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using System.Xml;
 using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
@@ -63,22 +64,28 @@ namespace SvnBridge.Handlers
                     break;
                 default:
                     string itemPath = Helper.Decode(activityPath.Substring(activityPath.IndexOf('/')));
-                    string propertyName = request.Set.Prop.Properties[0].LocalName;
-                    if (request.Set.Prop.Properties[0].NamespaceURI == WebDav.Namespaces.TIGRISSVN)
-                        propertyName = "svn:" + propertyName;
-                    sourceControlProvider.SetProperty(activityId,
-                                                      itemPath,
-                                                      propertyName,
-                                                      request.Set.Prop.Properties[0].InnerText);
+                    foreach (XmlElement prop in request.Set.Prop.Properties)
+                    {
+                        string propertyName = prop.LocalName;
+                        if (prop.NamespaceURI == WebDav.Namespaces.TIGRISSVN)
+                            propertyName = "svn:" + propertyName;
+                        sourceControlProvider.SetProperty(activityId,
+                                                          itemPath,
+                                                          propertyName,
+                                                          prop.InnerText);
+                    }
                     output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
                     output.Write(
                         "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns3=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns2=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
                     output.Write("<D:response>\n");
                     output.Write("<D:href>/" + Helper.Encode(path) + "</D:href>\n");
                     output.Write("<D:propstat>\n");
-                    output.Write("<D:prop>\n");
-                    output.Write("<ns1:" + request.Set.Prop.Properties[0].LocalName + "/>\r\n");
-                    output.Write("</D:prop>\n");
+                    foreach (XmlElement element in request.Set.Prop.Properties)
+                    {
+                        output.Write("<D:prop>\n");
+                        output.Write("<ns1:" + element.LocalName + "/>\r\n");
+                        output.Write("</D:prop>\n");
+                    }
                     output.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");
                     output.Write("</D:propstat>\n");
                     output.Write("</D:response>\n");
