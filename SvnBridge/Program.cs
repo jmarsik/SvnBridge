@@ -104,7 +104,7 @@ namespace SvnBridge
 
         private static void Run(string tfsUrl, int port, ProxyInformation proxyInformation)
         {
-            ListenerFactory.SetProxy(proxyInformation);
+            Proxy.Set(proxyInformation);
             IListener listener = ListenerFactory.Create();
 
             listener.TfsUrl = tfsUrl;

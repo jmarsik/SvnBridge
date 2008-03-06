@@ -96,7 +96,7 @@ namespace SvnBridge.Utility
             {
                 WebRequest request = WebRequest.Create(url + "/Services/v1.0/Registration.asmx");
                 request.Credentials = CredentialCache.DefaultNetworkCredentials;
-                request.Proxy = ListenerFactory.CreateProxy(proxyInformation);
+                request.Proxy = CreateProxy(proxyInformation);
                 if(proxyInformation.UseProxy)
                 {
                     
@@ -256,6 +256,24 @@ namespace SvnBridge.Utility
         {
             string result = date.ToUniversalTime().ToString("o");
             return result.Remove(result.Length - 2, 1);
+        }
+
+        public static IWebProxy CreateProxy(ProxyInformation proxyInformation)
+        {
+            if (proxyInformation.UseProxy == false)
+                return null;
+            IWebProxy proxy = new WebProxy(proxyInformation.Url, proxyInformation.Port);
+            ICredentials credential;
+            if (proxyInformation.UseDefaultCredentails)
+            {
+                credential = CredentialCache.DefaultNetworkCredentials;
+            }
+            else
+            {
+                credential = new NetworkCredential(proxyInformation.Username, proxyInformation.Password);
+            }
+            proxy.Credentials = credential;
+            return proxy;
         }
     }
 }
