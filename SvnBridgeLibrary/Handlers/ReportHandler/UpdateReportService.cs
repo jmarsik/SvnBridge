@@ -11,7 +11,7 @@ namespace SvnBridge.Handlers
 {
     public class UpdateReportService
     {
-        private ISourceControlProvider sourceControlProvider;
+        private readonly ISourceControlProvider sourceControlProvider;
 
         public UpdateReportService(ISourceControlProvider sourceControlProvider)
         {
@@ -29,7 +29,8 @@ namespace SvnBridge.Handlers
             else
             {
                 bool existingFile = false;
-                if (!updateReportRequest.Entries[0].StartEmpty &&
+                if (!updateReportRequest.IsCheckOut &&
+                    updateReportRequest.IsMissing(item.Name) == false &&
                     sourceControlProvider.ItemExists(item.Name, int.Parse(updateReportRequest.Entries[0].Rev)))
                 {
                     existingFile = true;
@@ -55,7 +56,8 @@ namespace SvnBridge.Handlers
                 output.Write("<S:set-prop name=\"svn:entry:uuid\">" + Constants.RepositoryUuid + "</S:set-prop>\n");
                 foreach (KeyValuePair<string, string> property in item.Properties)
                 {
-                    output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" + property.Value + "</S:set-prop>\n");
+                    output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" + property.Value +
+                                 "</S:set-prop>\n");
                 }
 
                 while (!item.DataLoaded)
@@ -105,7 +107,8 @@ namespace SvnBridge.Handlers
                 }
                 else
                 {
-                    if (!updateReportRequest.Entries[0].StartEmpty &&
+                    if (!updateReportRequest.IsCheckOut &&
+                        updateReportRequest.IsMissing(folder.Name) == false &&
                         sourceControlProvider.ItemExists(folder.Name, int.Parse(updateReportRequest.Entries[0].Rev)))
                     {
                         existingFolder = true;
@@ -135,7 +138,8 @@ namespace SvnBridge.Handlers
                     output.Write("<S:set-prop name=\"svn:entry:uuid\">" + Constants.RepositoryUuid + "</S:set-prop>\n");
                     foreach (KeyValuePair<string, string> property in folder.Properties)
                     {
-                        output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" + property.Value +
+                        output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" +
+                                     property.Value +
                                      "</S:set-prop>\n");
                     }
                 }

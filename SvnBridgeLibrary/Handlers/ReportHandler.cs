@@ -139,9 +139,9 @@ namespace SvnBridge.Handlers
                 targetRevision = sourceControlProvider.GetLatestVersion();
             }
 
-            if (updatereport.Entries[0].StartEmpty)
+            if (updatereport.IsCheckOut)
             {
-                metadata = (FolderMetaData) sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
+                metadata = (FolderMetaData)sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
             }
             else
             {
@@ -212,7 +212,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
+                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
@@ -221,7 +221,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
+                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");

@@ -15,5 +15,10 @@ namespace SvnBridge.Protocol
         public EntryData()
         {
         }
+
+        public override string ToString()
+        {
+            return path + " #" + Rev;
+        }
     }
 }

@@ -58,7 +58,13 @@ namespace SvnBridge.SourceControl
                     }
                 }
             }
-
+            foreach (string missingItem in clientDeletedFiles.Values)
+            {
+                if (sourceControlProvider.ItemExists(checkoutRootPath +"/" + missingItem, versionTo))
+                {
+                    FindItemOrCreateItem(root, checkoutRootPath, missingItem, versionTo);
+                }
+            }
             FlattenDeletedFolders(root);
         }
 
@@ -72,7 +78,7 @@ namespace SvnBridge.SourceControl
             for (int i = 0; i < parts.Length; i++)
             {
                 itemName += "/" + parts[i];
-                item = sourceControlUtility.FindItem(root, parts[i]);
+                item = sourceControlUtility.FindItem(folder, itemName);
                 bool lastNamePart = i == parts.Length - 1;
                 if (item == null)
                 {

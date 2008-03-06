@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 namespace TestsEndToEnd
@@ -44,6 +45,94 @@ namespace TestsEndToEnd
         }
 
         [Test]
+        public void AfterAnErrorWhenGettingFile_WillBeAbleToUpdateAgain()
+        {
+            CheckoutAndChangeDirectory();
+
+            File.WriteAllText("foo.bar", "blah");
+
+            Svn("add foo.bar");
+            Svn("commit -m blah");
+
+            WriteFile(testPath + "/test.txt", "as", true);
+            File.WriteAllText("test.txt", "hab");
+            ExecuteCommandAndGetError("update");
+            File.Delete("test.txt");
+
+            string svn = Svn("update");
+            Assert.IsTrue(
+                Regex.IsMatch(svn,@"^At revision \d+\.\r\n$")
+                );
+        }
+
+
+        [Test]
+        public void AfterAnErrorWhenGettingFile_WillBeAbleToUpdateAgain_AndGetModifiedFile()
+        {
+            CheckoutAndChangeDirectory();
+
+            File.WriteAllText("foo.bar", "blah");
+
+            Svn("add foo.bar");
+            Svn("commit -m blah");
+
+            WriteFile(testPath + "/test.txt", "as", true);
+            File.WriteAllText("test.txt", "hab");
+            ExecuteCommandAndGetError("update");
+            File.Delete("test.txt");
+
+            WriteFile(testPath + "/foo.bar", "12312", true);
+
+            Svn("update");
+
+            Assert.AreEqual("12312", File.ReadAllText("foo.bar"));
+        }
+
+
+        [Test]
+        public void UpdatingFileWhenItIsMissingInWorkingCopy()
+        {
+            CheckoutAndChangeDirectory();
+
+            File.WriteAllText("foo.bar", "12312");
+
+            Svn("add foo.bar");
+            Svn("commit -m blah");
+
+            Svn("propset blah b .");
+            Svn("commit -m blah");
+
+            Svn("update foo.bar --revision PREV");
+
+            Svn("update");
+
+            Assert.AreEqual("12312", File.ReadAllText("foo.bar"));
+        }
+
+        [Test]
+        public void UpdatingFolderWhenItIsMissingInWorkingCopy()
+        {
+            CheckoutAndChangeDirectory();
+
+            Directory.CreateDirectory("foo");
+
+            Svn("add foo");
+            Svn("commit -m blah");
+
+            Svn("propset blah b .");
+            Svn("commit -m blah");
+
+            Svn("update foo --revision PREV");
+
+            Assert.IsFalse(Directory.Exists("foo"));
+
+            Svn("update");
+
+            Assert.IsTrue(Directory.Exists("foo"));
+        }
+
+
+        [Test]
         public void CanGetLatestChangesWhenMovingBackward()
         {
             CheckoutAndChangeDirectory();
@@ -62,7 +151,7 @@ namespace TestsEndToEnd
             File.WriteAllText("test.txt", "hab123");
             Svn("commit -m blah2");
 
-            int previousVersion = _provider.GetLatestVersion() -1 ;
+            int previousVersion = _provider.GetLatestVersion() - 1;
 
             Svn("update");
 
