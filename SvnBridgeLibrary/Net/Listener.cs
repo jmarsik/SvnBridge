@@ -126,28 +126,25 @@ namespace SvnBridge.Net
                 {
                     dispatcher.Dispatch(connection);
                 }
-                catch (Exception errorMessage)
+                catch (Exception exception)
                 {
                     connection.Response.StatusCode = 500;
                     using (StreamWriter sw = new StreamWriter(connection.Response.OutputStream))
                     {
                         Guid guid = Guid.NewGuid();
 
-                        string error = "Failed to process a request. Failure id: " + guid + Environment.NewLine +
-                                       errorMessage;
-
                         string message = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                                    "<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n" +
-                                   "<C:error>\n" +
-                                   error +
-                                   "</C:error>\n" +
+                                   "<C:error/>\n" +
                                    "<m:human-readable errcode=\"160024\">\n" +
-                                    errorMessage +
+                                    
+                                   ("Failed to process a request. Failure id: " + guid + "\n" + exception) +
+
                                    "</m:human-readable>\n" +
                                    "</D:error>\n";
                         sw.Write(message);
 
-                        LogError(guid, errorMessage);
+                        LogError(guid, exception);
                     }
                     throw;
                 }
