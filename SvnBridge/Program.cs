@@ -113,10 +113,17 @@ namespace SvnBridge
             ToolTrayForm view = new ToolTrayForm();
             ListenerViewPresenter presenter = new ListenerViewPresenter(view, listener);
 
-            presenter.Show();
-            presenter.StartListener();
+            try
+            {
+                presenter.Show();
+                presenter.StartListener();
 
-            Application.Run(view);
+                Application.Run(view);
+            }
+            finally
+            {
+                presenter.StopListener();
+            }
         }
     }
 }
