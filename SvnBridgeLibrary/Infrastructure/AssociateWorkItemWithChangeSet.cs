@@ -57,12 +57,14 @@ namespace SvnBridge.Infrastructure
             {
                 using (StreamWriter sw = new StreamWriter(stream))
                 {
+                    int workItemRevisionId = GetWorkItemRevisionId(workItemId);
                     string text =
                         associateWorkItemWithChangeSetMessage
                             .Replace("{Guid}", Guid.NewGuid().ToString())
                             .Replace("{WorkItemId}", workItemId.ToString())
                             .Replace("{ChangeSetId}", changeSetId.ToString())
-                            .Replace("{RevisionId}", GetWorkItemRevisionId(workItemId).ToString());
+                            .Replace("{RevisionId}", workItemRevisionId.ToString())
+                            .Replace("{ServerUrl}", serverUrl);
 
                     sw.Write(text);
                 }

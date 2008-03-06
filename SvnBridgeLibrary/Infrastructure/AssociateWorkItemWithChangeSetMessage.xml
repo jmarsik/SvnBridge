@@ -8,13 +8,14 @@
 	<soap:Body>
 		<Update xmlns="http://schemas.microsoft.com/TeamFoundation/2005/06/WorkItemTracking/ClientServices/03">
 			<package>
-				<Package Product="http://codeplex-tfs3:8080/WorkItemTracking/v1.0/ClientService.asmx" xmlns="">
+				<Package Product="{ServerUrl}/WorkItemTracking/v1.0/ClientService.asmx" xmlns="">
 					<UpdateWorkItem WorkItemID="{WorkItemId}" Revision="{RevisionId}" ObjectType="WorkItem">
 						<ComputedColumns>
 							<ComputedColumn Column="System.RevisedDate" />
 							<ComputedColumn Column="System.ChangedDate" />
 							<ComputedColumn Column="System.PersonId" />
 							<ComputedColumn Column="Microsoft.VSTS.Common.StateChangeDate" />
+							<ComputedColumn Column="CodePlex.UpdatedBy" />
 						</ComputedColumns>
 						<Columns>
 							<Column Column="System.State">
@@ -25,6 +26,9 @@
 							</Column>
 							<Column Column="Microsoft.VSTS.Common.StateChangeDate" Type="ServerDateTime">
 								<Value />
+							</Column>
+							<Column Column="CodePlex.UpdatedBy">
+								<Value>Ayende_cp</Value>
 							</Column>
 						</Columns>
 						<InsertText FieldName="System.History" FieldDisplayName="History">Fixed on changeset {ChangeSetId}</InsertText>
