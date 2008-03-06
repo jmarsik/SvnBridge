@@ -38,5 +38,51 @@ namespace TestsRequiringTfsClient
             Assert.AreEqual("Fixed", item.State);
             Assert.AreEqual("Fixed", item.Reason);
         }
+
+        [Test]
+        public void AssociateTwoChangesetsWithWorkItem()
+        {
+            CheckoutAndChangeDirectory();
+
+            File.WriteAllText("test.txt", "blah");
+
+            Svn("add test.txt");
+
+            Svn("commit -m \"Done. Work Item: " + workItemId + "\"");
+
+            File.WriteAllText("test.txt", "hlab");
+
+            Svn("commit -m \"Done. Work Item: " + workItemId + "\"");
+
+            WorkItem item = store.GetWorkItem(workItemId);
+            Assert.AreEqual(2, item.Links.Count);
+            Assert.AreEqual("Fixed", item.State);
+            Assert.AreEqual("Fixed", item.Reason);
+        }
+
+        [Test]
+        public void AssociatingSingleCheckInWithMultiplyWorkItems()
+        {
+            int oldWorkItemId = workItemId;
+            AssociateWorkItemWithChangeSetTest.CreateWorkItemAndGetLatestChangeSet(out latestChangeSetId, out workItemId);
+            string workItems = oldWorkItemId  + ", " + workItemId;
+
+            CheckoutAndChangeDirectory();
+
+            File.WriteAllText("test.txt", "blah");
+
+            Svn("add test.txt");
+
+            Svn("commit -m \"Done. Work Item: " + workItems + "\"");
+
+            foreach (int workItem in new int[]{oldWorkItemId, workItemId})
+            {
+                WorkItem item = store.GetWorkItem(workItem);
+                Assert.AreEqual(1, item.Links.Count);
+                Assert.AreEqual("Fixed", item.State);
+                Assert.AreEqual("Fixed", item.Reason);
+            }
+        
+        }
     }
 }

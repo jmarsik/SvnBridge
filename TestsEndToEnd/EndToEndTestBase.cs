@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using SvnBridge;
+using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using Tests;
 
@@ -26,7 +27,7 @@ namespace TestsEndToEnd
 
             Environment.CurrentDirectory = Path.Combine(Path.GetTempPath(), checkoutFolder);
             Console.WriteLine("cd " + checkoutFolder);
-            listener = ListenerFactory.Create();
+            listener = IoC.Resolve<IListener>();
             listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
             listener.TfsUrl = "http://codeplex-tfs3:8080";
             listener.Port = this.port;

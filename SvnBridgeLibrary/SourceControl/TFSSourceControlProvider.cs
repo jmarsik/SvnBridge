@@ -409,12 +409,13 @@ namespace SvnBridge.SourceControl
                     try
                     {
                         associateWorkItemWithChangeSet.Associate(id, changesetId);
+                        associateWorkItemWithChangeSet.SetWorkItemFixed(id);
                     }
                     catch (Exception e)
                     {
                         // we can't realy raise an error here, because 
                         // we would fail the commit from the client side, while the changes
-                        // were already committed to the SCM.
+                        // were already committed to the source control provider.
                         // since we consider associating with work items nice but not essential,
                         // we will log the error and ignore it.
                         LogError("Failed to associate work item with changeset", e);

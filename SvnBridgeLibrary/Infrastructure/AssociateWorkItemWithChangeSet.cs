@@ -19,20 +19,23 @@ namespace SvnBridge.Infrastructure
     {
         private readonly static string associateWorkItemWithChangeSetMessage;
         private readonly static string getWorkItemInformationMessage;
+        private static readonly string setWorkItemStatusToFixedMessage;
 
         private readonly string serverUrl;
         private readonly ICredentials credentials;
+        private readonly string username;
 
 
         public AssociateWorkItemWithChangeSet(string serverUrl, ICredentials credentials)
         {
             this.serverUrl = serverUrl;
             this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
+            username = this.credentials.GetCredential(new Uri(serverUrl), "basic").UserName;
         }
 
         static AssociateWorkItemWithChangeSet()
         {
-            using (Stream stream = typeof (AssociateWorkItemWithChangeSet).Assembly.GetManifestResourceStream(
+            using (Stream stream = typeof(AssociateWorkItemWithChangeSet).Assembly.GetManifestResourceStream(
                 "SvnBridge.Infrastructure.AssociateWorkItemWithChangeSetMessage.xml"))
             {
                 associateWorkItemWithChangeSetMessage = new StreamReader(stream).ReadToEnd();
@@ -43,11 +46,17 @@ namespace SvnBridge.Infrastructure
             {
                 getWorkItemInformationMessage = new StreamReader(stream).ReadToEnd();
             }
+            using (Stream stream = typeof(AssociateWorkItemWithChangeSet).Assembly.GetManifestResourceStream(
+             "SvnBridge.Infrastructure.SetWorkItemStatusToFixedMessage.xml"))
+            {
+                setWorkItemStatusToFixedMessage = new StreamReader(stream).ReadToEnd();
+            }
 
         }
 
         public void Associate(int workItemId, int changeSetId)
         {
+
             HttpWebRequest request = GetWebRequest();
             request.ContentType =
                 "application/soap+xml; charset=utf-8; action=\"http://schemas.microsoft.com/TeamFoundation/2005/06/WorkItemTracking/ClientServices/03/Update\"";
@@ -57,14 +66,15 @@ namespace SvnBridge.Infrastructure
             {
                 using (StreamWriter sw = new StreamWriter(stream))
                 {
-                    int workItemRevisionId = GetWorkItemRevisionId(workItemId);
+                    int workItemRevisionId = GetWorkItemInformation(workItemId).Revision;
                     string text =
                         associateWorkItemWithChangeSetMessage
                             .Replace("{Guid}", Guid.NewGuid().ToString())
                             .Replace("{WorkItemId}", workItemId.ToString())
                             .Replace("{ChangeSetId}", changeSetId.ToString())
                             .Replace("{RevisionId}", workItemRevisionId.ToString())
-                            .Replace("{ServerUrl}", serverUrl);
+                            .Replace("{ServerUrl}", serverUrl)
+                            .Replace("{UserName}", username);
 
                     sw.Write(text);
                 }
@@ -74,17 +84,59 @@ namespace SvnBridge.Infrastructure
                 // we don't care about the response from here
                 request.GetResponse().Close();
             }
-            catch(WebException we)
+            catch (WebException we)
             {
-                using(Stream stream = we.Response.GetResponseStream())
-                using(StreamReader reader = new StreamReader(stream))
+                using (Stream stream = we.Response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
                 {
-                    throw new InvalidOperationException("Failed to associated work item "+ workItemId + " with changeset " + changeSetId + Environment.NewLine + reader.ReadToEnd(), we);
+                    throw new InvalidOperationException("Failed to associated work item " + workItemId + " with changeset " + changeSetId + Environment.NewLine + reader.ReadToEnd(), we);
                 }
             }
         }
 
-        public int GetWorkItemRevisionId(int workItemId)
+        public void SetWorkItemFixed(int workItemId)
+        {
+
+            HttpWebRequest request = GetWebRequest();
+            request.ContentType =
+                "application/soap+xml; charset=utf-8; action=\"http://schemas.microsoft.com/TeamFoundation/2005/06/WorkItemTracking/ClientServices/03/Update\"";
+
+            request.Method = "POST";
+            using (Stream stream = request.GetRequestStream())
+            {
+                using (StreamWriter sw = new StreamWriter(stream))
+                {
+                    WorkItemInformation information = GetWorkItemInformation(workItemId);
+                    if(information.State == "Fixed")
+                        return; // already fixed
+                    int workItemRevisionId = information.Revision;
+                    string text =
+                        setWorkItemStatusToFixedMessage
+                            .Replace("{Guid}", Guid.NewGuid().ToString())
+                            .Replace("{WorkItemId}", workItemId.ToString())
+                            .Replace("{RevisionId}", workItemRevisionId.ToString())
+                            .Replace("{ServerUrl}", serverUrl)
+                            .Replace("{UserName}", username);
+
+                    sw.Write(text);
+                }
+            }
+            try
+            {
+                // we don't care about the response from here
+                request.GetResponse().Close();
+            }
+            catch (WebException we)
+            {
+                using (Stream stream = we.Response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    throw new InvalidOperationException("Failed to set work item " + workItemId + " status to fixed" + Environment.NewLine + reader.ReadToEnd(), we);
+                }
+            }
+        }
+
+        public WorkItemInformation GetWorkItemInformation(int workItemId)
         {
             HttpWebRequest request = GetWebRequest();
             request.ContentType =
@@ -111,15 +163,37 @@ namespace SvnBridge.Infrastructure
                 XmlNamespaceManager nsMgr = new XmlNamespaceManager(xdoc.NameTable);
                 nsMgr.AddNamespace("wi", "http://schemas.microsoft.com/TeamFoundation/2005/06/WorkItemTracking/ClientServices/03");
                 XmlNode node = xdoc.SelectSingleNode("//wi:GetWorkItemResponse/wi:workItem/wi:table[@name='WorkItemInfo']", nsMgr);
-                int indexOfRevision = 0;
-                foreach (XmlNode xmlNode in node.SelectNodes("wi:columns/wi:c/wi:n", nsMgr))
-                {
-                    if (xmlNode.InnerText == "System.Rev")
-                        break;
-                    indexOfRevision += 1;
-                }
-                return int.Parse(node.SelectNodes("wi:rows/wi:r/wi:f", nsMgr)[indexOfRevision].InnerText);
+                int indexOfRevision = GetIndexOfColumn(nsMgr, node, "System.Rev");
+                int indexOfState = GetIndexOfColumn(nsMgr, node, "System.State");
+                XmlNodeList rowNodes = node.SelectNodes("wi:rows/wi:r/wi:f", nsMgr);
+                int revisionId = int.Parse(rowNodes[indexOfRevision].InnerText);
+                string state = rowNodes[indexOfState].InnerText;
+                return new WorkItemInformation(state, revisionId);
             }
+        }
+
+        public class WorkItemInformation
+        {
+            public WorkItemInformation(string state, int revision)
+            {
+                State = state;
+                Revision = revision;
+            }
+
+            public string State;
+            public int Revision;
+        }
+
+        private int GetIndexOfColumn(XmlNamespaceManager nsMgr, XmlNode node, string columnName)
+        {
+            int index = 0;
+            foreach (XmlNode xmlNode in node.SelectNodes("wi:columns/wi:c/wi:n", nsMgr))
+            {
+                if (xmlNode.InnerText == columnName)
+                    break;
+                index += 1;
+            }
+            return index;
         }
 
         private HttpWebRequest GetWebRequest()

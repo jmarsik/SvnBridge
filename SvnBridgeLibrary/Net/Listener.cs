@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Net
 {
@@ -10,32 +11,14 @@ namespace SvnBridge.Net
     {
         private readonly HttpContextDispatcher dispatcher;
         private bool isListening;
+        private readonly ILogger logger;
         private TcpListener listener;
         private int? port;
 
-        public Listener()
-            : this(null, null)
+        public Listener(ILogger logger)
         {
-        }
-
-        public Listener(int port)
-            : this((int?)port, null)
-        {
-        }
-
-        public Listener(int port,
-                        string tfsUrl)
-            : this((int?)port, tfsUrl)
-        {
-        }
-
-        private Listener(int? port,
-                         string tfsUrl)
-        {
-            this.port = port;
-
             dispatcher = new HttpContextDispatcher();
-            dispatcher.TfsUrl = tfsUrl;
+            this.logger = logger;
         }
 
         #region IListener Members
@@ -143,31 +126,35 @@ namespace SvnBridge.Net
                 {
                     dispatcher.Dispatch(connection);
                 }
-                catch (Exception exception)
+                catch (Exception errorMessage)
                 {
                     connection.Response.StatusCode = 500;
                     using (StreamWriter sw = new StreamWriter(connection.Response.OutputStream))
                     {
                         Guid guid = Guid.NewGuid();
 
+                        string error = "Failed to process a request. Failure id: " + guid + Environment.NewLine +
+                                       errorMessage;
+
                         string message = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                                    "<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n" +
-                                   "<C:error/>\n" +
+                                   "<C:error>\n" +
+                                   error +
+                                   "</C:error>\n" +
                                    "<m:human-readable errcode=\"160024\">\n" +
-                                   "Failed to process a request. Failure id: " + guid + Environment.NewLine +
-                                   exception +
+                                    errorMessage +
                                    "</m:human-readable>\n" +
                                    "</D:error>\n";
                         sw.Write(message);
 
-                        LogError(guid, exception);
+                        LogError(guid, errorMessage);
                     }
                     throw;
                 }
                 finally
                 {
                     FlushConnection(connection);
-                    TimeSpan duration = DateTime.Now-start;
+                    TimeSpan duration = DateTime.Now - start;
                     FinishedHandling(this, new FinishedHandlingEventArgs(duration,
                         connection.Request.HttpMethod,
                         connection.Request.Url.AbsoluteUri));
@@ -191,11 +178,9 @@ namespace SvnBridge.Net
             }
         }
 
-        private static void LogError(Guid guid, Exception e)
+        private void LogError(Guid guid, Exception e)
         {
-            EventLog.WriteEntry("SvnBridge",
-                "Error on handling request. Error id: " + guid + Environment.NewLine + e.ToString(),
-                EventLogEntryType.Error);
+            logger.Error("Error on handling request. Error id: " + guid + Environment.NewLine + e.ToString(), e);
         }
 
         private void OnListenException(Exception ex)

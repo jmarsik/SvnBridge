@@ -103,7 +103,6 @@
     <Compile Include="Net\IHttpResponse.cs" />
     <Compile Include="Net\IListener.cs" />
     <Compile Include="Net\Listener.cs" />
-    <Compile Include="Net\ListenerFactory.cs" />
     <Compile Include="Net\ListenerResponseStream.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -189,6 +188,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Infrastructure\GetWorkItemInformationMessage.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Infrastructure\SetWorkItemStatusToFixedMessage.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

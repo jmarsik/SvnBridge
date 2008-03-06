@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using SvnBridge.Presenters;
 using SvnBridge.Properties;
@@ -105,7 +106,7 @@ namespace SvnBridge
         private static void Run(string tfsUrl, int port, ProxyInformation proxyInformation)
         {
             Proxy.Set(proxyInformation);
-            IListener listener = ListenerFactory.Create();
+            IListener listener = IoC.Resolve<IListener>();
 
             listener.TfsUrl = tfsUrl;
             listener.Port = port;

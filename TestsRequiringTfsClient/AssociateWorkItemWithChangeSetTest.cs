@@ -49,7 +49,10 @@ namespace TestsRequiringTfsClient
             IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
                 new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialCache.DefaultCredentials);
             associateWorkItemWithChangeSet.Associate(workItemId, changesetId);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(workItemId);
+
             WorkItem item = store.GetWorkItem(workItemId);
+            Assert.AreEqual(1, item.Links.Count);
             Assert.AreEqual("Fixed", item.State);
             Assert.AreEqual("Fixed", item.Reason);
         }
@@ -67,9 +70,10 @@ namespace TestsRequiringTfsClient
             Assert.AreEqual(2, item.Revision);
 
             associateWorkItemWithChangeSet.Associate(workItemId, changesetId);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(workItemId);
 
             item = store.GetWorkItem(workItemId);
-
+            Assert.AreEqual(1, item.Links.Count);
             Assert.AreEqual("Fixed", item.State);
             Assert.AreEqual("Fixed", item.Reason);
         }

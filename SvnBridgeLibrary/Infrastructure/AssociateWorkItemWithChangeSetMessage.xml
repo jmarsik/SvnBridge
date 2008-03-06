@@ -14,21 +14,11 @@
 							<ComputedColumn Column="System.RevisedDate" />
 							<ComputedColumn Column="System.ChangedDate" />
 							<ComputedColumn Column="System.PersonId" />
-							<ComputedColumn Column="Microsoft.VSTS.Common.StateChangeDate" />
 							<ComputedColumn Column="CodePlex.UpdatedBy" />
 						</ComputedColumns>
 						<Columns>
-							<Column Column="System.State">
-								<Value>Fixed</Value>
-							</Column>
-							<Column Column="System.Reason">
-								<Value>Fixed</Value>
-							</Column>
-							<Column Column="Microsoft.VSTS.Common.StateChangeDate" Type="ServerDateTime">
-								<Value />
-							</Column>
 							<Column Column="CodePlex.UpdatedBy">
-								<Value>Ayende_cp</Value>
+								<Value>{UserName}</Value>
 							</Column>
 						</Columns>
 						<InsertText FieldName="System.History" FieldDisplayName="History">Fixed on changeset {ChangeSetId}</InsertText>

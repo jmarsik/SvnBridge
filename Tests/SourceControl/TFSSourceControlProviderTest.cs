@@ -47,6 +47,7 @@ namespace SvnBridge.SourceControl
         public void WillExtractWorkItemsFromCheckInCommentsAndAssociateWithChangeSet()
         {
             associateWorkItemWithChangeSet.Associate(15,15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
             mocks.ReplayAll();
             string comment = @"blah blah
 Work Item: 15";
@@ -57,8 +58,11 @@ Work Item: 15";
         public void CanAssociateMoreThanOneId()
         {
             associateWorkItemWithChangeSet.Associate(15, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
             associateWorkItemWithChangeSet.Associate(16, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(16);
             associateWorkItemWithChangeSet.Associate(17, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(17);
             mocks.ReplayAll();
             string comment = @"blah blah
 Work Items: 15, 16, 17";
@@ -69,8 +73,11 @@ Work Items: 15, 16, 17";
         public void CanAssociateOnMultiplyLines()
         {
             associateWorkItemWithChangeSet.Associate(15, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
             associateWorkItemWithChangeSet.Associate(16, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(16);
             associateWorkItemWithChangeSet.Associate(17, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(17);
             mocks.ReplayAll();
             string comment = @"blah blah
 Work Items: 15, 16
@@ -81,10 +88,15 @@ Work Item: 17";
         [Test]
         public void WillRecognizeWorkItemsIfWorkItemAppearsPreviouslyInText()
         {
+
             associateWorkItemWithChangeSet.Associate(15, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
             associateWorkItemWithChangeSet.Associate(16, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(16);
             associateWorkItemWithChangeSet.Associate(17, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(17);
             associateWorkItemWithChangeSet.Associate(81, 15);
+            associateWorkItemWithChangeSet.SetWorkItemFixed(81);
             mocks.ReplayAll();
             string comment = @"Adding work items support and fixing
 other issues with workitems
