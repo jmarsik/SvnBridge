@@ -64,7 +64,7 @@ namespace SvnBridge.Net
                     "A TFS server URL must be specified before connections can be dispatched.");
             }
             HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
-
+            handler.ApplicationPath = connection.Request.ApplicationPath;
             if (handler != null)
             {
                 try

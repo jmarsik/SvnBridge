@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using SvnBridge.Handlers;
 
 namespace SvnBridge.Nodes
 {
@@ -17,17 +18,17 @@ namespace SvnBridge.Nodes
 
         #region INode Members
 
-        public string Href()
+        public string Href(HttpContextHandlerBase handler)
         {
-            return path;
+            return handler.ApplicationPath + path;
         }
 
-        public string GetProperty(XmlElement property)
+        public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
         {
             switch (property.LocalName)
             {
                 case "baseline-collection":
-                    return GetBaselineCollection(property);
+                    return GetBaselineCollection(handler);
                 case "version-name":
                     return GetVersionName(property);
                 default:
@@ -37,10 +38,10 @@ namespace SvnBridge.Nodes
 
         #endregion
 
-        private string GetBaselineCollection(XmlElement property)
+        private string GetBaselineCollection(HttpContextHandlerBase handler)
         {
             return
-                "<lp1:baseline-collection><D:href>/!svn/bc/" + version.ToString() +
+                "<lp1:baseline-collection><D:href>"+handler.ApplicationPath+"/!svn/bc/" + version.ToString() +
                 "/</D:href></lp1:baseline-collection>";
         }
 

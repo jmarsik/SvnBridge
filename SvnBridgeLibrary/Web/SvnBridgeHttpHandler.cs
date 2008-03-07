@@ -22,13 +22,20 @@ namespace SvnBridge.Web
 
         public bool IsReusable
         {
-            get { return true; }
+            get { return false; }
         }
 
         public void ProcessRequest(HttpContext context)
         {
-            dispatcher.Dispatch(new HttpContextWrapper(context));
-            context.Response.OutputStream.Close();
+            try
+            {
+                dispatcher.Dispatch(new HttpContextWrapper(context));
+            }
+            finally
+            {
+                context.Response.OutputStream.Dispose();
+            }
+            
         }
 
         #endregion

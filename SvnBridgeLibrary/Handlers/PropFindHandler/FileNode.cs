@@ -1,6 +1,7 @@
 using System;
 using System.Xml;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Handlers;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
@@ -20,7 +21,7 @@ namespace SvnBridge.Nodes
 
         #region INode Members
 
-        public string Href()
+        public string Href(HttpContextHandlerBase handler)
         {
             string href = item.Name;
 
@@ -34,15 +35,15 @@ namespace SvnBridge.Nodes
                 href += "/";
             }
 
-            return Helper.Encode(href);
+            return handler.ApplicationPath + Helper.Encode(href);
         }
 
-        public string GetProperty(XmlElement property)
+        public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
         {
             switch (property.LocalName)
             {
                 case "version-controlled-configuration":
-                    return GetVersionControlledConfiguration();
+                    return GetVersionControlledConfiguration(handler);
                 case "resourcetype":
                     return GetResourceType();
                 case "baseline-relative-path":
@@ -50,7 +51,7 @@ namespace SvnBridge.Nodes
                 case "repository-uuid":
                     return GetRepositoryUUID();
                 case "checked-in":
-                    return GetCheckedIn();
+                    return GetCheckedIn(handler);
                 case "deadprop-count":
                     return "<lp2:deadprop-count>0</lp2:deadprop-count>";
                 case "creator-displayname":
@@ -77,10 +78,10 @@ namespace SvnBridge.Nodes
             return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>";
         }
 
-        private static string GetVersionControlledConfiguration()
+        private static string GetVersionControlledConfiguration(HttpContextHandlerBase handler)
         {
             return
-                "<lp1:version-controlled-configuration><D:href>" + Constants.VccPath +
+                "<lp1:version-controlled-configuration><D:href>" + handler.VccPath +
                 "</D:href></lp1:version-controlled-configuration>";
         }
 
@@ -124,10 +125,10 @@ namespace SvnBridge.Nodes
             return "<lp2:repository-uuid>" + Constants.RepositoryUuid + "</lp2:repository-uuid>";
         }
 
-        private string GetCheckedIn()
+        private string GetCheckedIn(HttpContextHandlerBase handler)
         {
             return
-                "<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true) +
+                "<lp1:checked-in><D:href>" + handler.ApplicationPath + "/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true) +
                 "</D:href></lp1:checked-in>";
         }
 

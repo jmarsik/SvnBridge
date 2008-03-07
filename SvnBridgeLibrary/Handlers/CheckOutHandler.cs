@@ -63,12 +63,12 @@ namespace SvnBridge.Handlers
             switch (path.Split('/')[2])
             {
                 case "bln":
-                    location = "//!svn/wbl/" + activityId + path.Substring(9);
+                    location = ApplicationPath + "//!svn/wbl/" + activityId + path.Substring(9);
                     break;
                 case "ver":
                     string itemPath = path.Substring(path.IndexOf('/', 10));
                     int version = int.Parse(path.Split('/')[3]);
-                    location = "//!svn/wrk/" + activityId + itemPath;
+                    location = ApplicationPath + "//!svn/wrk/" + activityId + itemPath;
                     ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(itemPath), Recursion.None);
                     if (item.Revision > version)
                     {

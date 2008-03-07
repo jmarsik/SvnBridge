@@ -156,7 +156,7 @@ namespace SvnBridge.Handlers
             Thread loadData = new Thread(itemLoaderManager.Start);
             loadData.Start();
 
-            UpdateReportService updateReportService = new UpdateReportService(sourceControlProvider);
+            UpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
 
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write(

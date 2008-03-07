@@ -36,7 +36,7 @@ namespace SvnBridge.Handlers
                 output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
                 output.Write("<D:options-response xmlns:D=\"DAV:\">\n");
                 output.Write(
-                    "<D:activity-collection-set><D:href>/!svn/act/</D:href></D:activity-collection-set></D:options-response>\n");
+                    "<D:activity-collection-set><D:href>" + ApplicationPath + "/!svn/act/</D:href></D:activity-collection-set></D:options-response>\n");
             }
         }
     }

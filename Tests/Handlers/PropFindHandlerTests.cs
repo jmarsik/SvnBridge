@@ -25,7 +25,7 @@ namespace SvnBridge.Handlers
             BcFileNode node = new BcFileNode(1234, item, provider);
 
             string expected = "/!svn/bc/1234/Foo/Bar.txt";
-            Assert.AreEqual(expected, node.Href());
+            Assert.AreEqual(expected, node.Href(handler));
         }
 
         [Test]

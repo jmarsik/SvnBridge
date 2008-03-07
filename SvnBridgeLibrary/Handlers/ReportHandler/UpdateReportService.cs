@@ -11,10 +11,12 @@ namespace SvnBridge.Handlers
 {
     public class UpdateReportService
     {
+        private readonly HttpContextHandlerBase handler;
         private readonly ISourceControlProvider sourceControlProvider;
 
-        public UpdateReportService(ISourceControlProvider sourceControlProvider)
+        public UpdateReportService(HttpContextHandlerBase handler, ISourceControlProvider sourceControlProvider)
         {
+            this.handler = handler;
             this.sourceControlProvider = sourceControlProvider;
         }
 
@@ -46,7 +48,7 @@ namespace SvnBridge.Handlers
                     output.Write("<S:add-file name=\"" + Helper.EncodeB(GetFileName(item.Name)) + "\">\n");
                 }
 
-                output.Write("<D:checked-in><D:href>/!svn/ver/" + item.Revision.ToString() + "/" +
+                output.Write("<D:checked-in><D:href>" + handler.ApplicationPath + "/!svn/ver/" + item.Revision.ToString() + "/" +
                              Helper.Encode(item.Name, true) + "</D:href></D:checked-in>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + item.Revision.ToString() +
                              "</S:set-prop>\n");
@@ -122,13 +124,13 @@ namespace SvnBridge.Handlers
                     else
                     {
                         output.Write("<S:add-directory name=\"" + Helper.EncodeB(GetFileName(folder.Name)) +
-                                     "\" bc-url=\"/!svn/bc/" + folder.Revision + "/" + Helper.Encode(folder.Name, true) +
+                                     "\" bc-url=\"" + handler.ApplicationPath + "/!svn/bc/" + folder.Revision + "/" + Helper.Encode(folder.Name, true) +
                                      "\">\n");
                     }
                 }
                 if (!rootFolder || updateReportRequest.UpdateTarget == null)
                 {
-                    output.Write("<D:checked-in><D:href>/!svn/ver/" + folder.Revision.ToString() + "/" +
+                    output.Write("<D:checked-in><D:href>" + handler.ApplicationPath + "/!svn/ver/" + folder.Revision.ToString() + "/" +
                                  Helper.Encode(folder.Name, true) + "</D:href></D:checked-in>\n");
                     output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + folder.Revision.ToString() +
                                  "</S:set-prop>\n");

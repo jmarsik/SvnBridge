@@ -54,7 +54,7 @@ namespace SvnBridge.Handlers
             output.Write("<D:merge-response xmlns:D=\"DAV:\">\n");
             output.Write("<D:updated-set>\n");
             output.Write("<D:response>\n");
-            output.Write("<D:href>" + Constants.VccPath + "</D:href>\n");
+            output.Write("<D:href>" + VccPath + "</D:href>\n");
             output.Write("<D:propstat><D:prop>\n");
             output.Write("<D:resourcetype><D:baseline/></D:resourcetype>\n");
             output.Write("\n");
@@ -79,7 +79,7 @@ namespace SvnBridge.Handlers
                 {
                     output.Write("<D:resourcetype/>\n");
                 }
-                output.Write("<D:checked-in><D:href>/!svn/ver/" + mergeResponse.Version.ToString() +
+                output.Write("<D:checked-in><D:href>" + ApplicationPath + "/!svn/ver/" + mergeResponse.Version.ToString() +
                              Helper.Encode(item.Path, true) + "</D:href></D:checked-in>\n");
                 output.Write("</D:prop>\n");
                 output.Write("<D:status>HTTP/1.1 200 OK</D:status>\n");

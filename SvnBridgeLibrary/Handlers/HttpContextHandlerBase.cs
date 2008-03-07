@@ -9,6 +9,8 @@ namespace SvnBridge.Handlers
 {
     public abstract class HttpContextHandlerBase
     {
+        private string applicationPath;
+
         public void Handle(IHttpContext context,
                            string tfsUrl)
         {
@@ -36,7 +38,7 @@ namespace SvnBridge.Handlers
             string authorizationHeader = context.Request.Headers["Authorization"];
             if (!string.IsNullOrEmpty(authorizationHeader))
             {
-                if(authorizationHeader.StartsWith("Negotiate"))
+                if (authorizationHeader.StartsWith("Negotiate"))
                 {
                     return (NetworkCredential)CredentialCache.DefaultCredentials;
                 }
@@ -86,6 +88,27 @@ namespace SvnBridge.Handlers
         protected static string GetPath(IHttpRequest request)
         {
             return request.LocalPath;
+        }
+
+        public string ApplicationPath
+        {
+            get { return applicationPath; }
+            set
+            {
+                applicationPath = value;
+                if(applicationPath.EndsWith("/"))
+                {
+                    applicationPath = applicationPath.Substring(0, applicationPath.Length - 1);
+                }
+            }
+        }
+
+        public string VccPath
+        {
+            get
+            {
+                return ApplicationPath + Constants.SvnVccPath;
+            }
         }
     }
 }

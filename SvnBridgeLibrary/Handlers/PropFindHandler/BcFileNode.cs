@@ -1,5 +1,6 @@
 using System.Xml;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Handlers;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
@@ -22,7 +23,7 @@ namespace SvnBridge.Nodes
 
         #region INode Members
 
-        public string Href()
+        public string Href(HttpContextHandlerBase handler)
         {
             string path = item.Name;
 
@@ -38,12 +39,12 @@ namespace SvnBridge.Nodes
                 href += "/";
             }
 
-            return Helper.Encode(href);
+            return handler.ApplicationPath + Helper.Encode(href);
         }
 
-        public string GetProperty(XmlElement property)
+        public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
         {
-            return node.GetProperty(property);
+            return node.GetProperty(handler, property);
         }
 
         #endregion

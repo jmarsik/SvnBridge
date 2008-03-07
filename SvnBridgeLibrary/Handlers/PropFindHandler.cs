@@ -115,7 +115,7 @@ namespace SvnBridge.Handlers
             return sourceControlProvider.GetItems(version, Helper.Decode(path), recursion);
         }
 
-        private static void HandleAllProp(ISourceControlProvider sourceControlProvider,
+        private void HandleAllProp(ISourceControlProvider sourceControlProvider,
                                           string requestPath,
                                           Stream outputStream)
         {
@@ -142,7 +142,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteAllPropForFolder(TextWriter writer,
+        private void WriteAllPropForFolder(TextWriter writer,
                                                   string requestPath,
                                                   ItemMetaData item)
         {
@@ -158,9 +158,9 @@ namespace SvnBridge.Handlers
                          "</lp1:creationdate>\n");
             writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
                          "</lp1:getlastmodified>\n");
-            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
+            writer.Write("<lp1:checked-in><D:href>"+ApplicationPath+"/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
                          "</D:href></lp1:checked-in>\n");
-            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath +
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
                          "</D:href></lp1:version-controlled-configuration>\n");
             writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
             writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
@@ -176,7 +176,7 @@ namespace SvnBridge.Handlers
             writer.Write("</D:multistatus>\n");
         }
 
-        private static void WriteAllPropForItem(TextWriter writer,
+        private void WriteAllPropForItem(TextWriter writer,
                                                 string requestPath,
                                                 ItemMetaData item,
                                                 byte[] itemData)
@@ -193,9 +193,9 @@ namespace SvnBridge.Handlers
                          "</lp1:creationdate>\n");
             writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
                          "</lp1:getlastmodified>\n");
-            writer.Write("<lp1:checked-in><D:href>/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
+            writer.Write("<lp1:checked-in><D:href>" + ApplicationPath + "/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
                          "</D:href></lp1:checked-in>\n");
-            writer.Write("<lp1:version-controlled-configuration><D:href>" + Constants.VccPath +
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
                          "</D:href></lp1:version-controlled-configuration>\n");
             writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
             writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
@@ -218,7 +218,7 @@ namespace SvnBridge.Handlers
             writer.Write("</D:multistatus>\n");
         }
 
-        private static void HandleProp(
+        private void HandleProp(
             ISourceControlProvider sourceControlProvider,
             string requestPath,
             string depthHeader,
@@ -226,7 +226,7 @@ namespace SvnBridge.Handlers
             PropData data,
             Stream outputStream)
         {
-            if (requestPath == "/!svn/vcc/default")
+            if (requestPath == Constants.SvnVccPath)
             {
                 WriteVccResponse(sourceControlProvider, requestPath, labelHeader, data, outputStream);
             }
@@ -244,7 +244,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteVccResponse(ISourceControlProvider sourceControlProvider,
+        private void WriteVccResponse(ISourceControlProvider sourceControlProvider,
                                              string requestPath,
                                              string label,
                                              PropData data,
@@ -261,7 +261,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteBlnResponse(string requestPath,
+        private void WriteBlnResponse(string requestPath,
                                              PropData data,
                                              Stream outputStream)
         {
@@ -276,7 +276,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteBcResponse(ISourceControlProvider sourceControlProvider,
+        private void WriteBcResponse(ISourceControlProvider sourceControlProvider,
                                             string requestPath,
                                             string depthHeader,
                                             PropData data,
@@ -317,7 +317,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WritePathResponse(ISourceControlProvider sourceControlProvider,
+        private void WritePathResponse(ISourceControlProvider sourceControlProvider,
                                               string requestPath,
                                               string depth,
                                               PropData data,
@@ -361,14 +361,14 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteProperties(INode node,
+        private void WriteProperties(INode node,
                                             IEnumerable<XmlElement> properties,
                                             TextWriter output)
         {
             WriteProperties(node, properties, output, false);
         }
 
-        private static void WriteProperties(INode node,
+        private void WriteProperties(INode node,
                                             IEnumerable<XmlElement> properties,
                                             TextWriter output,
                                             bool isFolder)
@@ -381,7 +381,7 @@ namespace SvnBridge.Handlers
                 output.Write(" xmlns:g0=\"DAV:\"");
             }
             output.Write(">\n");
-            output.Write("<D:href>" + node.Href() + "</D:href>\n");
+            output.Write("<D:href>" + node.Href(this) + "</D:href>\n");
 
             XmlDocument doc = new XmlDocument();
             List<string> propertyResults = new List<string>();
@@ -391,7 +391,7 @@ namespace SvnBridge.Handlers
                 XmlElement property = doc.CreateElement(prop.LocalName, prop.NamespaceURI);
                 if (!(isFolder && prop.LocalName == "getcontentlength"))
                 {
-                    propertyResults.Add(node.GetProperty(property));
+                    propertyResults.Add(node.GetProperty(this, property));
                 }
             }
 
