@@ -5,6 +5,8 @@ using System.Threading;
 using System.Xml;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
@@ -14,11 +16,12 @@ namespace SvnBridge.Handlers
 {
     public class ReportHandler : HttpContextHandlerBase
     {
-        private ItemLoaderManager itemLoaderManager;
+        private IItemLoaderManager itemLoaderManager;
 
         public override void Cancel()
         {
-            itemLoaderManager.Cancel();
+            if (itemLoaderManager != null)
+                itemLoaderManager.Cancel();
         }
 
         protected override void Handle(IHttpContext context,
@@ -48,7 +51,7 @@ namespace SvnBridge.Handlers
                     response.BufferOutput = false;
                     using (StreamWriter output = new StreamWriter(response.OutputStream))
                     {
-                        UpdateReport(request,sourceControlProvider, data, output);
+                        UpdateReport(request, sourceControlProvider, data, output);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "log-report")
@@ -79,14 +82,14 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void GetLocksReport(StreamWriter writer)
+        private static void GetLocksReport(StreamWriter writer)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<S:get-locks-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
             writer.Write("</S:get-locks-report>\n");
         }
 
-        private void GetLocationsReport(ISourceControlProvider sourceControlProvider,
+        private static void GetLocationsReport(ISourceControlProvider sourceControlProvider,
                                         GetLocationsReportData getLocationsReport,
                                         string path,
                                         StreamWriter output)
@@ -130,7 +133,7 @@ namespace SvnBridge.Handlers
             }
 
             string basePath = "/" + srcPathUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
-            if(basePath.StartsWith(request.ApplicationPath))
+            if (basePath.StartsWith(request.ApplicationPath))
             {
                 basePath = basePath.Substring(request.ApplicationPath.Length);
                 if (basePath.Length == 0)
@@ -149,7 +152,7 @@ namespace SvnBridge.Handlers
 
             if (updatereport.IsCheckOut)
             {
-                metadata = (FolderMetaData) sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
+                metadata = (FolderMetaData)sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
             }
             else
             {
@@ -161,10 +164,12 @@ namespace SvnBridge.Handlers
             }
 
             itemLoaderManager = new ItemLoaderManager(metadata, sourceControlProvider);
-            Thread loadData = new Thread(itemLoaderManager.Start);
-            loadData.Start();
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                itemLoaderManager.Start();
+            });
 
-            UpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
+            IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
 
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write(
@@ -220,7 +225,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
+                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
@@ -229,7 +234,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
+                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");

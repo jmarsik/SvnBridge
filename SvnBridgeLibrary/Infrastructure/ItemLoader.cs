@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using SvnBridge.SourceControl;
 
-namespace SvnBridge.Handlers
+namespace SvnBridge.Infrastructure
 {
     public class ItemLoader
     {
         private bool _cancel = false;
-        private Queue<ItemMetaData> _itemQueue;
-        private ISourceControlProvider _sourceControlProvider;
+        private readonly Queue<ItemMetaData> _itemQueue;
+        private readonly ISourceControlProvider _sourceControlProvider;
 
         public ItemLoader(Queue<ItemMetaData> itemQueue,
                           ISourceControlProvider sourceControlProvider)

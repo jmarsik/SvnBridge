@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using SvnBridge.Handlers;
+using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 
 namespace Tests

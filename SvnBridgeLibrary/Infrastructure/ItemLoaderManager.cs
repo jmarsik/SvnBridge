@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Threading;
 using CodePlex.TfsLibrary;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 
-namespace SvnBridge.Handlers
+namespace SvnBridge.Infrastructure
 {
-    public class ItemLoaderManager
+    public class ItemLoaderManager : IItemLoaderManager
     {
         private const int INITIAL_LOADING_THREADS = 2;
         private const int MAX_LOADING_THREADS = 20;
 
         private bool _cancel = false;
-        private FolderMetaData _folderInfo;
-        private List<ItemLoader> _itemLoaders = new List<ItemLoader>();
-        private Queue<ItemMetaData> _loadingQueue = new Queue<ItemMetaData>();
-        private List<Thread> _loadingThreads = new List<Thread>();
-        private ISourceControlProvider _sourceControlProvider;
+        private readonly FolderMetaData _folderInfo;
+        private readonly List<ItemLoader> _itemLoaders = new List<ItemLoader>();
+        private readonly Queue<ItemMetaData> _loadingQueue = new Queue<ItemMetaData>();
+        private readonly List<Thread> _loadingThreads = new List<Thread>();
+        private readonly ISourceControlProvider _sourceControlProvider;
 
         public ItemLoaderManager(FolderMetaData folderInfo,
                                  ISourceControlProvider sourceControlProvider)
