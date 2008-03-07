@@ -4,6 +4,7 @@ using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using NUnit.Framework;
 using SvnBridge.Infrastructure;
+using SvnBridge.SourceControl;
 using TestsRequiringTfsClient.Properties;
 
 namespace TestsRequiringTfsClient
@@ -14,13 +15,22 @@ namespace TestsRequiringTfsClient
         private int workItemId;
         private int changesetId;
         private WorkItemStore store;
+        private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 
         [SetUp]
-        public void TestInitialize()
+        public void SetUp()
         {
+            authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
+
             TeamFoundationServer server = TeamFoundationServerFactory.GetServer(Settings.Default.ServerUrl);
             store = (WorkItemStore)server.GetService(typeof(WorkItemStore));
             CreateWorkItemAndGetLatestChangeSet(out changesetId, out workItemId);
+        }
+
+        [TearDown]
+        public void TestCleanup()
+        {
+            authenticateAsLowPrivilegeUser.Dispose();
         }
 
         public static void CreateWorkItemAndGetLatestChangeSet(out int latestChangeSetId, out int workItemId)
@@ -47,7 +57,7 @@ namespace TestsRequiringTfsClient
         public void CanAssociateWorkItemWithChangeSet()
         {
             IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
-                new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialCache.DefaultCredentials);
+                new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialsHelper.DefaultCredentials);
             associateWorkItemWithChangeSet.Associate(workItemId, changesetId);
             associateWorkItemWithChangeSet.SetWorkItemFixed(workItemId);
 
@@ -61,7 +71,7 @@ namespace TestsRequiringTfsClient
         public void CanAssociateWithWorkItemAfterWorkItemHasBeenModified()
         {
             IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
-               new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialCache.DefaultCredentials);
+               new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialsHelper.DefaultCredentials);
 
             WorkItem item = store.GetWorkItem(workItemId);
             item.History = "test foo";

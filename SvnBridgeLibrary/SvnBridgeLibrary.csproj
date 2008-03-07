@@ -48,6 +48,7 @@
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
+    <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
     <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />
     <Compile Include="Infrastructure\BrokenXml.cs" />

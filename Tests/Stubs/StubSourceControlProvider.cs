@@ -114,6 +114,11 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
+        public string ServerUrl
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public virtual void CopyItem(string activityId,
                                      string path,
                                      string targetPath)

@@ -20,7 +20,11 @@ namespace SvnBridge.Net
             ParseRequest(stream);
         }
 
-        #region IHttpRequest Members
+
+        public string ApplicationPath
+        {
+            get { return "/"; }
+        }
 
         public NameValueCollection Headers
         {
@@ -50,7 +54,13 @@ namespace SvnBridge.Net
             }
         }
 
-        #endregion
+        public string LocalPath
+        {
+            get
+            {
+                return Url.LocalPath;
+            }
+        }
 
         private void BuildUrl()
         {

@@ -15,7 +15,10 @@ namespace SvnBridge.Web
             this.request = request;
         }
 
-        #region IHttpRequest Members
+        public string ApplicationPath
+        {
+            get { return request.ApplicationPath; }
+        }
 
         public NameValueCollection Headers
         {
@@ -37,6 +40,12 @@ namespace SvnBridge.Web
             get { return request.Url; }
         }
 
-        #endregion
+        public string LocalPath
+        {
+            get
+            {
+                return request.AppRelativeCurrentExecutionFilePath.Substring(1);//remove ~
+            }
+        }
     }
 }

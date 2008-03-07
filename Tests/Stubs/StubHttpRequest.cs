@@ -36,7 +36,10 @@ namespace SvnBridge.Stubs
             }
         }
 
-        #region IHttpRequest Members
+        public string ApplicationPath
+        {
+            get { return "/"; }
+        }
 
         public NameValueCollection Headers
         {
@@ -62,6 +65,12 @@ namespace SvnBridge.Stubs
             set { url = value; }
         }
 
-        #endregion
+        public string LocalPath
+        {
+            get
+            {
+                return url.LocalPath;
+            }
+        }
     }
 }

@@ -61,6 +61,11 @@ namespace SvnBridge.SourceControl
 
         #region ISourceControlProvider Members
 
+        public string ServerUrl
+        {
+            get { return serverUrl; }
+        }
+
         public void CopyItem(string activityId,
                              string path,
                              string targetPath)

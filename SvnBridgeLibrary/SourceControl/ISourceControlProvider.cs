@@ -5,6 +5,8 @@ namespace SvnBridge.SourceControl
 {
     public interface ISourceControlProvider
     {
+        string ServerUrl { get; }
+
         void CopyItem(string activityId,
                       string path,
                       string targetPath);

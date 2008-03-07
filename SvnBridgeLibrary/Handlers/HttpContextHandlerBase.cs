@@ -34,9 +34,12 @@ namespace SvnBridge.Handlers
         private static NetworkCredential GetCredential(IHttpContext context)
         {
             string authorizationHeader = context.Request.Headers["Authorization"];
-
             if (!string.IsNullOrEmpty(authorizationHeader))
             {
+                if(authorizationHeader.StartsWith("Negotiate"))
+                {
+                    return (NetworkCredential)CredentialCache.DefaultCredentials;
+                }
                 string encodedCredential = authorizationHeader.Substring(authorizationHeader.IndexOf(' ') + 1);
                 string credential = UTF8Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredential));
                 string[] credentialParts = credential.Split(':');
@@ -82,7 +85,7 @@ namespace SvnBridge.Handlers
 
         protected static string GetPath(IHttpRequest request)
         {
-            return request.Url.LocalPath;
+            return request.LocalPath;
         }
     }
 }

@@ -10,17 +10,25 @@ namespace TestsRequiringTfsClient
     [TestFixture]
     public class CommitAndSetWorkItemTest : EndToEndTestBase
     {
-        int latestChangeSetId;
-        int workItemId;
+        private int workItemId;
         private WorkItemStore store;
+        private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
+
         public override void SetUp()
         {
             base.SetUp();
-            
-            TeamFoundationServer server = TeamFoundationServerFactory.GetServer(Settings.Default.ServerUrl);
-            store = (WorkItemStore)server.GetService(typeof(WorkItemStore));
+            authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 
+            TeamFoundationServer server = TeamFoundationServerFactory.GetServer(Settings.Default.ServerUrl);
+            store = (WorkItemStore) server.GetService(typeof (WorkItemStore));
+            int latestChangeSetId;
             AssociateWorkItemWithChangeSetTest.CreateWorkItemAndGetLatestChangeSet(out latestChangeSetId, out workItemId);
+        }
+
+        [TearDown]
+        public void TestCleanup()
+        {
+            authenticateAsLowPrivilegeUser.Dispose();
         }
 
         [Test]
@@ -64,8 +72,9 @@ namespace TestsRequiringTfsClient
         public void AssociatingSingleCheckInWithMultiplyWorkItems()
         {
             int oldWorkItemId = workItemId;
+            int latestChangeSetId;
             AssociateWorkItemWithChangeSetTest.CreateWorkItemAndGetLatestChangeSet(out latestChangeSetId, out workItemId);
-            string workItems = oldWorkItemId  + ", " + workItemId;
+            string workItems = oldWorkItemId + ", " + workItemId;
 
             CheckoutAndChangeDirectory();
 
@@ -75,14 +84,13 @@ namespace TestsRequiringTfsClient
 
             Svn("commit -m \"Done. Work Item: " + workItems + "\"");
 
-            foreach (int workItem in new int[]{oldWorkItemId, workItemId})
+            foreach (int workItem in new int[] {oldWorkItemId, workItemId})
             {
                 WorkItem item = store.GetWorkItem(workItem);
                 Assert.AreEqual(1, item.Links.Count);
                 Assert.AreEqual("Fixed", item.State);
                 Assert.AreEqual("Fixed", item.Reason);
             }
-        
         }
     }
 }
