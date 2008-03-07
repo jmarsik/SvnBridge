@@ -11,6 +11,8 @@ namespace SvnBridge.Net
         bool SendChunked { get; set; }
         int StatusCode { get; set; }
 
+        bool BufferOutput { get; set; }
+
         void AppendHeader(string name,
                           string value);
 

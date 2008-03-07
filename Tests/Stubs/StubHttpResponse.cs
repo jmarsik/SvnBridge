@@ -14,6 +14,7 @@ namespace SvnBridge.Stubs
         private Stream outputStream;
         private bool sendChunked;
         private int statusCode;
+        private bool bufferOutput;
 
         public StubHttpResponse()
         {
@@ -74,6 +75,12 @@ namespace SvnBridge.Stubs
         }
 
         #endregion
+
+        public bool BufferOutput
+        {
+            get { return bufferOutput; }
+            set { bufferOutput = value; }
+        }
 
         public void Write(string content)
         {

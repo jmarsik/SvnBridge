@@ -12,6 +12,7 @@ namespace SvnBridge.Net
         private string contentType;
         private bool sendChunked;
         private int statusCode;
+        private bool bufferOutput;
 
         public ListenerResponse(ListenerRequest request,
                                 Stream stream)
@@ -65,6 +66,12 @@ namespace SvnBridge.Net
         {
             get { return statusCode; }
             set { statusCode = value; }
+        }
+
+        public bool BufferOutput
+        {
+            get { return bufferOutput; }
+            set { bufferOutput = value; }
         }
 
         public void Close()

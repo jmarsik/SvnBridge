@@ -45,9 +45,10 @@ namespace SvnBridge.Handlers
                     UpdateReportData data = Helper.DeserializeXml<UpdateReportData>(reader);
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
                     response.SendChunked = true;
+                    response.BufferOutput = false;
                     using (StreamWriter output = new StreamWriter(response.OutputStream))
                     {
-                        UpdateReport(sourceControlProvider, data, output);
+                        UpdateReport(request,sourceControlProvider, data, output);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "log-report")
@@ -55,6 +56,7 @@ namespace SvnBridge.Handlers
                     LogReportData data = Helper.DeserializeXml<LogReportData>(reader);
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
                     response.SendChunked = true;
+                    response.BufferOutput = false;
                     using (StreamWriter output = new StreamWriter(response.OutputStream))
                     {
                         LogReport(sourceControlProvider, data, path, output);
@@ -112,7 +114,8 @@ namespace SvnBridge.Handlers
             output.Write("</S:get-locations-report>\n");
         }
 
-        private void UpdateReport(ISourceControlProvider sourceControlProvider,
+        private void UpdateReport(IHttpRequest request,
+                                  ISourceControlProvider sourceControlProvider,
                                   UpdateReportData updatereport,
                                   StreamWriter output)
         {
@@ -127,7 +130,12 @@ namespace SvnBridge.Handlers
             }
 
             string basePath = "/" + srcPathUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
-
+            if(basePath.StartsWith(request.ApplicationPath))
+            {
+                basePath = basePath.Substring(request.ApplicationPath.Length);
+                if (basePath.Length == 0)
+                    basePath = "/";
+            }
             FolderMetaData metadata;
             int targetRevision;
             if (updatereport.TargetRevision != null)
@@ -141,7 +149,7 @@ namespace SvnBridge.Handlers
 
             if (updatereport.IsCheckOut)
             {
-                metadata = (FolderMetaData)sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
+                metadata = (FolderMetaData) sourceControlProvider.GetItems(targetRevision, basePath, Recursion.Full);
             }
             else
             {
@@ -212,7 +220,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
+                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
@@ -221,7 +229,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
+                        RenamedSourceItem renamedItem = (RenamedSourceItem) change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
