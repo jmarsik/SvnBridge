@@ -1,12 +1,12 @@
-using System;
 using System.Net.Sockets;
+using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 
-namespace SvnBridge.Infrastructure
+namespace SvnBridge.Proxies
 {
     public class RetryOnSocketExceptionsInterceptor : IInterceptor
     {
-        private ILogger logger;
+        private readonly ILogger logger;
 
         public RetryOnSocketExceptionsInterceptor(ILogger logger)
         {
@@ -30,7 +30,11 @@ namespace SvnBridge.Infrastructure
                     logger.Info("Socket Error occured, attempt #" + (i + 1) + ", retrying...", e);
                 }
             }
+            if (se == null)
+                return;
             logger.Error("All retries failed", se);
+            ExceptionHelper.PreserveStackTrace(se);
+            throw se;
         }
     }
 }

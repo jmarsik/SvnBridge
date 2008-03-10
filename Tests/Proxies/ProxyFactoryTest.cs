@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using NUnit.Framework;
-using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
+using SvnBridge.Proxies;
 
-namespace SvnBridge.Proxy
+namespace SvnBridge.Proxies
 {
     [TestFixture]
     public class ProxyFactoryTest
@@ -43,6 +44,16 @@ namespace SvnBridge.Proxy
             IFoo foo = ProxyFactory.Create<IFoo>(new FooImpl(), interceptor);
             int actual = foo.Add(3, 3);
             Assert.AreEqual(2, actual);
+        }
+
+        [Test]
+        public void CanRegisterTwoInterceptors()
+        {
+            MultiplyByTwoInterceptor interceptor1 = new MultiplyByTwoInterceptor();
+            DivideReturnValueBy3Interceptor interceptor2 = new DivideReturnValueBy3Interceptor();
+            IFoo foo = ProxyFactory.Create<IFoo>(new FooImpl(), interceptor1, interceptor2);
+            int actual = foo.Add(3, 3);
+            Assert.AreEqual(4, actual);
         }
     }
 

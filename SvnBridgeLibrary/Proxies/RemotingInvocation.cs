@@ -2,24 +2,31 @@ using System;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 
-namespace SvnBridge.Infrastructure
+
+namespace SvnBridge.Proxies
 {
-    internal class RemotingInvocation : IInvocation
+    public class RemotingInvocation : IInvocation
     {
         private readonly IMethodCallMessage message;
         private readonly object target;
         private object _returnValue;
         private readonly RealProxy realProxy;
+        private readonly IInterceptor[] interceptors;
         private readonly object[] args;
+        private int interceptorIndex = 0;
 
-        public RemotingInvocation(RealProxy realProxy, IMethodCallMessage message, object target)
+        public RemotingInvocation(RealProxy realProxy, IInterceptor[] interceptors, IMethodCallMessage message, object target)
         {
             this.message = message;
             this.target = target;
             this.realProxy = realProxy;
+            this.interceptors = interceptors;
             this.args = (object[])this.message.Properties["__Args"];
         }
+
 
         public object[] Arguments
         {
@@ -43,6 +50,13 @@ namespace SvnBridge.Infrastructure
 
         public void Proceed()
         {
+            if (interceptorIndex < interceptors.Length)
+            {
+                IInterceptor interceptor = interceptors[interceptorIndex];
+                interceptorIndex += 1;
+                interceptor.Invoke(this);
+                return;
+            }
 
             try
             {
@@ -52,9 +66,7 @@ namespace SvnBridge.Infrastructure
             {
                 Exception exception = e.InnerException;
 
-                typeof(Exception).GetMethod("InternalPreserveStackTrace",
-                                             BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Invoke(exception, new object[0]);
+                ExceptionHelper.PreserveStackTrace(exception);
 
                 throw exception;
             }

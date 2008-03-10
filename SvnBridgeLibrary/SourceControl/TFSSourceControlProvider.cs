@@ -8,6 +8,7 @@ using SvnBridge.Exceptions;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
+using SvnBridge.Proxies;
 using SvnBridge.SourceControl.Dto;
 using SvnBridge.Utility;
 
@@ -561,8 +562,8 @@ namespace SvnBridge.SourceControl
             return firstItem;
         }
 
-        private void UpdateItemRevisionsBasedOnPropertyItemRevisions(Dictionary<string, FolderMetaData> folders,
-                                                                     Dictionary<string, int> itemPropertyRevision)
+        private static void UpdateItemRevisionsBasedOnPropertyItemRevisions(IDictionary<string, FolderMetaData> folders,
+                                                                     IEnumerable<KeyValuePair<string, int>> itemPropertyRevision)
         {
             foreach (KeyValuePair<string, int> propertyRevision in itemPropertyRevision)
             {
@@ -668,7 +669,7 @@ namespace SvnBridge.SourceControl
 
         private void AddBaseFolderIfRequired(string activityId,
                                              ActivityItem item,
-                                             List<string> baseFolders,
+                                             ICollection<string> baseFolders,
                                              MergeActivityResponse mergeResponse)
         {
             string folderName = GetFolderName(item.Path);
@@ -799,7 +800,7 @@ namespace SvnBridge.SourceControl
             ProcessCopyItem(activityId, copy, true);
         }
 
-        private string GetLocalPath(string activityId,
+        private static string GetLocalPath(string activityId,
                                     string path)
         {
             return Constants.LOCAL_PREFIX + activityId + path.Replace('/', '\\');
@@ -932,7 +933,7 @@ namespace SvnBridge.SourceControl
             }
         }
 
-        private string GetPropertiesFolderName(string path,
+        private static string GetPropertiesFolderName(string path,
                                                ItemType itemType)
         {
             if (itemType == ItemType.Folder)
@@ -949,7 +950,7 @@ namespace SvnBridge.SourceControl
             }
         }
 
-        private string GetPropertiesFileName(string path,
+        private static string GetPropertiesFileName(string path,
                                              ItemType itemType)
         {
             if (itemType == ItemType.Folder)
@@ -1008,8 +1009,6 @@ namespace SvnBridge.SourceControl
             revision = -1;
             ItemProperties properties = null;
             string propertiesPath = GetPropertiesFileName(path, itemType);
-            if (ItemExists(propertiesPath, -1) == false)
-                return properties;
             ItemMetaData item = GetItems(-1, propertiesPath, Recursion.None, true);
             if (item != null)
             {
@@ -1078,7 +1077,7 @@ namespace SvnBridge.SourceControl
             }
         }
 
-        private string GetFolderName(string path)
+        private static string GetFolderName(string path)
         {
             return path.Substring(0, path.LastIndexOf('/'));
         }
@@ -1116,11 +1115,11 @@ namespace SvnBridge.SourceControl
 
 
         private void SetItemProperties(IDictionary<string, FolderMetaData> folders,
-                                       IDictionary<string, ItemProperties> properties)
+                                       IEnumerable<KeyValuePair<string, ItemProperties>> properties)
         {
             foreach (KeyValuePair<string, ItemProperties> itemProperties in properties)
             {
-                ItemMetaData item = null;
+                ItemMetaData item;
                 if (folders.ContainsKey(itemProperties.Key.ToLowerInvariant()))
                 {
                     item = folders[itemProperties.Key.ToLowerInvariant()];

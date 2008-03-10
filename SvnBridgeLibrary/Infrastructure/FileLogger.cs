@@ -20,7 +20,7 @@ namespace SvnBridge.Infrastructure
 
         public void Error(string message, Exception exception)
         {
-            Write("error", delegate(TextWriter writer)
+            Write("Error", delegate(TextWriter writer)
             {
                 writer.WriteLine(message);
                 writer.WriteLine(exception);
@@ -30,7 +30,7 @@ namespace SvnBridge.Infrastructure
         public void Info(string message, Exception exception)
         {
 
-            Write("info", delegate(TextWriter writer)
+            Write("Info", delegate(TextWriter writer)
             {
                 writer.WriteLine(message);
                 writer.WriteLine(exception);

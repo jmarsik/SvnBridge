@@ -1,7 +1,6 @@
 using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 
-namespace SvnBridge.Infrastructure
+namespace SvnBridge.Interfaces
 {
     public interface IInvocation
     {

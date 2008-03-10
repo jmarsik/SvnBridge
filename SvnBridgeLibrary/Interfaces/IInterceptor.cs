@@ -1,4 +1,4 @@
-namespace SvnBridge.Infrastructure
+namespace SvnBridge.Interfaces
 {
     public interface IInterceptor
     {

@@ -98,7 +98,8 @@
     <Compile Include="Net\ListenerTests.cs" />
     <Compile Include="Presenters\SettingsViewPresenterTests.cs" />
     <Compile Include="Infrastructure\MyMocks.cs" />
-    <Compile Include="Proxy\ProxyFactoryTest.cs" />
+    <Compile Include="Proxies\ProxyFactoryTest.cs" />
+    <Compile Include="Proxies\RetryOnSocketExceptionTest.cs" />
     <Compile Include="SourceControl\ProjectInformationRepositoryTest.cs" />
     <Compile Include="SourceControl\TFSSourceControlProviderTest.cs" />
     <Compile Include="Stubs\StubSourceControlProvider.cs" />
