@@ -1,3 +1,4 @@
+using System;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Protocol;
 
@@ -63,5 +64,7 @@ namespace SvnBridge.SourceControl
         bool WriteFile(string activityId,
                        string path,
                        byte[] fileData);
+
+        void ReadFileAsync(ItemMetaData item);
     }
 }

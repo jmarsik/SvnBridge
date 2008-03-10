@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace SvnBridge.SourceControl
@@ -7,7 +8,7 @@ namespace SvnBridge.SourceControl
     public class ItemMetaData
     {
         public string Author;
-        public byte[] Data = null;
+        public FutureData Data;
         public bool DataLoaded = false;
         public string DownloadUrl = null;
         public int Id;
@@ -19,7 +20,6 @@ namespace SvnBridge.SourceControl
 
         public ItemMetaData()
         {
-
         }
 
 
@@ -49,3 +49,4 @@ namespace SvnBridge.SourceControl
         }
     }
 }
+

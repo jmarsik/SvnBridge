@@ -5,6 +5,7 @@ using SvnBridge.Net;
 namespace TestsEndToEnd
 {
     [TestFixture]
+    [Explicit]
     public class LoadTest : EndToEndTestBase
     {
         public override void SetUp()

@@ -50,7 +50,8 @@
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
-    <Compile Include="Interfaces\IItemLoaderManager.cs" />
+    <Compile Include="Infrastructure\AsyncItemLoader.cs" />
+    <Compile Include="Interfaces\IItemLoader.cs" />
     <Compile Include="Interfaces\IUpdateReportService.cs" />
     <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />
     <Compile Include="Infrastructure\BrokenXml.cs" />
@@ -77,8 +78,6 @@
     <Compile Include="Handlers\HttpContextHandlerBase.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
-    <Compile Include="Infrastructure\ItemLoader.cs" />
-    <Compile Include="Infrastructure\ItemLoaderManager.cs" />
     <Compile Include="Infrastructure\UpdateReportService.cs" />
     <Compile Include="Interfaces\IProjectInformationRepository.cs" />
     <Compile Include="ListenErrorEventArgs.cs" />
@@ -92,6 +91,8 @@
     <Compile Include="SourceControl\Dto\ItemProperties.cs" />
     <Compile Include="SourceControl\Dto\Property.cs" />
     <Compile Include="SourceControl\FindOrCreateResults.cs" />
+    <Compile Include="SourceControl\Future.cs" />
+    <Compile Include="SourceControl\FutureInvocationException.cs" />
     <Compile Include="SourceControl\ICredentialsProvider.cs" />
     <Compile Include="SourceControl\ISourceControlUtility.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />

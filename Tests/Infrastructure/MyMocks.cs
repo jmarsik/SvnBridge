@@ -20,7 +20,7 @@ namespace Tests
         {
             if (returnValue is Return)
             {
-                return base.Attach(method, (Return) returnValue);
+                return base.Attach(method, (Return)returnValue);
             }
             else
             {
@@ -80,6 +80,8 @@ namespace Tests
 
         public delegate byte[] ReadFile(ItemMetaData item);
 
+        public delegate void ReadFileAsync(ItemMetaData item);
+
         public delegate void SetCredentials(NetworkCredential credentials);
 
         public delegate void SetProperty(string activityId,
@@ -100,19 +102,19 @@ namespace Tests
         public Results Attach(DeleteItem method,
                               bool returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(ItemExists method,
                               bool returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(ItemExists method,
                               Exception throwException)
         {
-            return base.Attach((Delegate) method, throwException);
+            return base.Attach((Delegate)method, throwException);
         }
 
         public Results Attach(ItemExists method,
@@ -124,13 +126,13 @@ namespace Tests
         public Results Attach(GetLatestVersion method,
                               int returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(IsDirectory method,
                               bool returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(IsDirectory method,
@@ -141,93 +143,107 @@ namespace Tests
 
         public Results Attach(MakeActivity method)
         {
-            return base.Attach((Delegate) method);
+            return base.Attach((Delegate)method);
         }
 
         public Results Attach(MakeActivity method,
                               Exception throwException)
         {
-            return base.Attach((Delegate) method, throwException);
+            return base.Attach((Delegate)method, throwException);
         }
 
         public Results Attach(MakeCollection method)
         {
-            return base.Attach((Delegate) method);
+            return base.Attach((Delegate)method);
         }
 
         public Results Attach(MakeCollection method,
                               Exception throwException)
         {
-            return base.Attach((Delegate) method, throwException);
+            return base.Attach((Delegate)method, throwException);
         }
 
         public Results Attach(MergeActivity method,
                               MergeActivityResponse returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(MergeActivity method,
                               Exception throwException)
         {
-            return base.Attach((Delegate) method, throwException);
+            return base.Attach((Delegate)method, throwException);
         }
 
         public Results Attach(GetItemInActivity method,
                               ItemMetaData returnValue)
         {
-            return base.Attach((Delegate) method, (ItemMetaData) returnValue);
+            return base.Attach((Delegate)method, (ItemMetaData)returnValue);
         }
 
         public Results Attach(GetItems method,
                               ItemMetaData returnValue)
         {
-            return base.Attach((Delegate) method, (ItemMetaData) returnValue);
+            return base.Attach((Delegate)method, (ItemMetaData)returnValue);
         }
 
-        public Results Attach(ReadFile method,
-                              byte[] returnValue)
+
+        public Results AttachReadFile(ReadFile method,
+                               byte[] returnValue)
         {
-            return base.Attach((Delegate) method, (byte[]) returnValue);
+            return base.Attach((Delegate)method, (byte[])returnValue);
+        }
+
+
+        public Results Attach(ReadFileAsync method,
+                             byte[] returnValue)
+        {
+            return base.Attach((Delegate)method, Return.DelegateResult(delegate(object[] parameters)
+            {
+                FutureData data = new FutureData(null, null);
+                data.Value = returnValue;
+                ((ItemMetaData)parameters[0]).Data = data;
+                return null;
+            }));
         }
 
         public Results Attach(SetCredentials method)
         {
-            return base.Attach((Delegate) method);
+            return base.Attach((Delegate)method);
         }
 
         public Results Attach(WriteFile method,
                               bool returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(GetLog method,
                               LogItem returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(SetProperty method)
         {
-            return base.Attach((Delegate) method);
+            return base.Attach((Delegate)method);
         }
 
         public Results Attach(GetChangedItems method,
                               FolderMetaData returnValue)
         {
-            return base.Attach((Delegate) method, (object) returnValue);
+            return base.Attach((Delegate)method, (object)returnValue);
         }
 
         public Results Attach(StreamRead method,
                               Exception throwException)
         {
-            return base.Attach((Delegate) method, throwException);
+            return base.Attach((Delegate)method, throwException);
         }
 
         public Results Attach(CopyItem method)
         {
-            return base.Attach((Delegate) method);
+            return base.Attach((Delegate)method);
         }
     }
 }

@@ -413,7 +413,7 @@ namespace Tests
             metadata.Items.Add(newFile);
             stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("fun");
-            stub.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFileAsync, fileData);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

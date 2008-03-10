@@ -416,7 +416,7 @@ namespace Tests
             folder.Items.Add(item);
             stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("New file");
-            stub.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFileAsync, fileData);
             stub.Attach(provider.ItemExists, Return.MultipleValues(true, false));
 
             string request =

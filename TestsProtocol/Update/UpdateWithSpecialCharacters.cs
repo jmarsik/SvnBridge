@@ -435,7 +435,7 @@ namespace Tests
             stub.Attach(provider.GetChangedItems, metadata);
             stub.Attach(provider.ItemExists, Return.MultipleValues(true, false, true, false));
             byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
-            stub.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFileAsync, fileData);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

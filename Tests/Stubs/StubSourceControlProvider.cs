@@ -33,6 +33,11 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
+        public virtual void ReadFileAsync(ItemMetaData item)
+        {
+            throw new NotImplementedException();
+        }
+
         public virtual MergeActivityResponse MergeActivity(string activityId)
         {
             throw new Exception("The method or operation is not implemented.");

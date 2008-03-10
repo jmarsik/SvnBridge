@@ -772,7 +772,7 @@ namespace Tests
             SvnDiffParser.WriteSvnDiff(svnDiff, svnDiffStream);
             byte[] svnDiffData = svnDiffStream.ToArray();
             string txdelta = Convert.ToBase64String(svnDiffData);
-            stub.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFileAsync, fileData);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

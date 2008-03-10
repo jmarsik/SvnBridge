@@ -64,12 +64,8 @@ namespace SvnBridge.Infrastructure
                                  "</S:set-prop>\n");
                 }
 
-                while (!item.DataLoaded)
-                {
-                    Thread.Sleep(100);
-                }
+                byte[] fileData = item.Data.Value;
 
-                byte[] fileData = item.Data;
                 item.DataLoaded = false;
                 item.Data = null;
                 SvnDiff svnDiff = SvnDiffEngine.CreateReplaceDiff(fileData);

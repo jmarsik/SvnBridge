@@ -16,14 +16,6 @@ namespace SvnBridge.Handlers
 {
     public class ReportHandler : HttpContextHandlerBase
     {
-        private IItemLoaderManager itemLoaderManager;
-
-        public override void Cancel()
-        {
-            if (itemLoaderManager != null)
-                itemLoaderManager.Cancel();
-        }
-
         protected override void Handle(IHttpContext context,
                                        ISourceControlProvider sourceControlProvider)
         {
@@ -163,11 +155,7 @@ namespace SvnBridge.Handlers
                                                           updatereport);
             }
 
-            itemLoaderManager = new ItemLoaderManager(metadata, sourceControlProvider);
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-                itemLoaderManager.Start();
-            });
+            new AsyncItemLoader(metadata, sourceControlProvider).Start();
 
             IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
 

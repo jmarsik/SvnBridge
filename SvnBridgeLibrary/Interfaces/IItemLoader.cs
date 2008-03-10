@@ -1,8 +1,7 @@
 namespace SvnBridge.Interfaces
 {
-    public interface IItemLoaderManager
+    public interface IItemLoader
     {
-        void Cancel();
         void Start();
     }
 }

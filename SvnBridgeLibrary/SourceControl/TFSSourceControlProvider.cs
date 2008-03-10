@@ -439,6 +439,13 @@ namespace SvnBridge.SourceControl
             return webTransferService.DownloadBytes(item.DownloadUrl, credentials);
         }
 
+
+        public void ReadFileAsync(ItemMetaData item)
+        {
+            IAsyncResult asyncResult =  webTransferService.BeginDownloadBytes(item.DownloadUrl, credentials);
+            item.Data = new FutureData(asyncResult, webTransferService);
+        }
+
         public void SetActivityComment(string activityId,
                                        string comment)
         {
@@ -1000,6 +1007,8 @@ namespace SvnBridge.SourceControl
             revision = -1;
             ItemProperties properties = null;
             string propertiesPath = GetPropertiesFileName(path, itemType);
+            if (ItemExists(propertiesPath, -1) == false)
+                return properties;
             ItemMetaData item = GetItems(-1, propertiesPath, Recursion.None, true);
             if (item != null)
             {

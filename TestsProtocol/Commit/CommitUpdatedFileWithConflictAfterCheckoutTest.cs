@@ -64,7 +64,7 @@ namespace Tests
             stub.Attach(provider.ItemExists, false);
             ItemMetaData item = new ItemMetaData();
             stub.Attach(provider.GetItemInActivity, item);
-            stub.Attach(provider.ReadFile, Encoding.Default.GetBytes("bbbb"));
+            stub.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("bbbb"));
             stub.Attach(provider.WriteFile, false);
 
             string request =

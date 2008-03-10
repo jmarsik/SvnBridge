@@ -78,7 +78,7 @@ namespace SvnBridge.Handlers
         public void TestThrowsExceptionIfBaseFileDoesNotMatchChecksum()
         {
             stub.Attach(provider.GetItemInActivity, new ItemMetaData());
-            stub.Attach(provider.ReadFile, new byte[] {});
+            stub.AttachReadFile(provider.ReadFile, new byte[] { });
             request.Path = "http://localhost:8082//!svn/wrk/61652fe8-44cd-8d43-810f-c95deccc6db3/Test.txt";
             request.Input = "SVN\0\0\u0004\u0008\u0001\u0008\u0088bbbb111a";
             request.Headers["X-SVN-Base-Fulltext-MD5"] = "65ba841e01d6db7733e90a5b7f9e6f80";
@@ -91,7 +91,7 @@ namespace SvnBridge.Handlers
         public void TestThrowsExceptionIfBaseFileDoesNotMatchChecksumWhenUpdateToEmptyFile()
         {
             stub.Attach(provider.GetItemInActivity, new ItemMetaData());
-            stub.Attach(provider.ReadFile, new byte[] {});
+            stub.AttachReadFile(provider.ReadFile, new byte[] { });
             request.Path = "http://localhost:8082//!svn/wrk/61652fe8-44cd-8d43-810f-c95deccc6db3/Test.txt";
             request.Input = "SVN\0";
             request.Headers["X-SVN-Base-Fulltext-MD5"] = "65ba841e01d6db7733e90a5b7f9e6f80";

@@ -410,7 +410,7 @@ namespace Tests
             metadata.Items.Add(folder);
             stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = GetBytes("New file");
-            stub.Attach(provider.ReadFile, fileData);
+            stub.Attach(provider.ReadFileAsync, fileData);
             stub.Attach(provider.ItemExists, Return.MultipleValues(true, false));
 
             string request =

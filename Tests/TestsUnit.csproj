@@ -81,6 +81,8 @@
     <Compile Include="Handlers\MkActivityHandlerTests.cs" />
     <Compile Include="Handlers\MkColHandlerTests.cs" />
     <Compile Include="Handlers\OptionsHandlerTests.cs" />
+    <Compile Include="Handlers\PropFindHandlerAllPropForFolderTests.cs" />
+    <Compile Include="Handlers\PropFindHandlerAllPropForItemTests.cs" />
     <Compile Include="Handlers\PropFindHandlerTests.cs" />
     <Compile Include="Handlers\PropFindHandler\BcFileNodeTests.cs" />
     <Compile Include="Handlers\PropFindHandler\FileNodeTests.cs" />
@@ -88,7 +90,6 @@
     <Compile Include="Handlers\PutHandlerTests.cs" />
     <Compile Include="Handlers\ReportHandlerLogReportTests.cs" />
     <Compile Include="Handlers\ReportHandlerUpdateReportTests.cs" />
-    <Compile Include="Handlers\ReportHandler\ItemLoaderTests.cs" />
     <Compile Include="Infrastructure\CachingItemMetaDataRepositoryTest.cs" />
     <Compile Include="Infrastructure\CircuitBreakerTest.cs" />
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
@@ -123,6 +124,9 @@
       <Project>{22D15920-C064-457D-889B-F7A2E16F3E05}</Project>
       <Name>SvnBridge</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Handlers\ReportHandler\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
