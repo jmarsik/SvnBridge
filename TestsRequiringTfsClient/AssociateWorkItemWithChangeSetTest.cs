@@ -1,10 +1,12 @@
 using System.Net;
+using IntegrationTests;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using NUnit.Framework;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
+using TestsEndToEnd;
 using TestsRequiringTfsClient.Properties;
 
 namespace TestsRequiringTfsClient

@@ -1,5 +1,6 @@
 using System.Text;
 using SvnBridge.Exceptions;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;

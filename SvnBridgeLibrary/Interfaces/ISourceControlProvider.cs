@@ -1,8 +1,9 @@
 using System;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Protocol;
+using SvnBridge.SourceControl;
 
-namespace SvnBridge.SourceControl
+namespace SvnBridge.Interfaces
 {
     public interface ISourceControlProvider
     {

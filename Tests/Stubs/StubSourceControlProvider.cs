@@ -1,5 +1,6 @@
 using System;
 using CodePlex.TfsLibrary.ObjectModel;
+using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 

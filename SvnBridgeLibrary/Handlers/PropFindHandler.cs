@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Xml;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Nodes;
 using SvnBridge.Protocol;

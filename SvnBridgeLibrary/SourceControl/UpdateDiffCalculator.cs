@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 
 namespace SvnBridge.SourceControl

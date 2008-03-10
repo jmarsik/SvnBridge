@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Text;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
@@ -30,20 +31,30 @@ namespace Tests
                                                                                           factory1,
                                                                                           webTransferService,
                                                                                           system);
+            associateWorkItemWithChangeSet = new AssociateWorkItemWithChangeSet(ServerUrl, GetCredentials());
+            ProjectInformationRepository projectInformationRepository = new ProjectInformationRepository(new NullCache(),
+                                                                                                         tfsSourceControlService,
+                                                                                                         ServerUrl);
             _provider = new TFSSourceControlProvider(ServerUrl,
                                                      PROJECT_NAME,
-                                                     null,
+                                                     GetCredentials(),
                                                      webTransferService,
                                                      tfsSourceControlService,
-                                                     new ProjectInformationRepository(new NullCache(),
-                                                                                      tfsSourceControlService,
-                                                                                      ServerUrl),
-                                                                                      new AssociateWorkItemWithChangeSet(ServerUrl, null),
-                                                                                      new ConsoleLogger());
+                                                     projectInformationRepository,
+                                                     associateWorkItemWithChangeSet,
+                                                     new FileLogger());
+
             testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, testPath);
             Commit();
+        }
+
+        private static ICredentials GetCredentials()
+        {
+            if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
+                return null;
+            return new NetworkCredential(Settings.Default.Username, Settings.Default.Password,Settings.Default.Domain);
         }
 
         [TearDown]
@@ -63,6 +74,7 @@ namespace Tests
         protected string testPath;
         protected TFSSourceControlProvider _provider;
         protected int _lastCommitRevision;
+        private AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
 
         protected void UpdateFile(string path,
                                   string fileData,

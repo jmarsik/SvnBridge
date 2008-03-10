@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace SvnBridge.SourceControl
+namespace SvnBridge.Interfaces
 {
     public interface ICredentialsProvider 
     {

@@ -1,6 +1,7 @@
 using CodePlex.TfsLibrary.ObjectModel;
+using SvnBridge.SourceControl;
 
-namespace SvnBridge.SourceControl
+namespace SvnBridge.Interfaces
 {
     public interface ISourceControlUtility
     {

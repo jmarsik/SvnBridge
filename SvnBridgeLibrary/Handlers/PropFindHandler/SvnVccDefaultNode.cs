@@ -1,7 +1,7 @@
 using System;
 using System.Xml;
 using SvnBridge.Handlers;
-using SvnBridge.SourceControl;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Nodes
 {

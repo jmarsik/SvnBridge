@@ -1,4 +1,5 @@
 using System.IO;
+using IntegrationTests;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using NUnit.Framework;

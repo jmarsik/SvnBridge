@@ -2,9 +2,9 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
-using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers

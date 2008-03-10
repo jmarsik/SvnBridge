@@ -22,5 +22,24 @@ namespace TestsEndToEnd
             Svn("commit -m test");
             Svn("update");
         }
+
+        [Test]
+        public void CommitRenamesOfFiles()
+        {
+            CheckoutAndChangeDirectory();
+            for (int i = 0; i < 25; i++)
+            {
+                File.WriteAllText("test." + i, i.ToString());
+            }
+            Svn("add test.*");
+            Svn("commit -m blah");
+
+            for (int i = 0; i < 25; i+=2)
+            {
+                Svn("rename test." + i + " ren." + i);
+            }
+
+            Svn("commit -m ren");
+        }
     }
 }

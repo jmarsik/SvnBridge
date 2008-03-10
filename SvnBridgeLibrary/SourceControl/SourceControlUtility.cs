@@ -1,6 +1,7 @@
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
 {

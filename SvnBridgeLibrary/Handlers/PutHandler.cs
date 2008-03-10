@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;

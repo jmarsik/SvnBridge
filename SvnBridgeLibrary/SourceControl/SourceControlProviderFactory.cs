@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Net;
 using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
 {

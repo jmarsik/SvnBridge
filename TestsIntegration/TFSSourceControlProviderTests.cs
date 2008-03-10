@@ -43,7 +43,7 @@ namespace Tests
                                                                                  tfsSourceControlService,
                                                                                  ServerUrl),
                                                                                  new AssociateWorkItemWithChangeSet(ServerUrl, null),
-                                                                                 new ConsoleLogger());
+                                                                                 new FileLogger());
         }
 
         [Test]

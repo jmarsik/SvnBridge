@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using SvnBridge.Exceptions;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
-using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers

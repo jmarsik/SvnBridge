@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Net
 {

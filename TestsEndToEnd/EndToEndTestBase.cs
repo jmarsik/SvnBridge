@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
+using IntegrationTests;
 using NUnit.Framework;
 using SvnBridge;
 using SvnBridge.Infrastructure;
@@ -18,6 +19,7 @@ namespace TestsEndToEnd
         public override void SetUp()
         {
             base.SetUp();
+            authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
             port = new Random().Next(1024, short.MaxValue);
             testUrl = "http://localhost:"+ this.port+ "/SvnBridgeTesting" + testPath;
 
@@ -29,7 +31,7 @@ namespace TestsEndToEnd
             Console.WriteLine("cd " + checkoutFolder);
             listener = IoC.Resolve<IListener>();
             listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
-            listener.TfsUrl = "http://codeplex-tfs3:8080";
+            listener.TfsUrl = ServerUrl;
             listener.Port = this.port;
             listener.Start();
         }
@@ -53,6 +55,8 @@ namespace TestsEndToEnd
             Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
 
             //Directory.Delete(checkoutFolder, true);
+
+            authenticateAsLowPrivilegeUser.Dispose();
         }
 
         #endregion
@@ -61,6 +65,7 @@ namespace TestsEndToEnd
         private string checkoutFolder;
         protected string testUrl;
         protected int port;
+        private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 
         private static void ForAllFilesInCurrentDirectory(Action<FileInfo> action)
         {

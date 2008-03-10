@@ -5,7 +5,7 @@ using SvnBridge.Net;
 namespace TestsEndToEnd
 {
     [TestFixture]
-    [Explicit]
+    [Ignore("Takes too long to run")]
     public class LoadTest : EndToEndTestBase
     {
         public override void SetUp()

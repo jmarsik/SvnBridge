@@ -1,10 +1,9 @@
 using System;
 using System.Net;
+using IntegrationTests.Properties;
 using SvnBridge.SourceControl;
-using TestsEndToEnd;
-using TestsRequiringTfsClient.Properties;
 
-namespace TestsRequiringTfsClient
+namespace IntegrationTests
 {
     /// <summary>
     /// This class is needed so we will authenticate as a non admin user, which is required 
@@ -17,14 +16,17 @@ namespace TestsRequiringTfsClient
         public AuthenticateAsLowPrivilegeUser()
         {
             oldCredentials = CredentialsHelper.DefaultCredentials;
-            CredentialsHelper.DefaultCredentials =
-                new NetworkCredential(Settings.Default.NonAdminUserName, Settings.Default.NonAdminUserPassword,
-                                      Settings.Default.NonAdminUserDomain);
+            if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
+                return;
+            CredentialsHelper.NullCredentials = CredentialsHelper.DefaultCredentials =
+                new NetworkCredential(Settings.Default.Username, Settings.Default.Password,
+                                      Settings.Default.Domain);
         }
 
         public void Dispose()
         {
             CredentialsHelper.DefaultCredentials = oldCredentials;
+            CredentialsHelper.NullCredentials = null;
         }
     }
 }

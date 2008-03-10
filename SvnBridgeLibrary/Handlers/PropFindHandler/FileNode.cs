@@ -2,6 +2,7 @@ using System;
 using System.Xml;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Handlers;
+using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 

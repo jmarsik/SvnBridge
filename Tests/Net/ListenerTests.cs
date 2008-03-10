@@ -11,7 +11,7 @@ namespace SvnBridge.Net
         [Test]
         public void SetInvalidTfsUrlThrows()
         {
-            Listener listener = new Listener(new ConsoleLogger());
+            Listener listener = new Listener(new FileLogger());
 
             Assert.Throws<UriFormatException>(
                 delegate { listener.TfsUrl = "foo"; });
@@ -20,7 +20,7 @@ namespace SvnBridge.Net
         [Test]
         public void SetPortAfterStartThrows()
         {
-            Listener listener = new Listener(new ConsoleLogger());
+            Listener listener = new Listener(new FileLogger());
             listener.Port = 10011;
             listener.TfsUrl = "http://foo";
             listener.Start();
@@ -34,7 +34,7 @@ namespace SvnBridge.Net
         [Test]
         public void SetTfsUrlAfterStartThrows()
         {
-            Listener listener = new Listener(new ConsoleLogger());
+            Listener listener = new Listener(new FileLogger());
             listener.Port = 10011;
             listener.TfsUrl = "http://foo";
             listener.Start();
@@ -48,7 +48,7 @@ namespace SvnBridge.Net
         [Test]
         public void StartWithoutSettingPortThrows()
         {
-            Listener listener = new Listener(new ConsoleLogger());
+            Listener listener = new Listener(new FileLogger());
             listener.TfsUrl = "http://foo";
 
             Assert.Throws<InvalidOperationException>(
@@ -58,7 +58,7 @@ namespace SvnBridge.Net
         [Test]
         public void StartWithoutSettingTfsUrlThrows()
         {
-            Listener listener = new Listener(new ConsoleLogger());
+            Listener listener = new Listener(new FileLogger());
             listener.Port = 10011;
 
             Assert.Throws<InvalidOperationException>(

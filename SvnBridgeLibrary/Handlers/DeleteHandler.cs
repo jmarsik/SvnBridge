@@ -1,6 +1,6 @@
 using System.Text;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
-using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers

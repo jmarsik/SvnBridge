@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Web.UI;
 using SvnBridge.Handlers.Renderers;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
