@@ -6,23 +6,34 @@ namespace SvnBridge.Infrastructure
 {
     public class FileLogger : ILogger
     {
-        private static void Write(Action<TextWriter> action)
+        private static void Write(string level, Action<TextWriter> action)
         {
-            string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "errors.log");
+            string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, level + ".log");
             using (TextWriter tw = new StreamWriter(logPath, true))
             {
+                tw.WriteLine(level);
+                tw.WriteLine(DateTime.Now.ToString("yyyy MM dd hh:mm:ss:fff"));
                 action(tw);
+                tw.WriteLine("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             }
         }
 
-        public void Error(string message, Exception ex)
+        public void Error(string message, Exception exception)
         {
-            Write(delegate(TextWriter writer)
+            Write("error", delegate(TextWriter writer)
             {
                 writer.WriteLine(message);
-                writer.WriteLine(ex);
-                writer.WriteLine("- - - - - - - - - - - - - - - - - - - - - - - -");
-                writer.WriteLine("- - - - - - - - - - - - - - - - - - - - - - - -");
+                writer.WriteLine(exception);
+            });
+        }
+
+        public void Info(string message, Exception exception)
+        {
+
+            Write("info", delegate(TextWriter writer)
+            {
+                writer.WriteLine(message);
+                writer.WriteLine(exception);
             });
         }
     }

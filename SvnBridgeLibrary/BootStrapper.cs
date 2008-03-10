@@ -71,8 +71,16 @@ namespace SvnBridge
                         {
                             continue;
                         }
-
-                        IoC.Container.Register(interfaceType, type);
+                        object[] attributes = type.GetCustomAttributes(typeof(InterceptorAttribute), true);
+                        if (attributes.Length == 0)
+                        {
+                            IoC.Container.Register(interfaceType, type);
+                        }
+                        else
+                        {
+                            Type interceptorType = ((InterceptorAttribute)attributes[0]).Interceptor;
+                            IoC.Container.Register(interfaceType, type, interceptorType);
+                        }
                     }
                 }
             }

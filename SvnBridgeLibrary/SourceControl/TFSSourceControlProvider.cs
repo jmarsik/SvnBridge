@@ -13,6 +13,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.SourceControl
 {
+    [Interceptor(typeof(RetryOnSocketExceptionsInterceptor))]
     public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
     {
         private static readonly Regex associatedWorkItems = new Regex(@"Work ?Items?: (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);

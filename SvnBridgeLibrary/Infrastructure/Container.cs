@@ -27,16 +27,28 @@ namespace SvnBridge.Infrastructure
 
         public void Register<T>(Creator creator)
         {
-            Register(typeof (Type), creator);
+            Register(typeof (T), creator);
         }
 
-        public void Register(Type service,
-                             Type impl)
+        public void Register(Type service,Type impl)
         {
-            Register(service,
-                     delegate(Container c,
-                              IDictionary deps)
-                     { return CreateInstance(impl, deps); });
+            Register(service, delegate(Container c,IDictionary deps)
+                     {
+                         return CreateInstance(impl, deps);
+                     });
+        }
+
+        public void Register(Type service,Type impl, Type interceptorType)
+        {
+            if (IoC.Container.IsRegistered(interceptorType) == false)
+                IoC.Container.Register(interceptorType, interceptorType);
+
+            Register(service, delegate(Container c, IDictionary deps)
+            {
+                object instance = CreateInstance(impl, deps);
+
+                return ProxyFactory.Create(service, instance, (IInterceptor)Resolve(interceptorType, deps));
+            });
         }
 
         public void Register(Type type,
