@@ -40,7 +40,6 @@ namespace SvnBridge.Handlers
                     UpdateReportData data = Helper.DeserializeXml<UpdateReportData>(reader);
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
                     response.SendChunked = true;
-                    response.BufferOutput = false;
                     using (StreamWriter output = new StreamWriter(response.OutputStream))
                     {
                         UpdateReport(request, sourceControlProvider, data, output);
@@ -155,7 +154,10 @@ namespace SvnBridge.Handlers
                                                           updatereport);
             }
 
-            new AsyncItemLoader(metadata, sourceControlProvider).Start();
+            ThreadPool.QueueUserWorkItem(delegate(object state)
+            {
+                new AsyncItemLoader(metadata, sourceControlProvider).Start();
+            });
 
             IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
 
@@ -167,10 +169,10 @@ namespace SvnBridge.Handlers
             output.Write("</S:update-report>\n");
         }
 
-        private void LogReport(ISourceControlProvider sourceControlProvider,
+        private static void LogReport(ISourceControlProvider sourceControlProvider,
                                LogReportData logreport,
                                string path,
-                               StreamWriter output)
+                               TextWriter output)
         {
             string serverPath = "/";
             if (path.IndexOf('/', 9) > -1)

@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Threading;
 using Attach;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Cache;
@@ -201,9 +202,12 @@ namespace Tests
         {
             return base.Attach((Delegate)method, Return.DelegateResult(delegate(object[] parameters)
             {
-                FutureData data = new FutureData(null, null, null);
-                data.Value = returnValue;
-                ((ItemMetaData)parameters[0]).Data = data;
+                FutureFile file = new FutureFile(delegate
+                {
+                    return returnValue;
+                });
+                ((ItemMetaData)parameters[0]).Data = file;
+                ((ItemMetaData) parameters[0]).DataLoaded = true;
                 return null;
             }));
         }

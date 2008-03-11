@@ -13,14 +13,18 @@ namespace IntegrationTests
     {
         private readonly NetworkCredential oldCredentials;
 
-        public AuthenticateAsLowPrivilegeUser()
+        public AuthenticateAsLowPrivilegeUser() : this(Settings.Default.Username, Settings.Default.Password, Settings.Default.Domain)
+        {
+
+        }
+
+        public AuthenticateAsLowPrivilegeUser(string user, string password, string domain)
         {
             oldCredentials = CredentialsHelper.DefaultCredentials;
-            if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
+            if (string.IsNullOrEmpty(user.Trim()))
                 return;
             CredentialsHelper.NullCredentials = CredentialsHelper.DefaultCredentials =
-                new NetworkCredential(Settings.Default.Username, Settings.Default.Password,
-                                      Settings.Default.Domain);
+                new NetworkCredential(user, password,domain);
         }
 
         public void Dispose()

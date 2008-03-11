@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Exceptions;
@@ -81,7 +82,8 @@ namespace SvnBridge.SourceControl
                 this.serverUrl = serverUrl.Split(',')[0];
                 rootPath = Constants.ServerRootPath;
             }
-            credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
+            credentials =
+                CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
             sourceControlHelper = new SourceControlUtility(SourceControlService, this, rootPath, serverUrl);
         }
 
@@ -110,7 +112,7 @@ namespace SvnBridge.SourceControl
         public bool DeleteItem(string activityId,
                                string path)
         {
-            if ((GetItems(-1, path, Recursion.None, true) == null) && (GetPendingItem(activityId, path) == null))
+            if ((GetItems(-1, path, Recursion.None, true, false) == null) && (GetPendingItem(activityId, path) == null))
             {
                 return false;
             }
@@ -209,7 +211,14 @@ namespace SvnBridge.SourceControl
                                      string path,
                                      Recursion recursion)
         {
-            return GetItems(version, path, recursion, false);
+            return GetItems(version, path, recursion, false, true);
+        }
+
+        public ItemMetaData GetItemsWithoutProperties(int version,
+                                                      string path,
+                                                      Recursion recursion)
+        {
+            return GetItems(version, path, recursion, false, false);
         }
 
         public int GetLatestVersion()
@@ -465,7 +474,9 @@ namespace SvnBridge.SourceControl
         {
             byte[] bytes = FileCache.Get(item.Name, item.Revision);
             if (bytes != null)
+            {
                 return bytes;
+            }
 
             byte[] downloadBytes = WebTransferService.DownloadBytes(item.DownloadUrl, credentials);
             FileCache.Set(item.Name, item.Revision, downloadBytes);
@@ -478,16 +489,27 @@ namespace SvnBridge.SourceControl
             byte[] bytes = FileCache.Get(item.Name, item.Revision);
             if (bytes != null)
             {
-                FutureData data = new FutureData(null, null, null);
-                data.Value = bytes;
-                item.Data = data;
+                item.Data = new FutureFile(delegate
+                {
+                    return FileCache.Get(item.Name, item.Revision);
+                });
+                item.DataLoaded = true;
                 return;
             }
-            IAsyncResult asyncResult = WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials);
-            item.Data = new FutureData(asyncResult, WebTransferService, delegate(byte[] obj)
+            IAsyncResult asyncResult = WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials,delegate(IAsyncResult ar)
             {
-                FileCache.Set(item.Name, item.Revision, obj);
+                if (FileCache.Get(item.Name, item.Revision) == null)
+                {
+                    byte[] data = WebTransferService.EndDownloadBytes(ar);
+                    FileCache.Set(item.Name, item.Revision, data);
+                }
             });
+            item.Data = new FutureFile(delegate
+                               {
+                                   asyncResult.AsyncWaitHandle.WaitOne();
+                                   return FileCache.Get(item.Name, item.Revision);
+                               });
+            item.DataLoaded = true;
         }
 
         public void SetActivityComment(string activityId,
@@ -523,7 +545,8 @@ namespace SvnBridge.SourceControl
         private ItemMetaData GetItems(int version,
                                       string path,
                                       Recursion recursion,
-                                      bool returnPropertyFiles)
+                                      bool returnPropertyFiles,
+                                      bool readItemsProperties)
         {
             if (path.StartsWith("/"))
             {
@@ -562,7 +585,7 @@ namespace SvnBridge.SourceControl
             for (int i = 0; i < items.Length; i++)
             {
                 ItemMetaData item = sourceControlHelper.ConvertSourceItem(items[i]);
-                if (recursion != Recursion.Full && !returnPropertyFiles)
+                if (recursion != Recursion.Full && readItemsProperties && !returnPropertyFiles)
                 {
                     if (Path.GetFileName(item.Name) != Constants.PROP_FOLDER)
                     {
@@ -759,7 +782,7 @@ namespace SvnBridge.SourceControl
                 {
                     existingPath = existingPath.Substring(0, lastIndexOf);
                 }
-                item = GetItems(-1, existingPath, Recursion.None, true);
+                item = GetItems(-1, existingPath, Recursion.None, true, false);
             } while (item == null);
 
             string localPath = GetLocalPath(activityId, path);
@@ -768,7 +791,7 @@ namespace SvnBridge.SourceControl
                                               localPath.Substring(0, localPath.LastIndexOf('\\')),
                                               item.Revision));
 
-            item = GetItems(-1, path.Substring(1), Recursion.None, true);
+            item = GetItems(-1, path.Substring(1), Recursion.None, true, false);
             if (item != null)
             {
                 updates.Add(LocalUpdate.FromLocal(item.Id, localPath, item.Revision));
@@ -1020,7 +1043,7 @@ namespace SvnBridge.SourceControl
             Activity activity = _activities[activityId];
             string localPath = GetLocalPath(activityId, path);
 
-            ItemMetaData item = GetItems(-1, path, Recursion.None, true);
+            ItemMetaData item = GetItems(-1, path, Recursion.None, true, false);
             if (item == null)
             {
                 item = GetPendingItem(activityId, path);
@@ -1061,7 +1084,7 @@ namespace SvnBridge.SourceControl
 
             if (cachedResult == null)
             {
-                item = GetItems(-1, propertiesPath, Recursion.None, true);
+                item = GetItems(-1, propertiesPath, Recursion.None, true, false);
                 Cache.Set(cacheKey, item);
             }
             else
@@ -1119,7 +1142,7 @@ namespace SvnBridge.SourceControl
 
                 string propertiesPath = GetPropertiesFileName(path, itemType);
                 string propertiesFolder = GetPropertiesFolderName(path, itemType);
-                ItemMetaData propertiesFolderItem = GetItems(-1, propertiesFolder, Recursion.None, true);
+                ItemMetaData propertiesFolderItem = GetItems(-1, propertiesFolder, Recursion.None, true, false);
                 if ((propertiesFolderItem == null) && !activity.Collections.Contains(propertiesFolder))
                 {
                     MakeCollection(activityId, propertiesFolder);

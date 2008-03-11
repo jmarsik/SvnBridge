@@ -154,6 +154,15 @@ namespace SvnBridge.Utility
             return xml.ToArray();
         }
 
+        public static string SerializeXmlString<T>(T request)
+        {
+            StringWriter sw = new StringWriter();
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
+            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+            serializer.Serialize(sw, request, ns);
+            return sw.GetStringBuilder().ToString();
+        }
+
 
         public static string GetMd5Checksum(byte[] data)
         {

@@ -8,7 +8,7 @@ namespace SvnBridge.SourceControl
     public class ItemMetaData
     {
         public string Author;
-        public FutureData Data;
+        public FutureFile Data;
         public bool DataLoaded = false;
         public string DownloadUrl = null;
         public int Id;
@@ -49,4 +49,5 @@ namespace SvnBridge.SourceControl
         }
     }
 }
+
 

@@ -63,19 +63,31 @@ namespace SvnBridge.Infrastructure
                     output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" + property.Value +
                                  "</S:set-prop>\n");
                 }
+                
+                while(item.DataLoaded==false)
+                    Thread.Sleep(100);
 
                 byte[] fileData = item.Data.Value;
 
                 item.DataLoaded = false;
                 item.Data = null;
-                SvnDiff svnDiff = SvnDiffEngine.CreateReplaceDiff(fileData);
+
+                SvnDiff svnDiff;
+                try
+                {
+                    svnDiff = SvnDiffEngine.CreateReplaceDiff(fileData);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException("Could not create diff for " + item.Name);
+                }
                 MemoryStream svnDiffStream = new MemoryStream();
                 SvnDiffParser.WriteSvnDiff(svnDiff, svnDiffStream);
                 byte[] svnDiffData = svnDiffStream.ToArray();
 
                 output.Write("<S:txdelta>");
-                output.Write(Convert.ToBase64String(svnDiffData) + "\n");
-                output.Write("</S:txdelta>");
+                output.Write(Convert.ToBase64String(svnDiffData));
+                output.Write("\n</S:txdelta>");
                 output.Write("<S:prop><V:md5-checksum>" + Helper.GetMd5Checksum(fileData) +
                              "</V:md5-checksum></S:prop>\n");
                 if (existingFile)

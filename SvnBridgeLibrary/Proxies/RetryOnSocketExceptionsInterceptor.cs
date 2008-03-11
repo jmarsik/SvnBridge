@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 
@@ -37,6 +38,10 @@ namespace SvnBridge.Proxies
                     // we will retry here, since we assume that the failure is trasient
                     logger.Info("Socket Error occured, attempt #" + (i + 1) + ", retrying...", se);
                 }
+
+                // if we are here we got an network exception, we will assume this is a
+                // trasient situation and wait a bit, hopefully it will clear up
+                Thread.Sleep(500);
             }
             if (exception == null)
                 return;

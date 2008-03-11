@@ -18,8 +18,11 @@ namespace TestsRequiringTfsClient
         public override void SetUp()
         {
             base.SetUp();
-            authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
+            authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser(Settings.Default.NonAdminUserName,
+                                                                              Settings.Default.NonAdminUserPassword,
+                                                                              Settings.Default.NonAdminUserDomain);
 
+        
             TeamFoundationServer server = TeamFoundationServerFactory.GetServer(Settings.Default.ServerUrl);
             store = (WorkItemStore) server.GetService(typeof (WorkItemStore));
             int latestChangeSetId;

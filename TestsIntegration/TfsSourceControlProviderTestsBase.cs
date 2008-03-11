@@ -49,7 +49,7 @@ namespace Tests
             TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
                                                                                           factory1,
                                                                                           webTransferService,
-                                                                                          system);
+                                                                                          system, new NullCache());
             ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
                                                                                        tfsSourceControlService,
                                                                                        ServerUrl);

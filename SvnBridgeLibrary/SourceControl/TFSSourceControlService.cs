@@ -1,25 +1,33 @@
 using System;
 using System.Net;
+using System.Text;
 using System.Web.Services.Protocols;
 using CodePlex.TfsLibrary;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using SvnBridge.Exceptions;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
+using SvnBridge.Proxies;
+using SvnBridge.Utility;
 
 namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlService : SourceControlService, ITFSSourceControlService
     {
         private readonly IRepositoryWebSvcFactory _webSvcFactory;
+        private readonly ICache cache;
 
         public TFSSourceControlService(IRegistrationService registrationService,
                                        IRepositoryWebSvcFactory webSvcFactory,
                                        IWebTransferService webTransferService,
-                                       IFileSystem fileSystem)
+                                       IFileSystem fileSystem,
+                                       ICache cache)
             : base(registrationService, webSvcFactory, webTransferService, fileSystem)
         {
             _webSvcFactory = webSvcFactory;
+            this.cache = cache;
         }
 
         #region ITFSSourceControlService Members
@@ -57,17 +65,36 @@ namespace SvnBridge.SourceControl
                                     ItemType itemType,
                                     bool generateDownloadUrls)
         {
+            
+           // NetworkCredential credential = credentials.GetCredential(new Uri(tfsUrl), "");
+           // string cacheKey = new StringBuilder("QueryItems_")
+           //     .Append(tfsUrl).Append("_")
+           //     .Append(credential.UserName).Append("@").Append(credential.Domain)
+           //         .Append("#").Append(credential.Password.GetHashCode())
+           //     .Append(workspaceName).Append("_")
+           //     .Append(workspaceOwner).Append("_")
+           //     .Append(GetChangeSet(version, tfsUrl, credential)).Append("_")
+           //     .Append(Helper.SerializeXmlString(deletedState)).Append("_")
+           //     .Append(Helper.SerializeXmlString(itemType)).Append("_")
+           //     .Append(generateDownloadUrls).Append("_")
+           //     .ToString();
+
+           //CachedResult result = cache.Get(cacheKey);
+           //if (result != null)
+           //    return (ItemSet[]) result.Value;
+
             Repository webSvc = TryCreateProxy(tfsUrl, credentials);
             try
             {
-                return
-                    webSvc.QueryItems(workspaceName,
-                                      workspaceOwner,
-                                      items,
-                                      version,
-                                      deletedState,
-                                      itemType,
-                                      generateDownloadUrls);
+                ItemSet[] queryItems = webSvc.QueryItems(workspaceName,
+                                                         workspaceOwner,
+                                                         items,
+                                                         version,
+                                                         deletedState,
+                                                         itemType,
+                                                         generateDownloadUrls);
+                //cache.Set(cacheKey, queryItems);
+                return queryItems;
             }
             catch (Exception e)
             {
@@ -78,6 +105,13 @@ namespace SvnBridge.SourceControl
 
                 throw;
             }
+        }
+
+        private int GetChangeSet(VersionSpec version, string tfsUrl, ICredentials credentials)
+        {
+            if(version is LatestVersionSpec)
+                return GetLatestChangeset(tfsUrl, credentials);
+            return ((ChangesetVersionSpec) version).cs;
         }
 
         #endregion

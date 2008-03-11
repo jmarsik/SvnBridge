@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
@@ -73,6 +74,11 @@ namespace Tests
                                              Recursion recursion)
         {
             throw new Exception("The method or operation is not implemented.");
+        }
+
+        public virtual ItemMetaData GetItemsWithoutProperties(int version, string path, Recursion recursion)
+        {
+            return GetItems(version, path, recursion);
         }
 
         public virtual bool IsDirectory(int version,

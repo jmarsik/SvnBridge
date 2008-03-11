@@ -65,7 +65,7 @@ namespace SvnBridge.Handlers
         private static void WriteFileNotFoundResponse(IHttpRequest request,
                                                       IHttpResponse response)
         {
-            response.StatusCode = (int) HttpStatusCode.NotFound;
+            response.StatusCode = (int)HttpStatusCode.NotFound;
             response.ContentType = "text/html; charset=iso-8859-1";
 
             string responseContent =
@@ -87,19 +87,20 @@ namespace SvnBridge.Handlers
         private static FolderMetaData GetFolderInfo(ISourceControlProvider sourceControlProvider,
                                                     string depth,
                                                     string path,
-                                                    int? version)
+                                                    int? version,
+                                                    bool loadPropertiesFromFile)
         {
             if (depth == "0")
             {
                 FolderMetaData folderInfo = new FolderMetaData();
                 ItemMetaData item =
-                    GetItems(sourceControlProvider, version.HasValue ? version.Value : -1, path, Recursion.None);
+                    GetItems(sourceControlProvider, version.HasValue ? version.Value : -1, path, Recursion.None, loadPropertiesFromFile);
                 folderInfo.Items.Add(item);
                 return folderInfo;
             }
             else if (depth == "1")
             {
-                return (FolderMetaData) GetItems(sourceControlProvider, version.Value, path, Recursion.OneLevel);
+                return (FolderMetaData)GetItems(sourceControlProvider, version.Value, path, Recursion.OneLevel, loadPropertiesFromFile);
             }
             else
             {
@@ -110,10 +111,14 @@ namespace SvnBridge.Handlers
         private static ItemMetaData GetItems(ISourceControlProvider sourceControlProvider,
                                              int version,
                                              string path,
-                                             Recursion recursion)
+                                             Recursion recursion,
+                                             bool loadPropertiesFromFile)
         {
             // Make sure path is decoded
-            return sourceControlProvider.GetItems(version, Helper.Decode(path), recursion);
+            if (loadPropertiesFromFile)
+                return sourceControlProvider.GetItems(version, Helper.Decode(path), recursion);
+            else
+                return sourceControlProvider.GetItemsWithoutProperties(version, Helper.Decode(path), recursion);
         }
 
         private void HandleAllProp(ISourceControlProvider sourceControlProvider,
@@ -123,7 +128,7 @@ namespace SvnBridge.Handlers
             string revision = requestPath.Split('/')[3];
             string path = requestPath.Substring(9 + revision.Length);
 
-            ItemMetaData item = GetItems(sourceControlProvider, int.Parse(revision), path, Recursion.None);
+            ItemMetaData item = GetItems(sourceControlProvider, int.Parse(revision), path, Recursion.None, true);
 
             if (item == null)
             {
@@ -159,7 +164,7 @@ namespace SvnBridge.Handlers
                          "</lp1:creationdate>\n");
             writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
                          "</lp1:getlastmodified>\n");
-            writer.Write("<lp1:checked-in><D:href>"+ApplicationPath+"/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
+            writer.Write("<lp1:checked-in><D:href>" + ApplicationPath + "/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name) +
                          "</D:href></lp1:checked-in>\n");
             writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
                          "</D:href></lp1:version-controlled-configuration>\n");
@@ -291,7 +296,7 @@ namespace SvnBridge.Handlers
                 throw new FileNotFoundException();
             }
 
-            FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depthHeader, path, version);
+            FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depthHeader, path, version, false);
 
             using (StreamWriter writer = new StreamWriter(outputStream))
             {
@@ -329,7 +334,7 @@ namespace SvnBridge.Handlers
                 throw new FileNotFoundException("Unable to find file '" + requestPath + "'in the source control repository", requestPath);
             }
 
-            FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depth, requestPath, null);
+            FolderMetaData folderInfo = GetFolderInfo(sourceControlProvider, depth, requestPath, null, true);
 
             using (StreamWriter writer = new StreamWriter(outputStream))
             {

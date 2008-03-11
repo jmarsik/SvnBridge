@@ -60,7 +60,6 @@
     <Compile Include="Interfaces\IInvocation.cs" />
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />
     <Compile Include="Interfaces\ISourceControlServicesHub.cs" />
-    <Compile Include="Proxies\CachingInterceptor.cs" />
     <Compile Include="Proxies\ProxyFactory.cs" />
     <Compile Include="Proxies\RemotingInvocation.cs" />
     <Compile Include="Proxies\RetryOnSocketExceptionsInterceptor.cs" />
@@ -102,7 +101,7 @@
     <Compile Include="SourceControl\Dto\ItemProperties.cs" />
     <Compile Include="SourceControl\Dto\Property.cs" />
     <Compile Include="SourceControl\FindOrCreateResults.cs" />
-    <Compile Include="SourceControl\Future.cs" />
+    <Compile Include="SourceControl\FutureFile.cs" />
     <Compile Include="SourceControl\FutureInvocationException.cs" />
     <Compile Include="Interfaces\ICredentialsProvider.cs" />
     <Compile Include="Interfaces\ISourceControlUtility.cs" />

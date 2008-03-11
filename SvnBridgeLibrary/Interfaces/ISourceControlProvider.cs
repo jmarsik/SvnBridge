@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
@@ -24,6 +25,11 @@ namespace SvnBridge.Interfaces
                                        UpdateReportData reportData);
 
         ItemMetaData GetItems(int version,
+                              string path,
+                              Recursion recursion);
+
+
+        ItemMetaData GetItemsWithoutProperties(int version,
                               string path,
                               Recursion recursion);
 

@@ -42,12 +42,28 @@ namespace SvnBridge.Proxies
         }
 
         [Test]
-        public void WillFailOnNonSocketException()
+        public void WillNotFailOnFirstWebException()
+        {
+            RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
+            IInvocation mock = mocks.CreateMock<IInvocation>();
+            // first call throws
+            Expect.Call(mock.Proceed).Throw(new WebException());
+
+            // second succeed
+            Expect.Call(mock.Proceed);
+
+            mocks.ReplayAll();
+
+            interceptor.Invoke(mock);
+        }
+
+        [Test]
+        public void WillFailOnNonSocketOrWebException()
         {
             RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
             IInvocation mock = mocks.CreateMock<IInvocation>();
           
-            Expect.Call(mock.Proceed).Throw(new WebException());
+            Expect.Call(mock.Proceed).Throw(new InvalidOperationException());
 
             mocks.ReplayAll();
 
@@ -56,7 +72,7 @@ namespace SvnBridge.Proxies
                 interceptor.Invoke(mock);
                 Assert.Fail("Should have thrown");
             }
-            catch(WebException)
+            catch (InvalidOperationException)
             {
 
             }
