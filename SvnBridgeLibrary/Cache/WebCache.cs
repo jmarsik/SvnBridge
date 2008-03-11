@@ -1,4 +1,6 @@
+using System;
 using System.Web;
+using System.Web.Caching;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.Cache
@@ -7,19 +9,20 @@ namespace SvnBridge.Cache
     {
         private readonly System.Web.Caching.Cache cache = HttpRuntime.Cache;
 
-        #region ICache Members
-
-        public object Get(string key)
+        public CachedResult Get(string key)
         {
-            return cache[key];
+            return (CachedResult)cache[key];
         }
 
-        public void Set(string key,
-                        object obj)
+        public void Set(string key, object obj)
         {
-            cache[key] = obj;
+            cache.Add(key, 
+                new CachedResult(obj), 
+                null, 
+                System.Web.Caching.Cache.NoAbsoluteExpiration,
+                TimeSpan.FromHours(2), 
+                CacheItemPriority.Default, 
+                null);
         }
-
-        #endregion
     }
 }

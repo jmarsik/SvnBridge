@@ -149,7 +149,7 @@ namespace SvnBridge.SourceControl
         [Test]
         public void WillGetFromCacheIfFound()
         {
-            Expect.Call(cache.Get("GetProjectLocation-blah")).Return(new ProjectLocationInformation("blah", "http"));
+            Expect.Call(cache.Get("GetProjectLocation-blah")).Return(new CachedResult(new ProjectLocationInformation("blah", "http")));
 
             mocks.ReplayAll();
 

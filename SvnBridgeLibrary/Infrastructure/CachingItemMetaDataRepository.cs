@@ -8,7 +8,7 @@ namespace SvnBridge.Infrastructure
 {
     public class CachingItemMetaDataRepository : IItemMetaDataRepository
     {
-        private static readonly XmlSerializer serializer = new XmlSerializer(typeof (UpdateReportData));
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(UpdateReportData));
         private readonly ICache cache;
         private readonly ISourceControlProvider svc;
 
@@ -25,12 +25,12 @@ namespace SvnBridge.Infrastructure
                                      string path,
                                      Recursion recursion)
         {
-            string cacheKey = version + "-" + path + "-" + recursion;
+            string cacheKey = "GetItems_" + version + "-" + path + "-" + recursion;
 
-            object cached = cache.Get(cacheKey);
+            CachedResult cached = cache.Get(cacheKey);
             if (cached != null)
             {
-                return (ItemMetaData) cached;
+                return (ItemMetaData)cached.Value;
             }
             ItemMetaData items = svc.GetItems(version, path, recursion);
             cache.Set(cacheKey, items);
@@ -51,10 +51,10 @@ namespace SvnBridge.Infrastructure
             }
             string cacheKey = path + "-" + versionFrom + "-" + versionTo + "-" + reportDataAsKey;
 
-            object cached = cache.Get(cacheKey);
+            CachedResult cached = cache.Get(cacheKey);
             if (cached != null)
             {
-                return (FolderMetaData) cached;
+                return (FolderMetaData)cached.Value;
             }
 
             FolderMetaData items = svc.GetChangedItems(path, versionFrom, versionTo, reportData);

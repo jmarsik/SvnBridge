@@ -1,6 +1,7 @@
 using CodePlex.TfsLibrary.ObjectModel;
 using NUnit.Framework;
 using Rhino.Mocks;
+using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 
@@ -21,14 +22,22 @@ namespace SvnBridge.SourceControl
             provider = new TFSSourceControlProvider(
                 "blah",
                 null,
-                System.Net.CredentialCache.DefaultCredentials,
-                mocks.Stub<IWebTransferService>(),
-                mocks.Stub<ITFSSourceControlService>(),
-                mocks.Stub<IProjectInformationRepository>(),
-                associateWorkItemWithChangeSet,
-                new FileLogger()
-                );
+                CreateSourceControlServicesHub());
         }
+
+        public ISourceControlServicesHub CreateSourceControlServicesHub()
+        {
+            return new SourceControlServicesHub(
+                System.Net.CredentialCache.DefaultCredentials,
+                MockRepository.GenerateStub<IWebTransferService>(),
+                MockRepository.GenerateStub<ITFSSourceControlService>(),
+                MockRepository.GenerateStub<IProjectInformationRepository>(),
+                associateWorkItemWithChangeSet,
+                new FileLogger(),
+                new NullCache(),
+                MockRepository.GenerateStub<IFileCache>());
+        }
+
 
         [TearDown]
         public void TestCleanup()

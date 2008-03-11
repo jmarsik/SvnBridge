@@ -20,8 +20,12 @@ namespace SvnBridge.Stubs
 
         #region IListener Members
 
-        public event EventHandler<ListenErrorEventArgs> ListenError;
-        public event EventHandler<FinishedHandlingEventArgs> FinishedHandling;
+        public event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
+        event EventHandler<FinishedHandlingEventArgs> IListener.FinishedHandling
+        {
+            add { }
+            remove { }
+        }
 
         public int Port
         {
@@ -51,7 +55,6 @@ namespace SvnBridge.Stubs
             {
                 Stop_Delegate();
             }
-
             Stop_Called = true;
         }
 

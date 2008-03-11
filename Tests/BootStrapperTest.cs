@@ -44,6 +44,7 @@ namespace SvnBridge
             dependencies["serverUrl"] = "http://codeplex-tfs3:8080/";
             dependencies["projectName"] = "as";
             dependencies["credentials"] = CredentialCache.DefaultCredentials;
+            dependencies["rootCachePath"] = ".";
 
             IProjectInformationRepository stub = mocks.Stub<IProjectInformationRepository>();
             SetupResult.For(stub.GetProjectLocation(null, null)).IgnoreArguments().Return(

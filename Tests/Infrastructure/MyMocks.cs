@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using Attach;
 using CodePlex.TfsLibrary.ObjectModel;
+using SvnBridge.Cache;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 
@@ -200,7 +201,7 @@ namespace Tests
         {
             return base.Attach((Delegate)method, Return.DelegateResult(delegate(object[] parameters)
             {
-                FutureData data = new FutureData(null, null);
+                FutureData data = new FutureData(null, null, null);
                 data.Value = returnValue;
                 ((ItemMetaData)parameters[0]).Data = data;
                 return null;

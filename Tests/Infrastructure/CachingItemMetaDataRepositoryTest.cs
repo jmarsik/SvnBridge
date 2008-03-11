@@ -37,7 +37,7 @@ namespace SvnBridge.Infrastructure
         [Test]
         public void GetChangedItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
         {
-            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new FolderMetaData());
+            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new CachedResult(new FolderMetaData()));
 
             UpdateReportData reportData = new UpdateReportData();
             DoNotExpect.Call(mockSourceControlProvider.GetChangedItems("blah", 5, 10, reportData));
@@ -66,7 +66,7 @@ namespace SvnBridge.Infrastructure
         [Test]
         public void GetItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
         {
-            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new ItemMetaData());
+            SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new CachedResult(new ItemMetaData()));
 
             DoNotExpect.Call(mockSourceControlProvider.GetItems(5, "blah", Recursion.Full));
 

@@ -28,10 +28,10 @@ namespace SvnBridge.SourceControl
                                                              string projectName)
         {
             string cacheKey = "GetProjectLocation-" + projectName;
-            object cached = cache.Get(cacheKey);
+            CachedResult cached = cache.Get(cacheKey);
             if (cached != null)
             {
-                return (ProjectLocationInformation) cached;
+                return (ProjectLocationInformation) cached.Value;
             }
 
             projectName = projectName.ToLower();

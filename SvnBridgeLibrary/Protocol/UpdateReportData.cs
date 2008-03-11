@@ -22,8 +22,6 @@ namespace SvnBridge.Protocol
         [XmlElement("update-target", Namespace = WebDav.Namespaces.SVN, DataType = "string")] public string UpdateTarget
             = null;
 
-        private bool isCheckOut;
-
         public bool IsCheckOut
         {
             get { return Entries[0].StartEmpty && Entries.Count == 1; }

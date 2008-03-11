@@ -6,7 +6,7 @@ namespace SvnBridge.Cache
     {
         #region ICache Members
 
-        public object Get(string key)
+        public CachedResult Get(string key)
         {
             return null;
         }

@@ -78,8 +78,12 @@ namespace SvnBridge
                         }
                         else
                         {
-                            Type interceptorType = ((InterceptorAttribute)attributes[0]).Interceptor;
-                            IoC.Container.Register(interfaceType, type, interceptorType);
+                            List<Type> interceptors = new List<Type>();
+                            Array.ForEach(attributes, delegate (object attr)
+                            {
+                                interceptors.Add(((InterceptorAttribute)attr).Interceptor);
+                            });
+                            IoC.Container.Register(interfaceType, type, interceptors.ToArray());
                         }
                     }
                 }

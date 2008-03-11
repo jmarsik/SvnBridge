@@ -63,49 +63,52 @@ namespace SvnBridge.Net
                 throw new InvalidOperationException(
                     "A TFS server URL must be specified before connections can be dispatched.");
             }
-            HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
-            handler.ApplicationPath = connection.Request.ApplicationPath;
-            if (handler != null)
-            {
-                try
-                {
-                    if (urlIncludesProjectName)
-                    {
-                        string projectName = connection.Request.Headers["Host"].Split('.')[0];
-                        handler.Handle(connection, tfsUrl, projectName);
-                    }
-                    else
-                    {
-                        handler.Handle(connection, tfsUrl);
-                    }
-                }
-                catch (WebException ex)
-                {
-                    HttpWebResponse response = ex.Response as HttpWebResponse;
 
-                    if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        SendUnauthorizedResponse(connection);
-                    }
-                    else
-                    {
-                        throw;
-                    }
+            HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
+
+            if (handler == null)
+            {
+                SendUnsupportedMethodResponse(connection);
+                return;
+            }
+
+            handler.ApplicationPath = connection.Request.ApplicationPath;
+
+            try
+            {
+                if (urlIncludesProjectName)
+                {
+                    string projectName = connection.Request.Headers["Host"].Split('.')[0];
+                    handler.Handle(connection, tfsUrl, projectName);
                 }
-                catch (NetworkAccessDeniedException)
+                else
+                {
+                    handler.Handle(connection, tfsUrl);
+                }
+            }
+            catch (WebException ex)
+            {
+                HttpWebResponse response = ex.Response as HttpWebResponse;
+
+                if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     SendUnauthorizedResponse(connection);
                 }
-                catch (IOException)
+                else
                 {
-                    // Error caused by client cancelling operation
-                    handler.Cancel();
+                    throw;
                 }
             }
-            else
+            catch (NetworkAccessDeniedException)
             {
-                SendUnsupportedMethodResponse(connection);
+                SendUnauthorizedResponse(connection);
             }
+            catch (IOException)
+            {
+                // Error caused by client cancelling operation
+                handler.Cancel();
+            }
+
         }
 
         private static void SendUnauthorizedResponse(IHttpContext connection)

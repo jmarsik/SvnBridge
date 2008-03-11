@@ -40,16 +40,23 @@ namespace SvnBridge.Infrastructure
                      });
         }
 
-        public void Register(Type service,Type impl, Type interceptorType)
+        public void Register(Type service,Type impl, params Type[] interceptorsType)
         {
-            if (IoC.Container.IsRegistered(interceptorType) == false)
-                IoC.Container.Register(interceptorType, interceptorType);
+            foreach (Type interceptorType in interceptorsType)
+            {
+                if (IoC.Container.IsRegistered(interceptorType) == false)
+                    IoC.Container.Register(interceptorType, interceptorType);
+            }
 
             Register(service, delegate(Container c, IDictionary deps)
             {
                 object instance = CreateInstance(impl, deps);
-
-                return ProxyFactory.Create(service, instance, (IInterceptor)Resolve(interceptorType, deps));
+                List<IInterceptor> interceptors = new List<IInterceptor>();
+                foreach (Type interceptorType in interceptorsType)
+                {
+                    interceptors.Add((IInterceptor)Resolve(interceptorType, deps));
+                }
+                return ProxyFactory.Create(service, instance, interceptors.ToArray());
             });
         }
 

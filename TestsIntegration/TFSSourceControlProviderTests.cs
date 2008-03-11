@@ -35,15 +35,7 @@ namespace Tests
                                                                                           system);
             TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
                                                                              PROJECT_NAME,
-                                                                             null,
-                                                                             webTransferService,
-                                                                             tfsSourceControlService,
-                                                                             new ProjectInformationRepository(
-                                                                                 new NullCache(),
-                                                                                 tfsSourceControlService,
-                                                                                 ServerUrl),
-                                                                                 new AssociateWorkItemWithChangeSet(ServerUrl, null),
-                                                                                 new FileLogger());
+                                                                             CreateSourceControlServicesHub());
         }
 
         [Test]

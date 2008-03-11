@@ -7,8 +7,10 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using IntegrationTests.Properties;
 using NUnit.Framework;
+using Rhino.Mocks;
 using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 
 namespace Tests
@@ -22,27 +24,11 @@ namespace Tests
         public virtual void SetUp()
         {
             _activityId = Guid.NewGuid().ToString();
-            RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
-            FileSystem system = new FileSystem();
-            RegistrationService service = new RegistrationService(factory);
-            RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
-            WebTransferService webTransferService = new WebTransferService(system);
-            TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
-                                                                                          factory1,
-                                                                                          webTransferService,
-                                                                                          system);
             associateWorkItemWithChangeSet = new AssociateWorkItemWithChangeSet(ServerUrl, GetCredentials());
-            ProjectInformationRepository projectInformationRepository = new ProjectInformationRepository(new NullCache(),
-                                                                                                         tfsSourceControlService,
-                                                                                                         ServerUrl);
+
             _provider = new TFSSourceControlProvider(ServerUrl,
                                                      PROJECT_NAME,
-                                                     GetCredentials(),
-                                                     webTransferService,
-                                                     tfsSourceControlService,
-                                                     projectInformationRepository,
-                                                     associateWorkItemWithChangeSet,
-                                                     new FileLogger());
+                                                     CreateSourceControlServicesHub());
 
             testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
@@ -50,11 +36,42 @@ namespace Tests
             Commit();
         }
 
+
+        public ISourceControlServicesHub CreateSourceControlServicesHub()
+        {
+            RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
+            FileSystem system = new FileSystem();
+
+            RegistrationService service = new RegistrationService(factory);
+            RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
+            WebTransferService webTransferService = new WebTransferService(system);
+
+            TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
+                                                                                          factory1,
+                                                                                          webTransferService,
+                                                                                          system);
+            ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
+                                                                                       tfsSourceControlService,
+                                                                                       ServerUrl);
+            return new SourceControlServicesHub(
+                GetCredentials(),
+                webTransferService,
+                tfsSourceControlService, 
+                repository,
+                associateWorkItemWithChangeSet,
+                new FileLogger(),
+                new NullCache(),
+                MockRepository.GenerateStub<IFileCache>());
+        }
+
+
         private static ICredentials GetCredentials()
         {
             if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
+            {
                 return null;
-            return new NetworkCredential(Settings.Default.Username, Settings.Default.Password,Settings.Default.Domain);
+            }
+            return new NetworkCredential(Settings.Default.Username, Settings.Default.Password, Settings.Default.Domain);
         }
 
         [TearDown]

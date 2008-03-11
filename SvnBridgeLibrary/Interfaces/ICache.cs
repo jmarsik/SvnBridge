@@ -1,10 +1,14 @@
+using System.Net;
+using CodePlex.TfsLibrary.ObjectModel;
+using SvnBridge.Infrastructure;
+using SvnBridge.SourceControl;
+
 namespace SvnBridge.Interfaces
 {
     public interface ICache
     {
-        object Get(string key);
+        CachedResult Get(string key);
 
-        void Set(string key,
-                 object obj);
+        void Set(string key, object obj);
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Net;
 using System.Net.Sockets;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
@@ -15,7 +17,7 @@ namespace SvnBridge.Proxies
 
         public void Invoke(IInvocation invocation)
         {
-            SocketException se = null;
+            Exception exception = null;
             for (int i = 0; i < 3; i++)
             {
                 try
@@ -23,18 +25,24 @@ namespace SvnBridge.Proxies
                     invocation.Proceed();
                     return;
                 }
-                catch (SocketException e)
+                catch (WebException we)
                 {
-                    se = e;
+                    exception = we;
                     // we will retry here, since we assume that the failure is trasient
-                    logger.Info("Socket Error occured, attempt #" + (i + 1) + ", retrying...", e);
+                    logger.Info("Web Exception occured, attempt #" + (i + 1) + ", retrying...", we);
+                }
+                catch (SocketException se)
+                {
+                    exception = se;
+                    // we will retry here, since we assume that the failure is trasient
+                    logger.Info("Socket Error occured, attempt #" + (i + 1) + ", retrying...", se);
                 }
             }
-            if (se == null)
+            if (exception == null)
                 return;
-            logger.Error("All retries failed", se);
-            ExceptionHelper.PreserveStackTrace(se);
-            throw se;
+            logger.Error("All retries failed", exception);
+            ExceptionHelper.PreserveStackTrace(exception);
+            throw exception;
         }
     }
 }
