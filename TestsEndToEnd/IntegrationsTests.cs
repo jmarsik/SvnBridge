@@ -1,5 +1,5 @@
 using System.IO;
-using NUnit.Framework;
+using Xunit;
 
 namespace TestsEndToEnd
 {
@@ -7,13 +7,12 @@ namespace TestsEndToEnd
     /// This set of tests are here for scenarios that were found by
     /// users
     /// </summary>
-    [TestFixture]
     public class IntegrationsTests : EndToEndTestBase
     {
         /// <summary>
         /// http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=9315
         /// </summary>
-        [Test]
+        [Fact]
         public void FailToAddFileOnUpdateAfterAdd()
         {
             CheckoutAndChangeDirectory();
@@ -23,7 +22,7 @@ namespace TestsEndToEnd
             Svn("update");
         }
 
-        [Test]
+        [Fact]
         public void CommitRenamesOfFiles()
         {
             CheckoutAndChangeDirectory();
@@ -42,7 +41,7 @@ namespace TestsEndToEnd
             Svn("commit -m ren");
         }
 
-        [Test]
+        [Fact]
         public void CommitRenamesAndModificationOfFiles()
         {
             CheckoutAndChangeDirectory();

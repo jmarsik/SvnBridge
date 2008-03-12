@@ -4,24 +4,24 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using IntegrationTests;
-using NUnit.Framework;
 using SvnBridge;
 using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using Tests;
+using Xunit;
 
 namespace TestsEndToEnd
 {
-    public class EndToEndTestBase : TFSSourceControlProviderTestsBase
+    public class EndToEndTestBase : TFSSourceControlProviderTestsBase, IDisposable
     {
         #region Setup/Teardown
 
-        public override void SetUp()
+        public EndToEndTestBase()
         {
             base.SetUp();
             authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
             port = new Random().Next(1024, short.MaxValue);
-            testUrl = "http://localhost:"+ this.port+ "/SvnBridgeTesting" + testPath;
+            testUrl = "http://localhost:" + this.port + "/SvnBridgeTesting" + testPath;
 
             new BootStrapper().Start();
 
@@ -44,7 +44,7 @@ namespace TestsEndToEnd
             Console.WriteLine("md " + checkoutFolder);
         }
 
-        public override void TearDown()
+        public void Dispose()
         {
             listener.Stop();
 
@@ -102,14 +102,6 @@ namespace TestsEndToEnd
             Environment.CurrentDirectory = 
                 Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
             Console.WriteLine("cd " + Environment.CurrentDirectory);
-        }
-
-        protected static void TemporaryIgnore(string message)
-        {
-            if (DateTime.Now < new DateTime(2008, 3, 15))
-            {
-                Assert.Ignore("We are ignoring this for now, because:" + message);
-            }
         }
 
         protected static string ExecuteCommandAndGetError(string command)

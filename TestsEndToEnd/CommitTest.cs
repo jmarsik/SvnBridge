@@ -1,19 +1,18 @@
 using System.IO;
-using NUnit.Framework;
+using Xunit;
 
 namespace TestsEndToEnd
 {
-    [TestFixture]
     public class CommitTest : EndToEndTestBase
     {
-        [Test]
+        [Fact]
         public void CanCommitNewFile()
         {
             CheckoutAndChangeDirectory();
             File.WriteAllText("test.txt", "hab");
             Svn("add test.txt");
             string command = Svn("commit -m blah");
-            Assert.IsTrue(
+            Assert.True(
                 command.Contains("Committed")
                 );
         }

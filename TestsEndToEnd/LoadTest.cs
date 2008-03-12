@@ -1,11 +1,9 @@
 using System.IO;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Net;
 
 namespace TestsEndToEnd
 {
-    [TestFixture]
-    [Ignore("Takes too long to run")]
     public class LoadTest : EndToEndTestBase
     {
         public override void SetUp()
@@ -17,7 +15,7 @@ namespace TestsEndToEnd
             };
         }
 
-        [Test]
+        [Fact(Skip="Takes too long to run")]
         public void Commit1000Files()
         {
             CheckoutAndChangeDirectory();

@@ -1,12 +1,11 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 
 namespace TestsEndToEnd
 {
-    [TestFixture]
     public class ListItemTest : EndToEndTestBase
     {
-        [Test]
+        [Fact]
         public void CanListFolderAndFile()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -16,10 +15,10 @@ namespace TestsEndToEnd
             string expected = @"TestFolder1/
 test.txt
 ";
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanListFolders()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -29,10 +28,10 @@ test.txt
             string expected = @"TestFolder1/
 TestFolder2/
 ";
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanListFoldersAndFilesRecursively()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -44,11 +43,11 @@ TestFolder2/
 TestFolder2/
 TestFolder2/text.txt
 ";
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
 
-        [Test]
+        [Fact]
         public void CanListPreviousVersion()
         {
             int version = CreateFolder(testPath + "/TestFolder1", true);
@@ -57,11 +56,11 @@ TestFolder2/text.txt
             string actual = Svn("list " + testUrl + " --revision " + version);
             string expected = @"TestFolder1/
 ";
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
 
-        [Test]
+        [Fact]
         public void CanListPreviousVersion_UsingPrev()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -72,25 +71,23 @@ TestFolder2/text.txt
             string actual = Svn("list test.txt --revision PREV");
             string expected = @"test.txt
 ";
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanListPreviousVersion_WhenDirectoryDoesNotExists()
         {
             CheckoutAndChangeDirectory();
             string actual = ExecuteCommandAndGetError("list --revision PREV");
             string expected = @"svn: Unable to find repository location for '' in revision";
-            Assert.IsTrue(
+            Assert.True(
                 actual.StartsWith(expected)
                 );
         }
 
-        [Test]
+        [Fact(Skip="SvnBridge doesn't support dated-rev-report")]
         public void CanListPreviousVersionUsingDate()
         {
-            TemporaryIgnore("SvnBridge doesn't support dated-rev-report");
-
             CreateFolder(testPath + "/TestFolder1", true);
             DateTime commitDate = DateTime.Now;
 
@@ -100,17 +97,17 @@ TestFolder2/text.txt
                 Svn("list " + testUrl + " --revision {" + commitDate.ToString("yyyyMMddTHHmmss") + "}");
             string expected = @"TestFolder1/
 ";
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanListSingleFolder()
         {
             CreateFolder(testPath + "/TestFolder", true);
             string actual = Svn("list " + testUrl);
             string expected = @"TestFolder/
 ";
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
     }
 }

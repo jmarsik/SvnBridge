@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
+using Xunit;
 
 namespace TestsEndToEnd
 {
-    [TestFixture]
     public class UpdateTest : EndToEndTestBase
     {
-        [Test]
+        [Fact]
         public void CanUpdateWorkingCopy()
         {
             CheckoutAndChangeDirectory();
@@ -16,12 +15,12 @@ namespace TestsEndToEnd
             Svn("commit -m blah");
             WriteFile(testPath + "/test2.txt", "blah", true);
             string output = Svn("update");
-            Assert.IsTrue(
+            Assert.True(
                 output.Contains("A    test2.txt")
                 );
         }
 
-        [Test]
+        [Fact]
         public void CanUpdateWorkingCopyToPreviousVersion()
         {
             CheckoutAndChangeDirectory();
@@ -32,7 +31,7 @@ namespace TestsEndToEnd
             Svn("update test.txt --revision PREV");
         }
 
-        [Test]
+        [Fact]
         public void CanUpdateWorkingCopyToPreviousVersion_AndRemoveFolder()
         {
             CheckoutAndChangeDirectory();
@@ -44,7 +43,7 @@ namespace TestsEndToEnd
             Svn("update foo --revision PREV");
         }
 
-        [Test]
+        [Fact]
         public void AfterAnErrorWhenGettingFile_WillBeAbleToUpdateAgain()
         {
             CheckoutAndChangeDirectory();
@@ -60,13 +59,13 @@ namespace TestsEndToEnd
             File.Delete("test.txt");
 
             string svn = Svn("update");
-            Assert.IsTrue(
+            Assert.True(
                 Regex.IsMatch(svn,@"^At revision \d+\.\r\n$")
                 );
         }
 
 
-        [Test]
+        [Fact]
         public void AfterAnErrorWhenGettingFile_WillBeAbleToUpdateAgain_AndGetModifiedFile()
         {
             CheckoutAndChangeDirectory();
@@ -85,11 +84,11 @@ namespace TestsEndToEnd
 
             Svn("update");
 
-            Assert.AreEqual("12312", File.ReadAllText("foo.bar"));
+            Assert.Equal("12312", File.ReadAllText("foo.bar"));
         }
 
 
-        [Test]
+        [Fact]
         public void UpdatingFileWhenItIsMissingInWorkingCopy()
         {
             CheckoutAndChangeDirectory();
@@ -106,10 +105,10 @@ namespace TestsEndToEnd
 
             Svn("update");
 
-            Assert.AreEqual("12312", File.ReadAllText("foo.bar"));
+            Assert.Equal("12312", File.ReadAllText("foo.bar"));
         }
 
-        [Test]
+        [Fact]
         public void UpdatingFolderWhenItIsMissingInWorkingCopy()
         {
             CheckoutAndChangeDirectory();
@@ -124,15 +123,15 @@ namespace TestsEndToEnd
 
             Svn("update foo --revision PREV");
 
-            Assert.IsFalse(Directory.Exists("foo"));
+            Assert.False(Directory.Exists("foo"));
 
             Svn("update");
 
-            Assert.IsTrue(Directory.Exists("foo"));
+            Assert.True(Directory.Exists("foo"));
         }
 
 
-        [Test]
+        [Fact]
         public void CanGetLatestChangesWhenMovingBackward()
         {
             CheckoutAndChangeDirectory();
@@ -157,10 +156,10 @@ namespace TestsEndToEnd
 
             Svn("update test.txt --revision " + previousVersion);
 
-            Assert.AreEqual("hab", File.ReadAllText("test.txt"));
+            Assert.Equal("hab", File.ReadAllText("test.txt"));
         }
 
-        [Test]
+        [Fact]
         public void WhenFileInFolderIsInPreviousVersionAndUpdatingToLatestShouldUpdateFile()
         {
             CheckoutAndChangeDirectory();
@@ -171,9 +170,9 @@ namespace TestsEndToEnd
 
             Svn("update");
             Svn("update TestFolder1/blah.txt --revision PREV");
-            Assert.AreEqual("abc", File.ReadAllText("TestFolder1/blah.txt"));
+            Assert.Equal("abc", File.ReadAllText("TestFolder1/blah.txt"));
             Svn("update");
-            Assert.AreEqual("def", File.ReadAllText("TestFolder1/blah.txt"));
+            Assert.Equal("def", File.ReadAllText("TestFolder1/blah.txt"));
         }
     }
 }

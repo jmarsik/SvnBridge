@@ -1,12 +1,11 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 
 namespace TestsEndToEnd
 {
-    [TestFixture]
     public class PropertiesTest : EndToEndTestBase
     {
-        [Test]
+        [Fact]
         public void CanSetAndGetProperty()
         {
             CheckoutAndChangeDirectory();
@@ -19,10 +18,10 @@ namespace TestsEndToEnd
 
             string actual = Svn("propget myLabel");
 
-            Assert.AreEqual("WorkItem: %BUGID%"+Environment.NewLine, actual);
+            Assert.Equal("WorkItem: %BUGID%"+Environment.NewLine, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanSetAndGetSvnIgnore()
         {
             CheckoutAndChangeDirectory();
@@ -35,11 +34,11 @@ namespace TestsEndToEnd
 
             string actual = Svn("propget svn:ignore");
 
-            Assert.AreEqual("*.ing", actual.Trim());
+            Assert.Equal("*.ing", actual.Trim());
         }
 
 
-        [Test]
+        [Fact]
         public void CanSetAndGetProperty_WithColon()
         {
             CheckoutAndChangeDirectory();
@@ -52,10 +51,10 @@ namespace TestsEndToEnd
 
             string actual = Svn("propget bugtraq:label");
 
-            Assert.AreEqual("WorkItem: %BUGID%"+Environment.NewLine, actual);
+            Assert.Equal("WorkItem: %BUGID%"+Environment.NewLine, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanWriteAndReadBugTrackingProperties()
         {
             CheckoutAndChangeDirectory();
@@ -71,19 +70,19 @@ namespace TestsEndToEnd
             CheckoutAgainAndChangeDirectory();
 
             string svn = Svn("propget bugtraq:label");
-            Assert.AreEqual("Work Item:", svn.Trim());
+            Assert.Equal("Work Item:", svn.Trim());
 
             svn = Svn("propget bugtraq:message");
-            Assert.AreEqual("Work Item: %BUGID%", svn.Trim());
+            Assert.Equal("Work Item: %BUGID%", svn.Trim());
 
             svn = Svn("propget bugtraq:number");
-            Assert.AreEqual("true", svn.Trim());
+            Assert.Equal("true", svn.Trim());
 
             svn = Svn("propget bugtraq:url");
-            Assert.AreEqual("http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=%BUGID%", svn.Trim());
+            Assert.Equal("http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=%BUGID%", svn.Trim());
 
             svn = Svn("propget bugtraq:warnifnoissue");
-            Assert.AreEqual("true", svn.Trim());
+            Assert.Equal("true", svn.Trim());
         }
     }
 }
