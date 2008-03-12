@@ -496,19 +496,32 @@ namespace SvnBridge.SourceControl
                 item.DataLoaded = true;
                 return;
             }
-            IAsyncResult asyncResult = WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials,delegate(IAsyncResult ar)
+            /*** Async of download seems to sometimes return incorrect data **/
+            //
+            //IAsyncResult asyncResult = WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
+            //{
+            //    if (FileCache.Get(item.Name, item.Revision) == null)
+            //    {
+            //        byte[] data = WebTransferService.EndDownloadBytes(ar); // data is wrong sometimes!!
+            //        FileCache.Set(item.Name, item.Revision, data);
+            //    }
+            //});
+            //item.Data = new FutureFile(delegate
+            //                   {
+            //                       asyncResult.AsyncWaitHandle.WaitOne();
+            //                       return FileCache.Get(item.Name, item.Revision);
+            //                   });
+
+            byte[] data = WebTransferService.DownloadBytes(item.DownloadUrl, credentials);
+            if (FileCache.Get(item.Name, item.Revision) == null)
             {
-                if (FileCache.Get(item.Name, item.Revision) == null)
-                {
-                    byte[] data = WebTransferService.EndDownloadBytes(ar);
-                    FileCache.Set(item.Name, item.Revision, data);
-                }
-            });
+                FileCache.Set(item.Name, item.Revision, data);
+            }
             item.Data = new FutureFile(delegate
                                {
-                                   asyncResult.AsyncWaitHandle.WaitOne();
                                    return FileCache.Get(item.Name, item.Revision);
                                });
+
             item.DataLoaded = true;
         }
 
