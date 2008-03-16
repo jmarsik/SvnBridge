@@ -121,7 +121,7 @@ namespace SvnBridge.SourceControl
         {
             try
             {
-                Repository repository = (Repository) _webSvcFactory.Create(tfsUrl, credentials);
+                Repository repository = (Repository)_webSvcFactory.Create(tfsUrl, credentials);
                 repository.PreAuthenticate = true;
                 repository.UnsafeAuthenticatedConnectionSharing = true;
                 return repository;
@@ -130,6 +130,10 @@ namespace SvnBridge.SourceControl
             {
                 throw new RepositoryUnavailableException(
                     "Failed when accessing server at: '" + tfsUrl + "' reason: " + soapEx.Detail.OuterXml, soapEx);
+            }
+            catch (NetworkAccessDeniedException)
+            {
+                throw;
             }
             catch (Exception e)
             {

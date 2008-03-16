@@ -4,4 +4,5 @@ obj
 obj
 </Value></Property><Property><Name>svn:ignore</Name><Value>bin
 obj
+FileCache
 </Value></Property></Properties></ItemProperties>
