@@ -51,9 +51,9 @@
 	</Target>
 	
 	<Target Name="SetVersionNumber">
-		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\SvnBridgeLibrary\Properties\AssemblyInfo.cs"/>
-		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\SvnBridge\Properties\AssemblyInfo.cs"/>
-		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\SvnBridgeViaIis\Properties\AssemblyInfo.cs"/>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeLibrary\Properties\AssemblyInfo.cs"/>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\Properties\AssemblyInfo.cs"/>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeViaIis\Properties\AssemblyInfo.cs"/>
 	</Target>
 
 	<Target Name="Merge">
