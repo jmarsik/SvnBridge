@@ -155,9 +155,10 @@ namespace IntegrationTests
             CreateFolder(testPath + "/..svnbridge", true);
             WriteFile(testPath + "/..svnbridge/WheelMUD Database Creation.sql", GetBytes(propertyFile), true);
 
-            Exception result = Record.Exception(delegate { _provider.GetItems(-1, testPath, Recursion.Full); });
-
-            Assert.Null(result);
+            Assert.DoesNotThrow(delegate
+            {
+                _provider.GetItems(-1, testPath, Recursion.Full);     
+            });
         }
     }
 }

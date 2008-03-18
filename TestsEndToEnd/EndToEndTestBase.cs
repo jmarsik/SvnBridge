@@ -44,7 +44,7 @@ namespace TestsEndToEnd
             Console.WriteLine("md " + checkoutFolder);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             listener.Stop();
 

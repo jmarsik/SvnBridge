@@ -1,26 +1,25 @@
+using System;
 using System.Net;
 using IntegrationTests;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using NUnit.Framework;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 using TestsEndToEnd;
 using TestsRequiringTfsClient.Properties;
+using Xunit;
 
 namespace TestsRequiringTfsClient
 {
-    [TestFixture]
-    public class AssociateWorkItemWithChangeSetTest
+    public class AssociateWorkItemWithChangeSetTest : IDisposable
     {
         private int workItemId;
         private int changesetId;
         private WorkItemStore store;
         private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 
-        [SetUp]
-        public void SetUp()
+        public  AssociateWorkItemWithChangeSetTest()
         {
             authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser(Settings.Default.NonAdminUserName,
                                                                                 Settings.Default.NonAdminUserPassword,
@@ -31,8 +30,7 @@ namespace TestsRequiringTfsClient
             CreateWorkItemAndGetLatestChangeSet(out changesetId, out workItemId);
         }
 
-        [TearDown]
-        public void TestCleanup()
+        public void Dispose()
         {
             authenticateAsLowPrivilegeUser.Dispose();
         }
@@ -57,7 +55,7 @@ namespace TestsRequiringTfsClient
         }
 
 
-        [Test]
+        [Fact]
         public void CanAssociateWorkItemWithChangeSet()
         {
             IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
@@ -66,12 +64,12 @@ namespace TestsRequiringTfsClient
             associateWorkItemWithChangeSet.SetWorkItemFixed(workItemId);
 
             WorkItem item = store.GetWorkItem(workItemId);
-            Assert.AreEqual(1, item.Links.Count);
-            Assert.AreEqual("Fixed", item.State);
-            Assert.AreEqual("Fixed", item.Reason);
+            Assert.Equal(1, item.Links.Count);
+            Assert.Equal("Fixed", item.State);
+            Assert.Equal("Fixed", item.Reason);
         }
 
-        [Test]
+        [Fact]
         public void CanAssociateWithWorkItemAfterWorkItemHasBeenModified()
         {
             IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
@@ -81,15 +79,15 @@ namespace TestsRequiringTfsClient
             item.History = "test foo";
             item.Save();
 
-            Assert.AreEqual(2, item.Revision);
+            Assert.Equal(2, item.Revision);
 
             associateWorkItemWithChangeSet.Associate(workItemId, changesetId);
             associateWorkItemWithChangeSet.SetWorkItemFixed(workItemId);
 
             item = store.GetWorkItem(workItemId);
-            Assert.AreEqual(1, item.Links.Count);
-            Assert.AreEqual("Fixed", item.State);
-            Assert.AreEqual("Fixed", item.Reason);
+            Assert.Equal(1, item.Links.Count);
+            Assert.Equal("Fixed", item.State);
+            Assert.Equal("Fixed", item.Reason);
         }
     }
 }

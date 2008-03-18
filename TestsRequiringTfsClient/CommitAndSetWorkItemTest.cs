@@ -2,22 +2,20 @@ using System.IO;
 using IntegrationTests;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using NUnit.Framework;
 using TestsEndToEnd;
 using TestsRequiringTfsClient.Properties;
+using Xunit;
 
 namespace TestsRequiringTfsClient
 {
-    [TestFixture]
     public class CommitAndSetWorkItemTest : EndToEndTestBase
     {
         private int workItemId;
         private WorkItemStore store;
         private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 
-        public override void SetUp()
+        public CommitAndSetWorkItemTest()
         {
-            base.SetUp();
             authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser(Settings.Default.NonAdminUserName,
                                                                               Settings.Default.NonAdminUserPassword,
                                                                               Settings.Default.NonAdminUserDomain);
@@ -29,13 +27,13 @@ namespace TestsRequiringTfsClient
             AssociateWorkItemWithChangeSetTest.CreateWorkItemAndGetLatestChangeSet(out latestChangeSetId, out workItemId);
         }
 
-        [TearDown]
-        public void TestCleanup()
+        public override void Dispose()
         {
+            base.Dispose();
             authenticateAsLowPrivilegeUser.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CanFixWorkItemByCommitMessage()
         {
             CheckoutAndChangeDirectory();
@@ -47,11 +45,11 @@ namespace TestsRequiringTfsClient
             Svn("commit -m \"Done. Work Item: " + workItemId + "\"");
 
             WorkItem item = store.GetWorkItem(workItemId);
-            Assert.AreEqual("Fixed", item.State);
-            Assert.AreEqual("Fixed", item.Reason);
+            Assert.Equal("Fixed", item.State);
+            Assert.Equal("Fixed", item.Reason);
         }
 
-        [Test]
+        [Fact]
         public void AssociateTwoChangesetsWithWorkItem()
         {
             CheckoutAndChangeDirectory();
@@ -67,12 +65,12 @@ namespace TestsRequiringTfsClient
             Svn("commit -m \"Done. Work Item: " + workItemId + "\"");
 
             WorkItem item = store.GetWorkItem(workItemId);
-            Assert.AreEqual(2, item.Links.Count);
-            Assert.AreEqual("Fixed", item.State);
-            Assert.AreEqual("Fixed", item.Reason);
+            Assert.Equal(2, item.Links.Count);
+            Assert.Equal("Fixed", item.State);
+            Assert.Equal("Fixed", item.Reason);
         }
 
-        [Test]
+        [Fact]
         public void AssociatingSingleCheckInWithMultiplyWorkItems()
         {
             int oldWorkItemId = workItemId;
@@ -91,9 +89,9 @@ namespace TestsRequiringTfsClient
             foreach (int workItem in new int[] {oldWorkItemId, workItemId})
             {
                 WorkItem item = store.GetWorkItem(workItem);
-                Assert.AreEqual(1, item.Links.Count);
-                Assert.AreEqual("Fixed", item.State);
-                Assert.AreEqual("Fixed", item.Reason);
+                Assert.Equal(1, item.Links.Count);
+                Assert.Equal("Fixed", item.State);
+                Assert.Equal("Fixed", item.Reason);
             }
         }
     }
