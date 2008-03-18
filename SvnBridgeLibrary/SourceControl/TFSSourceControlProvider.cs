@@ -496,29 +496,15 @@ namespace SvnBridge.SourceControl
                 item.DataLoaded = true;
                 return;
             }
-            /*** Async of download seems to sometimes return incorrect data **/
-            //
-            //IAsyncResult asyncResult = WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
-            //{
-            //    if (FileCache.Get(item.Name, item.Revision) == null)
-            //    {
-            //        byte[] data = WebTransferService.EndDownloadBytes(ar); // data is wrong sometimes!!
-            //        FileCache.Set(item.Name, item.Revision, data);
-            //    }
-            //});
-            //item.Data = new FutureFile(delegate
-            //                   {
-            //                       asyncResult.AsyncWaitHandle.WaitOne();
-            //                       return FileCache.Get(item.Name, item.Revision);
-            //                   });
 
-            byte[] data = WebTransferService.DownloadBytes(item.DownloadUrl, credentials);
-            if (FileCache.Get(item.Name, item.Revision) == null)
+            IAsyncResult asyncResult = WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
             {
+                byte[] data = WebTransferService.EndDownloadBytes(ar);
                 FileCache.Set(item.Name, item.Revision, data);
-            }
+            });
             item.Data = new FutureFile(delegate
                                {
+                                   asyncResult.AsyncWaitHandle.WaitOne();
                                    return FileCache.Get(item.Name, item.Revision);
                                });
 
@@ -794,8 +780,8 @@ namespace SvnBridge.SourceControl
                 if (lastIndexOf != -1)
                     existingPath = existingPath.Substring(0, lastIndexOf);
                 else
-                    existingPath = ""; 
-                
+                    existingPath = "";
+
                 item = GetItems(-1, existingPath, Recursion.None, true, false);
             } while (item == null);
 

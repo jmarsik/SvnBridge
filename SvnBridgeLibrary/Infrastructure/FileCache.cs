@@ -8,6 +8,8 @@ namespace SvnBridge.Infrastructure
 {
     public class FileCache : IFileCache
     {
+        private const string verificationExtension = ".verification";
+
         private readonly string rootCachePath;
         /// <summary>
         /// this is actually a bit shorter than the realy legnth,
@@ -23,20 +25,27 @@ namespace SvnBridge.Infrastructure
 
         public byte[] Get(string filename, int revision)
         {
-            filename = HashIfNeeded(filename);
+            string hashedFilename = HashIfNeeded(filename);
 
-            string cachedFileName = Path.Combine(Path.Combine(rootCachePath, filename), revision.ToString());
+            string cachedFileName = Path.Combine(Path.Combine(rootCachePath, hashedFilename), revision.ToString());
+            FileInfo verification = new FileInfo(cachedFileName + verificationExtension);
+            FileInfo cached = new FileInfo(cachedFileName);
 
-            if (File.Exists(cachedFileName))
+            if (
+                // both verification and cached exists, and the verification
+                // file is newer than the cached file
+                cached.Exists && verification.Exists &&
+                cached.LastWriteTimeUtc <= verification.LastWriteTimeUtc
+                )
             {
                 return File.ReadAllBytes(cachedFileName);
             }
             return null;
         }
 
-        private  string HashIfNeeded(string filename)
+        private string HashIfNeeded(string filename)
         {
-            if(filename.Length + rootCachePath.Length < MaxPathLength)
+            if (filename.Length + rootCachePath.Length < MaxPathLength)
                 return filename;
 
             byte[] hash = HashAlgorithm.Create().ComputeHash(Encoding.UTF8.GetBytes(filename));
@@ -46,7 +55,7 @@ namespace SvnBridge.Infrastructure
             {
                 sb.Append(b.ToString("X2"));
             }
-            for (int i = 5; i < sb.Length; i+=10)
+            for (int i = 5; i < sb.Length; i += 10)
             {
                 sb.Insert(i, Path.DirectorySeparatorChar);
             }
@@ -55,11 +64,12 @@ namespace SvnBridge.Infrastructure
 
         public void Set(string filename, int revision, byte[] data)
         {
-            filename = HashIfNeeded(filename);
-            string directoryName = Path.Combine(rootCachePath, filename);
+            string hashedFilename = HashIfNeeded(filename);
+            string directoryName = Path.Combine(rootCachePath, hashedFilename);
             string cachedFileName = Path.Combine(directoryName, revision.ToString());
             EnsureDirectoryExists(directoryName);
             File.WriteAllBytes(cachedFileName, data);
+            File.WriteAllText(cachedFileName + verificationExtension, filename);
         }
 
         private static void EnsureDirectoryExists(string directoryName)
