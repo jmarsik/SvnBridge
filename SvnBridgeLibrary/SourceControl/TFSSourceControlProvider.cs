@@ -792,9 +792,10 @@ namespace SvnBridge.SourceControl
             {
                 int lastIndexOf = existingPath.LastIndexOf('/');
                 if (lastIndexOf != -1)
-                {
                     existingPath = existingPath.Substring(0, lastIndexOf);
-                }
+                else
+                    existingPath = ""; 
+                
                 item = GetItems(-1, existingPath, Recursion.None, true, false);
             } while (item == null);
 

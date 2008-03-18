@@ -18,6 +18,16 @@ namespace Tests
     [TestFixture]
     public abstract class TFSSourceControlProviderTestsBase
     {
+        protected static string ServerUrl = Settings.Default.ServerUrl;
+        protected const string PROJECT_NAME = "SvnBridgeTesting";
+        protected string _activityId;
+        protected string _activityIdRoot;
+        protected string testPath;
+        protected TFSSourceControlProvider _provider;
+        protected TFSSourceControlProvider _providerRoot;
+        protected int _lastCommitRevision;
+        private AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
+
         #region Setup/Teardown
 
         [SetUp]
@@ -33,9 +43,18 @@ namespace Tests
             testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
             _provider.MakeActivity(_activityId);
             _provider.MakeCollection(_activityId, testPath);
+            
             Commit();
         }
 
+        public void CreateRootProvider()
+        {
+            _activityIdRoot = Guid.NewGuid().ToString();
+            _providerRoot = new TFSSourceControlProvider(ServerUrl,
+                                         PROJECT_NAME + testPath,
+                                         CreateSourceControlServicesHub());
+            _provider.MakeActivity(_activityIdRoot);
+        }
 
         public ISourceControlServicesHub CreateSourceControlServicesHub()
         {
@@ -64,7 +83,6 @@ namespace Tests
                 MockRepository.GenerateStub<IFileCache>());
         }
 
-
         private static ICredentials GetCredentials()
         {
             if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
@@ -81,17 +99,11 @@ namespace Tests
             DeleteItem(testPath, false);
             _provider.MergeActivity(_activityId);
             _provider.DeleteActivity(_activityId);
+            if (_providerRoot != null)
+                _providerRoot.DeleteActivity(_activityIdRoot);
         }
 
         #endregion
-
-        protected static string ServerUrl = Settings.Default.ServerUrl;
-        protected const string PROJECT_NAME = "SvnBridgeTesting";
-        protected string _activityId;
-        protected string testPath;
-        protected TFSSourceControlProvider _provider;
-        protected int _lastCommitRevision;
-        private AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
 
         protected void UpdateFile(string path,
                                   string fileData,
@@ -131,6 +143,15 @@ namespace Tests
             _lastCommitRevision = response.Version;
             _provider.DeleteActivity(_activityId);
             _provider.MakeActivity(_activityId);
+            return response;
+        }
+
+        protected MergeActivityResponse CommitRoot()
+        {
+            MergeActivityResponse response = _providerRoot.MergeActivity(_activityIdRoot);
+            _lastCommitRevision = response.Version;
+            _providerRoot.DeleteActivity(_activityIdRoot);
+            _providerRoot.MakeActivity(_activityIdRoot);
             return response;
         }
 
