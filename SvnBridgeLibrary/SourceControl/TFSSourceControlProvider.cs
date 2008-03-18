@@ -1223,10 +1223,9 @@ namespace SvnBridge.SourceControl
                     string folderName = GetFolderName(itemProperties.Key);
                     item = sourceControlHelper.FindItem(folders[folderName.ToLowerInvariant()], itemProperties.Key);
                 }
-                foreach (Property property in itemProperties.Value.Properties)
-                {
-                    item.Properties[property.Name] = property.Value;
-                }
+                if (item != null)
+                    foreach (Property property in itemProperties.Value.Properties)
+                        item.Properties[property.Name] = property.Value;
             }
         }
 

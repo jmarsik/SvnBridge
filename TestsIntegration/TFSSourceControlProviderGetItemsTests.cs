@@ -1,13 +1,23 @@
-using NUnit.Framework;
+using System;
 using SvnBridge.SourceControl;
 using Tests;
+using Xunit;
 
 namespace IntegrationTests
 {
-    [TestFixture]
-    public class TFSSourceControlProviderGetItemsTests : TFSSourceControlProviderTestsBase
+    public class TFSSourceControlProviderGetItemsTests : TFSSourceControlProviderTestsBase, IDisposable
     {
-        [Test]
+        public TFSSourceControlProviderGetItemsTests()
+        {
+            base.SetUp();
+        }
+
+        public void Dispose()
+        {
+            base.TearDown();
+        }
+
+        [Fact]
         public void TestGetItemInActivityReturnsCorrectItemIfIsInRenamedFolder()
         {
             CreateFolder(testPath + "/A", false);
@@ -17,27 +27,27 @@ namespace IntegrationTests
 
             ItemMetaData item = _provider.GetItemInActivity(_activityId, testPath + "/B/Test.txt");
 
-            Assert.AreEqual(testPath.Substring(1) + "/A/Test.txt", item.Name);
+            Assert.Equal(testPath.Substring(1) + "/A/Test.txt", item.Name);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsForRootSucceeds()
         {
             FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, "", Recursion.OneLevel);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsOnFile()
         {
             WriteFile(testPath + "/File1.txt", "filedata", true);
 
             ItemMetaData item = _provider.GetItems(-1, testPath + "/File1.txt", Recursion.None);
 
-            Assert.IsNotNull(item);
-            Assert.AreEqual(testPath.Substring(1) + "/File1.txt", item.Name);
+            Assert.NotNull(item);
+            Assert.Equal(testPath.Substring(1) + "/File1.txt", item.Name);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsOnFileReturnsPropertiesForFile()
         {
             WriteFile(testPath + "/File1.txt", "filedata", false);
@@ -46,10 +56,10 @@ namespace IntegrationTests
 
             ItemMetaData item = _provider.GetItems(-1, testPath + "/File1.txt", Recursion.None);
 
-            Assert.AreEqual(propvalue, item.Properties["prop1"]);
+            Assert.Equal(propvalue, item.Properties["prop1"]);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsOnFolderReturnsPropertiesForFileWithinFolder()
         {
             string mimeType = "application/octet-stream";
@@ -59,10 +69,10 @@ namespace IntegrationTests
 
             FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
 
-            Assert.AreEqual(mimeType, item.Items[0].Properties["mime-type"]);
+            Assert.Equal(mimeType, item.Items[0].Properties["mime-type"]);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsOnFolderReturnsPropertiesForFolder()
         {
             string ignore = "*.bad\n";
@@ -70,10 +80,10 @@ namespace IntegrationTests
 
             FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
 
-            Assert.AreEqual(ignore, item.Properties["ignore"]);
+            Assert.Equal(ignore, item.Properties["ignore"]);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFileAndRecursionIsFull()
         {
             WriteFile(testPath + "/Test.txt", "whee", true);
@@ -82,10 +92,10 @@ namespace IntegrationTests
 
             FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
 
-            Assert.AreEqual(revision, item.Items[0].Revision);
+            Assert.Equal(revision, item.Items[0].Revision);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsReturnsCorrectRevisionWhenPropertyHasBeenAddedToFolderAndRecursionIsFull()
         {
             CreateFolder(testPath + "/Folder1", true);
@@ -94,10 +104,10 @@ namespace IntegrationTests
 
             FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
 
-            Assert.AreEqual(revision, item.Items[0].Revision);
+            Assert.Equal(revision, item.Items[0].Revision);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsReturnsCorrectRevisionWhenPropertyIsAdded()
         {
             WriteFile(testPath + "/File1.txt", "filedata", true);
@@ -106,10 +116,10 @@ namespace IntegrationTests
 
             ItemMetaData item = _provider.GetItems(-1, testPath + "/File1.txt", Recursion.None);
 
-            Assert.AreEqual(revision, item.Revision);
+            Assert.Equal(revision, item.Revision);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsReturnsCorrectRevisionWhenPropertyIsAddedThenFileIsUpdated()
         {
             WriteFile(testPath + "/File1.txt", "filedata", true);
@@ -119,10 +129,10 @@ namespace IntegrationTests
 
             ItemMetaData item = _provider.GetItems(-1, testPath + "/File1.txt", Recursion.None);
 
-            Assert.AreEqual(revision, item.Revision);
+            Assert.Equal(revision, item.Revision);
         }
 
-        [Test]
+        [Fact]
         public void TestGetItemsWithAllRecursionLevelsReturnsPropertyForFolder()
         {
             CreateFolder(testPath + "/Folder1", false);
@@ -133,9 +143,21 @@ namespace IntegrationTests
             FolderMetaData item2 = (FolderMetaData) _provider.GetItems(-1, testPath + "/Folder1", Recursion.OneLevel);
             FolderMetaData item3 = (FolderMetaData) _provider.GetItems(-1, testPath + "/Folder1", Recursion.None);
 
-            Assert.AreEqual(ignore, item1.Properties["ignore"]);
-            Assert.AreEqual(ignore, item2.Properties["ignore"]);
-            Assert.AreEqual(ignore, item3.Properties["ignore"]);
+            Assert.Equal(ignore, item1.Properties["ignore"]);
+            Assert.Equal(ignore, item2.Properties["ignore"]);
+            Assert.Equal(ignore, item3.Properties["ignore"]);
+        }
+
+        [Fact]
+        public void TestGetItemsIgnoresStalePropertyFiles()
+        {
+            string propertyFile = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ItemProperties xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Properties><Property><Name>mime-type</Name><Value>application/octet-stream</Value></Property></Properties></ItemProperties>";
+            CreateFolder(testPath + "/..svnbridge", true);
+            WriteFile(testPath + "/..svnbridge/WheelMUD Database Creation.sql", GetBytes(propertyFile), true);
+
+            Exception result = Record.Exception(delegate { _provider.GetItems(-1, testPath, Recursion.Full); });
+
+            Assert.Null(result);
         }
     }
 }
