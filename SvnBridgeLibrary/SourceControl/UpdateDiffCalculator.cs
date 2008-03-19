@@ -424,14 +424,17 @@ namespace SvnBridge.SourceControl
             {
                 FolderMetaData folder = root;
                 string itemName = checkoutRootPath;
-                string[] nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split('/');
+                string[] nameParts;
+                if (checkoutRootPath != "")
+                    nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split('/');
+                else
+                    nameParts = remoteName.Split('/'); 
+                
                 for (int i = 0; i < nameParts.Length; i++)
                 {
                     bool lastNamePart = false;
                     if (i == nameParts.Length - 1)
-                    {
                         lastNamePart = true;
-                    }
 
                     itemName += "/" + nameParts[i];
                     ItemMetaData item = sourceControlUtility.FindItem(folder, itemName);

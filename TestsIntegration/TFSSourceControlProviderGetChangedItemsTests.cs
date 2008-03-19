@@ -96,6 +96,22 @@ namespace Tests
         }
 
         [Test]
+        public void TestGetChangedItemsWithAddedFileAtRoot()
+        {
+            int versionFrom = _lastCommitRevision;
+            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
+            int versionTo = _lastCommitRevision;
+            UpdateReportData reportData = new UpdateReportData();
+            CreateRootProvider();
+
+            FolderMetaData folder = _providerRoot.GetChangedItems("", versionFrom, versionTo, reportData);
+
+            Assert.AreEqual("", folder.Name);
+            Assert.AreEqual("TestFile.txt", folder.Items[0].Name);
+            Assert.IsNotNull(folder.Items[0].DownloadUrl);
+        }
+        
+        [Test]
         public void TestGetChangedItemsWithAddedFileContainingProperty()
         {
             int versionFrom = _lastCommitRevision;
