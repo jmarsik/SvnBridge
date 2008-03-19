@@ -180,7 +180,7 @@ namespace SvnBridge.SourceControl
                                 SourceItemChange change,
                                 FolderMetaData root)
         {
-            if (change.Item.RemoteName.EndsWith("/" + Constants.PROP_FOLDER))
+            if (change.Item.RemoteName.EndsWith("/" + Constants.PropFolder))
             {
                 return;
             }
@@ -202,8 +202,8 @@ namespace SvnBridge.SourceControl
             // we ignore it here because this only happens when the related item
             // is delete, and at any rate, this is a SvnBridge implementation detail
             // which the client is not concerned about
-            if (change.Item.RemoteName.EndsWith("/" + Constants.PROP_FOLDER) ||
-                change.Item.RemoteName.Contains("/" + Constants.PROP_FOLDER + "/"))
+            if (change.Item.RemoteName.EndsWith("/" + Constants.PropFolder) ||
+                change.Item.RemoteName.Contains("/" + Constants.PropFolder + "/"))
             {
                 return;
             }
@@ -262,19 +262,19 @@ namespace SvnBridge.SourceControl
         {
             string remoteName = change.Item.RemoteName;
             bool propertyChange = false;
-            if (remoteName.Contains("/" + Constants.PROP_FOLDER + "/"))
+            if (remoteName.Contains("/" + Constants.PropFolder + "/"))
             {
                 propertyChange = true;
-                if (remoteName.EndsWith("/" + Constants.PROP_FOLDER + "/" + Constants.FOLDER_PROP_FILE))
+                if (remoteName.EndsWith("/" + Constants.PropFolder + "/" + Constants.FolderPropFile))
                 {
                     remoteName =
                         remoteName.Substring(0,
-                                             remoteName.IndexOf("/" + Constants.PROP_FOLDER + "/" +
-                                                                Constants.FOLDER_PROP_FILE));
+                                             remoteName.IndexOf("/" + Constants.PropFolder + "/" +
+                                                                Constants.FolderPropFile));
                 }
                 else
                 {
-                    remoteName = remoteName.Replace("/" + Constants.PROP_FOLDER + "/", "/");
+                    remoteName = remoteName.Replace("/" + Constants.PropFolder + "/", "/");
                 }
             }
             return new ItemInformation(propertyChange, remoteName);

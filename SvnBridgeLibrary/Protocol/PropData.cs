@@ -8,7 +8,8 @@ namespace SvnBridge.Protocol
     [Serializable]
     public class PropData
     {
-        [XmlAnyElement()] public List<XmlElement> Properties = new List<XmlElement>();
+        [XmlAnyElement()] 
+		public List<XmlElement> Properties = new List<XmlElement>();
 
         public PropData()
         {

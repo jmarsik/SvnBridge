@@ -36,12 +36,12 @@ namespace TestsEndToEnd
 
         private static void GenerateFile()
         {
-            int lines = 1024 * 2;
+            int lines = 1024 * 10;
             using (TextWriter writer = File.CreateText("test.txt"))
             {
                 for (int i = 0; i < lines; i++)
                 {
-                    int lineWidth = 128;
+					int lineWidth = 128;
                     string [] items = new string[lineWidth];
                     for (int j = 0; j < lineWidth; j++)
                     {

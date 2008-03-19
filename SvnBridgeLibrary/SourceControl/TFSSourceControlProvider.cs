@@ -586,22 +586,22 @@ namespace SvnBridge.SourceControl
                 ItemMetaData item = sourceControlHelper.ConvertSourceItem(items[i]);
                 if (recursion != Recursion.Full && readItemsProperties && !returnPropertyFiles)
                 {
-                    if (Path.GetFileName(item.Name) != Constants.PROP_FOLDER)
+                    if (Path.GetFileName(item.Name) != Constants.PropFolder)
                     {
                         RetrievePropertiesForItem(item);
                     }
                 }
 
-                if (item.Name.Contains("/" + Constants.PROP_FOLDER + "/") && !returnPropertyFiles)
+                if (item.Name.Contains("/" + Constants.PropFolder + "/") && !returnPropertyFiles)
                 {
                     string itemPath =
-                        item.Name.Replace("/" + Constants.PROP_FOLDER + "/" + Constants.FOLDER_PROP_FILE, "");
-                    itemPath = itemPath.Replace("/" + Constants.PROP_FOLDER + "/", "/");
+                        item.Name.Replace("/" + Constants.PropFolder + "/" + Constants.FolderPropFile, "");
+                    itemPath = itemPath.Replace("/" + Constants.PropFolder + "/", "/");
                     ItemProperties itemProperties = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
                     properties[itemPath] = itemProperties;
                     itemPropertyRevision[itemPath] = item.Revision;
                 }
-                else if (!item.Name.EndsWith("/" + Constants.PROP_FOLDER) || item.ItemType != ItemType.Folder ||
+                else if (!item.Name.EndsWith("/" + Constants.PropFolder) || item.ItemType != ItemType.Folder ||
                          returnPropertyFiles)
                 {
                     if (item.ItemType == ItemType.Folder)
@@ -701,15 +701,15 @@ namespace SvnBridge.SourceControl
             foreach (ActivityItem item in _activities[activityId].MergeList)
             {
                 ActivityItem newItem = item;
-                if (!item.Path.EndsWith("/" + Constants.PROP_FOLDER))
+                if (!item.Path.EndsWith("/" + Constants.PropFolder))
                 {
-                    if (item.Path.Contains("/" + Constants.PROP_FOLDER + "/"))
+                    if (item.Path.Contains("/" + Constants.PropFolder + "/"))
                     {
-                        string path = item.Path.Replace("/" + Constants.PROP_FOLDER + "/", "/");
+                        string path = item.Path.Replace("/" + Constants.PropFolder + "/", "/");
                         ItemType newItemType = item.FileType;
-                        if (path.EndsWith("/" + Constants.FOLDER_PROP_FILE))
+                        if (path.EndsWith("/" + Constants.FolderPropFile))
                         {
-                            path = path.Replace("/" + Constants.FOLDER_PROP_FILE, "");
+                            path = path.Replace("/" + Constants.FolderPropFile, "");
                             newItemType = ItemType.Folder;
                         }
                         newItem = new ActivityItem(path, newItemType, item.Action);
@@ -871,7 +871,7 @@ namespace SvnBridge.SourceControl
         private static string GetLocalPath(string activityId,
                                            string path)
         {
-            return Constants.LOCAL_PREFIX + activityId + path.Replace('/', '\\');
+            return Constants.LocalPrefix + activityId + path.Replace('/', '\\');
         }
 
         private void UpdateLocalVersion(string activityId,
@@ -1006,15 +1006,15 @@ namespace SvnBridge.SourceControl
         {
             if (itemType == ItemType.Folder)
             {
-                return path + "/" + Constants.PROP_FOLDER;
+                return path + "/" + Constants.PropFolder;
             }
             else if (path.LastIndexOf('/') != -1)
             {
-                return path.Substring(0, path.LastIndexOf('/')) + "/" + Constants.PROP_FOLDER;
+                return path.Substring(0, path.LastIndexOf('/')) + "/" + Constants.PropFolder;
             }
             else
             {
-                return Constants.PROP_FOLDER;
+                return Constants.PropFolder;
             }
         }
 
@@ -1023,17 +1023,17 @@ namespace SvnBridge.SourceControl
         {
             if (itemType == ItemType.Folder)
             {
-                return path + "/" + Constants.PROP_FOLDER + "/" + Constants.FOLDER_PROP_FILE;
+                return path + "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
             }
             else if (path.LastIndexOf('/') != -1)
             {
                 return
-                    path.Substring(0, path.LastIndexOf('/')) + "/" + Constants.PROP_FOLDER +
+                    path.Substring(0, path.LastIndexOf('/')) + "/" + Constants.PropFolder +
                     path.Substring(path.LastIndexOf('/'));
             }
             else
             {
-                return Constants.PROP_FOLDER + "/" + path;
+                return Constants.PropFolder + "/" + path;
             }
         }
 

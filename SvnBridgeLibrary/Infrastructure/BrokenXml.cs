@@ -12,11 +12,13 @@ namespace SvnBridge.Infrastructure
     public class BrokenXml
     {
         static readonly Regex findDuplicateNamespacesInTagStart = new Regex(@"<([\w\d]+):([\w\d]+):([\w\d]+)>", RegexOptions.Compiled);
+		static readonly Regex findDuplicateNamespacesInTag = new Regex(@"<\s*([\w\d]+):([\w\d]+):([\w\d]+)\s*/>", RegexOptions.Compiled);
         static readonly Regex findDuplicateNamespacesInTagEnd = new Regex(@"</([\w\d]+):([\w\d]+):([\w\d]+)>", RegexOptions.Compiled);
 
         public static string Escape(string brokenXml)
         {
             string replaced = findDuplicateNamespacesInTagStart.Replace(brokenXml, "<$1:$2__COLON__$3>");
+        	replaced = findDuplicateNamespacesInTag.Replace(replaced, "<$1:$2__COLON__$3/>");
             return findDuplicateNamespacesInTagEnd.Replace(replaced, "</$1:$2__COLON__$3>");
         }
     }
