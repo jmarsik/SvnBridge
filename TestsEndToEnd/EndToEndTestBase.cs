@@ -7,7 +7,6 @@ using IntegrationTests;
 using SvnBridge;
 using SvnBridge.Infrastructure;
 using SvnBridge.Net;
-using Tests;
 using Xunit;
 
 namespace TestsEndToEnd
@@ -18,7 +17,6 @@ namespace TestsEndToEnd
 
         public EndToEndTestBase()
         {
-            base.SetUp();
             authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
             port = new Random().Next(1024, short.MaxValue);
             testUrl = "http://localhost:" + this.port + "/SvnBridgeTesting" + testPath;
@@ -44,11 +42,11 @@ namespace TestsEndToEnd
             Console.WriteLine("md " + checkoutFolder);
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             listener.Stop();
 
-            base.TearDown();
+            base.Dispose();
             ForAllFilesInCurrentDirectory(
                 delegate(FileInfo file) { file.Attributes = file.Attributes & ~FileAttributes.ReadOnly; });
 

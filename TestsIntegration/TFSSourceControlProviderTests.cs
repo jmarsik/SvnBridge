@@ -2,7 +2,6 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
-using NUnit.Framework;
 using SvnBridge.Cache;
 using SvnBridge.Exceptions;
 using SvnBridge.SourceControl;
@@ -10,18 +9,23 @@ using SvnBridge.Infrastructure;
 
 namespace Tests
 {
-    [TestFixture]
-    public class TFSSourceControlProviderTests : TFSSourceControlProviderTestsBase
+	using IntegrationTests;
+	using Xunit;
+
+	public class TFSSourceControlProviderTests : TFSSourceControlProviderTestsBase
     {
-        [Test, ExpectedException(typeof (FolderAlreadyExistsException))]
+        [Fact]
         public void TestAddFolderThatAlreadyExistsThrowsException()
         {
             CreateFolder(testPath + "/New Folder", true);
 
-            _provider.MakeCollection(_activityId, testPath + "/New Folder");
+        	Assert.Throws(typeof (FolderAlreadyExistsException), delegate
+        	{
+        		_provider.MakeCollection(_activityId, testPath + "/New Folder");
+        	});
         }
 
-        [Test]
+        [Fact]
         public void TestCreateProviderWithMultipleTFSUrlsSucceeds()
         {
             RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
@@ -38,33 +42,33 @@ namespace Tests
                                                                              CreateSourceControlServicesHub());
         }
 
-        [Test]
+        [Fact]
         public void TestDeleteItemReturnsFalseIfFileDoesNotExist()
         {
             bool result = _provider.DeleteItem(_activityId, testPath + "/NotHere.txt");
 
-            Assert.IsFalse(result);
+            Assert.False(result);
         }
 
-        [Test]
+        [Fact]
         public void TestDeleteItemReturnsTrueWhenFileExists()
         {
             WriteFile(testPath + "/File.txt", "filedata", true);
 
             bool result = _provider.DeleteItem(_activityId, testPath + "/File.txt");
 
-            Assert.IsTrue(result);
+            Assert.True(result);
         }
 
-        [Test]
+        [Fact]
         public void TestItemExistsReturnsFalseIfFileDoesNotExist()
         {
             bool result = _provider.ItemExists(testPath + "/TestFile.txt");
 
-            Assert.IsFalse(result);
+            Assert.False(result);
         }
 
-        [Test]
+        [Fact]
         public void TestItemExistsReturnsFalseIfFileDoesNotExistInSpecifiedVersion()
         {
             int version = _lastCommitRevision;
@@ -72,17 +76,17 @@ namespace Tests
 
             bool result = _provider.ItemExists(testPath + "/TestFile.txt", version);
 
-            Assert.IsFalse(result);
+            Assert.False(result);
         }
 
-        [Test]
+        [Fact]
         public void TestItemExistsReturnsTrueIfFileExists()
         {
             WriteFile(testPath + "/TestFile.txt", "Fun text", true);
 
             bool result = _provider.ItemExists(testPath + "/TestFile.txt");
 
-            Assert.IsTrue(result);
+            Assert.True(result);
         }
     }
 }

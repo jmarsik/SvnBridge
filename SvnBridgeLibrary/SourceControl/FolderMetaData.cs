@@ -13,7 +13,7 @@ namespace SvnBridge.SourceControl
         {
         }
 
-        private List<ItemMetaData> _items = new List<ItemMetaData>();
+        private readonly List<ItemMetaData> _items = new List<ItemMetaData>();
 
         public virtual List<ItemMetaData> Items
         {

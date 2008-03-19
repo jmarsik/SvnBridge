@@ -1,22 +1,11 @@
 using System;
 using SvnBridge.SourceControl;
-using Tests;
 using Xunit;
 
 namespace IntegrationTests
 {
-    public class TFSSourceControlProviderGetItemsTests : TFSSourceControlProviderTestsBase, IDisposable
+    public class TFSSourceControlProviderGetItemsTests : TFSSourceControlProviderTestsBase
     {
-        public TFSSourceControlProviderGetItemsTests()
-        {
-            base.SetUp();
-        }
-
-        public void Dispose()
-        {
-            base.TearDown();
-        }
-
         [Fact]
         public void TestGetItemInActivityReturnsCorrectItemIfIsInRenamedFolder()
         {

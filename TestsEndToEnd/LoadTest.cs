@@ -6,14 +6,13 @@ namespace TestsEndToEnd
 {
     public class LoadTest : EndToEndTestBase
     {
-        public override void SetUp()
-        {
-            base.SetUp();
-            listener.FinishedHandling+=delegate(object sender, FinishedHandlingEventArgs e)
-            {
-                System.Console.WriteLine(e.Method + " " + e.Url + " in " + e.Duration);
-            };
-        }
+		public LoadTest()
+		{
+			listener.FinishedHandling += delegate(object sender, FinishedHandlingEventArgs e)
+		   {
+			   System.Console.WriteLine(e.Method + " " + e.Url + " in " + e.Duration);
+		   };
+		}
 
         [Fact(Skip="Takes too long to run")]
         public void Commit1000Files()

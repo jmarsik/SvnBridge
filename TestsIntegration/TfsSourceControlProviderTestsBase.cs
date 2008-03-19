@@ -6,248 +6,248 @@ using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using IntegrationTests.Properties;
-using NUnit.Framework;
 using Rhino.Mocks;
 using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 
-namespace Tests
+namespace IntegrationTests
 {
-    [TestFixture]
-    public abstract class TFSSourceControlProviderTestsBase
-    {
-        protected static string ServerUrl = Settings.Default.ServerUrl;
-        protected const string PROJECT_NAME = "SvnBridgeTesting";
-        protected string _activityId;
-        protected string _activityIdRoot;
-        protected string testPath;
-        protected TFSSourceControlProvider _provider;
-        protected TFSSourceControlProvider _providerRoot;
-        protected int _lastCommitRevision;
-        private AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
+	public abstract class TFSSourceControlProviderTestsBase : IDisposable
+	{
+		protected static string ServerUrl = Settings.Default.ServerUrl;
+		protected const string PROJECT_NAME = "SvnBridgeTesting";
+		protected string _activityId;
+		protected string _activityIdRoot;
+		protected string testPath;
+		protected TFSSourceControlProvider _provider;
+		protected TFSSourceControlProvider _providerRoot;
+		protected int _lastCommitRevision;
+		private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
+		private readonly AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 
-        #region Setup/Teardown
+		#region Setup/Teardown
 
-        [SetUp]
-        public virtual void SetUp()
-        {
-            _activityId = Guid.NewGuid().ToString();
-            associateWorkItemWithChangeSet = new AssociateWorkItemWithChangeSet(ServerUrl, GetCredentials());
+		public TFSSourceControlProviderTestsBase()
+		{
+			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 
-            _provider = new TFSSourceControlProvider(ServerUrl,
-                                                     PROJECT_NAME,
-                                                     CreateSourceControlServicesHub());
+			_activityId = Guid.NewGuid().ToString();
+			associateWorkItemWithChangeSet = new AssociateWorkItemWithChangeSet(ServerUrl, GetCredentials());
 
-            testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            _provider.MakeActivity(_activityId);
-            _provider.MakeCollection(_activityId, testPath);
+			_provider = new TFSSourceControlProvider(ServerUrl,
+			                                         PROJECT_NAME,
+			                                         CreateSourceControlServicesHub());
+
+			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
+			_provider.MakeActivity(_activityId);
+			_provider.MakeCollection(_activityId, testPath);
             
-            Commit();
-        }
+			Commit();
+		}
 
-        public void CreateRootProvider()
-        {
-            _activityIdRoot = Guid.NewGuid().ToString();
-            _providerRoot = new TFSSourceControlProvider(ServerUrl,
-                                         PROJECT_NAME + testPath,
-                                         CreateSourceControlServicesHub());
-            _provider.MakeActivity(_activityIdRoot);
-        }
+		public void CreateRootProvider()
+		{
+			_activityIdRoot = Guid.NewGuid().ToString();
+			_providerRoot = new TFSSourceControlProvider(ServerUrl,
+			                                             PROJECT_NAME + testPath,
+			                                             CreateSourceControlServicesHub());
+			_provider.MakeActivity(_activityIdRoot);
+		}
 
-        public ISourceControlServicesHub CreateSourceControlServicesHub()
-        {
-            RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
-            FileSystem system = new FileSystem();
+		public ISourceControlServicesHub CreateSourceControlServicesHub()
+		{
+			RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
+			FileSystem system = new FileSystem();
 
-            RegistrationService service = new RegistrationService(factory);
-            RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
-            WebTransferService webTransferService = new WebTransferService(system);
+			RegistrationService service = new RegistrationService(factory);
+			RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
+			WebTransferService webTransferService = new WebTransferService(system);
 
-            TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
-                                                                                          factory1,
-                                                                                          webTransferService,
-                                                                                          system, new NullCache());
-            ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
-                                                                                       tfsSourceControlService,
-                                                                                       ServerUrl);
-            return new SourceControlServicesHub(
-                GetCredentials(),
-                webTransferService,
-                tfsSourceControlService, 
-                repository,
-                associateWorkItemWithChangeSet,
-                new FileLogger(),
-                new NullCache(),
-                MockRepository.GenerateStub<IFileCache>());
-        }
+			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
+			                                                                              factory1,
+			                                                                              webTransferService,
+			                                                                              system, new NullCache());
+			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
+			                                                                           tfsSourceControlService,
+			                                                                           ServerUrl);
+			return new SourceControlServicesHub(
+				GetCredentials(),
+				webTransferService,
+				tfsSourceControlService, 
+				repository,
+				associateWorkItemWithChangeSet,
+				new FileLogger(),
+				new NullCache(),
+				MockRepository.GenerateStub<IFileCache>());
+		}
 
-        private static ICredentials GetCredentials()
-        {
-            if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
-            {
-                return null;
-            }
-            return new NetworkCredential(Settings.Default.Username, Settings.Default.Password, Settings.Default.Domain);
-        }
+		private static ICredentials GetCredentials()
+		{
+			if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
+			{
+				return null;
+			}
+			return new NetworkCredential(Settings.Default.Username, Settings.Default.Password, Settings.Default.Domain);
+		}
 
-        [TearDown]
-        public virtual void TearDown()
-        {
-            Commit();
-            DeleteItem(testPath, false);
-            _provider.MergeActivity(_activityId);
-            _provider.DeleteActivity(_activityId);
-            if (_providerRoot != null)
-                _providerRoot.DeleteActivity(_activityIdRoot);
-        }
+		public virtual void Dispose()
+		{
+			Commit();
+			DeleteItem(testPath, false);
+			_provider.MergeActivity(_activityId);
+			_provider.DeleteActivity(_activityId);
+			if (_providerRoot != null)
+				_providerRoot.DeleteActivity(_activityIdRoot);
+			authenticateAsLowPrivilegeUser.Dispose();
+		}
 
-        #endregion
+		#endregion
 
-        protected void UpdateFile(string path,
-                                  string fileData,
-                                  bool commit)
-        {
-            byte[] data = Encoding.Default.GetBytes(fileData);
-            _provider.WriteFile(_activityId, path, data);
-            if (commit)
-            {
-                Commit();
-            }
-        }
+		protected void UpdateFile(string path,
+		                          string fileData,
+		                          bool commit)
+		{
+			byte[] data = Encoding.Default.GetBytes(fileData);
+			_provider.WriteFile(_activityId, path, data);
+			if (commit)
+			{
+				Commit();
+			}
+		}
 
-        protected bool WriteFile(string path,
-                                 string fileData,
-                                 bool commit)
-        {
-            byte[] data = Encoding.Default.GetBytes(fileData);
-            return WriteFile(path, data, commit);
-        }
+		protected bool WriteFile(string path,
+		                         string fileData,
+		                         bool commit)
+		{
+			byte[] data = Encoding.Default.GetBytes(fileData);
+			return WriteFile(path, data, commit);
+		}
 
-        protected bool WriteFile(string path,
-                                 byte[] fileData,
-                                 bool commit)
-        {
-            bool created = _provider.WriteFile(_activityId, path, fileData);
-            if (commit)
-            {
-                Commit();
-            }
-            return created;
-        }
+		protected bool WriteFile(string path,
+		                         byte[] fileData,
+		                         bool commit)
+		{
+			bool created = _provider.WriteFile(_activityId, path, fileData);
+			if (commit)
+			{
+				Commit();
+			}
+			return created;
+		}
 
-        protected MergeActivityResponse Commit()
-        {
-            MergeActivityResponse response = _provider.MergeActivity(_activityId);
-            _lastCommitRevision = response.Version;
-            _provider.DeleteActivity(_activityId);
-            _provider.MakeActivity(_activityId);
-            return response;
-        }
+		protected MergeActivityResponse Commit()
+		{
+			MergeActivityResponse response = _provider.MergeActivity(_activityId);
+			_lastCommitRevision = response.Version;
+			_provider.DeleteActivity(_activityId);
+			_provider.MakeActivity(_activityId);
+			return response;
+		}
 
-        protected MergeActivityResponse CommitRoot()
-        {
-            MergeActivityResponse response = _providerRoot.MergeActivity(_activityIdRoot);
-            _lastCommitRevision = response.Version;
-            _providerRoot.DeleteActivity(_activityIdRoot);
-            _providerRoot.MakeActivity(_activityIdRoot);
-            return response;
-        }
+		protected MergeActivityResponse CommitRoot()
+		{
+			MergeActivityResponse response = _providerRoot.MergeActivity(_activityIdRoot);
+			_lastCommitRevision = response.Version;
+			_providerRoot.DeleteActivity(_activityIdRoot);
+			_providerRoot.MakeActivity(_activityIdRoot);
+			return response;
+		}
 
-        protected void DeleteItem(string path,
-                                  bool commit)
-        {
-            _provider.DeleteItem(_activityId, path);
-            if (commit)
-            {
-                Commit();
-            }
-        }
+		protected void DeleteItem(string path,
+		                          bool commit)
+		{
+			_provider.DeleteItem(_activityId, path);
+			if (commit)
+			{
+				Commit();
+			}
+		}
 
-        protected void CopyItem(string path,
-                                string newPath,
-                                bool commit)
-        {
-            _provider.CopyItem(_activityId, path, newPath);
-            if (commit)
-            {
-                Commit();
-            }
-        }
+		protected void CopyItem(string path,
+		                        string newPath,
+		                        bool commit)
+		{
+			_provider.CopyItem(_activityId, path, newPath);
+			if (commit)
+			{
+				Commit();
+			}
+		}
 
-        protected void RenameItem(string path,
-                                  string newPath,
-                                  bool commit)
-        {
-            MoveItem(path, newPath, commit);
-        }
+		protected void RenameItem(string path,
+		                          string newPath,
+		                          bool commit)
+		{
+			MoveItem(path, newPath, commit);
+		}
 
-        protected void MoveItem(string path,
-                                string newPath,
-                                bool commit)
-        {
-            DeleteItem(path, false);
-            CopyItem(path, newPath, false);
-            if (commit)
-            {
-                Commit();
-            }
-        }
+		protected void MoveItem(string path,
+		                        string newPath,
+		                        bool commit)
+		{
+			DeleteItem(path, false);
+			CopyItem(path, newPath, false);
+			if (commit)
+			{
+				Commit();
+			}
+		}
 
-        protected int CreateFolder(string path,
-                                   bool commit)
-        {
-            _provider.MakeCollection(_activityId, path);
-            if (commit)
-            {
-                return Commit().Version;
-            }
-            return -1;
-        }
+		protected int CreateFolder(string path,
+		                           bool commit)
+		{
+			_provider.MakeCollection(_activityId, path);
+			if (commit)
+			{
+				return Commit().Version;
+			}
+			return -1;
+		}
 
-        protected string ReadFile(string path)
-        {
-            ItemMetaData item = _provider.GetItems(-1, path, Recursion.None);
-            return GetString(_provider.ReadFile(item));
-        }
+		protected string ReadFile(string path)
+		{
+			ItemMetaData item = _provider.GetItems(-1, path, Recursion.None);
+			return GetString(_provider.ReadFile(item));
+		}
 
-        protected void SetProperty(string path,
-                                   string name,
-                                   string value,
-                                   bool commit)
-        {
-            _provider.SetProperty(_activityId, path, name, value);
-            if (commit)
-            {
-                Commit();
-            }
-        }
+		protected void SetProperty(string path,
+		                           string name,
+		                           string value,
+		                           bool commit)
+		{
+			_provider.SetProperty(_activityId, path, name, value);
+			if (commit)
+			{
+				Commit();
+			}
+		}
 
-        protected string GetString(byte[] data)
-        {
-            return Encoding.Default.GetString(data);
-        }
+		protected string GetString(byte[] data)
+		{
+			return Encoding.Default.GetString(data);
+		}
 
-        protected byte[] GetBytes(string data)
-        {
-            return Encoding.Default.GetBytes(data);
-        }
+		protected byte[] GetBytes(string data)
+		{
+			return Encoding.Default.GetBytes(data);
+		}
 
-        protected bool ResponseContains(MergeActivityResponse response,
-                                        string path,
-                                        ItemType itemType)
-        {
-            bool found = false;
-            foreach (MergeActivityResponseItem item in response.Items)
-            {
-                if ((item.Path == path) && (item.Type == itemType))
-                {
-                    found = true;
-                }
-            }
+		protected bool ResponseContains(MergeActivityResponse response,
+		                                string path,
+		                                ItemType itemType)
+		{
+			bool found = false;
+			foreach (MergeActivityResponseItem item in response.Items)
+			{
+				if ((item.Path == path) && (item.Type == itemType))
+				{
+					found = true;
+				}
+			}
 
-            return found;
-        }
-    }
+			return found;
+		}
+	}
 }
