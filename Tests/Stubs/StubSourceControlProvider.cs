@@ -112,7 +112,12 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool DeleteItem(string activityId,
+    	public void RemoveProperty(string activityId, string path, string property)
+    	{
+    		throw new NotImplementedException();
+    	}
+
+    	public virtual bool DeleteItem(string activityId,
                                        string path)
         {
             throw new Exception("The method or operation is not implemented.");

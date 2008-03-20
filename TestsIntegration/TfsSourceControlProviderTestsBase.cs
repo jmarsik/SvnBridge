@@ -18,10 +18,10 @@ namespace IntegrationTests
 	{
 		protected static string ServerUrl = Settings.Default.ServerUrl;
 		protected const string PROJECT_NAME = "SvnBridgeTesting";
-		protected string _activityId;
+		protected readonly string _activityId;
 		protected string _activityIdRoot;
-		protected string testPath;
-		protected TFSSourceControlProvider _provider;
+		protected readonly string testPath;
+		protected readonly TFSSourceControlProvider _provider;
 		protected TFSSourceControlProvider _providerRoot;
 		protected int _lastCommitRevision;
 		private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
@@ -34,6 +34,7 @@ namespace IntegrationTests
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 
 			_activityId = Guid.NewGuid().ToString();
+
 			associateWorkItemWithChangeSet = new AssociateWorkItemWithChangeSet(ServerUrl, GetCredentials());
 
 			_provider = new TFSSourceControlProvider(ServerUrl,

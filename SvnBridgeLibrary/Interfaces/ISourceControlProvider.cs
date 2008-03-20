@@ -68,6 +68,10 @@ namespace SvnBridge.Interfaces
                          string property,
                          string value);
 
+		void RemoveProperty(string activityId,
+						string path,
+						string property);
+
         bool WriteFile(string activityId,
                        string path,
                        byte[] fileData);

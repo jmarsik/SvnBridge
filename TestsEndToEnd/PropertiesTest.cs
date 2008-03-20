@@ -84,5 +84,22 @@ namespace TestsEndToEnd
             svn = Svn("propget bugtraq:warnifnoissue");
             Assert.Equal("true", svn.Trim());
         }
+
+    	[Fact]
+    	public void CanRemoveProperty()
+    	{
+			CheckoutAndChangeDirectory();
+    		Svn("propset svn:ignore blah .");
+    		Svn("commit -m prop");
+
+    		Svn("propdel svn:ignore .");
+
+    		Svn("commit -m prop");
+
+			CheckoutAgainAndChangeDirectory();
+
+    		string svn = Svn("propget svn:ignore .");
+    		Assert.Empty(svn);
+    	}
     }
 }

@@ -31,14 +31,13 @@ namespace Trace
             txtTargetServer.Enabled = false;
             button1.Enabled = false;
 
-            File.WriteAllText("c:\\output1.txt", "");
-            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+            File.WriteAllText("output1.txt", "");
             int port = int.Parse(txtPort.Text);
-            _server = new TcpListener(localAddr, port);
+            _server = new TcpListener(IPAddress.Loopback, port);
             _targetServer = txtTargetServer.Text;
             _targetPort = txtTargetPort.Text;
 
-            File.WriteAllText(@"c:\Tests.txt", "");
+            File.WriteAllText(@"Tests.txt", "");
             WriteTestLogLine("using System;");
             WriteTestLogLine("using CodePlex.TfsLibrary;");
             WriteTestLogLine("using NUnit.Framework;");
@@ -65,7 +64,7 @@ namespace Trace
                 retry = false;
                 try
                 {
-                    File.AppendAllText(@"c:\Tests.txt", log);
+                    File.AppendAllText(@"Tests.txt", log);
                 }
                 catch
                 {
@@ -137,7 +136,7 @@ namespace Trace
                 try
                 {
                     //string data = Encoding.UTF8.GetString(buffer, 0, count);
-                    using (FileStream stream = File.OpenWrite("c:\\output1.txt"))
+                    using (FileStream stream = File.OpenWrite("output1.txt"))
                     {
                         stream.Position = stream.Length;
                         //byte[] start = Encoding.UTF8.GetBytes("++");
@@ -269,5 +268,15 @@ namespace Trace
             WriteTestLog(output.ToString());
             _lastDirection = direction;
         }
+
+		private void txtPort_TextChanged(object sender, EventArgs e)
+		{
+
+		}
+
+		private void label1_Click(object sender, EventArgs e)
+		{
+
+		}
     }
 }
