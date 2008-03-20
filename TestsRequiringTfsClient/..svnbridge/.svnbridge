@@ -2,4 +2,10 @@
 obj
 </Value></Property><Property><Name>svn:ignore</Name><Value>bin
 obj
+[Bb]in
+[Dd]ebug
+[Rr]elease
+*.user
+*.aps
+*.eto
 </Value></Property></Properties></ItemProperties>

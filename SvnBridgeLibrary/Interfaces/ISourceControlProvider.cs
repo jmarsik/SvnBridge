@@ -77,5 +77,7 @@ namespace SvnBridge.Interfaces
                        byte[] fileData);
 
         void ReadFileAsync(ItemMetaData item);
+
+    	Guid GetRepositoryUuid();
     }
 }

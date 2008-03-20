@@ -121,9 +121,9 @@ namespace SvnBridge.Nodes
             }
         }
 
-        private static string GetRepositoryUUID()
+        private string GetRepositoryUUID()
         {
-            return "<lp2:repository-uuid>" + Constants.RepositoryUuid + "</lp2:repository-uuid>";
+			return "<lp2:repository-uuid>" + sourceControlProvider.GetRepositoryUuid() + "</lp2:repository-uuid>";
         }
 
         private string GetCheckedIn(HttpContextHandlerBase handler)

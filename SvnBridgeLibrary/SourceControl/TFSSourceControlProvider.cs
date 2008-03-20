@@ -510,6 +510,17 @@ namespace SvnBridge.SourceControl
 			item.DataLoaded = true;
 		}
 
+		public Guid GetRepositoryUuid()
+		{
+			string cacheKey = "GetRepositoryUuid_"+serverUrl;
+			CachedResult result = Cache.Get(cacheKey);
+			if (result!=null)
+				return (Guid)result.Value;
+			Guid id = SourceControlService.GetRepositoryId(serverUrl, credentials);
+			Cache.Set(cacheKey, id);
+			return id;
+		}
+
 		public void SetActivityComment(string activityId,
 									   string comment)
 		{

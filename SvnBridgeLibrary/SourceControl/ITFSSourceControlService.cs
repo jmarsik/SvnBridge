@@ -113,5 +113,7 @@ namespace SvnBridge.SourceControl
                                   string workspaceName,
                                   Stream localContents,
                                   string serverPath);
+
+    	Guid GetRepositoryId(string tfsUrl, System.Net.ICredentials credentials);
     }
 }
