@@ -3,7 +3,13 @@ using Xunit;
 
 namespace TestsEndToEnd
 {
-    /// <summary>
+	using System;
+	using SvnBridge;
+	using SvnBridge.Infrastructure;
+	using SvnBridge.Interfaces;
+	using SvnBridge.SourceControl;
+
+	/// <summary>
     /// This set of tests are here for scenarios that were found by
     /// users
     /// </summary>
@@ -62,5 +68,17 @@ namespace TestsEndToEnd
 
             Svn("commit -m ren");
         }
+
+    	[Fact]
+    	public void WillClearExistingTempWorkSpacesOnCommit()
+    	{
+    		WriteFile(testPath + "/test1234", "!", true);
+
+			RenameItem(testPath+"/test1234", testPath+"/test5678", false);
+
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test1234", "blah");
+			Svn("commit -m test");
+    	}
     }
 }

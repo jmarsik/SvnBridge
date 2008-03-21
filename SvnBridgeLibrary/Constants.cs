@@ -10,6 +10,7 @@ namespace SvnBridge
 		public const string SvnVccPath = "/!svn/vcc/default";
 		public const string FolderPropFile = ".svnbridge";
 		public static readonly string LocalPrefix = Path.GetTempFileName();
+		public const string WorkspaceComment = "Temporary workspace for edit-merge-commit";
 		public const string PropFolder = "..svnbridge";
 	}
 }

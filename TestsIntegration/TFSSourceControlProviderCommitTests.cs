@@ -691,12 +691,16 @@ namespace IntegrationTests
 		[Fact]
 		public void TestCommitUpdatedFileAtRoot()
 		{
-			CreateRootProvider();
 			WriteFile(testPath + "/TestFile.txt", "Test file contents", true);
 			byte[] testFile = GetBytes("Test file contents\r\nUpdated");
 
+			CreateRootProvider();
 			bool created = _providerRoot.WriteFile(_activityIdRoot, "/TestFile.txt", testFile);
 			MergeActivityResponse response = CommitRoot();
+
+			//it was removed when we created a new workspace
+			// we have to recreate it.
+			_provider.MakeActivity(_activityId);
 
 			Assert.Equal(GetString(testFile), ReadFile(testPath + "/TestFile.txt"));
 			Assert.Equal(false, created);

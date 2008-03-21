@@ -343,11 +343,24 @@ namespace SvnBridge.SourceControl
 
 		public void MakeActivity(string activityId)
 		{
-			string workspaceComment = "Temporary workspace for edit-merge-commit";
-			SourceControlService.CreateWorkspace(serverUrl, credentials, activityId, workspaceComment);
+			ClearExistingTempWorkspaces();
+
+			SourceControlService.CreateWorkspace(serverUrl, credentials, activityId, Constants.WorkspaceComment);
 			string localPath = GetLocalPath(activityId, "");
 			SourceControlService.AddWorkspaceMapping(serverUrl, credentials, activityId, rootPath, localPath);
 			_activities[activityId] = new Activity();
+		}
+
+		private void ClearExistingTempWorkspaces()
+		{
+			WorkspaceInfo[] workspaces = SourceControlService.GetWorkspaces(serverUrl, credentials,WorkspaceComputers.ThisComputer);
+			foreach (WorkspaceInfo workspace in workspaces)
+			{
+				if (workspace.Comment != Constants.WorkspaceComment)
+					continue;
+				SourceControlService.DeleteWorkspace(serverUrl, credentials, 
+				                                     workspace.Name);
+			}
 		}
 
 		public void MakeCollection(string activityId,

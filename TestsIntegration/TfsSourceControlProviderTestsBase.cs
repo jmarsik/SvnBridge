@@ -14,6 +14,8 @@ using SvnBridge.SourceControl;
 
 namespace IntegrationTests
 {
+	using System.Web.Services.Protocols;
+
 	public abstract class TFSSourceControlProviderTestsBase : IDisposable
 	{
 		protected static string ServerUrl = Settings.Default.ServerUrl;
@@ -38,13 +40,13 @@ namespace IntegrationTests
 			associateWorkItemWithChangeSet = new AssociateWorkItemWithChangeSet(ServerUrl, GetCredentials());
 
 			_provider = new TFSSourceControlProvider(ServerUrl,
-			                                         PROJECT_NAME,
-			                                         CreateSourceControlServicesHub());
+													 PROJECT_NAME,
+													 CreateSourceControlServicesHub());
 
 			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss");
 			_provider.MakeActivity(_activityId);
 			_provider.MakeCollection(_activityId, testPath);
-            
+
 			Commit();
 		}
 
@@ -52,8 +54,8 @@ namespace IntegrationTests
 		{
 			_activityIdRoot = Guid.NewGuid().ToString();
 			_providerRoot = new TFSSourceControlProvider(ServerUrl,
-			                                             PROJECT_NAME + testPath,
-			                                             CreateSourceControlServicesHub());
+														 PROJECT_NAME + testPath,
+														 CreateSourceControlServicesHub());
 			_provider.MakeActivity(_activityIdRoot);
 		}
 
@@ -67,16 +69,16 @@ namespace IntegrationTests
 			WebTransferService webTransferService = new WebTransferService(system);
 
 			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
-			                                                                              factory1,
-			                                                                              webTransferService,
-			                                                                              system, new NullCache());
+																						  factory1,
+																						  webTransferService,
+																						  system, new NullCache());
 			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
-			                                                                           tfsSourceControlService,
-			                                                                           ServerUrl);
+																					   tfsSourceControlService,
+																					   ServerUrl);
 			return new SourceControlServicesHub(
 				GetCredentials(),
 				webTransferService,
-				tfsSourceControlService, 
+				tfsSourceControlService,
 				repository,
 				associateWorkItemWithChangeSet,
 				new FileLogger(),
@@ -107,8 +109,8 @@ namespace IntegrationTests
 		#endregion
 
 		protected void UpdateFile(string path,
-		                          string fileData,
-		                          bool commit)
+								  string fileData,
+								  bool commit)
 		{
 			byte[] data = Encoding.Default.GetBytes(fileData);
 			_provider.WriteFile(_activityId, path, data);
@@ -119,16 +121,16 @@ namespace IntegrationTests
 		}
 
 		protected bool WriteFile(string path,
-		                         string fileData,
-		                         bool commit)
+								 string fileData,
+								 bool commit)
 		{
 			byte[] data = Encoding.Default.GetBytes(fileData);
 			return WriteFile(path, data, commit);
 		}
 
 		protected bool WriteFile(string path,
-		                         byte[] fileData,
-		                         bool commit)
+								 byte[] fileData,
+								 bool commit)
 		{
 			bool created = _provider.WriteFile(_activityId, path, fileData);
 			if (commit)
@@ -157,7 +159,7 @@ namespace IntegrationTests
 		}
 
 		protected void DeleteItem(string path,
-		                          bool commit)
+								  bool commit)
 		{
 			_provider.DeleteItem(_activityId, path);
 			if (commit)
@@ -167,8 +169,8 @@ namespace IntegrationTests
 		}
 
 		protected void CopyItem(string path,
-		                        string newPath,
-		                        bool commit)
+								string newPath,
+								bool commit)
 		{
 			_provider.CopyItem(_activityId, path, newPath);
 			if (commit)
@@ -178,15 +180,15 @@ namespace IntegrationTests
 		}
 
 		protected void RenameItem(string path,
-		                          string newPath,
-		                          bool commit)
+								  string newPath,
+								  bool commit)
 		{
 			MoveItem(path, newPath, commit);
 		}
 
 		protected void MoveItem(string path,
-		                        string newPath,
-		                        bool commit)
+								string newPath,
+								bool commit)
 		{
 			DeleteItem(path, false);
 			CopyItem(path, newPath, false);
@@ -197,7 +199,7 @@ namespace IntegrationTests
 		}
 
 		protected int CreateFolder(string path,
-		                           bool commit)
+								   bool commit)
 		{
 			_provider.MakeCollection(_activityId, path);
 			if (commit)
@@ -214,9 +216,9 @@ namespace IntegrationTests
 		}
 
 		protected void SetProperty(string path,
-		                           string name,
-		                           string value,
-		                           bool commit)
+								   string name,
+								   string value,
+								   bool commit)
 		{
 			_provider.SetProperty(_activityId, path, name, value);
 			if (commit)
@@ -236,8 +238,8 @@ namespace IntegrationTests
 		}
 
 		protected bool ResponseContains(MergeActivityResponse response,
-		                                string path,
-		                                ItemType itemType)
+										string path,
+										ItemType itemType)
 		{
 			bool found = false;
 			foreach (MergeActivityResponseItem item in response.Items)
