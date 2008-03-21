@@ -49,6 +49,7 @@ namespace SvnBridge.Presenters
 			SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView, new ProxyInformation());
 			settingsViewPresenter.Port = listener.Port;
 			settingsViewPresenter.TfsUrl = listener.TfsUrl;
+			settingsViewPresenter.IgnoredUsedPort = listener.Port;
 			settingsViewPresenter.Show();
 
 			if ((!settingsViewPresenter.Cancelled) &&

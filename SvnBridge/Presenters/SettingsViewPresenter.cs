@@ -16,8 +16,9 @@ namespace SvnBridge.Presenters
         private readonly ISettingsView view;
         private int port;
         private string tfsUrl;
+    	private int ignoredUsedPort;
 
-        public SettingsViewPresenter(ISettingsView view, ProxyInformation proxyInformation)
+    	public SettingsViewPresenter(ISettingsView view, ProxyInformation proxyInformation)
         {
             this.view = view;
             this.proxyInformation = proxyInformation;
@@ -52,7 +53,13 @@ namespace SvnBridge.Presenters
             set { tfsUrl = value; }
         }
 
-        public void Show()
+    	public int IgnoredUsedPort
+    	{
+    		get { return ignoredUsedPort; }
+    		set { ignoredUsedPort = value; }
+    	}
+
+    	public void Show()
         {
             view.Show();
         }
