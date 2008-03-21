@@ -8,19 +8,21 @@ namespace SvnBridge.Views
     public partial class ToolTrayForm : Form, IListenerView
     {
         private ListenerViewPresenter presenter;
-
+    	private bool hasErrors = false;
         public ToolTrayForm()
         {
             InitializeComponent();
-			notifyIcon.BalloonTipClicked+=NotifyIcon_OnClick;
+			notifyIcon.BalloonTipClicked+=BalloonTipClicked_OnClick;
 			Closed+=delegate(object sender, EventArgs e)
 			{
 				presenter.ViewClosed();
 			};
         }
 
-    	private void NotifyIcon_OnClick(object sender, EventArgs e)
+    	private void BalloonTipClicked_OnClick(object sender, EventArgs e)
     	{
+			if (hasErrors==false)
+				return;
     		presenter.ShowErrors();
     	}
 
@@ -50,6 +52,7 @@ namespace SvnBridge.Views
 
         public void OnListenerError(string message)
         {
+        	hasErrors = true;
             notifyIcon.ShowBalloonTip(1000, "SvnBridge", message, ToolTipIcon.Error);
         }
 
