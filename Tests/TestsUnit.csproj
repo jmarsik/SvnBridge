@@ -107,6 +107,7 @@
     <Compile Include="SourceControl\ProjectInformationRepositoryTest.cs" />
     <Compile Include="SourceControl\TFSSourceControlProviderTest.cs" />
     <Compile Include="SourceControl\TFSSourceControlServiceTest.cs" />
+    <Compile Include="Stubs\StubErrorsView.cs" />
     <Compile Include="Stubs\StubSourceControlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\ProtocolTestsBase.cs" />

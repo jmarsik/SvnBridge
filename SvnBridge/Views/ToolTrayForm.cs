@@ -12,9 +12,19 @@ namespace SvnBridge.Views
         public ToolTrayForm()
         {
             InitializeComponent();
+			notifyIcon.BalloonTipClicked+=NotifyIcon_OnClick;
+			Closed+=delegate(object sender, EventArgs e)
+			{
+				presenter.ViewClosed();
+			};
         }
 
-        #region IListenerView Members
+    	private void NotifyIcon_OnClick(object sender, EventArgs e)
+    	{
+    		presenter.ShowErrors();
+    	}
+
+    	#region IListenerView Members
 
         public void OnListenerStarted()
         {
@@ -40,7 +50,6 @@ namespace SvnBridge.Views
 
         public void OnListenerError(string message)
         {
-            Trace.TraceError(message);
             notifyIcon.ShowBalloonTip(1000, "SvnBridge", message, ToolTipIcon.Error);
         }
 
@@ -75,6 +84,11 @@ namespace SvnBridge.Views
 
             presenter.ChangeSettings(settingsView);
         }
+
+		private void OnShowErrorsClick(object sender, EventArgs e)
+		{
+			presenter.ShowErrors();
+		}
 
         private void OnStartClicked(object sender,
                                     EventArgs e)

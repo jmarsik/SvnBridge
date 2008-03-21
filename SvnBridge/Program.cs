@@ -112,7 +112,10 @@ namespace SvnBridge
             listener.Port = port;
 
             ToolTrayForm view = new ToolTrayForm();
-            ListenerViewPresenter presenter = new ListenerViewPresenter(view, listener);
+            ListenerViewPresenter presenter = new ListenerViewPresenter(
+				view, 
+				new ErrorsView(),
+				listener);
 
             try
             {
