@@ -62,6 +62,21 @@ namespace IntegrationTests
         }
 
         [Fact]
+        public void TestGetItemsOnRootFolderReturnsPropertiesForFileWithinFolder()
+        {
+            string mimeType = "application/octet-stream";
+            string path = testPath + "/TestFile.txt";
+            WriteFile(path, "Fun text", false);
+            SetProperty(path, "mime-type", mimeType, true);
+            CreateRootProvider();
+
+            FolderMetaData folder = (FolderMetaData)_providerRoot.GetItems(-1, "", Recursion.Full);
+
+            Assert.Equal(mimeType, folder.Items[0].Properties["mime-type"]);
+            Assert.Equal(1, folder.Items.Count);
+        }
+
+        [Fact]
         public void TestGetItemsOnFolderReturnsPropertiesForFolder()
         {
             string ignore = "*.bad\n";
@@ -70,6 +85,19 @@ namespace IntegrationTests
             FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
 
             Assert.Equal(ignore, item.Properties["ignore"]);
+        }
+
+        [Fact]
+        public void TestGetItemsOnRootFolderReturnsPropertiesForFolder()
+        {
+            string ignore = "*.bad\n";
+            SetProperty(testPath, "ignore", ignore, true);
+            CreateRootProvider();
+
+            FolderMetaData item = (FolderMetaData)_providerRoot.GetItems(-1, "", Recursion.Full);
+
+            Assert.Equal(ignore, item.Properties["ignore"]);
+            Assert.Equal(0, item.Items.Count);
         }
 
         [Fact]

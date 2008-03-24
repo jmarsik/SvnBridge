@@ -627,17 +627,23 @@ namespace SvnBridge.SourceControl
 					}
 				}
 
-				if (item.Name.Contains("/" + Constants.PropFolder + "/") && !returnPropertyFiles)
+				if ((item.Name.Contains("/" + Constants.PropFolder + "/") || item.Name.StartsWith(Constants.PropFolder + "/")) && !returnPropertyFiles)
 				{
-					string itemPath =
-						item.Name.Replace("/" + Constants.PropFolder + "/" + Constants.FolderPropFile, "");
+					string itemPath = item.Name.Replace("/" + Constants.PropFolder + "/" + Constants.FolderPropFile, "");
+                    if (itemPath == Constants.PropFolder + "/" + Constants.FolderPropFile)
+                    {
+                        itemPath = "";
+                    }
 					itemPath = itemPath.Replace("/" + Constants.PropFolder + "/", "/");
+                    if (itemPath.StartsWith(Constants.PropFolder + "/"))
+                    {
+                        itemPath = itemPath.Substring(Constants.PropFolder.Length + 1);
+                    }
 					ItemProperties itemProperties = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
 					properties[itemPath] = itemProperties;
 					itemPropertyRevision[itemPath] = item.Revision;
 				}
-				else if (!item.Name.EndsWith("/" + Constants.PropFolder) || item.ItemType != ItemType.Folder ||
-						 returnPropertyFiles)
+				else if ((item.Name != Constants.PropFolder && !item.Name.EndsWith("/" + Constants.PropFolder)) || item.ItemType != ItemType.Folder || returnPropertyFiles)
 				{
 					if (item.ItemType == ItemType.Folder)
 					{
@@ -1209,7 +1215,10 @@ namespace SvnBridge.SourceControl
 
 		private static string GetFolderName(string path)
 		{
-			return path.Substring(0, path.LastIndexOf('/'));
+            if (path.Contains("/"))
+                return path.Substring(0, path.LastIndexOf('/'));
+            else
+                return "";
 		}
 
 		private ItemMetaData GetPendingItem(string activityId,
