@@ -24,11 +24,11 @@
 	<!-- Individiual targets -->
 
 	<Target Name="Clean">
-		<MSBuild Projects="SvnBridge.sln" Targets="Clean" Properties="Configuration=$(BuildType)"/>
+		<MSBuild Projects="SvnBridge-Build.sln" Targets="Clean" Properties="Configuration=$(BuildType)"/>
 	</Target>
 
 	<Target Name="Build">
-		<MSBuild Projects="SvnBridge.sln" Targets="Build" Properties="Configuration=$(BuildType)"/>
+		<MSBuild Projects="SvnBridge-Build.sln" Targets="Build" Properties="Configuration=$(BuildType)"/>
 	</Target>
 
 	<Target Name="UnitTest" DependsOnTargets="Build">
