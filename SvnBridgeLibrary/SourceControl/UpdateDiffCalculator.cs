@@ -40,20 +40,21 @@ namespace SvnBridge.SourceControl
                                            versionFrom,
                                            versionTo);
             }
-
+           
             if (updateReportData.Entries != null)
             {
                 foreach (EntryData data in updateReportData.Entries)
                 {
-                    if (data.path == null)
-                        continue; //we already went over the root;
-                    versionFrom = int.Parse(data.Rev);
-                    if (versionFrom != versionTo)
+                    int itemVersionFrom = int.Parse(data.Rev);
+                    // we already checked that version at the root level
+                    if (itemVersionFrom==versionFrom)
+                        continue;
+                    if (itemVersionFrom != versionTo)
                     {
                         FindOrCreateResults results = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo);
 
                         bool changed = CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, root,
-                                                       versionFrom, versionTo);
+                                                       itemVersionFrom, versionTo);
                         if(changed == false)
                             results.RevertAddition();
                     }

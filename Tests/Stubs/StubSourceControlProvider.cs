@@ -45,7 +45,12 @@ namespace Tests
 			return new Guid("81a5aebe-f34e-eb42-b435-ac1ecbb335f7");
     	}
 
-    	public virtual MergeActivityResponse MergeActivity(string activityId)
+        public virtual int GetVersionForDate(DateTime date)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual MergeActivityResponse MergeActivity(string activityId)
         {
             throw new Exception("The method or operation is not implemented.");
         }

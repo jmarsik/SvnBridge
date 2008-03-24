@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 using IntegrationTests;
@@ -19,7 +20,7 @@ namespace TestsEndToEnd
         {
             authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
             port = new Random().Next(1024, short.MaxValue);
-            testUrl = "http://localhost:" + this.port + "/SvnBridgeTesting" + testPath;
+            testUrl = "http://" + IPAddress.Loopback + ":" + this.port + "/SvnBridgeTesting" + testPath;
 
             new BootStrapper().Start();
 
@@ -95,9 +96,9 @@ namespace TestsEndToEnd
         {
             CreateTempFolder();
             Environment.CurrentDirectory = checkoutFolder;
-            Console.WriteLine("cd " +checkoutFolder);
+            Console.WriteLine("cd " + checkoutFolder);
             Svn("co " + testUrl);
-            Environment.CurrentDirectory = 
+            Environment.CurrentDirectory =
                 Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
             Console.WriteLine("cd " + Environment.CurrentDirectory);
         }
@@ -105,7 +106,7 @@ namespace TestsEndToEnd
         protected static string ExecuteCommandAndGetError(string command)
         {
             string err = null;
-            ExecuteInternal(command,delegate(Process svn)
+            ExecuteInternal(command, delegate(Process svn)
             {
                 err = svn.StandardError.ReadToEnd();
             });
@@ -116,7 +117,7 @@ namespace TestsEndToEnd
         {
             StringBuilder output = new StringBuilder();
             string err = null;
-            ExecuteInternal(command,delegate(Process svn)
+            ExecuteInternal(command, delegate(Process svn)
             {
                 ThreadPool.QueueUserWorkItem(delegate
                 {
@@ -125,7 +126,7 @@ namespace TestsEndToEnd
                 ThreadPool.QueueUserWorkItem(delegate
                 {
                     string line;
-                    while((line = svn.StandardOutput.ReadLine())!=null)
+                    while ((line = svn.StandardOutput.ReadLine()) != null)
                     {
                         Console.WriteLine(line);
                         output.AppendLine(line);
@@ -136,12 +137,12 @@ namespace TestsEndToEnd
             {
                 throw new InvalidOperationException("Failed to execute command: " + err);
             }
-			if(command.StartsWith("commit"))
-			{
-				// we need to recreate the work space, because
-				// a commit will kill all existing workspaces
-				_provider.MakeActivity(_activityId);
-			}
+            if (command.StartsWith("commit"))
+            {
+                // we need to recreate the work space, because
+                // a commit will kill all existing workspaces
+                _provider.MakeActivity(_activityId);
+            }
             return output.ToString();
         }
 

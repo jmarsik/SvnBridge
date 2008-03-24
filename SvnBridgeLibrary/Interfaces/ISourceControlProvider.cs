@@ -79,5 +79,7 @@ namespace SvnBridge.Interfaces
         void ReadFileAsync(ItemMetaData item);
 
     	Guid GetRepositoryUuid();
+
+        int GetVersionForDate(DateTime date);
     }
 }

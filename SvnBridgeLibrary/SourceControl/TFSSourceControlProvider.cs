@@ -534,6 +534,58 @@ namespace SvnBridge.SourceControl
 			return id;
 		}
 
+		public int GetVersionForDate(DateTime date)
+		{
+			DateVersionSpec dateVersion = new DateVersionSpec();
+			dateVersion.date = date.ToUniversalTime();
+
+			DateVersionSpec dateSpecForFirstVersion = GetDateSpecForVersion(1);
+
+			if (dateVersion.date < dateSpecForFirstVersion.date)
+				return 0; // the date is before the repository has started
+
+			int latestVersion = GetLatestVersion();
+			DateVersionSpec latestVersionDate = GetDateSpecForVersion(latestVersion);
+
+			// if the required date is after the latest version, obviously 
+			// the latest version is the nearest to it.
+			if (latestVersionDate.date < dateVersion.date)
+				return latestVersion;
+
+			LogItem logDateToLatest = SourceControlService.QueryLog(
+				ServerUrl,
+				credentials,
+				rootPath,
+				dateVersion,
+				latestVersionDate,
+				RecursionType.Full,
+				1);
+			// get the change set before that one, which is the nearest changeset
+			// to the requested date
+			return logDateToLatest.History[0].ChangeSetID - 1;
+		}
+
+		private DateVersionSpec GetDateSpecForVersion(int version)
+		{
+			DateVersionSpec spec = new DateVersionSpec();
+			int latestVersion = version;
+
+			ChangesetVersionSpec fromVersion = new ChangesetVersionSpec();
+			fromVersion.cs = latestVersion - 1;
+			ChangesetVersionSpec toVersion = new ChangesetVersionSpec();
+			toVersion.cs = latestVersion;
+			LogItem log = SourceControlService.QueryLog(
+				ServerUrl,
+				credentials,
+				rootPath,
+				fromVersion,
+				toVersion,
+				RecursionType.Full,
+				1);
+			spec.date = log.History[0].CommitDateTime;
+			return spec;
+		}
+
 		public void SetActivityComment(string activityId,
 									   string comment)
 		{

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Xunit;
 
 namespace TestsEndToEnd
@@ -85,11 +86,14 @@ TestFolder2/text.txt
                 );
         }
 
-        [Fact(Skip="SvnBridge doesn't support dated-rev-report")]
+        [Fact]
         public void CanListPreviousVersionUsingDate()
         {
             CreateFolder(testPath + "/TestFolder1", true);
             DateTime commitDate = DateTime.Now;
+
+            //SVN protocol is only accurate to the second
+            Thread.Sleep(TimeSpan.FromSeconds(2));
 
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
 
@@ -98,6 +102,31 @@ TestFolder2/text.txt
             string expected = @"TestFolder1/
 ";
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanListLatestUsingDate()
+        {
+            CreateFolder(testPath + "/TestFolder1", true);
+            WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
+
+            string actual =
+                Svn("list " + testUrl + " --revision {" + DateTime.Now.AddHours(2).ToString("yyyyMMddTHHmmss") + "}");
+            string expected = @"TestFolder1/
+test.txt
+";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanListUsingDateBeforeRepositoryCreated()
+        {
+            CreateFolder(testPath + "/TestFolder1", true);
+            WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
+
+            string actual =
+                ExecuteCommandAndGetError("list " + testUrl + " --revision {" + new DateTime(2000,1,1).ToString("yyyyMMddTHHmmss") + "}");
+            Assert.Contains("Unable to find repository location for", actual);
         }
 
         [Fact]

@@ -66,11 +66,31 @@ namespace SvnBridge.Handlers
                         GetLocationsReport(sourceControlProvider, data, path, output);
                     }
                 }
+                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "dated-rev-report")
+                {
+                    DatedRevReportData data = Helper.DeserializeXml<DatedRevReportData>(reader);
+                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                    using (StreamWriter output = new StreamWriter(response.OutputStream))
+                    {
+                        GetDatedRevReport(sourceControlProvider, data, output);
+                    }
+                }
                 else
                 {
                     throw new Exception("Unrecognized report name: " + reader.LocalName);
                 }
             }
+        }
+
+        private void GetDatedRevReport(ISourceControlProvider sourceControlProvider, DatedRevReportData data, TextWriter output)
+        {
+            int targetRevision = sourceControlProvider.GetVersionForDate(data.CreationDate);
+
+            output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+            output.Write("<S:dated-rev-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
+            output.Write("<D:version-name>");
+            output.Write(targetRevision);
+            output.Write("</D:version-name></S:dated-rev-report>");
         }
 
         private static void GetLocksReport(StreamWriter writer)
