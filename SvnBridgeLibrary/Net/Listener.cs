@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -71,7 +70,6 @@ namespace SvnBridge.Net
             }
 
             isListening = true;
-
             listener = new TcpListener(IPAddress.Loopback, Port);
             listener.Start();
 
@@ -118,7 +116,7 @@ namespace SvnBridge.Net
 
         private void Process(TcpClient tcpClient)
         {
-            IHttpContext connection = new ListenerContext(tcpClient.GetStream());
+        	IHttpContext connection = new ListenerContext(tcpClient.GetStream());
             try
             {
                 DateTime start = DateTime.Now;
@@ -128,24 +126,33 @@ namespace SvnBridge.Net
                 }
                 catch (Exception exception)
                 {
-                    connection.Response.StatusCode = 500;
-                    using (StreamWriter sw = new StreamWriter(connection.Response.OutputStream))
-                    {
-                        Guid guid = Guid.NewGuid();
+                	try
+                	{
+                		connection.Response.StatusCode = 500;
+                		using (StreamWriter sw = new StreamWriter(connection.Response.OutputStream))
+                		{
+                			Guid guid = Guid.NewGuid();
 
-                        string message = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                                   "<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n" +
-                                   "<C:error/>\n" +
-                                   "<m:human-readable errcode=\"160024\">\n" +
+                			string message = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                			                 "<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n" +
+                			                 "<C:error/>\n" +
+                			                 "<m:human-readable errcode=\"160024\">\n" +
                                     
-                                   ("Failed to process a request. Failure id: " + guid + "\n" + exception) +
+                			                 ("Failed to process a request. Failure id: " + guid + "\n" + exception) +
 
-                                   "</m:human-readable>\n" +
-                                   "</D:error>\n";
-                        sw.Write(message);
+                			                 "</m:human-readable>\n" +
+                			                 "</D:error>\n";
+                			sw.Write(message);
 
-                        LogError(guid, exception);
-                    }
+                			LogError(guid, exception);
+                		}
+                	}
+                	catch 
+                	{
+						// we explicitly ignore all exceptions here, we don't really have
+						// much to do if the error handling code failed to work, after all.
+                	}
+					// we still raise the original exception, though.
                     throw;
                 }
                 finally

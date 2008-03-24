@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using SvnBridge.Exceptions;
 using SvnBridge.Infrastructure;
 using Xunit;
 
@@ -53,5 +54,14 @@ namespace IntegrationTests
             byte[] bytes = fileCache.Get("blah", 1);
             Assert.Null(bytes);
         }
+
+		[Fact]
+		public void WillThrowIfDoesNotHaveAccessToFileSystem()
+		{
+			Assert.Throws<EnvironmentValidationException>("", delegate
+			{
+				new FileCache(@"b:\cache").ValidateEnvironment();
+			});
+		}
     }
 }

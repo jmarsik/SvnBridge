@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using SvnBridge.Exceptions;
 using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using SvnBridge.Presenters;
@@ -18,7 +19,7 @@ namespace SvnBridge
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            new BootStrapper().Start();
+			new BootStrapper().Start();
 
             string tfsUrl = null;
             int? port = null;

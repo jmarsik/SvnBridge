@@ -49,6 +49,7 @@
     <Compile Include="BootStrapper.cs" />
     <Compile Include="Cache\NullCache.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Exceptions\EnvironmentValidationException.cs" />
     <Compile Include="Exceptions\RepositoryUnavailableException.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Infrastructure\FileCache.cs" />
     <Compile Include="Infrastructure\SourceControlServicesHub.cs" />
     <Compile Include="Interfaces\CachedResult.cs" />
+    <Compile Include="Interfaces\ICanValidateMyEnvironment.cs" />
     <Compile Include="Interfaces\IFileCache.cs" />
     <Compile Include="Interfaces\IInterceptor.cs" />
     <Compile Include="Interfaces\IInvocation.cs" />

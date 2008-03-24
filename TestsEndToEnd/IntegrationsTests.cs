@@ -80,5 +80,15 @@ namespace TestsEndToEnd
 			File.WriteAllText("test1234", "blah");
 			Svn("commit -m test");
     	}
+
+		[Fact]
+		public void VerySlowCalculationOfUpdateDiff_ShouldNotCauseError()
+		{
+			CheckoutAndChangeDirectory();
+			Svn("update");
+		}
+
+
+
     }
 }

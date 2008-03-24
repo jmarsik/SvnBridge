@@ -1,17 +1,22 @@
 using System;
 using System.IO;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text;
+using SvnBridge.Exceptions;
 using SvnBridge.Interfaces;
+using System.Threading;
 
 namespace SvnBridge.Infrastructure
 {
-    public class FileCache : IFileCache
+	public class FileCache : IFileCache, ICanValidateMyEnvironment
     {
         private const string verificationExtension = ".verification";
 
         private readonly string rootCachePath;
-        /// <summary>
+		private bool ensuredDirectoryExists;
+
+		/// <summary>
         /// this is actually a bit shorter than the realy legnth,
         /// That is because we need to allow for the revision number as well
         /// </summary>
@@ -20,11 +25,12 @@ namespace SvnBridge.Infrastructure
         public FileCache(string rootCachePath)
         {
             this.rootCachePath = rootCachePath;
-            EnsureDirectoryExists(rootCachePath);
         }
 
         public byte[] Get(string filename, int revision)
         {
+			EnsureRootDirectoryExists();
+
             string hashedFilename = HashIfNeeded(filename);
 
             string cachedFileName = Path.Combine(Path.Combine(rootCachePath, hashedFilename), revision.ToString());
@@ -64,7 +70,9 @@ namespace SvnBridge.Infrastructure
 
         public void Set(string filename, int revision, byte[] data)
         {
-            string hashedFilename = HashIfNeeded(filename);
+			EnsureRootDirectoryExists();
+			
+			string hashedFilename = HashIfNeeded(filename);
             string directoryName = Path.Combine(rootCachePath, hashedFilename);
             string cachedFileName = Path.Combine(directoryName, revision.ToString());
             EnsureDirectoryExists(directoryName);
@@ -72,12 +80,44 @@ namespace SvnBridge.Infrastructure
             File.WriteAllText(cachedFileName + verificationExtension, filename);
         }
 
-        private static void EnsureDirectoryExists(string directoryName)
+		private void EnsureRootDirectoryExists()
+		{
+			if (ensuredDirectoryExists)
+				return;
+			ensuredDirectoryExists = true;
+			EnsureDirectoryExists(rootCachePath);
+		}
+
+        private void EnsureDirectoryExists(string directoryName)
         {
             if (Directory.Exists(directoryName) == false)
             {
                 Directory.CreateDirectory(directoryName);
             }
         }
+
+		public void ValidateEnvironment()
+		{
+			try
+			{
+				EnsureDirectoryExists(rootCachePath);
+
+				Guid guid = Guid.NewGuid();
+				File.WriteAllText(Path.Combine(rootCachePath, "test_file_write"),guid.ToString());
+				File.ReadAllText(Path.Combine(rootCachePath, "test_file_write"));
+				Directory.CreateDirectory(Path.Combine(rootCachePath, "test_directory_create"));
+				string test_folder_write_in_subfolder = Path.Combine(Path.Combine(rootCachePath, "test_directory_create"),
+				                              "test_file_write_in_subfolder");
+				File.WriteAllText(test_folder_write_in_subfolder, "test_file_write_in_subfolder");
+				File.ReadAllText(test_folder_write_in_subfolder);
+			}
+			catch (Exception)
+			{
+				string message = "Could not validate environment for file cache at: '"+rootCachePath+"'." + Environment.NewLine +
+					"Usually this error occurs because of invalid permissions on the file cache folder. "+Environment.NewLine+
+					"Ensure that the application (user: '"+ Thread.CurrentPrincipal.Identity.Name + "' is allowed read/write/create directory permissions in the directory '"+ Environment.NewLine + "' and its subdirectories.";
+				throw new EnvironmentValidationException(message);
+			}
+		}
     }
 }
