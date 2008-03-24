@@ -346,6 +346,22 @@ namespace IntegrationTests
 			Assert.True(ResponseContains(response, testPath, ItemType.Folder));
 		}
 
+        [Fact]
+        public void TestCommitNewFolderInRoot()
+        {
+            CreateRootProvider();
+
+            _providerRoot.MakeCollection(_activityIdRoot, "/TestFolder");
+            MergeActivityResponse response = CommitRoot();
+
+            Assert.True(_provider.ItemExists(testPath + "/TestFolder"));
+            Assert.Equal(ItemType.Folder, _provider.GetItems(-1, testPath + "/TestFolder", Recursion.None).ItemType);
+            Assert.Equal(_provider.GetLatestVersion(), response.Version);
+            Assert.Equal(2, response.Items.Count);
+            Assert.True(ResponseContains(response, "/TestFolder", ItemType.Folder));
+            Assert.True(ResponseContains(response, "/", ItemType.Folder));
+        }
+
 		[Fact]
 		public void TestCommitNewFolderContainingNewFile()
 		{
@@ -394,6 +410,22 @@ namespace IntegrationTests
 			Assert.Equal(1, response.Items.Count);
 			Assert.True(ResponseContains(response, testPath, ItemType.Folder));
 		}
+
+        [Fact]
+        public void TestCommitNewPropertyOnRootFolder()
+        {
+            CreateRootProvider();
+            string ignore = "*.bad\n";
+
+            _providerRoot.SetProperty(_activityIdRoot, "/", "ignore", ignore);
+            MergeActivityResponse response = CommitRoot();
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
+            Assert.Equal(ignore, item.Properties["ignore"]);
+            Assert.Equal(_provider.GetLatestVersion(), response.Version);
+            Assert.Equal(1, response.Items.Count);
+            Assert.True(ResponseContains(response, "/", ItemType.Folder));
+        }
 
 		[Fact]
 		public void TestCommitNewPropertyOnNewFileInSameCommit()

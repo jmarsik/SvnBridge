@@ -56,7 +56,7 @@ namespace IntegrationTests
 			_providerRoot = new TFSSourceControlProvider(ServerUrl,
 														 PROJECT_NAME + testPath,
 														 CreateSourceControlServicesHub());
-			_provider.MakeActivity(_activityIdRoot);
+			_providerRoot.MakeActivity(_activityIdRoot);
 		}
 
 		public ISourceControlServicesHub CreateSourceControlServicesHub()

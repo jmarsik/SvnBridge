@@ -627,7 +627,7 @@ namespace SvnBridge.SourceControl
 					}
 				}
 
-				if ((item.Name.Contains("/" + Constants.PropFolder + "/") || item.Name.StartsWith(Constants.PropFolder + "/")) && !returnPropertyFiles)
+				if (IsPropertyFile(item.Name) && !returnPropertyFiles)
 				{
 					string itemPath = item.Name.Replace("/" + Constants.PropFolder + "/" + Constants.FolderPropFile, "");
                     if (itemPath == Constants.PropFolder + "/" + Constants.FolderPropFile)
@@ -643,7 +643,7 @@ namespace SvnBridge.SourceControl
 					properties[itemPath] = itemProperties;
 					itemPropertyRevision[itemPath] = item.Revision;
 				}
-				else if ((item.Name != Constants.PropFolder && !item.Name.EndsWith("/" + Constants.PropFolder)) || item.ItemType != ItemType.Folder || returnPropertyFiles)
+				else if (!IsPropertyFolder(item.Name) || item.ItemType != ItemType.Folder || returnPropertyFiles)
 				{
 					if (item.ItemType == ItemType.Folder)
 					{
@@ -668,6 +668,22 @@ namespace SvnBridge.SourceControl
 			UpdateItemRevisionsBasedOnPropertyItemRevisions(folders, itemPropertyRevision);
 			return firstItem;
 		}
+
+        private bool IsPropertyFile(string name)
+        {
+            if (name.StartsWith(Constants.PropFolder + "/") || name.Contains("/" + Constants.PropFolder + "/"))
+                return true;
+            else
+                return false;
+        }
+
+        private bool IsPropertyFolder(string name)
+        {
+            if (name == Constants.PropFolder || name.EndsWith("/" + Constants.PropFolder))
+                return true;
+            else
+                return false;
+        }
 
 		private static void UpdateItemRevisionsBasedOnPropertyItemRevisions(IDictionary<string, FolderMetaData> folders,
 																			IEnumerable<KeyValuePair<string, int>>
@@ -760,8 +776,12 @@ namespace SvnBridge.SourceControl
 					{
 						sortedMergeResponse.Add(newItem.Path);
 
+                        string path = newItem.Path.Substring(rootPath.Length);
+                        if (path == "")
+                            path = "/";
+
 						MergeActivityResponseItem responseItem =
-							new MergeActivityResponseItem(newItem.FileType, newItem.Path.Substring(rootPath.Length));
+							new MergeActivityResponseItem(newItem.FileType, path);
 						if (newItem.Action != ActivityItemAction.Deleted && newItem.Action != ActivityItemAction.Branch &&
 							newItem.Action != ActivityItemAction.RenameDelete)
 						{
@@ -796,9 +816,10 @@ namespace SvnBridge.SourceControl
 
 				if (!folderFound)
 				{
-					MergeActivityResponseItem responseItem =
-						new MergeActivityResponseItem(ItemType.Folder,
-													  GetFolderName(item.Path.Substring(rootPath.Length)));
+                    folderName = GetFolderName(item.Path.Substring(rootPath.Length));
+                    if (folderName == "")
+                        folderName = "/";
+					MergeActivityResponseItem responseItem = new MergeActivityResponseItem(ItemType.Folder, folderName);
 					mergeResponse.Items.Add(responseItem);
 				}
 			}
@@ -1047,7 +1068,10 @@ namespace SvnBridge.SourceControl
 		{
 			if (itemType == ItemType.Folder)
 			{
-				return path + "/" + Constants.PropFolder;
+                if (path == "/")
+                    return "/" + Constants.PropFolder;
+                else
+				    return path + "/" + Constants.PropFolder;
 			}
 			else if (path.LastIndexOf('/') != -1)
 			{
@@ -1064,7 +1088,10 @@ namespace SvnBridge.SourceControl
 		{
 			if (itemType == ItemType.Folder)
 			{
-				return path + "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
+                if (path == "/")
+                    return "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
+                else
+				    return path + "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
 			}
 			else if (path.LastIndexOf('/') != -1)
 			{
@@ -1219,7 +1246,7 @@ namespace SvnBridge.SourceControl
                 return path.Substring(0, path.LastIndexOf('/'));
             else
                 return "";
-		}
+        }
 
 		private ItemMetaData GetPendingItem(string activityId,
 											string path)
