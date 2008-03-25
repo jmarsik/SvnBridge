@@ -1,53 +1,21 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsUnit", "Tests\TestsUnit.csproj", "{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsUnit-vs2008", "Tests\TestsUnit-vs2008.csproj", "{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridge", "SvnBridge\SvnBridge.csproj", "{22D15920-C064-457D-889B-F7A2E16F3E05}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridge-vs2008", "SvnBridge\SvnBridge-vs2008.csproj", "{22D15920-C064-457D-889B-F7A2E16F3E05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsIntegration", "TestsIntegration\TestsIntegration.csproj", "{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsIntegration-vs2008", "TestsIntegration\TestsIntegration-vs2008.csproj", "{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPTrace", "TCPTrace\TCPTrace.csproj", "{8ED37441-BF40-4CE1-A514-27182894CE90}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPTrace-vs2008", "TCPTrace\TCPTrace-vs2008.csproj", "{8ED37441-BF40-4CE1-A514-27182894CE90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsProtocol", "TestsProtocol\TestsProtocol.csproj", "{593B4F22-DB4E-451C-BC6E-5F620CE818E4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsProtocol-vs2008", "TestsProtocol\TestsProtocol-vs2008.csproj", "{593B4F22-DB4E-451C-BC6E-5F620CE818E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeViaIis", "SvnBridgeViaIis\SvnBridgeViaIis.csproj", "{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeViaIis-vs2008", "SvnBridgeViaIis\SvnBridgeViaIis-vs2008.csproj", "{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeLibrary", "SvnBridgeLibrary\SvnBridgeLibrary.csproj", "{95E4E16B-0975-4705-B3A0-83700DE483C2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeLibrary-vs2008", "SvnBridgeLibrary\SvnBridgeLibrary-vs2008.csproj", "{95E4E16B-0975-4705-B3A0-83700DE483C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsEndToEnd", "TestsEndToEnd\TestsEndToEnd.csproj", "{7913B9B3-9BDA-48D9-8928-4F46E1CF0E1D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsEndToEnd-vs2008", "TestsEndToEnd\TestsEndToEnd-vs2008.csproj", "{7913B9B3-9BDA-48D9-8928-4F46E1CF0E1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

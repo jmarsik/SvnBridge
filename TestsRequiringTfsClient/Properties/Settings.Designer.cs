@@ -31,5 +31,38 @@ namespace TestsRequiringTfsClient.Properties {
                 return ((string)(this["ServerUrl"]));
             }
         }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("{42DFB6C4-63D1-4146-B0E2-978316BC237A}")]
+        public string NonAdminUserPassword
+        {
+            get
+            {
+                return ((string)(this["NonAdminUserPassword"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("leastPrivilegeUser")]
+        public string NonAdminUserName
+        {
+            get
+            {
+                return ((string)(this["NonAdminUserName"]));
+            }
+        }
+
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("codeplex-tfs3")]
+        public string NonAdminUserDomain
+        {
+            get
+            {
+                return ((string)(this["NonAdminUserDomain"]));
+            }
+        }
     }
 }
