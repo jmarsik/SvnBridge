@@ -2,18 +2,17 @@ using System;
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class ReportHandlerUpdateReportTests : HandlerTestsBase
     {
         protected ReportHandler handler = new ReportHandler();
 
-        [Test]
+        [Fact]
         public void TestHandleEncodesDeleteFileElements()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -32,10 +31,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(output.Contains("<S:delete-entry name=\"F !@#$%^&amp;()_-+={[}];',.~`.txt\"/>"));
+            Assert.True(output.Contains("<S:delete-entry name=\"F !@#$%^&amp;()_-+={[}];',.~`.txt\"/>"));
         }
 
-        [Test]
+        [Fact]
         public void TestHandleEncodesDeleteFolderElements()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -54,10 +53,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(output.Contains("<S:delete-entry name=\"B !@#$%^&amp;()_-+={[}];',.~`\"/>"));
+            Assert.True(output.Contains("<S:delete-entry name=\"B !@#$%^&amp;()_-+={[}];',.~`\"/>"));
         }
 
-        [Test]
+        [Fact]
         public void TestHandleEncodesUpdateFileElements()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -82,10 +81,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(output.Contains("<S:open-file name=\"G !@#$%^&amp;()_-+={[}];',.~`.txt\" rev=\"5733\">"));
+            Assert.True(output.Contains("<S:open-file name=\"G !@#$%^&amp;()_-+={[}];',.~`.txt\" rev=\"5733\">"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesAddDirectoryCheckedInHrefElements()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -109,12 +108,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(
+            Assert.True(
                 output.Contains(
                     "<D:checked-in><D:href>/!svn/ver/5722/Test/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60</D:href></D:checked-in>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesAddDirectoryElements()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -138,12 +137,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(
+            Assert.True(
                 output.Contains(
                     "<S:add-directory name=\"B !@#$%^&amp;()_-+={[}];',.~`\" bc-url=\"/!svn/bc/5722/Test/B%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60\">"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesAddFileCheckedInHrefElements()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -167,12 +166,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(
+            Assert.True(
                 output.Contains(
                     "<D:checked-in><D:href>/!svn/ver/5722/Test/C%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',.~%60..txt</D:href></D:checked-in>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesAddFileElements()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -196,10 +195,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(output.Contains("<S:add-file name=\"C !@#$%^&amp;()_-+={[}];',.~`..txt\">"));
+            Assert.True(output.Contains("<S:add-file name=\"C !@#$%^&amp;()_-+={[}];',.~`..txt\">"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleProducesCorrectOutputForBranchedFile()
         {
             FolderMetaData folder = new FolderMetaData();
@@ -245,17 +244,17 @@ namespace SvnBridge.Handlers
                 "<S:prop></S:prop>\n" +
                 "</S:open-directory>\n" +
                 "</S:update-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
-            Assert.AreEqual(Encoding.UTF8, response.ContentEncoding);
-            Assert.AreEqual(200, response.StatusCode);
-            Assert.IsTrue(response.SendChunked);
-            Assert.AreEqual("/", r.Parameters[0]);
-            Assert.AreEqual(5699, r.Parameters[1]);
-            Assert.AreEqual(5700, r.Parameters[2]);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal("text/xml; charset=\"utf-8\"", response.ContentType);
+            Assert.Equal(Encoding.UTF8, response.ContentEncoding);
+            Assert.Equal(200, response.StatusCode);
+            Assert.True(response.SendChunked);
+            Assert.Equal("/", r.Parameters[0]);
+            Assert.Equal(5699, r.Parameters[1]);
+            Assert.Equal(5700, r.Parameters[2]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleProducesCorrectOutputForDeletedFileInSubfolder()
         {
             FolderMetaData folder = new FolderMetaData();
@@ -300,17 +299,17 @@ namespace SvnBridge.Handlers
                 "<S:prop></S:prop>\n" +
                 "</S:open-directory>\n" +
                 "</S:update-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
-            Assert.AreEqual(Encoding.UTF8, response.ContentEncoding);
-            Assert.AreEqual(200, response.StatusCode);
-            Assert.IsTrue(response.SendChunked);
-            Assert.AreEqual("/", r.Parameters[0]);
-            Assert.AreEqual(5697, r.Parameters[1]);
-            Assert.AreEqual(5698, r.Parameters[2]);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal("text/xml; charset=\"utf-8\"", response.ContentType);
+            Assert.Equal(Encoding.UTF8, response.ContentEncoding);
+            Assert.Equal(200, response.StatusCode);
+            Assert.True(response.SendChunked);
+            Assert.Equal("/", r.Parameters[0]);
+            Assert.Equal(5697, r.Parameters[1]);
+            Assert.Equal(5698, r.Parameters[2]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleSucceedsWhenTargetRevisionIsNotSpecified()
         {
             FolderMetaData folder = new FolderMetaData();
@@ -339,7 +338,7 @@ namespace SvnBridge.Handlers
                 "<S:prop></S:prop>\n" +
                 "</S:open-directory>\n" +
                 "</S:update-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
         }
     }
 }

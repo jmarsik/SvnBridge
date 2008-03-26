@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using CodePlex.TfsLibrary;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.SourceControl;
 
 namespace Tests
 {
-    [TestFixture]
     public class ShowLogWithSpecialCharactersInFilename : ProtocolTestsBase
     {
-        [Test]
+        [Fact]
         public void Test1()
         {
             stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
@@ -58,10 +57,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test10()
         {
             stub.Attach(provider.GetLatestVersion, 5532);
@@ -103,10 +102,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test11()
         {
             string request =
@@ -147,10 +146,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test12()
         {
             stub.Attach(provider.ItemExists, true);
@@ -198,10 +197,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test13()
         {
             string request =
@@ -244,10 +243,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test14()
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
@@ -298,10 +297,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test2()
         {
             stub.Attach(provider.ItemExists, true);
@@ -352,10 +351,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test3()
         {
             stub.Attach(provider.GetLatestVersion, 5532);
@@ -397,10 +396,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test4()
         {
             string request =
@@ -441,10 +440,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test5()
         {
             stub.Attach(provider.ItemExists, true);
@@ -492,10 +491,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test6()
         {
             stub.Attach(provider.GetLatestVersion, 5532);
@@ -537,10 +536,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test7()
         {
             string request =
@@ -581,10 +580,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test8()
         {
             stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
@@ -631,10 +630,10 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void Test9()
         {
             stub.Attach(provider.ItemExists, true);
@@ -685,7 +684,7 @@ namespace Tests
 
             string actual = ProcessRequest(request, ref expected);
 
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Trace
             File.WriteAllText(@"Tests.txt", "");
             WriteTestLogLine("using System;");
             WriteTestLogLine("using CodePlex.TfsLibrary;");
-            WriteTestLogLine("using NUnit.Framework;");
+            WriteTestLogLine("using Xunit;");
             WriteTestLogLine("using SvnBridge.SourceControl;");
             WriteTestLogLine("using CodePlex.TfsLibrary.RepositoryWebSvc;");
 
@@ -188,7 +188,7 @@ namespace Trace
             StringBuilder output = new StringBuilder();
             if (_lastDirection == 0)
             {
-                output.AppendLine("        [Test]");
+                output.AppendLine("        [Fact]");
                 _testCount++;
                 output.AppendLine("        public void Test" + _testCount.ToString() + "()");
                 output.AppendLine("        {");
@@ -208,10 +208,10 @@ namespace Trace
                         output.AppendLine("");
                         output.AppendLine("            string actual = ProcessRequest(request, ref expected);");
                         output.AppendLine("");
-                        output.AppendLine("            Assert.AreEqual(expected, actual);");
+                        output.AppendLine("            Assert.Equal(expected, actual);");
                         output.AppendLine("        }");
                         output.AppendLine("");
-                        output.AppendLine("        [Test]");
+                        output.AppendLine("        [Fact]");
                         _testCount++;
                         output.AppendLine("        public void Test" + _testCount.ToString() + "()");
                         output.AppendLine("        {");

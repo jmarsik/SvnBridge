@@ -1,4 +1,5 @@
-using NUnit.Framework;
+using System;
+using Xunit;
 using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
@@ -6,13 +7,11 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Infrastructure
 {
-    [TestFixture]
-    public class CachingItemMetaDataRepositoryTest
+    public class CachingItemMetaDataRepositoryTest : IDisposable
     {
         #region Setup/Teardown
 
-        [SetUp]
-        public void TestInitialize()
+        public CachingItemMetaDataRepositoryTest()
         {
             mocks = new MockRepository();
             mockCache = mocks.DynamicMock<ICache>();
@@ -21,8 +20,7 @@ namespace SvnBridge.Infrastructure
             repository = new CachingItemMetaDataRepository(mockSourceControlProvider, mockCache);
         }
 
-        [TearDown]
-        public void TestCleanup()
+        public void Dispose()
         {
             mocks.VerifyAll();
         }
@@ -34,7 +32,7 @@ namespace SvnBridge.Infrastructure
         private MockRepository mocks;
         private CachingItemMetaDataRepository repository;
 
-        [Test]
+        [Fact]
         public void GetChangedItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
         {
             SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new CachedResult(new FolderMetaData()));
@@ -45,10 +43,10 @@ namespace SvnBridge.Infrastructure
             mocks.ReplayAll();
 
             FolderMetaData items = repository.GetChangedItems("blah", 5, 10, reportData);
-            Assert.IsNotNull(items);
+            Assert.NotNull(items);
         }
 
-        [Test]
+        [Fact]
         public void GetChangedItems_WhenCannotFindItemInCache_WillCallSourceCodeProvider()
         {
             SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(null);
@@ -60,10 +58,10 @@ namespace SvnBridge.Infrastructure
             mocks.ReplayAll();
 
             FolderMetaData items = repository.GetChangedItems("blah", 5, 10, reportData);
-            Assert.IsNotNull(items);
+            Assert.NotNull(items);
         }
 
-        [Test]
+        [Fact]
         public void GetItems_WhenCanFindItemInCache_WillSkipCallingToSourceCodeProvider()
         {
             SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(new CachedResult(new ItemMetaData()));
@@ -73,10 +71,10 @@ namespace SvnBridge.Infrastructure
             mocks.ReplayAll();
 
             ItemMetaData items = repository.GetItems(5, "blah", Recursion.Full);
-            Assert.IsNotNull(items);
+            Assert.NotNull(items);
         }
 
-        [Test]
+        [Fact]
         public void GetItems_WhenCannotFindItemInCache_WillGoToSourceCodeProvider()
         {
             SetupResult.For(mockCache.Get(null)).IgnoreArguments().Return(null);
@@ -87,7 +85,7 @@ namespace SvnBridge.Infrastructure
             mocks.ReplayAll();
 
             ItemMetaData items = repository.GetItems(5, "blah", Recursion.Full);
-            Assert.IsNotNull(items);
+            Assert.NotNull(items);
         }
     }
 }

@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class PropFindHandlerAllPropForFolderTests : HandlerTestsBase
     {
         #region Setup/Teardown
@@ -31,7 +30,7 @@ namespace SvnBridge.Handlers
         private PropFindHandler handler;
         private FolderMetaData item;
 
-        [Test]
+        [Fact]
         public void TestAllPropBaselineRelativePath()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -41,10 +40,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp2:baseline-relative-path>Foo</lp2:baseline-relative-path>"));
+            Assert.True(result.Contains("<lp2:baseline-relative-path>Foo</lp2:baseline-relative-path>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropCheckedIn()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -54,10 +53,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:checked-in><D:href>/!svn/ver/1234/Foo</D:href></lp1:checked-in>"));
+            Assert.True(result.Contains("<lp1:checked-in><D:href>/!svn/ver/1234/Foo</D:href></lp1:checked-in>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropContentType()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -67,10 +66,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>"));
+            Assert.True(result.Contains("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropCreationDate()
         {
             DateTime dt = DateTime.Now;
@@ -82,11 +81,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp1:creationdate>" + dt.ToUniversalTime().ToString("o") + "</lp1:creationdate>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropCreatorDisplayName()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -96,10 +95,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
+            Assert.True(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropDeadDropCount()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -109,10 +108,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
+            Assert.True(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropGetETag()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -122,10 +121,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:getetag>W/\"1234//Foo\"</lp1:getetag>"));
+            Assert.True(result.Contains("<lp1:getetag>W/\"1234//Foo\"</lp1:getetag>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropGetLastModified()
         {
             DateTime dt = DateTime.Now;
@@ -137,11 +136,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp1:getlastmodified>" + dt.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropRepositoryUuid()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -151,11 +150,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropResourceType()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -165,10 +164,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:resourcetype><D:collection/></lp1:resourcetype>"));
+            Assert.True(result.Contains("<lp1:resourcetype><D:collection/></lp1:resourcetype>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropVersionControlledConfiguration()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -178,12 +177,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains(
                     "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>"));
         }
 
-        [Test]
+        [Fact]
         public void TestAllPropVersionName()
         {
             request.Path = "http://localhost/!svn/bc/1234/Foo";
@@ -193,7 +192,7 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:version-name>1234</lp1:version-name>"));
+            Assert.True(result.Contains("<lp1:version-name>1234</lp1:version-name>"));
         }
     }
 }

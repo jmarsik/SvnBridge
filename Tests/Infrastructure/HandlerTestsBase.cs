@@ -1,6 +1,6 @@
 using System.Collections.Specialized;
 using System.IO;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.SourceControl;
 using SvnBridge.Stubs;
 using Tests;
@@ -16,7 +16,11 @@ namespace SvnBridge.Infrastructure
         protected MyMocks stub = new MyMocks();
         protected string tfsUrl;
 
-        [SetUp]
+        public HandlerTestsBase()
+        {
+            Setup();
+        }
+
         public virtual void Setup()
         {
             provider = stub.CreateObject<StubSourceControlProvider>();

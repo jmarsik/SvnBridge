@@ -2,17 +2,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class CopyHandlerTests : HandlerTestsBase
     {
         protected CopyHandler handler = new CopyHandler();
 
-        [Test]
+        [Fact]
         public void TestDestinationInResponseMessageIsDecodedAndEncoded()
         {
             Results r = stub.Attach(provider.CopyItem);
@@ -23,12 +22,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains(
                     "<p>Destination //!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB !@#$%^&amp;()_-+={[}];',.~` has been created.</p>"));
         }
 
-        [Test]
+        [Fact]
         public void TestHandleProducesCorrectOutput()
         {
             Results r = stub.Attach(provider.CopyItem);
@@ -48,19 +47,19 @@ namespace SvnBridge.Handlers
                 "<hr />\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual("text/html", response.ContentType);
-            Assert.IsTrue(
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal("text/html", response.ContentType);
+            Assert.True(
                 response.Headers.Contains(
                     new KeyValuePair<string, string>("Location",
                                                      "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt")));
-            Assert.AreEqual(1, r.CallCount);
-            Assert.AreEqual("cdfcf93f-8649-5e44-a8ec-b3f40e10e907", r.Parameters[0]);
-            Assert.AreEqual("/File.txt", r.Parameters[1]);
-            Assert.AreEqual("/FileRenamed.txt", r.Parameters[2]);
+            Assert.Equal(1, r.CallCount);
+            Assert.Equal("cdfcf93f-8649-5e44-a8ec-b3f40e10e907", r.Parameters[0]);
+            Assert.Equal("/File.txt", r.Parameters[1]);
+            Assert.Equal("/FileRenamed.txt", r.Parameters[2]);
         }
 
-        [Test]
+        [Fact]
         public void TestLocationResponseHeaderIsDecoded()
         {
             Results r = stub.Attach(provider.CopyItem);
@@ -70,13 +69,13 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.IsTrue(
+            Assert.True(
                 response.Headers.Contains(
                     new KeyValuePair<string, string>("Location",
                                                      "http://localhost:8084//!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB !@#$%^&()_-+={[}];',.~`")));
         }
 
-        [Test]
+        [Fact]
         public void TestSourceControlProviderCalledCorrectlyWithSpecialCharactersInPath()
         {
             Results r = stub.Attach(provider.CopyItem);
@@ -86,10 +85,10 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, r.CallCount);
-            Assert.AreEqual("15407bc3-2250-aa4c-aa51-4e65b2c824c3", r.Parameters[0]);
-            Assert.AreEqual("/B !@#$%^&()_-+={[}];',.~`", r.Parameters[1]);
-            Assert.AreEqual("/BB !@#$%^&()_-+={[}];',.~`", r.Parameters[2]);
+            Assert.Equal(1, r.CallCount);
+            Assert.Equal("15407bc3-2250-aa4c-aa51-4e65b2c824c3", r.Parameters[0]);
+            Assert.Equal("/B !@#$%^&()_-+={[}];',.~`", r.Parameters[1]);
+            Assert.Equal("/BB !@#$%^&()_-+={[}];',.~`", r.Parameters[2]);
         }
     }
 }

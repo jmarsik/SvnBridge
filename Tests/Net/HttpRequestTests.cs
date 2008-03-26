@@ -1,12 +1,11 @@
 using System;
 using System.IO;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace SvnBridge.Net
 {
-    [TestFixture]
     public class HttpRequestTests
     {
         private class StubStream : Stream
@@ -82,7 +81,7 @@ namespace SvnBridge.Net
             }
         }
 
-        [Test]
+        [Fact]
         public void TestParseRequestWithContentLengthGreaterThanBufferSize()
         {
             StringBuilder buffer = new StringBuilder();
@@ -97,7 +96,7 @@ namespace SvnBridge.Net
                 delegate { new ListenerRequest(stream); });
         }
 
-        [Test]
+        [Fact]
         public void TestRequestUrlExcludesDoubleLeadingSlash()
         {
             StringBuilder buffer = new StringBuilder();

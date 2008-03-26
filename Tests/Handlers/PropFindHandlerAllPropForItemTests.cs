@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class PropFindHandlerAllPropForItemTests : HandlerTestsBase
     {
         #region Setup/Teardown
@@ -40,7 +39,7 @@ namespace SvnBridge.Handlers
             request.Headers["Depth"] = "0";
         }
 
-        [Test]
+        [Fact]
         public void TestBaselineRelativePath()
         {
             ArrangeRequest();
@@ -48,10 +47,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp2:baseline-relative-path>Foo/Bar.txt</lp2:baseline-relative-path>"));
+            Assert.True(result.Contains("<lp2:baseline-relative-path>Foo/Bar.txt</lp2:baseline-relative-path>"));
         }
 
-        [Test]
+        [Fact]
         public void TestCheckedIn()
         {
             ArrangeRequest();
@@ -59,11 +58,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp1:checked-in><D:href>/!svn/ver/1234/Foo/Bar.txt</D:href></lp1:checked-in>"));
         }
 
-        [Test]
+        [Fact]
         public void TestContentType()
         {
             ArrangeRequest();
@@ -71,10 +70,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:getcontenttype>text/plain</lp1:getcontenttype>"));
+            Assert.True(result.Contains("<lp1:getcontenttype>text/plain</lp1:getcontenttype>"));
         }
 
-        [Test]
+        [Fact]
         public void TestCreationDate()
         {
             DateTime dt = DateTime.Now;
@@ -84,11 +83,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp1:creationdate>" + dt.ToUniversalTime().ToString("o") + "</lp1:creationdate>"));
         }
 
-        [Test]
+        [Fact]
         public void TestCreatorDisplayName()
         {
             ArrangeRequest();
@@ -96,10 +95,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
+            Assert.True(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
         }
 
-        [Test]
+        [Fact]
         public void TestDeadDropCount()
         {
             ArrangeRequest();
@@ -107,10 +106,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
+            Assert.True(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
         }
 
-        [Test]
+        [Fact]
         public void TestGetETag()
         {
             ArrangeRequest();
@@ -118,10 +117,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:getetag>W/\"1234//Foo/Bar.txt\"</lp1:getetag>"));
+            Assert.True(result.Contains("<lp1:getetag>W/\"1234//Foo/Bar.txt\"</lp1:getetag>"));
         }
 
-        [Test]
+        [Fact]
         public void TestGetLastModified()
         {
             DateTime dt = DateTime.Now;
@@ -131,11 +130,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp1:getlastmodified>" + dt.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>"));
         }
 
-        [Test]
+        [Fact]
         public void TestHref()
         {
             ArrangeRequest();
@@ -143,10 +142,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<D:href>/!svn/bc/1234/Foo/Bar.txt</D:href>"));
+            Assert.True(result.Contains("<D:href>/!svn/bc/1234/Foo/Bar.txt</D:href>"));
         }
 
-        [Test]
+        [Fact]
         public void TestLockDiscovery()
         {
             ArrangeRequest();
@@ -154,10 +153,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<D:lockdiscovery/>"));
+            Assert.True(result.Contains("<D:lockdiscovery/>"));
         }
 
-        [Test]
+        [Fact]
         public void TestMD5Checksum()
         {
             ArrangeRequest();
@@ -165,12 +164,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp2:md5-checksum>" + Helper.GetMd5Checksum(new byte[4] {0, 1, 2, 3}) +
                                 "</lp2:md5-checksum>"));
         }
 
-        [Test]
+        [Fact]
         public void TestRepositoryUuid()
         {
             ArrangeRequest();
@@ -178,11 +177,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>"));
         }
 
-        [Test]
+        [Fact]
         public void TestResourceType()
         {
             ArrangeRequest();
@@ -190,10 +189,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:resourcetype/>"));
+            Assert.True(result.Contains("<lp1:resourcetype/>"));
         }
 
-        [Test]
+        [Fact]
         public void TestSupportedLock()
         {
             ArrangeRequest();
@@ -201,7 +200,7 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains(
+            Assert.True(result.Contains(
                               "<D:supportedlock>\n" +
                               "<D:lockentry>\n" +
                               "<D:lockscope><D:exclusive/></D:lockscope>\n" +
@@ -210,7 +209,7 @@ namespace SvnBridge.Handlers
                               "</D:supportedlock>\n"));
         }
 
-        [Test]
+        [Fact]
         public void TestVersionControlledConfiguration()
         {
             ArrangeRequest();
@@ -218,12 +217,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains(
                     "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>"));
         }
 
-        [Test]
+        [Fact]
         public void TestVersionName()
         {
             ArrangeRequest();
@@ -231,7 +230,7 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:version-name>1234</lp1:version-name>"));
+            Assert.True(result.Contains("<lp1:version-name>1234</lp1:version-name>"));
         }
     }
 }

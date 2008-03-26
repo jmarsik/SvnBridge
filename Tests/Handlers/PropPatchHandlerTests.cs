@@ -1,17 +1,16 @@
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class PropPatchHandlerTests : HandlerTestsBase
     {
         protected PropPatchHandler handler = new PropPatchHandler();
 
-        [Test]
+        [Fact]
         public void VerifyCorrectOutputForLog()
         {
             Results r = stub.Attach(provider.SetActivityComment);
@@ -35,10 +34,10 @@ namespace SvnBridge.Handlers
                 "</D:propstat>\n" +
                 "</D:response>\n" +
                 "</D:multistatus>\n";
-            Assert.AreEqual(expected, result);
+            Assert.Equal(expected, result);
         }
 
-        [Test]
+        [Fact]
         public void VerifyCorrectOutputForPropertyUpdate()
         {
             Results r = stub.Attach(provider.SetProperty);
@@ -63,10 +62,10 @@ namespace SvnBridge.Handlers
                 "</D:propstat>\n" +
                 "</D:response>\n" +
                 "</D:multistatus>\n";
-            Assert.AreEqual(expected, result);
+            Assert.Equal(expected, result);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleCallsSourceControlProviderWithCorrectActivityIdWhenPathHasOneSlashAfterHostname()
         {
             Results r = stub.Attach(provider.SetActivityComment);
@@ -76,10 +75,10 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
+            Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleCorrectlyCallsSourceControlProviderForCheckinComment()
         {
             Results r = stub.Attach(provider.SetActivityComment);
@@ -89,11 +88,11 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
-            Assert.AreEqual("Test comment", r.Parameters[1]);
+            Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
+            Assert.Equal("Test comment", r.Parameters[1]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleCorrectlyCallsSourceControlProviderForSetProperty()
         {
             Results r = stub.Attach(provider.SetProperty);
@@ -103,13 +102,13 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("be05cf36-7514-3f4d-81ea-7822f7b1dfe7", r.Parameters[0]);
-            Assert.AreEqual("/Folder1", r.Parameters[1]);
-            Assert.AreEqual("svn:ignore", r.Parameters[2]);
-            Assert.AreEqual("*.bad\n", r.Parameters[3]);
+            Assert.Equal("be05cf36-7514-3f4d-81ea-7822f7b1dfe7", r.Parameters[0]);
+            Assert.Equal("/Folder1", r.Parameters[1]);
+            Assert.Equal("svn:ignore", r.Parameters[2]);
+            Assert.Equal("*.bad\n", r.Parameters[3]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesHrefElement()
         {
             Results r = stub.Attach(provider.SetProperty);
@@ -121,7 +120,7 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains(
                     "<D:href>//!svn/wrk/208d5649-1590-0247-a7d6-831b1e447dbf/Spikes/SvnFacade/trunk/New%20Folder%2010/banner_top_project.jpg</D:href>"));
         }

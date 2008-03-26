@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -5,7 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
@@ -13,14 +14,13 @@ using SvnBridge.Utility;
 
 namespace Tests
 {
-    public abstract class ProtocolTestsBase
+    public abstract class ProtocolTestsBase : IDisposable
     {
         protected HttpContextDispatcher HttpDispatcher;
         protected StubSourceControlProvider provider;
         protected MyMocks stub = new MyMocks();
 
-        [SetUp]
-        public virtual void Setup()
+        public ProtocolTestsBase()
         {
             provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
@@ -28,8 +28,7 @@ namespace Tests
             HttpDispatcher.TfsUrl = "http://foo";
         }
 
-        [TearDown]
-        public virtual void TearDown()
+        public void Dispose()
         {
             SourceControlProviderFactory.CreateDelegate = null;
         }

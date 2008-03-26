@@ -1,18 +1,17 @@
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class GetHandlerTests : HandlerTestsBase
     {
         protected GetHandler handler = new GetHandler();
 
-        [Test]
+        [Fact]
         public void TestHandle()
         {
             ItemMetaData item = new ItemMetaData();
@@ -24,13 +23,13 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string expected = "asdf";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual("text/plain", response.ContentType);
-            Assert.AreEqual(1, getItemsResult.CallCount);
-            Assert.AreEqual(1234, getItemsResult.Parameters[0]);
-            Assert.AreEqual("/Foo/Bar.txt", getItemsResult.Parameters[1]);
-            Assert.AreEqual(1, readFileResult.CallCount);
-            Assert.AreEqual(item, readFileResult.Parameters[0]);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal("text/plain", response.ContentType);
+            Assert.Equal(1, getItemsResult.CallCount);
+            Assert.Equal(1234, getItemsResult.Parameters[0]);
+            Assert.Equal("/Foo/Bar.txt", getItemsResult.Parameters[1]);
+            Assert.Equal(1, readFileResult.CallCount);
+            Assert.Equal(item, readFileResult.Parameters[0]);
         }
     }
 }

@@ -1,22 +1,20 @@
 using System.Windows.Forms;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Stubs;
 using Assert = CodePlex.NUnitExtensions.Assert;
 
 namespace SvnBridge.Presenters
 {
-	[TestFixture]
 	public class ListenerViewPresenterTests
 	{
 		#region Setup/Teardown
 
-		[SetUp]
-		public void SetUp()
-		{
-			stubListener = new StubListener();
-			stubView = new StubListenerView();
-			stubErrorView = new StubErrorsView();
-		}
+        public ListenerViewPresenterTests()
+        {
+            stubListener = new StubListener();
+            stubView = new StubListenerView();
+            stubErrorView = new StubErrorsView();
+        }
 
 		#endregion
 
@@ -29,7 +27,7 @@ namespace SvnBridge.Presenters
 			return new ListenerViewPresenter(stubView, stubErrorView, stubListener);
 		}
 
-		[Test]
+		[Fact]
 		public void TestCancelChangeSettingsDoesntStopListener()
 		{
 			stubListener.Get_Port = 8081;
@@ -49,7 +47,7 @@ namespace SvnBridge.Presenters
 			Assert.False(stubListener.Stop_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestChangeSettingsDefaultsToExistingSettings()
 		{
 			stubListener.Get_Port = 8081;
@@ -63,7 +61,7 @@ namespace SvnBridge.Presenters
 			Assert.Equal(stubSettingsView.Presenter.TfsUrl, "http://foo");
 		}
 
-		[Test]
+		[Fact]
 		public void TestChangeSettingsWithChangesStopsAndStartsListener()
 		{
 			stubListener.Get_Port = 8081;
@@ -83,7 +81,7 @@ namespace SvnBridge.Presenters
 			Assert.True(stubListener.Start_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestChangeSettingsWithNoChangesDoesntStopListener()
 		{
 			stubListener.Get_Port = 8081;
@@ -102,7 +100,7 @@ namespace SvnBridge.Presenters
 			Assert.False(stubListener.Stop_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestConstructorSetsViewsPresenter()
 		{
 			ListenerViewPresenter presenter = CreatePresenter();
@@ -110,7 +108,7 @@ namespace SvnBridge.Presenters
 			Assert.Equal(presenter, stubView.Set_Presenter);
 		}
 
-		[Test]
+		[Fact]
 		public void TestGetPortReturnsListenersPort()
 		{
 			int expected = 8081;
@@ -121,7 +119,7 @@ namespace SvnBridge.Presenters
 			Assert.Equal(expected, presenter.Port);
 		}
 
-		[Test]
+		[Fact]
 		public void TestGetTfsUrlReturnsListenersTfsUrl()
 		{
 			string expected = "http://foo";
@@ -132,7 +130,7 @@ namespace SvnBridge.Presenters
 			Assert.Equal(expected, presenter.TfsUrl);
 		}
 
-		[Test]
+		[Fact]
 		public void WhenListenerRaiseAnErrorWillShowInView()
 		{
 			CreatePresenter();
@@ -140,7 +138,7 @@ namespace SvnBridge.Presenters
 			Assert.True(stubView.OnListenerError_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void WhenListenerRaiseAnErrorWillAddToErrorsView()
 		{
 			CreatePresenter();
@@ -148,14 +146,14 @@ namespace SvnBridge.Presenters
 			Assert.True(stubErrorView.AddError_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void WhenAskedToShowErrorsWillShowErrorsView()
 		{
 			CreatePresenter().ShowErrors();
 			Assert.True(stubErrorView.Show_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestShowCallsViewsShow()
 		{
 			ListenerViewPresenter presenter = CreatePresenter();
@@ -165,7 +163,7 @@ namespace SvnBridge.Presenters
 			Assert.True(stubView.Show_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestStartListenerCallsViewsOnListenerStarted()
 		{
 			ListenerViewPresenter presenter = CreatePresenter();
@@ -175,7 +173,7 @@ namespace SvnBridge.Presenters
 			Assert.True(stubView.OnListenerStarted_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestStartListenerStartListener()
 		{
 			ListenerViewPresenter presenter = CreatePresenter();
@@ -185,7 +183,7 @@ namespace SvnBridge.Presenters
 			Assert.True(stubListener.Start_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestStopListenerCallsViewsOnListenerStopped()
 		{
 			ListenerViewPresenter presenter = CreatePresenter();
@@ -195,7 +193,7 @@ namespace SvnBridge.Presenters
 			Assert.True(stubView.OnListenerStopped_Called);
 		}
 
-		[Test]
+		[Fact]
 		public void TestStopListenerStopsListener()
 		{
 			ListenerViewPresenter presenter = CreatePresenter();

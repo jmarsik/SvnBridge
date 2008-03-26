@@ -23,5 +23,10 @@ namespace SvnBridge.Infrastructure
         {
             return Container.Resolve(type, dependencies);
         }
+
+        public static void Reset()
+        {
+            Container = new Container();
+        }
     }
 }

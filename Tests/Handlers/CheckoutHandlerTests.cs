@@ -2,18 +2,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class CheckoutHandlerTests : HandlerTestsBase
     {
         protected CheckOutHandler handler = new CheckOutHandler();
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesCheckedOutResourceOutput()
         {
             ItemMetaData item = new ItemMetaData();
@@ -26,12 +25,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 output.Contains(
                     "Checked-out resource //!svn/wrk/f86c2543-a3d3-d04f-b458-8924481e51c6/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',~%60..txt"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesLocationResponseHeader()
         {
             ItemMetaData item = new ItemMetaData();
@@ -43,7 +42,7 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.IsTrue(
+            Assert.True(
                 response.Headers.Contains(
                     new KeyValuePair<string, string>("Location",
                                                      "http://localhost:8084//!svn/wrk/f86c2543-a3d3-d04f-b458-8924481e51c6/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',~%60..txt")));

@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using Attach;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Exceptions;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
@@ -12,12 +12,11 @@ using Tests;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class MergeHandlerTests : HandlerTestsBase
     {
         protected MergeHandler handler = new MergeHandler();
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesCheckedInHrefElement()
         {
             MergeActivityResponse mergeResponse =
@@ -31,12 +30,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 output.Contains(
                     "<D:checked-in><D:href>/!svn/ver/5719/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',~%60..txt</D:href></D:checked-in>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesHrefElement()
         {
             MergeActivityResponse mergeResponse =
@@ -50,10 +49,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(output.Contains("<D:href>/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',~%60..txt</D:href>"));
+            Assert.True(output.Contains("<D:href>/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',~%60..txt</D:href>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleProducesCorrectOutputForConflict()
         {
             stub.Attach((MyMocks.MergeActivity) provider.MergeActivity, new ConflictException("Conflict at '/Test.txt'"));
@@ -71,10 +70,10 @@ namespace SvnBridge.Handlers
                 "Conflict at '/Test.txt'\n" +
                 "</m:human-readable>\n" +
                 "</D:error>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual(409, response.StatusCode);
-            Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
-            Assert.IsTrue(response.Headers.Contains(new KeyValuePair<string, string>("Cache-Control", "no-cache")));
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal(409, response.StatusCode);
+            Assert.Equal("text/xml; charset=\"utf-8\"", response.ContentType);
+            Assert.True(response.Headers.Contains(new KeyValuePair<string, string>("Cache-Control", "no-cache")));
         }
     }
 }

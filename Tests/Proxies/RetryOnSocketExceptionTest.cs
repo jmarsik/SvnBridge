@@ -1,31 +1,28 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using NUnit.Framework;
+using Xunit;
 using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using SvnBridge.Proxies;
 
 namespace SvnBridge.Proxies
 {
-    [TestFixture]
-    public class RetryOnSocketExceptionTest
+    public class RetryOnSocketExceptionTest : IDisposable
     {
         private MockRepository mocks;
 
-        [SetUp]
-        public void TestInitialize()
+        public RetryOnSocketExceptionTest()
         {
             mocks = new MockRepository();
         }
 
-        [TearDown]
-        public void TestCleanup()
+        public void Dispose()
         {
             mocks.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void WillNotFailOnFirstSocketException()
         {
             RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
@@ -41,7 +38,7 @@ namespace SvnBridge.Proxies
             interceptor.Invoke(mock);
         }
 
-        [Test]
+        [Fact]
         public void WillNotFailOnFirstWebException()
         {
             RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
@@ -57,7 +54,7 @@ namespace SvnBridge.Proxies
             interceptor.Invoke(mock);
         }
 
-        [Test]
+        [Fact]
         public void WillFailOnNonSocketOrWebException()
         {
             RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
@@ -67,18 +64,12 @@ namespace SvnBridge.Proxies
 
             mocks.ReplayAll();
 
-            try
-            {
-                interceptor.Invoke(mock);
-                Assert.Fail("Should have thrown");
-            }
-            catch (InvalidOperationException)
-            {
+            Exception result = Record.Exception(delegate { interceptor.Invoke(mock); });
 
-            }
+            Assert.IsType(typeof(InvalidOperationException), result);
         }
 
-        [Test]
+        [Fact]
         public void WillThrowAfterThreeAttempts()
         {
             RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
@@ -87,15 +78,9 @@ namespace SvnBridge.Proxies
 
             mocks.ReplayAll();
 
-            try
-            {
-                interceptor.Invoke(mock);
-                Assert.Fail("Should have thrown");
-            }
-            catch (SocketException)
-            {
+            Exception result = Record.Exception(delegate { interceptor.Invoke(mock); });
 
-            }
+            Assert.IsType(typeof(SocketException), result);
         }
     }
 }

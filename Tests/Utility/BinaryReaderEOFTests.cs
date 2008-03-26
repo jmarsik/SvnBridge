@@ -1,10 +1,9 @@
 using System;
 using System.IO;
-using NUnit.Framework;
+using Xunit;
 
 namespace SvnBridge.Utility
 {
-    [TestFixture]
     public class BinaryReaderEOFTests
     {
         private byte[] CreateTestData(int size)
@@ -15,7 +14,7 @@ namespace SvnBridge.Utility
             return data;
         }
 
-        [Test]
+        [Fact]
         public void TestEOFReturnsFalseIfNotEndOfStream()
         {
             byte[] testData = CreateTestData(10);
@@ -23,10 +22,10 @@ namespace SvnBridge.Utility
 
             bool result = reader.EOF;
 
-            Assert.AreEqual(false, result);
+            Assert.Equal(false, result);
         }
 
-        [Test]
+        [Fact]
         public void TestEOFReturnsTrueIfAtEndOfStream()
         {
             byte[] testData = CreateTestData(10);
@@ -35,10 +34,10 @@ namespace SvnBridge.Utility
 
             bool result = reader.EOF;
 
-            Assert.AreEqual(true, result);
+            Assert.Equal(true, result);
         }
 
-        [Test]
+        [Fact]
         public void TestEOFReturnsTrueWithZeroByteStream()
         {
             byte[] testData = CreateTestData(0);
@@ -46,10 +45,10 @@ namespace SvnBridge.Utility
 
             bool result = reader.EOF;
 
-            Assert.AreEqual(true, result);
+            Assert.Equal(true, result);
         }
 
-        [Test]
+        [Fact]
         public void TestReadByteReadsCorrectBytes()
         {
             byte[] testData = CreateTestData(10);
@@ -57,11 +56,11 @@ namespace SvnBridge.Utility
 
             for (int i = 0; i < testData.Length; i++)
             {
-                Assert.AreEqual(testData[i], reader.ReadByte());
+                Assert.Equal(testData[i], reader.ReadByte());
             }
         }
 
-        [Test]
+        [Fact]
         public void TestReadByteReadsCorrectBytesWhenReadPastBufferSize()
         {
             byte[] testData = CreateTestData(BinaryReaderEOF.BUF_SIZE + 10);
@@ -69,11 +68,11 @@ namespace SvnBridge.Utility
 
             for (int i = 0; i < testData.Length; i++)
             {
-                Assert.AreEqual(testData[i], reader.ReadByte());
+                Assert.Equal(testData[i], reader.ReadByte());
             }
         }
 
-        [Test]
+        [Fact]
         public void TestReadBytesReadsCorrectBytes()
         {
             byte[] testData = CreateTestData(10);
@@ -83,11 +82,11 @@ namespace SvnBridge.Utility
 
             for (int i = 0; i < testData.Length; i++)
             {
-                Assert.AreEqual(testData[i], result[i]);
+                Assert.Equal(testData[i], result[i]);
             }
         }
 
-        [Test]
+        [Fact]
         public void TestReadBytesReadsCorrectBytesIfReadingExactBufferSize()
         {
             byte[] testData = CreateTestData(BinaryReaderEOF.BUF_SIZE*2);
@@ -98,16 +97,16 @@ namespace SvnBridge.Utility
 
             for (int i = 0; i < result1.Length; i++)
             {
-                Assert.AreEqual(testData[i], result1[i]);
+                Assert.Equal(testData[i], result1[i]);
             }
 
             for (int i = 0; i < result2.Length; i++)
             {
-                Assert.AreEqual(testData[i + 1024], result2[i]);
+                Assert.Equal(testData[i + 1024], result2[i]);
             }
         }
 
-        [Test]
+        [Fact]
         public void TestReadBytesReadsCorrectBytesWhenReadsLargerThenBufferSize()
         {
             byte[] testData = CreateTestData(BinaryReaderEOF.BUF_SIZE*3);
@@ -117,7 +116,7 @@ namespace SvnBridge.Utility
 
             for (int i = 0; i < testData.Length; i++)
             {
-                Assert.AreEqual(testData[i], result[i]);
+                Assert.Equal(testData[i], result[i]);
             }
         }
     }

@@ -1,14 +1,13 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace SvnBridge.Net
 {
-    [TestFixture]
     public class ListenerTests
     {
-        [Test]
+        [Fact]
         public void SetInvalidTfsUrlThrows()
         {
             Listener listener = new Listener(new FileLogger());
@@ -17,7 +16,7 @@ namespace SvnBridge.Net
                 delegate { listener.TfsUrl = "foo"; });
         }
 
-        [Test]
+        [Fact]
         public void SetPortAfterStartThrows()
         {
             Listener listener = new Listener(new FileLogger());
@@ -31,7 +30,7 @@ namespace SvnBridge.Net
             listener.Stop();
         }
 
-        [Test]
+        [Fact]
         public void SetTfsUrlAfterStartThrows()
         {
             Listener listener = new Listener(new FileLogger());
@@ -45,7 +44,7 @@ namespace SvnBridge.Net
             listener.Stop();
         }
 
-        [Test]
+        [Fact]
         public void StartWithoutSettingPortThrows()
         {
             Listener listener = new Listener(new FileLogger());
@@ -55,7 +54,7 @@ namespace SvnBridge.Net
                 delegate { listener.Start(); });
         }
 
-        [Test]
+        [Fact]
         public void StartWithoutSettingTfsUrlThrows()
         {
             Listener listener = new Listener(new FileLogger());

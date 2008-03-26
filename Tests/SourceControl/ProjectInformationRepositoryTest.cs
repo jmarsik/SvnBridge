@@ -2,28 +2,25 @@ using System;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using NUnit.Framework;
+using Xunit;
 using Rhino.Mocks;
 using Rhino.Mocks.Constraints;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
 {
-    [TestFixture]
-    public class ProjectInformationRepositoryTest
+    public class ProjectInformationRepositoryTest : IDisposable
     {
         #region Setup/Teardown
 
-        [SetUp]
-        public void TestInitialize()
+        public ProjectInformationRepositoryTest()
         {
             mocks = new MockRepository();
             sourceControlService = mocks.DynamicMock<ITFSSourceControlService>();
             cache = mocks.DynamicMock<ICache>();
         }
 
-        [TearDown]
-        public void TestCleanup()
+        public void Dispose()
         {
             mocks.VerifyAll();
         }
@@ -34,7 +31,7 @@ namespace SvnBridge.SourceControl
         private ITFSSourceControlService sourceControlService;
         private ICache cache;
 
-        [Test]
+        [Fact]
         public void GetProjectInforation_WillQueryServerForProject()
         {
             string serverUrl = "http://codeplex-tfs3:8080";
@@ -65,7 +62,7 @@ namespace SvnBridge.SourceControl
                 repository.GetProjectLocation(CredentialCache.DefaultCredentials, "blah");
         }
 
-        [Test]
+        [Fact]
         public void GetProjectInforation_WillReturnRemoteProjectName()
         {
             string serverUrl = "http://codeplex-tfs3:8080";
@@ -95,10 +92,10 @@ namespace SvnBridge.SourceControl
             ProjectLocationInformation location =
                 repository.GetProjectLocation(CredentialCache.DefaultCredentials, "blah");
 
-            Assert.AreEqual("test", location.RemoteProjectName);
+            Assert.Equal("test", location.RemoteProjectName);
         }
 
-        [Test]
+        [Fact]
         public void GetProjectInformation_WillQueryAllServers()
         {
             string multiServers = "http://codeplex-tfs3:8080,http://codeplex-tfs2:8080,http://codeplex-tfs1:8080";
@@ -133,9 +130,7 @@ namespace SvnBridge.SourceControl
             repository.GetProjectLocation(null, "as");
         }
 
-        [Test]
-        [ExpectedException(typeof (InvalidOperationException),
-            ExpectedMessage = "Could not find project 'blah' in: http://not.used")]
+        [Fact]
         public void IfProjectNotFound_WillThrow()
         {
             mocks.ReplayAll();
@@ -143,10 +138,13 @@ namespace SvnBridge.SourceControl
             IProjectInformationRepository repository =
                 new ProjectInformationRepository(cache, sourceControlService, "http://not.used");
 
-            repository.GetProjectLocation(null, "blah");
+            Exception result = Record.Exception(delegate { repository.GetProjectLocation(null, "blah"); });
+
+            Assert.IsType(typeof(InvalidOperationException), result);
+            Assert.Equal("Could not find project 'blah' in: http://not.used", result.Message);
         }
 
-        [Test]
+        [Fact]
         public void WillGetFromCacheIfFound()
         {
             Expect.Call(cache.Get("GetProjectLocation-blah")).Return(new CachedResult(new ProjectLocationInformation("blah", "http")));
@@ -157,10 +155,10 @@ namespace SvnBridge.SourceControl
                 new ProjectInformationRepository(cache, sourceControlService, "http://not.used");
 
             ProjectLocationInformation location = repository.GetProjectLocation(null, "blah");
-            Assert.IsNotNull(location);
+            Assert.NotNull(location);
         }
 
-        [Test]
+        [Fact]
         public void WillSetInCacheAfterFindingFromServer()
         {
             string serverUrl = "http://codeplex-tfs3:8080";
@@ -193,7 +191,7 @@ namespace SvnBridge.SourceControl
             ProjectLocationInformation location =
                 repository.GetProjectLocation(CredentialCache.DefaultCredentials, "blah");
 
-            Assert.AreEqual("test", location.RemoteProjectName);
+            Assert.Equal("test", location.RemoteProjectName);
         }
     }
 }

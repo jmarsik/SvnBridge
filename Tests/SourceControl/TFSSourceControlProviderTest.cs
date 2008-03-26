@@ -1,5 +1,6 @@
+using System;
 using CodePlex.TfsLibrary.ObjectModel;
-using NUnit.Framework;
+using Xunit;
 using Rhino.Mocks;
 using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
@@ -7,15 +8,13 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
 {
-    [TestFixture]
-    public class TFSSourceControlProviderTest
+    public class TFSSourceControlProviderTest : IDisposable
     {
         private MockRepository mocks;
         private IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private TFSSourceControlProvider provider;
 
-        [SetUp]
-        public void TestInitialize()
+        public TFSSourceControlProviderTest()
         {
             mocks = new MockRepository();
             associateWorkItemWithChangeSet = mocks.CreateMock<IAssociateWorkItemWithChangeSet>();
@@ -38,21 +37,19 @@ namespace SvnBridge.SourceControl
                 MockRepository.GenerateStub<IFileCache>());
         }
 
-
-        [TearDown]
-        public void TestCleanup()
+        public void Dispose()
         {
             mocks.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void WillNotAssociateIfCommentHasNoWorkItems()
         {
             mocks.ReplayAll();
             provider.AssociateWorkItemsWithChangeSet("blah blah", 15);
         }
 
-        [Test]
+        [Fact]
         public void WillExtractWorkItemsFromCheckInCommentsAndAssociateWithChangeSet()
         {
             associateWorkItemWithChangeSet.Associate(15,15);
@@ -63,7 +60,7 @@ Work Item: 15";
             provider.AssociateWorkItemsWithChangeSet(comment, 15);
         }
 
-        [Test]
+        [Fact]
         public void CanAssociateMoreThanOneId()
         {
             associateWorkItemWithChangeSet.Associate(15, 15);
@@ -78,7 +75,7 @@ Work Items: 15, 16, 17";
             provider.AssociateWorkItemsWithChangeSet(comment, 15);
         }
 
-        [Test]
+        [Fact]
         public void CanAssociateOnMultiplyLines()
         {
             associateWorkItemWithChangeSet.Associate(15, 15);
@@ -94,7 +91,7 @@ Work Item: 17";
             provider.AssociateWorkItemsWithChangeSet(comment, 15); 
         }
 
-        [Test]
+        [Fact]
         public void WillRecognizeWorkItemsIfWorkItemAppearsPreviouslyInText()
         {
 

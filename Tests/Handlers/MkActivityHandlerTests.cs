@@ -1,15 +1,14 @@
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class MkActivityHandlerTests : HandlerTestsBase
     {
         protected MkActivityHandler handler = new MkActivityHandler();
 
-        [Test]
+        [Fact]
         public void VerifyHandleCorrectlyCallsSourceControlService()
         {
             Results r = stub.Attach(provider.MakeActivity);
@@ -17,8 +16,8 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, r.CallCount);
-            Assert.AreEqual("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
+            Assert.Equal(1, r.CallCount);
+            Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
         }
     }
 }

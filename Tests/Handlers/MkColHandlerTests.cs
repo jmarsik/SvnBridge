@@ -2,18 +2,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Exceptions;
 using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class MkColHandlerTests : HandlerTestsBase
     {
         protected MkColHandler handler = new MkColHandler();
 
-        [Test]
+        [Fact]
         public void VerifyCorrectOutputForSuccessfulCreate()
         {
             Results r = stub.Attach(provider.MakeCollection);
@@ -33,16 +32,16 @@ namespace SvnBridge.Handlers
                 "<hr />\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
-            Assert.AreEqual(expected, result);
-            Assert.AreEqual(201, response.StatusCode);
-            Assert.AreEqual("text/html", response.ContentType);
-            Assert.IsTrue(
+            Assert.Equal(expected, result);
+            Assert.Equal(201, response.StatusCode);
+            Assert.Equal("text/html", response.ContentType);
+            Assert.True(
                 response.Headers.Contains(
                     new KeyValuePair<string, string>("Location",
                                                      "http://localhost:8082//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Spikes/SvnFacade/trunk/New Folder 6")));
         }
 
-        [Test]
+        [Fact]
         public void VerifyCorrectOutputWhenFolderAlreadyExists()
         {
             stub.Attach(provider.MakeCollection, new FolderAlreadyExistsException());
@@ -61,13 +60,13 @@ namespace SvnBridge.Handlers
                 "<hr>\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
-            Assert.AreEqual(expected, result);
-            Assert.AreEqual(405, response.StatusCode);
-            Assert.AreEqual("text/html; charset=iso-8859-1", response.ContentType);
-            Assert.IsTrue(response.Headers.Contains(new KeyValuePair<string, string>("Allow", "TRACE")));
+            Assert.Equal(expected, result);
+            Assert.Equal(405, response.StatusCode);
+            Assert.Equal("text/html; charset=iso-8859-1", response.ContentType);
+            Assert.True(response.Headers.Contains(new KeyValuePair<string, string>("Allow", "TRACE")));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleCorrectlyInvokesSourceControlProvider()
         {
             Results r = stub.Attach(provider.MakeCollection);
@@ -76,12 +75,12 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, r.CallCount);
-            Assert.AreEqual("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/Empty", r.Parameters[1]);
+            Assert.Equal(1, r.CallCount);
+            Assert.Equal("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
+            Assert.Equal("/Spikes/SvnFacade/trunk/Empty", r.Parameters[1]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyPathIsDecodedWhenCallingSourceControlProvider()
         {
             Results r = stub.Attach(provider.MakeCollection);
@@ -89,7 +88,7 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("/Folder With Spaces", r.Parameters[1]);
+            Assert.Equal("/Folder With Spaces", r.Parameters[1]);
         }
     }
 }

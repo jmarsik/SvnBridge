@@ -1,22 +1,18 @@
 using System.Windows.Forms;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Net;
 using SvnBridge.Stubs;
 using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace SvnBridge.Presenters
 {
-    [TestFixture]
     public class SettingsViewPresenterTests
     {
         #region Setup/Teardown
-
-        [SetUp]
-        public void SetUp()
+        public SettingsViewPresenterTests()
         {
             stubView = new StubSettingsView();
         }
-
         #endregion
 
         private StubSettingsView stubView;
@@ -26,7 +22,7 @@ namespace SvnBridge.Presenters
             return new SettingsViewPresenter(stubView, new ProxyInformation());
         }
 
-        [Test]
+        [Fact]
         public void TestConstructorSetsViewsPresenter()
         {
             SettingsViewPresenter presenter = CreatePresenter();
@@ -34,7 +30,7 @@ namespace SvnBridge.Presenters
             Assert.Equal(stubView.Presenter, presenter);
         }
 
-        [Test]
+        [Fact]
         public void TestShowCallsViewsShow()
         {
             SettingsViewPresenter presenter = CreatePresenter();
@@ -44,7 +40,7 @@ namespace SvnBridge.Presenters
             Assert.True(stubView.Show_Called);
         }
 
-        [Test]
+        [Fact]
         public void TestViewSetsCancelled()
         {
             stubView.Show_Delegate =
@@ -56,7 +52,7 @@ namespace SvnBridge.Presenters
             Assert.True(presenter.Cancelled);
         }
 
-        [Test]
+        [Fact]
         public void TestViewSetsPort()
         {
             int expected = 8081;
@@ -69,7 +65,7 @@ namespace SvnBridge.Presenters
             Assert.Equal(expected, presenter.Port);
         }
 
-        [Test]
+        [Fact]
         public void TestViewSetsTfsUrl()
         {
             string expected = "http://foo";

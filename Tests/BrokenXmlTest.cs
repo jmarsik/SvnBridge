@@ -1,5 +1,5 @@
 using System.Xml;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 
 namespace SvnBridge
@@ -7,10 +7,9 @@ namespace SvnBridge
 	using Protocol;
 	using Utility;
 
-	[TestFixture]
     public class BrokenXmlTest
     {
-        [Test]
+        [Fact]
         public void CanEscapeBrokenXml()
         {
             string brokenXml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><C:bugtraq:label>Work Item:</C:bugtraq:label><C:bugtraq:url>http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=%BUGID%</C:bugtraq:url><C:bugtraq:message> Work Item: %BUGID%</C:bugtraq:message><C:bugtraq:number>true</C:bugtraq:number><C:bugtraq:warnifnoissue>true</C:bugtraq:warnifnoissue></D:prop></D:set></D:propertyupdate>";
@@ -19,16 +18,16 @@ namespace SvnBridge
             xdoc.LoadXml(validXml);
         }
 
-		[Test]
+		[Fact]
 		public void CanDeserializeBrokenXml()
 		{
 			string brokenXml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><C:bugtraq:label>Work Item:</C:bugtraq:label><C:bugtraq:url>http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=%BUGID%</C:bugtraq:url><C:bugtraq:message> Work Item: %BUGID%</C:bugtraq:message><C:bugtraq:number>true</C:bugtraq:number><C:bugtraq:warnifnoissue>true</C:bugtraq:warnifnoissue></D:prop></D:set></D:propertyupdate>";
 			string validXml = BrokenXml.Escape(brokenXml);
 			PropertyUpdateData xml = Helper.DeserializeXml<PropertyUpdateData>(validXml);
-			Assert.AreEqual(5, xml.Set.Prop.Properties.Count);
+			Assert.Equal(5, xml.Set.Prop.Properties.Count);
 		}
 
-    	[Test]
+    	[Fact]
     	public void CanEscapeBrokenXmlWhenUsingSingleTagOpenClose()
     	{
 			string brokenXml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:remove><D:prop><S:svn:ignore/></D:prop></D:remove></D:propertyupdate>";

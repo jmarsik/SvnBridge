@@ -1,59 +1,58 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Interfaces;
 using SvnBridge.Proxies;
 
 namespace SvnBridge.Proxies
 {
-    [TestFixture]
     public class ProxyFactoryTest
     {
-        [Test]
+        [Fact]
         public void CanInterceptMethodCall()
         {
             LoggingInterceptor interceptor = new LoggingInterceptor();
             IFoo foo = ProxyFactory.Create<IFoo>(new FooImpl(), interceptor);
             foo.Method1();
-            Assert.AreEqual("Method1", interceptor.calls[0]);
+            Assert.Equal("Method1", interceptor.calls[0]);
         }
 
-        [Test]
+        [Fact]
         public void CanInterceptMethodCallAndThenProceed()
         {
             ErrorCountInterceptor interceptor = new ErrorCountInterceptor();
             IFoo foo = ProxyFactory.Create<IFoo>(new FooImpl(), interceptor);
             foo.Method1();
-            Assert.AreEqual("SocketException", interceptor.errors[0].GetType().Name);
+            Assert.Equal("SocketException", interceptor.errors[0].GetType().Name);
         }
 
-        [Test]
+        [Fact]
         public void CanModifyArgumentsToCall()
         {
             MultiplyByTwoInterceptor interceptor = new MultiplyByTwoInterceptor();
             IFoo foo = ProxyFactory.Create<IFoo>(new FooImpl(), interceptor);
             int actual = foo.Add(2, 3);
-            Assert.AreEqual(10, actual);
+            Assert.Equal(10, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanModifyReturnValue()
         {
             DivideReturnValueBy3Interceptor interceptor = new DivideReturnValueBy3Interceptor();
             IFoo foo = ProxyFactory.Create<IFoo>(new FooImpl(), interceptor);
             int actual = foo.Add(3, 3);
-            Assert.AreEqual(2, actual);
+            Assert.Equal(2, actual);
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterTwoInterceptors()
         {
             MultiplyByTwoInterceptor interceptor1 = new MultiplyByTwoInterceptor();
             DivideReturnValueBy3Interceptor interceptor2 = new DivideReturnValueBy3Interceptor();
             IFoo foo = ProxyFactory.Create<IFoo>(new FooImpl(), interceptor1, interceptor2);
             int actual = foo.Add(3, 3);
-            Assert.AreEqual(4, actual);
+            Assert.Equal(4, actual);
         }
     }
 

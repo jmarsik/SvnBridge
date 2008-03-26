@@ -5,19 +5,18 @@ using System.Text;
 using Attach;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
 using Tests;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class ReportHandlerLogReportTests : HandlerTestsBase
     {
         protected ReportHandler handler = new ReportHandler();
 
-        [Test]
+        [Fact]
         public void VerifyHandleEncodesFilenamesWithSpecialCharacters()
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
@@ -62,10 +61,10 @@ namespace SvnBridge.Handlers
                 "<S:added-path copyfrom-path=\"/newFolder4/F!@#$%^&amp;()~`_-+={[}];',.txt\" copyfrom-rev=\"5531\">/newFolder4/G!@#$%^&amp;()~`_-+={[}];',.txt</S:added-path>\n" +
                 "</S:log-item>\n" +
                 "</S:log-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleForGetAtLogRoot()
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
@@ -91,15 +90,15 @@ namespace SvnBridge.Handlers
                 "<S:deleted-path>/Folder9</S:deleted-path>\n" +
                 "</S:log-item>\n" +
                 "</S:log-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual("/", r.Parameters[0]);
-            Assert.AreEqual(1, r.Parameters[1]);
-            Assert.AreEqual(5696, r.Parameters[2]);
-            Assert.AreEqual(Recursion.Full, r.Parameters[3]);
-            Assert.AreEqual(100, r.Parameters[4]);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal("/", r.Parameters[0]);
+            Assert.Equal(1, r.Parameters[1]);
+            Assert.Equal(5696, r.Parameters[2]);
+            Assert.Equal(Recursion.Full, r.Parameters[3]);
+            Assert.Equal(100, r.Parameters[4]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleOutputForGetLocationsReportOnRoot()
         {
             stub.Attach(provider.GetItems, new ItemMetaData());
@@ -114,13 +113,13 @@ namespace SvnBridge.Handlers
                 "<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
                 "<S:location rev=\"5597\" path=\"/\"/>\n" +
                 "</S:get-locations-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual(200, context.Response.StatusCode);
-            Assert.AreEqual("text/xml; charset=\"utf-8\"", context.Response.ContentType);
-            Assert.AreEqual(true, context.Response.SendChunked);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal(200, context.Response.StatusCode);
+            Assert.Equal("text/xml; charset=\"utf-8\"", context.Response.ContentType);
+            Assert.Equal(true, context.Response.SendChunked);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleOutputForGetLocationsReportOnSubFolder()
         {
             stub.Attach(provider.GetItems, new ItemMetaData());
@@ -136,10 +135,10 @@ namespace SvnBridge.Handlers
                 "<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n" +
                 "<S:location rev=\"5573\" path=\"/Folder1\"/>\n" +
                 "</S:get-locations-report>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleProducesCorrectOutputForBranchedFile()
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
@@ -166,14 +165,14 @@ namespace SvnBridge.Handlers
                 "</S:log-item>\n" +
                 "</S:log-report>\n";
 
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
-            Assert.AreEqual(Encoding.UTF8, response.ContentEncoding);
-            Assert.AreEqual(200, response.StatusCode);
-            Assert.IsTrue(response.SendChunked);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal("text/xml; charset=\"utf-8\"", response.ContentType);
+            Assert.Equal(Encoding.UTF8, response.ContentEncoding);
+            Assert.Equal(200, response.StatusCode);
+            Assert.True(response.SendChunked);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleProducesCorrectOutputForRenamedFile()
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
@@ -202,16 +201,16 @@ namespace SvnBridge.Handlers
                 "</S:log-item>\n" +
                 "</S:log-report>\n";
 
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual("text/xml; charset=\"utf-8\"", response.ContentType);
-            Assert.AreEqual(Encoding.UTF8, response.ContentEncoding);
-            Assert.AreEqual(200, response.StatusCode);
-            Assert.IsTrue(response.SendChunked);
-            Assert.AreEqual("/File.txt", r.Parameters[0]);
-            Assert.AreEqual(1, r.Parameters[1]);
-            Assert.AreEqual(5531, r.Parameters[2]);
-            Assert.AreEqual(Recursion.Full, r.Parameters[3]);
-            Assert.AreEqual(100, r.Parameters[4]);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal("text/xml; charset=\"utf-8\"", response.ContentType);
+            Assert.Equal(Encoding.UTF8, response.ContentEncoding);
+            Assert.Equal(200, response.StatusCode);
+            Assert.True(response.SendChunked);
+            Assert.Equal("/File.txt", r.Parameters[0]);
+            Assert.Equal(1, r.Parameters[1]);
+            Assert.Equal(5531, r.Parameters[2]);
+            Assert.Equal(Recursion.Full, r.Parameters[3]);
+            Assert.Equal(100, r.Parameters[4]);
         }
     }
 }

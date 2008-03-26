@@ -1,17 +1,16 @@
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class DeleteHandlerTests : HandlerTestsBase
     {
         protected DeleteHandler handler = new DeleteHandler();
 
-        [Test]
+        [Fact]
         public void VerifyHandleCorrectlyInvokesSourceControlProviderForDeleteActivity()
         {
             Results r = stub.Attach(provider.DeleteActivity);
@@ -19,11 +18,11 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, r.CallCount);
-            Assert.AreEqual("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
+            Assert.Equal(1, r.CallCount);
+            Assert.Equal("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleCorrectlyInvokesSourceControlProviderForDeleteFile()
         {
             Results r = stub.Attach(provider.DeleteItem, true);
@@ -32,12 +31,12 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, r.CallCount);
-            Assert.AreEqual("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/Test4.txt", r.Parameters[1]);
+            Assert.Equal(1, r.CallCount);
+            Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
+            Assert.Equal("/Spikes/SvnFacade/trunk/Test4.txt", r.Parameters[1]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleDecodesPathWhenInvokingSourceControlProviderForDeleteItem()
         {
             Results r = stub.Attach(provider.DeleteItem, true);
@@ -46,10 +45,10 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 6", r.Parameters[1]);
+            Assert.Equal("/Spikes/SvnFacade/trunk/New Folder 6", r.Parameters[1]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyHandleReturnsCorrectResponseWhenDeleteFileNotFound()
         {
             Results r = stub.Attach(provider.DeleteItem, false);
@@ -68,9 +67,9 @@ namespace SvnBridge.Handlers
                 "<hr>\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
-            Assert.AreEqual(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
-            Assert.AreEqual(404, response.StatusCode);
-            Assert.AreEqual("text/html; charset=iso-8859-1", response.ContentType);
+            Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));
+            Assert.Equal(404, response.StatusCode);
+            Assert.Equal("text/html; charset=iso-8859-1", response.ContentType);
         }
     }
 }

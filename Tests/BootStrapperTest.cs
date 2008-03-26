@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Net;
-using NUnit.Framework;
+using Xunit;
 using Rhino.Mocks;
 using Rhino.Mocks.Constraints;
 using SvnBridge.Infrastructure;
@@ -10,35 +10,31 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge
 {
-	[TestFixture]
-	public class BootStrapperTest
+	public class BootStrapperTest : IDisposable
 	{
 		#region Setup/Teardown
+        public BootStrapperTest()
+        {
+            mocks = new MockRepository();
+        }
 
-		[SetUp]
-		public void TestInitialize()
-		{
-			mocks = new MockRepository();
-		}
-
-		[TearDown]
-		public void TestCleanup()
-		{
-			mocks.VerifyAll();
-		}
-
+        public void Dispose()
+        {
+            mocks.VerifyAll();
+            IoC.Reset();
+        }
 		#endregion
 
 		private MockRepository mocks;
 
-		[Test]
+		[Fact]
 		public void AfterStartingBootStrapper_CanResolveCache_FromContainer()
 		{
 			new BootStrapper().Start();
-			Assert.IsNotNull(IoC.Resolve<ICache>());
+			Assert.NotNull(IoC.Resolve<ICache>());
 		}
 
-		[Test]
+		[Fact]
 		public void AfterStartingBootStrapper_CanResoveCachingItemMetaDataRepository()
 		{
 			new BootStrapper().Start();
@@ -55,10 +51,10 @@ namespace SvnBridge
 			mocks.ReplayAll();
 
 			dependencies["projectInformationRepository"] = stub;
-			Assert.IsNotNull(IoC.Resolve<IItemMetaDataRepository>(dependencies));
+			Assert.NotNull(IoC.Resolve<IItemMetaDataRepository>(dependencies));
 		}
 
-		[Test]
+		[Fact]
 		public void ContainerWillCallEnvironmentValidation()
 		{
 			MockRepository mocks = new MockRepository();
@@ -76,7 +72,7 @@ namespace SvnBridge
 			mocks.VerifyAll();
 		}
 
-		[Test]
+		[Fact]
 		public void ContainerWillCallEnvironmentValidation_OnlyOnce()
 		{
 			MockRepository mocks = new MockRepository();
@@ -96,5 +92,5 @@ namespace SvnBridge
 
 			mocks.VerifyAll();
 		}
-	}
+    }
 }

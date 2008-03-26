@@ -1,12 +1,11 @@
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Utility;
 
 namespace Tests.Utility
 {
-    [TestFixture]
     public class SvnDiffEngineTests
     {
-        [Test]
+        [Fact]
         public void TestApplySvnDiffThatWillExpand()
         {
             byte[] source = new byte[5002];
@@ -19,11 +18,11 @@ namespace Tests.Utility
 
             byte[] resultBytes = SvnDiffEngine.ApplySvnDiff(svnDiff, source, 0);
 
-            Assert.AreEqual(5002, resultBytes.Length);
-            Assert.AreEqual(1, resultBytes[5001]);
+            Assert.Equal(5002, resultBytes.Length);
+            Assert.Equal(1, resultBytes[5001]);
         }
 
-        [Test]
+        [Fact]
         public void TestApplySvnDiffWhereCopyFromTargetOverlapsWithDestination()
         {
             SvnDiff svnDiff = new SvnDiff();
@@ -34,10 +33,10 @@ namespace Tests.Utility
 
             byte[] resultBytes = SvnDiffEngine.ApplySvnDiff(svnDiff, new byte[0], 0);
 
-            Assert.AreEqual(new byte[6] {1, 2, 1, 2, 1, 2}, resultBytes);
+            Assert.Equal(new byte[6] {1, 2, 1, 2, 1, 2}, resultBytes);
         }
 
-        [Test]
+        [Fact]
         public void TestApplySvnDiffWithCopyFromData()
         {
             byte[] source = new byte[0];
@@ -49,10 +48,10 @@ namespace Tests.Utility
 
             byte[] resultBytes = SvnDiffEngine.ApplySvnDiff(svnDiff, source, 0);
 
-            Assert.AreEqual(new byte[2] {1, 2}, resultBytes);
+            Assert.Equal(new byte[2] {1, 2}, resultBytes);
         }
 
-        [Test]
+        [Fact]
         public void TestApplySvnDiffWithCopyFromSource()
         {
             byte[] source = new byte[4] {1, 2, 3, 4};
@@ -64,10 +63,10 @@ namespace Tests.Utility
 
             byte[] resultBytes = SvnDiffEngine.ApplySvnDiff(svnDiff, source, 0);
 
-            Assert.AreEqual(new byte[2] {3, 4}, resultBytes);
+            Assert.Equal(new byte[2] {3, 4}, resultBytes);
         }
 
-        [Test]
+        [Fact]
         public void TestApplySvnDiffWithCopyFromTarget()
         {
             SvnDiff svnDiff = new SvnDiff();
@@ -78,10 +77,10 @@ namespace Tests.Utility
 
             byte[] resultBytes = SvnDiffEngine.ApplySvnDiff(svnDiff, new byte[0], 0);
 
-            Assert.AreEqual(new byte[2] {5, 5}, resultBytes);
+            Assert.Equal(new byte[2] {5, 5}, resultBytes);
         }
 
-        [Test]
+        [Fact]
         public void TestApplySvnDiffWithSouceDataIndex()
         {
             byte[] source = new byte[4] {1, 2, 3, 4};
@@ -93,7 +92,7 @@ namespace Tests.Utility
 
             byte[] resultBytes = SvnDiffEngine.ApplySvnDiff(svnDiff, source, 1);
 
-            Assert.AreEqual(new byte[2] {3, 4}, resultBytes);
+            Assert.Equal(new byte[2] {3, 4}, resultBytes);
         }
     }
 }

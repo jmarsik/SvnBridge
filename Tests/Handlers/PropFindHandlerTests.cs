@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using Attach;
-using NUnit.Framework;
+using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.Nodes;
 using SvnBridge.SourceControl;
@@ -10,12 +10,11 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    [TestFixture]
     public class PropFindHandlerTests : HandlerTestsBase
     {
         protected PropFindHandler handler = new PropFindHandler();
 
-        [Test]
+        [Fact]
         public void TestBcFileNodeHrefForFolder()
         {
             ItemMetaData item = new ItemMetaData();
@@ -25,10 +24,10 @@ namespace SvnBridge.Handlers
             BcFileNode node = new BcFileNode(1234, item, provider);
 
             string expected = "/!svn/bc/1234/Foo/Bar.txt";
-            Assert.AreEqual(expected, node.Href(handler));
+            Assert.Equal(expected, node.Href(handler));
         }
 
-        [Test]
+        [Fact]
         public void TestBcMd5Checksum()
         {
             stub.Attach(provider.ItemExists, true);
@@ -45,12 +44,12 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp2:md5-checksum>" + Helper.GetMd5Checksum(new byte[4] {0, 1, 2, 3}) +
                                 "</lp2:md5-checksum>"));
         }
 
-        [Test]
+        [Fact]
         public void TestCorrectlyInvokesProviderWithBcPathAndDepthOne()
         {
             stub.Attach(provider.ItemExists, true);
@@ -65,14 +64,13 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual(1, results.CallCount);
-            Assert.AreEqual(1234, results.Parameters[0]);
-            Assert.AreEqual("/Foo", results.Parameters[1]);
-            Assert.AreEqual(Recursion.OneLevel, results.Parameters[2]);
+            Assert.Equal(1, results.CallCount);
+            Assert.Equal(1234, results.Parameters[0]);
+            Assert.Equal("/Foo", results.Parameters[1]);
+            Assert.Equal(Recursion.OneLevel, results.Parameters[2]);
         }
 
-        [Test]
-        [ExpectedException(typeof (InvalidOperationException))]
+        [Fact]
         public void TestInvalidDepthThrowsEx()
         {
             stub.Attach(provider.ItemExists, true);
@@ -81,10 +79,12 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "2";
 
-            handler.Handle(context, tfsUrl);
+            Exception result = Record.Exception(delegate { handler.Handle(context, tfsUrl); });
+
+            Assert.IsType(typeof(InvalidOperationException), result);
         }
 
-        [Test]
+        [Fact]
         public void TestPropFindLockDiscovery()
         {
             stub.Attach(provider.ItemExists, true);
@@ -100,10 +100,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<D:lockdiscovery/>"));
+            Assert.True(result.Contains("<D:lockdiscovery/>"));
         }
 
-        [Test]
+        [Fact]
         public void TestPropFindWithDepthOneIncludesFolderAndChildren()
         {
             stub.Attach(provider.ItemExists, true);
@@ -122,11 +122,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<D:href>/!svn/bc/1234/Foo/</D:href>"));
-            Assert.IsTrue(result.Contains("<D:href>/!svn/bc/1234/Foo/Bar.txt</D:href>"));
+            Assert.True(result.Contains("<D:href>/!svn/bc/1234/Foo/</D:href>"));
+            Assert.True(result.Contains("<D:href>/!svn/bc/1234/Foo/Bar.txt</D:href>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyBaselineRelativePathPropertyForFolderReturnsDecoded()
         {
             stub.Attach(provider.ItemExists, true);
@@ -142,10 +142,10 @@ namespace SvnBridge.Handlers
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             string expected = "<lp2:baseline-relative-path>Folder With Spaces</lp2:baseline-relative-path>";
-            Assert.IsTrue(result.Contains(expected));
+            Assert.True(result.Contains(expected));
         }
 
-        [Test]
+        [Fact]
         public void VerifyCreationDate()
         {
             stub.Attach(provider.ItemExists, true);
@@ -164,11 +164,11 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(
+            Assert.True(
                 result.Contains("<lp1:creationdate>" + Helper.FormatDate(dt.ToUniversalTime()) + "</lp1:creationdate>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyCreatorDisplayName()
         {
             stub.Attach(provider.ItemExists, true);
@@ -186,10 +186,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
+            Assert.True(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyDeadPropCountReturnsZero()
         {
             stub.Attach(provider.ItemExists, true);
@@ -204,10 +204,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
+            Assert.True(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyGetContentLengthForFolder()
         {
             stub.Attach(provider.ItemExists, true);
@@ -227,10 +227,10 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<g0:getcontentlength/>"));
+            Assert.True(result.Contains("<g0:getcontentlength/>"));
         }
 
-        [Test]
+        [Fact]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
         {
             Results r1 = stub.Attach(provider.ItemExists, true);
@@ -244,11 +244,11 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", r1.Parameters[0]);
-            Assert.AreEqual("/Spikes/SvnFacade/trunk/New Folder 7", r2.Parameters[1]);
+            Assert.Equal("/Spikes/SvnFacade/trunk/New Folder 7", r1.Parameters[0]);
+            Assert.Equal("/Spikes/SvnFacade/trunk/New Folder 7", r2.Parameters[1]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForSvnBcFolderPath()
         {
             Results r = stub.Attach(provider.ItemExists, true);
@@ -263,10 +263,10 @@ namespace SvnBridge.Handlers
 
             handler.Handle(context, tfsUrl);
 
-            Assert.AreEqual("/Test Project", r.Parameters[0]);
+            Assert.Equal("/Test Project", r.Parameters[0]);
         }
 
-        [Test]
+        [Fact]
         public void VerifyVersionName()
         {
             stub.Attach(provider.ItemExists, true);
@@ -285,7 +285,7 @@ namespace SvnBridge.Handlers
             handler.Handle(context, tfsUrl);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.IsTrue(result.Contains("<lp1:version-name>1234</lp1:version-name>"));
+            Assert.True(result.Contains("<lp1:version-name>1234</lp1:version-name>"));
         }
     }
 }
