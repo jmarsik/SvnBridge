@@ -32,11 +32,11 @@
 	</Target>
 
 	<Target Name="UnitTest" DependsOnTargets="Build">
-		<Exec Command="nunit-console.exe Tests\bin\$(BuildType)\Tests.dll  /xml TestsUnit.results.xml "/>
+		<Exec Command="References\xunit.console.exe Tests\bin\$(BuildType)\Tests.dll  /xml TestsUnit.results.xml "/>
 	</Target>
 
 	<Target Name="ProtocolTest" DependsOnTargets="Build">
-		<Exec Command="nunit-console.exe TestsProtocol\bin\$(BuildType)\TestsProtocol.dll /xml=TestsProtocol.results.xml "/>
+		<Exec Command="References\xunit.console.exe TestsProtocol\bin\$(BuildType)\TestsProtocol.dll /xml=TestsProtocol.results.xml "/>
 	</Target>
 
 	<Target Name="EndToEndTest" DependsOnTargets="Build">
