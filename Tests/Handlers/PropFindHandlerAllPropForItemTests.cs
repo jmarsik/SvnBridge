@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using Xunit;
 using SvnBridge.Infrastructure;
+using SvnBridge.PathParsing;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
@@ -44,7 +45,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp2:baseline-relative-path>Foo/Bar.txt</lp2:baseline-relative-path>"));
@@ -55,7 +56,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -67,7 +68,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:getcontenttype>text/plain</lp1:getcontenttype>"));
@@ -80,7 +81,7 @@ namespace SvnBridge.Handlers
             item.LastModifiedDate = dt;
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -92,7 +93,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
@@ -103,7 +104,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
@@ -114,7 +115,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:getetag>W/\"1234//Foo/Bar.txt\"</lp1:getetag>"));
@@ -127,7 +128,7 @@ namespace SvnBridge.Handlers
             item.LastModifiedDate = dt;
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -139,7 +140,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<D:href>/!svn/bc/1234/Foo/Bar.txt</D:href>"));
@@ -150,7 +151,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<D:lockdiscovery/>"));
@@ -161,7 +162,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -174,7 +175,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -186,7 +187,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:resourcetype/>"));
@@ -197,7 +198,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains(
@@ -214,7 +215,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -227,7 +228,7 @@ namespace SvnBridge.Handlers
         {
             ArrangeRequest();
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:version-name>1234</lp1:version-name>"));

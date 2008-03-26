@@ -64,7 +64,7 @@ namespace SvnBridge
 
 			mocks.ReplayAll();
 
-			IoC.Container.Register<ICanValidateMyEnvironment>(delegate { return validate;  });
+			IoC.Container.OverrideRegisteration(typeof(ICanValidateMyEnvironment), validate);
 
 
 			IoC.Resolve<ICanValidateMyEnvironment>();
@@ -83,8 +83,7 @@ namespace SvnBridge
 
 			mocks.ReplayAll();
 
-			IoC.Container.Register<ICanValidateMyEnvironment>(delegate { return validate; });
-
+			IoC.Container.OverrideRegisteration(typeof(ICanValidateMyEnvironment), validate);
 
 			IoC.Resolve<ICanValidateMyEnvironment>();
 			IoC.Resolve<ICanValidateMyEnvironment>();

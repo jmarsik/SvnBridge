@@ -62,7 +62,7 @@ namespace SvnBridge.Handlers
 			}
 		}
 
-		private static void WriteFileNotFoundResponse(IHttpRequest request,
+		private void WriteFileNotFoundResponse(IHttpRequest request,
 													  IHttpResponse response)
 		{
 			response.StatusCode = (int)HttpStatusCode.NotFound;

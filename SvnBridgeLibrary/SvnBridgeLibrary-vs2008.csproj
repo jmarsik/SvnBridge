@@ -49,6 +49,7 @@
     <Compile Include="BootStrapper.cs" />
     <Compile Include="Cache\NullCache.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Exceptions\CacheMissException.cs" />
     <Compile Include="Exceptions\EnvironmentValidationException.cs" />
     <Compile Include="Exceptions\RepositoryUnavailableException.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
@@ -56,6 +57,8 @@
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
+    <Compile Include="PathParsing\StaticServerPathParser.cs" />
+    <Compile Include="PathParsing\StaticServerWithProjectNameInHostNamePathParser.cs" />
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />
     <Compile Include="Infrastructure\ExceptionHelper.cs" />
     <Compile Include="Infrastructure\FileCache.cs" />
@@ -66,6 +69,7 @@
     <Compile Include="Interfaces\IInterceptor.cs" />
     <Compile Include="Interfaces\IInvocation.cs" />
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />
+    <Compile Include="Interfaces\IPathParser.cs" />
     <Compile Include="Interfaces\ISourceControlServicesHub.cs" />
     <Compile Include="Protocol\DatedRevReportData.cs" />
     <Compile Include="Proxies\ProxyFactory.cs" />

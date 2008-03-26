@@ -1,6 +1,7 @@
 using System.Configuration;
 using System.Web;
 using SvnBridge.Net;
+using SvnBridge.PathParsing;
 
 namespace SvnBridge.Web
 {
@@ -10,12 +11,15 @@ namespace SvnBridge.Web
 
         public SvnBridgeHttpHandler()
         {
-            dispatcher = new HttpContextDispatcher();
-            dispatcher.TfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
-            if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
+        	string tfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
+        	if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
             {
-                dispatcher.URLIncludesProjectName = true;
+                dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl));
             }
+			else
+        	{
+        		dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl));
+        	}
         }
 
         #region IHttpHandler Members

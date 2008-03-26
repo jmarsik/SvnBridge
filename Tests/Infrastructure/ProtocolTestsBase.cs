@@ -9,6 +9,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using Xunit;
 using SvnBridge;
 using SvnBridge.Net;
+using SvnBridge.PathParsing;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
@@ -24,8 +25,7 @@ namespace Tests
         {
             provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            HttpDispatcher = new HttpContextDispatcher();
-            HttpDispatcher.TfsUrl = "http://foo";
+            HttpDispatcher = new HttpContextDispatcher(new StaticServerPathParser("http://foo"));
         }
 
         public void Dispose()

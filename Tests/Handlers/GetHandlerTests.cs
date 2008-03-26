@@ -3,6 +3,7 @@ using System.Text;
 using Attach;
 using Xunit;
 using SvnBridge.Infrastructure;
+using SvnBridge.PathParsing;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
@@ -20,7 +21,7 @@ namespace SvnBridge.Handlers
             Results readFileResult = stub.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("asdf"));
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo/Bar.txt";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string expected = "asdf";
             Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));

@@ -36,7 +36,7 @@
 	</Target>
 
 	<Target Name="ProtocolTest" DependsOnTargets="Build">
-		<Exec Command="References\xunit.console.exe TestsProtocol\bin\$(BuildType)\TestsProtocol.dll /xml=TestsProtocol.results.xml "/>
+		<Exec Command="References\xunit.console.exe TestsProtocol\bin\$(BuildType)\TestsProtocol.dll /xml TestsProtocol.results.xml "/>
 	</Target>
 
 	<Target Name="EndToEndTest" DependsOnTargets="Build">
@@ -44,7 +44,7 @@
 	</Target>
 	
 	<Target Name="IntegrationTest" DependsOnTargets="Build">
-		<Exec Command="References\xunit.console.exe  TestsIntegration\bin\$(BuildType)\TestsIntegration.dll  /xml IntegrationTests.results.xml "/>
+		<Exec Command="References\xunit.console.exe  TestsIntegration\bin\$(BuildType)\IntegrationTests.dll  /xml IntegrationTests.results.xml "/>
 	</Target>
 
 	<Target Name="TestAll" DependsOnTargets="UnitTest;ProtocolTest;IntegrationTest;EndToEndTest">

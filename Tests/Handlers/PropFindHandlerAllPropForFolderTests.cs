@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using Xunit;
 using SvnBridge.Infrastructure;
+using SvnBridge.PathParsing;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
@@ -37,7 +38,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp2:baseline-relative-path>Foo</lp2:baseline-relative-path>"));
@@ -50,7 +51,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:checked-in><D:href>/!svn/ver/1234/Foo</D:href></lp1:checked-in>"));
@@ -63,7 +64,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>"));
@@ -78,7 +79,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -92,7 +93,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
@@ -105,7 +106,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
@@ -118,7 +119,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:getetag>W/\"1234//Foo\"</lp1:getetag>"));
@@ -133,7 +134,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -147,7 +148,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -161,7 +162,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:resourcetype><D:collection/></lp1:resourcetype>"));
@@ -174,7 +175,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -189,7 +190,7 @@ namespace SvnBridge.Handlers
             request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
             request.Headers["Depth"] = "0";
 
-            handler.Handle(context, tfsUrl);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:version-name>1234</lp1:version-name>"));

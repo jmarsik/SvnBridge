@@ -1,3 +1,5 @@
+using SvnBridge.Interfaces;
+
 namespace SvnBridge.Net
 {
     public interface IHttpContext

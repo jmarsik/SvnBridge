@@ -4,26 +4,20 @@ using System.Net;
 using System.Text;
 using CodePlex.TfsLibrary;
 using SvnBridge.Handlers;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Net
 {
     public class HttpContextDispatcher
     {
-        private string tfsUrl;
-        private bool urlIncludesProjectName;
+		private readonly IPathParser parser;
 
-        public string TfsUrl
-        {
-            get { return tfsUrl; }
-            set { tfsUrl = value; }
-        }
+    	public HttpContextDispatcher(IPathParser parser)
+    	{
+    		this.parser = parser;
+    	}
 
-        public bool URLIncludesProjectName
-        {
-            set { urlIncludesProjectName = value; }
-        }
-
-        public HttpContextHandlerBase GetHandler(string httpMethod)
+    	public HttpContextHandlerBase GetHandler(string httpMethod)
         {
             switch (httpMethod.ToLowerInvariant())
             {
@@ -58,7 +52,7 @@ namespace SvnBridge.Net
 
         public void Dispatch(IHttpContext connection)
         {
-            if (string.IsNullOrEmpty(TfsUrl))
+			if (string.IsNullOrEmpty(parser.GetServerUrl(connection.Request)))
             {
                 throw new InvalidOperationException(
                     "A TFS server URL must be specified before connections can be dispatched.");
@@ -71,20 +65,11 @@ namespace SvnBridge.Net
                 SendUnsupportedMethodResponse(connection);
                 return;
             }
-
             handler.ApplicationPath = connection.Request.ApplicationPath;
 
             try
             {
-                if (urlIncludesProjectName)
-                {
-                    string projectName = connection.Request.Headers["Host"].Split('.')[0];
-                    handler.Handle(connection, tfsUrl, projectName);
-                }
-                else
-                {
-                    handler.Handle(connection, tfsUrl);
-                }
+               handler.Handle(connection, parser);
             }
             catch (WebException ex)
             {

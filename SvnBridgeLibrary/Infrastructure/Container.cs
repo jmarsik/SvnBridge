@@ -174,5 +174,13 @@ namespace SvnBridge.Infrastructure
 			typeToCreator.Clear();
 			configuration.Clear();
 		}
+
+		public void OverrideRegisteration(Type type, object service)
+		{
+			typeToCreator[type] = delegate
+			{
+				return service;
+			};
+		}
 	}
 }

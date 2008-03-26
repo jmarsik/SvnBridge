@@ -3,20 +3,21 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using SvnBridge.Interfaces;
+using SvnBridge.PathParsing;
 
 namespace SvnBridge.Net
 {
     public class Listener : IListener
     {
-        private readonly HttpContextDispatcher dispatcher;
+        private HttpContextDispatcher dispatcher;
         private bool isListening;
         private readonly ILogger logger;
         private TcpListener listener;
         private int? port;
+    	private string tfsUrl;
 
-        public Listener(ILogger logger)
+    	public Listener(ILogger logger)
         {
-            dispatcher = new HttpContextDispatcher();
             this.logger = logger;
         }
 
@@ -41,7 +42,7 @@ namespace SvnBridge.Net
 
         public string TfsUrl
         {
-            get { return dispatcher.TfsUrl; }
+            get { return tfsUrl; }
             set
             {
                 if (isListening)
@@ -53,7 +54,7 @@ namespace SvnBridge.Net
                 // validate URI
                 new Uri(value, UriKind.Absolute);
 
-                dispatcher.TfsUrl = value;
+                tfsUrl = value;
             }
         }
 
@@ -68,6 +69,8 @@ namespace SvnBridge.Net
             {
                 throw new InvalidOperationException("A TFS server URL must be specified before starting the listener.");
             }
+
+			dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl));
 
             isListening = true;
             listener = new TcpListener(IPAddress.Loopback, Port);

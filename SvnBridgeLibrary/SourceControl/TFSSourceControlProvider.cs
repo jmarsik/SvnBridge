@@ -14,6 +14,7 @@ namespace SvnBridge.SourceControl
 	using Protocol;
 	using Proxies;
 	using Utility;
+	using System.Threading;
 
 	[Interceptor(typeof(RetryOnSocketExceptionsInterceptor))]
 	public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
@@ -508,16 +509,35 @@ namespace SvnBridge.SourceControl
 				item.DataLoaded = true;
 				return;
 			}
-
-			IAsyncResult asyncResult = WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
+			int retry = 0;
+			ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+			WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
 			{
-				byte[] data = WebTransferService.EndDownloadBytes(ar);
-				FileCache.Set(item.Name, item.Revision, data);
+				try
+				{
+					byte[] data = WebTransferService.EndDownloadBytes(ar);
+					FileCache.Set(item.Name, item.Revision, data);
+					manualResetEvent.Set();
+				}
+				catch (Exception e)
+				{
+					if(retry == 3)
+					{
+						manualResetEvent.Set();
+						throw;
+					}
+					retry += 1;
+					ReadFileAsync(item);
+				}
 			});
 			item.Data = new FutureFile(delegate
 							   {
-								   asyncResult.AsyncWaitHandle.WaitOne();
-								   return FileCache.Get(item.Name, item.Revision);
+								   manualResetEvent.WaitOne();
+								   manualResetEvent.Close();
+							   	byte[] results = FileCache.Get(item.Name, item.Revision);
+								if (results == null)
+									throw new CacheMissException(item.Name);
+							   	return results;
 							   });
 
 			item.DataLoaded = true;

@@ -11,17 +11,14 @@ namespace SvnBridge.Handlers
     public abstract class HttpContextHandlerBase
     {
         private string applicationPath;
+    	private IPathParser parser;
 
-        public void Handle(IHttpContext context,
-                           string tfsUrl)
+        public void Handle(IHttpContext context, IPathParser pathParser)
         {
-            Handle(context, tfsUrl, null);
-        }
+        	this.parser = pathParser;
+        	string tfsUrl = pathParser.GetServerUrl(context.Request);
+        	string projectName = pathParser.GetProjectName(context.Request);
 
-        public void Handle(IHttpContext context,
-                           string tfsUrl,
-                           string projectName)
-        {
             ISourceControlProvider sourceControlProvider =
                 SourceControlProviderFactory.Create(tfsUrl, projectName, GetCredential(context));
             Handle(context, sourceControlProvider);
@@ -86,9 +83,9 @@ namespace SvnBridge.Handlers
             }
         }
 
-        protected static string GetPath(IHttpRequest request)
+        protected string GetPath(IHttpRequest request)
         {
-            return request.LocalPath;
+        	return parser.GetLocalPath(request);
         }
 
         public string ApplicationPath
