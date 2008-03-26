@@ -1,4 +1,5 @@
 using System.Xml;
+using SvnBridge.PathParsing;
 using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.Nodes;
@@ -31,7 +32,9 @@ namespace SvnBridge.Handlers
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
             FileNode node = new FileNode(item, null);
 
-            string result = node.GetProperty(new GetHandler(), xml.CreateElement("checked-in"));
+        	GetHandler handler = new GetHandler();
+			handler.Initialize(context, new StaticServerPathParser(tfsUrl));
+        	string result = node.GetProperty(handler, xml.CreateElement("checked-in"));
 
             Assert.Equal(
                 "<lp1:checked-in><D:href>/!svn/ver/5718/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',~%60..txt</D:href></lp1:checked-in>",

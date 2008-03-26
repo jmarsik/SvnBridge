@@ -12,4 +12,6 @@ TestsUnit.results.xml
 IntegrationTests.results.xml
 SvnBridge-Build.sln.cache
 SvnBridge-vs2008.suo
+SvnBridge-vs2008.4.0.resharper
+SvnBridge-vs2008.4.0.resharper.user
 </Value></Property><Property><Name>bugtraq__COLON__url</Name><Value>http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=%BUGID%</Value></Property><Property><Name>bugtraq__COLON__message</Name><Value>Work Item: %BUGID%</Value></Property><Property><Name>bugtraq__COLON__number</Name><Value>true</Value></Property><Property><Name>bugtraq__COLON__warnifnoissue</Name><Value>true</Value></Property></Properties></ItemProperties>

@@ -50,8 +50,9 @@ namespace SvnBridge.Infrastructure
                     output.Write("<S:add-file name=\"" + Helper.EncodeB(GetFileName(item.Name)) + "\">\n");
                 }
 
-                output.Write("<D:checked-in><D:href>" + handler.ApplicationPath + "/!svn/ver/" + item.Revision  + "/" +
-                             Helper.Encode(item.Name, true) + "</D:href></D:checked-in>\n");
+            	string localPath = handler.GetLocalPath( "/!svn/ver/" + item.Revision  + "/" +
+            	                                    Helper.Encode(item.Name, true));
+            	output.Write("<D:checked-in><D:href>" + localPath + "</D:href></D:checked-in>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + item.Revision  +
                              "</S:set-prop>\n");
                 output.Write("<S:set-prop name=\"svn:entry:committed-date\">" + Helper.FormatDate(item.LastModifiedDate) +
@@ -134,14 +135,15 @@ namespace SvnBridge.Infrastructure
                     else
                     {
                         output.Write("<S:add-directory name=\"" + Helper.EncodeB(GetFileName(folder.Name)) +
-                                     "\" bc-url=\"" + handler.ApplicationPath + "/!svn/bc/" + folder.Revision + "/" + Helper.Encode(folder.Name, true) +
+                                     "\" bc-url=\"" + handler.GetLocalPath("/!svn/bc/" + folder.Revision + "/" + Helper.Encode(folder.Name, true)) +
                                      "\">\n");
                     }
                 }
                 if (!rootFolder || updateReportRequest.UpdateTarget == null)
                 {
-                    output.Write("<D:checked-in><D:href>" + handler.ApplicationPath + "/!svn/ver/" + folder.Revision + "/" +
-                                 Helper.Encode(folder.Name, true) + "</D:href></D:checked-in>\n");
+                	string svnVer = handler.GetLocalPath("/!svn/ver/" + folder.Revision + "/" +
+                	                                           Helper.Encode(folder.Name, true));
+                    output.Write("<D:checked-in><D:href>" + svnVer + "</D:href></D:checked-in>\n");
                     output.Write("<S:set-prop name=\"svn:entry:committed-rev\">" + folder.Revision  +
                                  "</S:set-prop>\n");
                     output.Write("<S:set-prop name=\"svn:entry:committed-date\">" +

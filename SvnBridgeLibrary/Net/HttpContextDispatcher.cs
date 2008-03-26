@@ -52,7 +52,9 @@ namespace SvnBridge.Net
 
         public void Dispatch(IHttpContext connection)
         {
-			if (string.IsNullOrEmpty(parser.GetServerUrl(connection.Request)))
+        	IHttpRequest request = connection.Request;
+        	string tfsUrl = parser.GetServerUrl(request.Url);
+        	if (string.IsNullOrEmpty(tfsUrl))
             {
                 throw new InvalidOperationException(
                     "A TFS server URL must be specified before connections can be dispatched.");
@@ -65,7 +67,6 @@ namespace SvnBridge.Net
                 SendUnsupportedMethodResponse(connection);
                 return;
             }
-            handler.ApplicationPath = connection.Request.ApplicationPath;
 
             try
             {

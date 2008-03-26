@@ -1,5 +1,7 @@
 using System;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
+using SvnBridge.PathParsing;
 
 namespace SvnBridge.Stubs
 {
@@ -12,7 +14,6 @@ namespace SvnBridge.Stubs
         public int Get_Port;
         public string Get_TfsUrl;
         public int Set_Port;
-        public string Set_TfsUrl;
         public bool Start_Called;
         public StartDelegate Start_Delegate;
         public bool Stop_Called;
@@ -33,13 +34,7 @@ namespace SvnBridge.Stubs
             set { Set_Port = value; }
         }
 
-        public string TfsUrl
-        {
-            get { return Get_TfsUrl; }
-            set { Set_TfsUrl = value; }
-        }
-
-        public void Start()
+        public void Start(IPathParser parser)
         {
             if (Start_Delegate != null)
             {

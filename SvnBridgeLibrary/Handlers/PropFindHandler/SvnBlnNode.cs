@@ -4,50 +4,50 @@ using SvnBridge.Handlers;
 
 namespace SvnBridge.Nodes
 {
-    public class SvnBlnNode : INode
-    {
-        private string path;
-        private int version;
+	public class SvnBlnNode : INode
+	{
+		private string path;
+		private int version;
 
-        public SvnBlnNode(string path,
-                          int version)
-        {
-            this.path = path;
-            this.version = version;
-        }
+		public SvnBlnNode(string path,
+						  int version)
+		{
+			this.path = path;
+			this.version = version;
+		}
 
-        #region INode Members
+		#region INode Members
 
-        public string Href(HttpContextHandlerBase handler)
-        {
-            return handler.ApplicationPath + path;
-        }
+		public string Href(HttpContextHandlerBase handler)
+		{
+			return handler.GetLocalPath(path);
+		}
 
-        public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
-        {
-            switch (property.LocalName)
-            {
-                case "baseline-collection":
-                    return GetBaselineCollection(handler);
-                case "version-name":
-                    return GetVersionName(property);
-                default:
-                    throw new Exception("Property not found: " + property.LocalName);
-            }
-        }
+		public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
+		{
+			switch (property.LocalName)
+			{
+				case "baseline-collection":
+					return GetBaselineCollection(handler);
+				case "version-name":
+					return GetVersionName(property);
+				default:
+					throw new Exception("Property not found: " + property.LocalName);
+			}
+		}
 
-        #endregion
+		#endregion
 
-        private string GetBaselineCollection(HttpContextHandlerBase handler)
+		private string GetBaselineCollection(HttpContextHandlerBase handler)
         {
             return
-                "<lp1:baseline-collection><D:href>"+handler.ApplicationPath+"/!svn/bc/" + version.ToString() +
+                "<lp1:baseline-collection><D:href>"+handler.GetLocalPath("/!svn/bc/" + version)+
                 "/</D:href></lp1:baseline-collection>";
         }
 
-        private string GetVersionName(XmlElement property)
-        {
-            return "<lp1:version-name>" + version.ToString() + "</lp1:version-name>";
-        }
-    }
+		private string GetVersionName(XmlElement property)
+		{
+			return "<lp1:version-name>" + version.ToString() + "</lp1:version-name>";
+		}
+	}
 }

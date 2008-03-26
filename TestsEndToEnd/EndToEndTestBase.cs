@@ -6,8 +6,11 @@ using System.Text;
 using System.Threading;
 using IntegrationTests;
 using SvnBridge;
+using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
+using SvnBridge.PathParsing;
 using Xunit;
 
 namespace TestsEndToEnd
@@ -20,9 +23,22 @@ namespace TestsEndToEnd
         {
             authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
             port = new Random().Next(1024, short.MaxValue);
-            testUrl = "http://" + IPAddress.Loopback + ":" + this.port + "/SvnBridgeTesting" + testPath;
+			IPathParser parser;
+			
+			/*
+			string tfsUrl = new Uri(ServerUrl).Host + ":" + new Uri(ServerUrl).Port;
+			testUrl = "http://" + IPAddress.Loopback + ":" + this.port + "/" + tfsUrl
+				+ "/SvnBridgeTesting" + testPath;
 
-            new BootStrapper().Start();
+			parser = new RequestBasePathParser(new TfsUrlValidator(new WebCache()));
+			*/
+
+			testUrl = "http://" + IPAddress.Loopback + ":" + this.port + "/SvnBridgeTesting" + testPath;
+			//IPathParser parser = new RequestBasePathParser(new TfsUrlValidator(new WebCache()));
+			parser = new StaticServerPathParser(ServerUrl);
+
+
+        	new BootStrapper().Start();
 
             CreateTempFolder();
 
@@ -30,9 +46,10 @@ namespace TestsEndToEnd
             Console.WriteLine("cd " + checkoutFolder);
             listener = IoC.Resolve<IListener>();
             listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
-            listener.TfsUrl = ServerUrl;
             listener.Port = this.port;
-            listener.Start();
+
+			
+        	listener.Start(parser);
         }
 
         private void CreateTempFolder()

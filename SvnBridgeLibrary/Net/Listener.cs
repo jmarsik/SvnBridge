@@ -14,7 +14,6 @@ namespace SvnBridge.Net
         private readonly ILogger logger;
         private TcpListener listener;
         private int? port;
-    	private string tfsUrl;
 
     	public Listener(ILogger logger)
         {
@@ -40,37 +39,14 @@ namespace SvnBridge.Net
             }
         }
 
-        public string TfsUrl
-        {
-            get { return tfsUrl; }
-            set
-            {
-                if (isListening)
-                {
-                    throw new InvalidOperationException(
-                        "The TFS server URL cannot be changed while the listener is listening.");
-                }
-
-                // validate URI
-                new Uri(value, UriKind.Absolute);
-
-                tfsUrl = value;
-            }
-        }
-
-        public void Start()
+        public void Start(IPathParser parser)
         {
             if (!port.HasValue)
             {
                 throw new InvalidOperationException("A port must be specified before starting the listener.");
             }
 
-            if (string.IsNullOrEmpty(TfsUrl))
-            {
-                throw new InvalidOperationException("A TFS server URL must be specified before starting the listener.");
-            }
-
-			dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl));
+			dispatcher = new HttpContextDispatcher(parser);
 
             isListening = true;
             listener = new TcpListener(IPAddress.Loopback, Port);

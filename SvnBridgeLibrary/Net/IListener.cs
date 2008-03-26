@@ -1,16 +1,17 @@
 using System;
+using SvnBridge.Interfaces;
+using SvnBridge.PathParsing;
 
 namespace SvnBridge.Net
 {
     public interface IListener
     {
         int Port { get; set; }
-        string TfsUrl { get; set; }
 
         event EventHandler<ListenErrorEventArgs> ListenError;
         event EventHandler<FinishedHandlingEventArgs> FinishedHandling;
 
-        void Start();
+        void Start(IPathParser parser);
         void Stop();
     }
 }

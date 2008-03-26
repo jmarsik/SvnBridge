@@ -166,8 +166,9 @@ namespace SvnBridge.Handlers
 						 "</lp1:creationdate>\n");
 			writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
 						 "</lp1:getlastmodified>\n");
-			writer.Write("<lp1:checked-in><D:href>" + ApplicationPath + "/!svn/ver/" + item.Revision + "/" +
-						 Helper.Encode(item.Name) +
+			string svrVerLocalPath = GetLocalPath( "/!svn/ver/" + item.Revision + "/" +
+			                            Helper.Encode(item.Name) );
+			writer.Write("<lp1:checked-in><D:href>" + svrVerLocalPath+
 						 "</D:href></lp1:checked-in>\n");
 			writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
 						 "</D:href></lp1:version-controlled-configuration>\n");
@@ -203,8 +204,9 @@ namespace SvnBridge.Handlers
 						 "</lp1:creationdate>\n");
 			writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
 						 "</lp1:getlastmodified>\n");
-			writer.Write("<lp1:checked-in><D:href>" + ApplicationPath + "/!svn/ver/" + item.Revision + "/" +
-						 Helper.Encode(item.Name) +
+			string svnVerLocalPath = GetLocalPath( "/!svn/ver/" + item.Revision + "/" +
+			                            Helper.Encode(item.Name));
+			writer.Write("<lp1:checked-in><D:href>" + svnVerLocalPath +
 						 "</D:href></lp1:checked-in>\n");
 			writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
 						 "</D:href></lp1:version-controlled-configuration>\n");

@@ -13,7 +13,13 @@ namespace SvnBridge.Handlers
 {
     public class PropFindHandlerTests : HandlerTestsBase
     {
-        protected PropFindHandler handler = new PropFindHandler();
+        protected PropFindHandler handler;
+
+    	public PropFindHandlerTests()
+    	{
+    		handler = new PropFindHandler();
+			handler.Initialize(context, new StaticServerPathParser(tfsUrl));
+    	}
 
         [Fact]
         public void TestBcFileNodeHrefForFolder()

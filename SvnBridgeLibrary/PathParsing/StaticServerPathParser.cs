@@ -1,34 +1,49 @@
+using System;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 
 namespace SvnBridge.PathParsing
 {
-	public class StaticServerPathParser : IPathParser
+	public class StaticServerPathParser : BasePathParser
 	{
 		private readonly string server;
 
 		public StaticServerPathParser(string server)
 		{
+			Uri ignored;
+			if (Uri.TryCreate(server, UriKind.Absolute, out ignored) == false)
+				throw new InvalidOperationException("The url '" + server + "' is not a valid url");
+
 			this.server = server;
 		}
 
-		public string GetServerUrl(IHttpRequest request)
+		public override string GetServerUrl(Uri requestUrl)
 		{
 			return server;
 		}
 
-		public string GetLocalPath(IHttpRequest request)
+		public override string GetLocalPath(IHttpRequest request)
 		{
 			return request.LocalPath;
 		}
 
-		#region IPathParser Members
+		public override string GetLocalPath(IHttpRequest request, string url)
+		{
+			Uri urlAsUri = new Uri(url);
+			string path = urlAsUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
+			if (path == "")
+				return "/";
+			return path;
+		}
 
-		public string GetProjectName(IHttpRequest request)
+		public override string GetProjectName(IHttpRequest request)
 		{
 			return null;
 		}
 
-		#endregion
+		public override string GetApplicationPath(IHttpRequest request)
+		{
+			return request.ApplicationPath;
+		}
 	}
 }

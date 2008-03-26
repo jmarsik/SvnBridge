@@ -24,7 +24,7 @@ namespace SvnBridge.Presenters
 
 		private ListenerViewPresenter CreatePresenter()
 		{
-			return new ListenerViewPresenter(stubView, stubErrorView, stubListener);
+			return new ListenerViewPresenter(stubView, stubErrorView, stubListener, "http://foo");
 		}
 
 		[Fact]

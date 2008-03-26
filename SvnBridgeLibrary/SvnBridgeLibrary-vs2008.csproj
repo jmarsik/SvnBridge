@@ -58,6 +58,10 @@
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
+    <Compile Include="Infrastructure\TfsUrlValidator.cs" />
+    <Compile Include="Interfaces\ITfsUrlValidator.cs" />
+    <Compile Include="PathParsing\BasePathParser.cs" />
+    <Compile Include="PathParsing\RequestBasePathParser.cs" />
     <Compile Include="PathParsing\StaticServerPathParser.cs" />
     <Compile Include="PathParsing\StaticServerWithProjectNameInHostNamePathParser.cs" />
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />

@@ -36,7 +36,7 @@ namespace SvnBridge.Nodes
                 href += "/";
             }
 
-            return handler.ApplicationPath + Helper.Encode(href);
+        	return handler.GetLocalPath(Helper.Encode(href));
         }
 
         public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
@@ -129,7 +129,7 @@ namespace SvnBridge.Nodes
         private string GetCheckedIn(HttpContextHandlerBase handler)
         {
             return
-                "<lp1:checked-in><D:href>" + handler.ApplicationPath + "/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true) +
+                "<lp1:checked-in><D:href>" + handler.GetLocalPath( "/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true)) +
                 "</D:href></lp1:checked-in>";
         }
 

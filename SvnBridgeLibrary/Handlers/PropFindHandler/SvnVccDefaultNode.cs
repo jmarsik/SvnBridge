@@ -27,11 +27,11 @@ namespace SvnBridge.Nodes
         {
             if (label == null)
             {
-                return handler.ApplicationPath + path;
+            	return handler.GetLocalPath(path);
             }
             else
             {
-                return handler.ApplicationPath + "/!svn/bln/" + label;
+                return handler.GetLocalPath("/!svn/bln/" + label);
             }
         }
 
@@ -55,12 +55,12 @@ namespace SvnBridge.Nodes
         private string GetCheckedIn(HttpContextHandlerBase handler)
         {
             int maxVersion = sourceControlProvider.GetLatestVersion();
-            return "<lp1:checked-in><D:href>" + handler.ApplicationPath + "/!svn/bln/" + maxVersion.ToString() + "</D:href></lp1:checked-in>";
+            return "<lp1:checked-in><D:href>" + handler.GetLocalPath( "/!svn/bln/" + maxVersion) + "</D:href></lp1:checked-in>";
         }
 
         private string GetBaselineCollection(HttpContextHandlerBase handler)
         {
-            return "<lp1:baseline-collection><D:href>" + handler.ApplicationPath + "/!svn/bc/" + label + "/</D:href></lp1:baseline-collection>";
+            return "<lp1:baseline-collection><D:href>" + handler.GetLocalPath("/!svn/bc/" + label) + "/</D:href></lp1:baseline-collection>";
         }
 
         private string GetVersionName(XmlElement property)

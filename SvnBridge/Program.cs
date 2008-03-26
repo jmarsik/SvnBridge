@@ -109,14 +109,14 @@ namespace SvnBridge
             Proxy.Set(proxyInformation);
             IListener listener = IoC.Resolve<IListener>();
 
-            listener.TfsUrl = tfsUrl;
             listener.Port = port;
 
             ToolTrayForm view = new ToolTrayForm();
             ListenerViewPresenter presenter = new ListenerViewPresenter(
 				view, 
 				new ErrorsView(),
-				listener);
+				listener,
+				tfsUrl);
 
             try
             {

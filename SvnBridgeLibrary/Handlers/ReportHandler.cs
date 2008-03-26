@@ -21,7 +21,7 @@ namespace SvnBridge.Handlers
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
-            string path = GetPath(request);
+        	string path = GetPath(request);
 
             using (XmlReader reader = XmlReader.Create(request.InputStream, Helper.InitializeNewXmlReaderSettings()))
             {
@@ -53,7 +53,7 @@ namespace SvnBridge.Handlers
                     response.BufferOutput = false;
                     using (StreamWriter output = new StreamWriter(response.OutputStream))
                     {
-                        LogReport(sourceControlProvider, data, path, output);
+						LogReport(sourceControlProvider, data, path, output);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locations")
@@ -63,7 +63,7 @@ namespace SvnBridge.Handlers
                     response.SendChunked = true;
                     using (StreamWriter output = new StreamWriter(response.OutputStream))
                     {
-                        GetLocationsReport(sourceControlProvider, data, path, output);
+						GetLocationsReport(sourceControlProvider, data, path, output);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "dated-rev-report")
@@ -133,23 +133,7 @@ namespace SvnBridge.Handlers
                                   UpdateReportData updatereport,
                                   StreamWriter output)
         {
-            Uri srcPathUri = null;
-            if (!String.IsNullOrEmpty(updatereport.SrcPath))
-            {
-                srcPathUri = new Uri(updatereport.SrcPath);
-            }
-            else
-            {
-                srcPathUri = new Uri("/");
-            }
-
-            string basePath = "/" + srcPathUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
-            if (basePath.StartsWith(request.ApplicationPath))
-            {
-                basePath = basePath.Substring(request.ApplicationPath.Length);
-                if (basePath.Length == 0)
-                    basePath = "/";
-            }
+        	string basePath = PathParser.GetLocalPath(request, updatereport.SrcPath);
             FolderMetaData metadata;
             int targetRevision;
             if (updatereport.TargetRevision != null)
@@ -173,6 +157,8 @@ namespace SvnBridge.Handlers
                                                           targetRevision,
                                                           updatereport);
             }
+			if(metadata==null)
+				throw new InvalidOperationException("Could not find " + basePath +" in revision " + targetRevision);
 
             ThreadPool.QueueUserWorkItem(delegate(object state)
             {
