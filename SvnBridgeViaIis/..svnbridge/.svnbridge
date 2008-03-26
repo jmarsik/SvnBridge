@@ -5,4 +5,5 @@ obj
 </Value></Property><Property><Name>svn:ignore</Name><Value>bin
 obj
 FileCache
+SvnBridgeViaIis-vs2008.csproj.user
 </Value></Property></Properties></ItemProperties>

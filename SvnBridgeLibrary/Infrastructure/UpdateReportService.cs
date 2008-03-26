@@ -79,7 +79,7 @@ namespace SvnBridge.Infrastructure
                 }
                 catch (Exception e)
                 {
-                    throw new InvalidOperationException("Could not create diff for " + item.Name);
+                    throw new InvalidOperationException("Could not create diff for " + item.Name, e);
                 }
                 MemoryStream svnDiffStream = new MemoryStream();
                 SvnDiffParser.WriteSvnDiff(svnDiff, svnDiffStream);

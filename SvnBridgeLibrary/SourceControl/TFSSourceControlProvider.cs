@@ -519,7 +519,7 @@ namespace SvnBridge.SourceControl
 					FileCache.Set(item.Name, item.Revision, data);
 					manualResetEvent.Set();
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
 					if(retry == 3)
 					{
