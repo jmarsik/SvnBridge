@@ -26,6 +26,10 @@ namespace SvnBridge.Views
 		{
 			txtPortNumber.Text = presenter.Port.ToString();
 			txtTfsUrl.Text = presenter.TfsUrl;
+			if (presenter.GetServerUrlFromRequest!=null)
+				GetServerUrlFromRequest.Checked = presenter.GetServerUrlFromRequest.Value;
+			else
+				GetServerUrlFromRequest.Checked = true;
 			ShowDialog();
 		}
 
@@ -84,7 +88,10 @@ namespace SvnBridge.Views
 			}
 
 			Cursor = Cursors.WaitCursor;
-			bool validTfsUrl = Helper.IsValidTFSUrl(txtTfsUrl.Text, presenter.ProxyInformation);
+			bool validTfsUrl = 
+				GetServerUrlFromRequest.Checked ||
+				Helper.IsValidTFSUrl(txtTfsUrl.Text, presenter.ProxyInformation);
+
 			Cursor = Cursors.Default;
 			if (!validTfsUrl)
 			{
@@ -99,6 +106,7 @@ namespace SvnBridge.Views
 
 			presenter.Port = int.Parse(txtPortNumber.Text);
 			presenter.TfsUrl = txtTfsUrl.Text;
+			presenter.GetServerUrlFromRequest = GetServerUrlFromRequest.Checked;
 
 			DialogResult = DialogResult.OK;
 			Close();
@@ -109,6 +117,11 @@ namespace SvnBridge.Views
 		{
 			DialogResult = DialogResult.Cancel;
 			Close();
+		}
+
+		private void GetServerUrlFromRequest_CheckedChanged(object sender, EventArgs e)
+		{
+			txtTfsUrl.Enabled = GetServerUrlFromRequest.Checked == false;
 		}
 	}
 }

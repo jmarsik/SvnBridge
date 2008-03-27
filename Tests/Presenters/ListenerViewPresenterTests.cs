@@ -18,13 +18,13 @@ namespace SvnBridge.Presenters
 
 		#endregion
 
-		private StubListenerView stubView;
-		private StubListener stubListener;
-		private StubErrorsView stubErrorView;
+		private readonly StubListenerView stubView;
+		private readonly StubListener stubListener;
+		private readonly StubErrorsView stubErrorView;
 
 		private ListenerViewPresenter CreatePresenter()
 		{
-			return new ListenerViewPresenter(stubView, stubErrorView, stubListener, "http://foo");
+			return new ListenerViewPresenter(stubView, stubErrorView, stubListener, "http://foo", null);
 		}
 
 		[Fact]

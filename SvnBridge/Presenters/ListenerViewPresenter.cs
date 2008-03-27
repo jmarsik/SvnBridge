@@ -1,3 +1,5 @@
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.PathParsing;
 using SvnBridge.Views;
@@ -11,12 +13,15 @@ namespace SvnBridge.Presenters
 		private string tfsUrl;
 		private readonly IListenerView view;
 		private bool closed;
+		private bool? getServerUrlFromRequest;
 
 		public ListenerViewPresenter(IListenerView view,
 		                             IListenerErrorsView errorsView,
 		                             IListener listener,
-		                             string tfsUrl)
+		                             string tfsUrl,
+									 bool? serverUrlFromRequest)
 		{
+			getServerUrlFromRequest = serverUrlFromRequest;
 			this.listener = listener;
 			this.tfsUrl = tfsUrl;
 			this.view = view;
@@ -51,16 +56,18 @@ namespace SvnBridge.Presenters
 
 		public void ChangeSettings(ISettingsView settingsView)
 		{
-			var settingsViewPresenter = new SettingsViewPresenter(settingsView, new ProxyInformation());
+			SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView, new ProxyInformation());
 			settingsViewPresenter.Port = listener.Port;
 			settingsViewPresenter.TfsUrl = TfsUrl;
+			settingsViewPresenter.GetServerUrlFromRequest = GetServerUrlFromRequest;
 			settingsViewPresenter.IgnoredUsedPort = listener.Port;
 			settingsViewPresenter.Show();
 
 			if ((!settingsViewPresenter.Cancelled) &&
-			    (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl)))
+			    (SettingsHaveChanged(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl,
+			                         settingsViewPresenter.GetServerUrlFromRequest)))
 			{
-				ApplyNewSettings(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl);
+				ApplyNewSettings(settingsViewPresenter.Port, settingsViewPresenter.TfsUrl, settingsViewPresenter.GetServerUrlFromRequest);
 			}
 		}
 
@@ -71,7 +78,14 @@ namespace SvnBridge.Presenters
 
 		public void StartListener()
 		{
-			listener.Start(new StaticServerPathParser(TfsUrl));
+			IPathParser parser;
+			
+			if (getServerUrlFromRequest == true)
+				parser = new RequestBasePathParser(IoC.Resolve<ITfsUrlValidator>());
+			else
+				parser = new StaticServerPathParser(TfsUrl);
+
+			listener.Start(parser);
 
 			view.OnListenerStarted();
 		}
@@ -83,21 +97,26 @@ namespace SvnBridge.Presenters
 			view.OnListenerStopped();
 		}
 
-		private void ApplyNewSettings(int port,
-		                              string tfsUrl)
+		private void ApplyNewSettings(int port, string serverUrl, bool? urlFromRequest)
 		{
 			StopListener();
 
 			listener.Port = port;
-			TfsUrl = tfsUrl;
+			GetServerUrlFromRequest = urlFromRequest;
+			TfsUrl = serverUrl;
 
 			StartListener();
 		}
 
-		private bool SettingsHaveChanged(int port,
-		                                 string tfsUrl)
+		private bool SettingsHaveChanged(int port, string serverUrl, bool? serverUrlFromRequest)
 		{
-			return port != listener.Port || tfsUrl != TfsUrl;
+			return port != listener.Port || serverUrl != TfsUrl || serverUrlFromRequest != GetServerUrlFromRequest;
+		}
+
+		public bool ? GetServerUrlFromRequest
+		{
+			get { return getServerUrlFromRequest; }
+			set { getServerUrlFromRequest = value; }
 		}
 
 		public void ShowErrors()

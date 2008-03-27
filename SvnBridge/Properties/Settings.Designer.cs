@@ -117,5 +117,17 @@ namespace SvnBridge.Properties {
                 this["ProxyEncryptedPassword"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public string ServerUrlFromRequest {
+            get {
+                return ((string)(this["ServerUrlFromRequest"]));
+            }
+            set {
+                this["ServerUrlFromRequest"] = value;
+            }
+        }
     }
 }
