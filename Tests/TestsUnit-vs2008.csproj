@@ -95,7 +95,6 @@
     <Compile Include="Handlers\PutHandlerTests.cs" />
     <Compile Include="Handlers\ReportHandlerLogReportTests.cs" />
     <Compile Include="Handlers\ReportHandlerUpdateReportTests.cs" />
-    <Compile Include="Infrastructure\CachingItemMetaDataRepositoryTest.cs" />
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
     <Compile Include="Infrastructure\TestHelper.cs" />

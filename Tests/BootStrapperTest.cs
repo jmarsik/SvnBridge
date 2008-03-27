@@ -35,7 +35,7 @@ namespace SvnBridge
 		}
 
 		[Fact]
-		public void AfterStartingBootStrapper_CanResoveCachingItemMetaDataRepository()
+		public void AfterStartingBootStrapper_CanResolveItems()
 		{
 			new BootStrapper().Start();
 			var dependencies = new Hashtable();
@@ -43,15 +43,7 @@ namespace SvnBridge
 			dependencies["projectName"] = "as";
 			dependencies["credentials"] = CredentialCache.DefaultCredentials;
 			dependencies["rootCachePath"] = ".";
-
-			var stub = mocks.Stub<IProjectInformationRepository>();
-			SetupResult.For(stub.GetProjectLocation(null, null)).IgnoreArguments().Return(
-				new ProjectLocationInformation("test", "http://codeplex-tfs3:8080/"));
-
-			mocks.ReplayAll();
-
-			dependencies["projectInformationRepository"] = stub;
-			Assert.NotNull(IoC.Resolve<IItemMetaDataRepository>(dependencies));
+			Assert.NotNull(IoC.Resolve<ITFSSourceControlService>(dependencies));
 		}
 
 		[Fact]

@@ -85,7 +85,6 @@
     <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />
     <Compile Include="Infrastructure\BrokenXml.cs" />
     <Compile Include="Infrastructure\Clock.cs" />
-    <Compile Include="Infrastructure\CachingItemMetaDataRepository.cs" />
     <Compile Include="Infrastructure\FileLogger.cs" />
     <Compile Include="Infrastructure\Container.cs" />
     <Compile Include="Infrastructure\IAssociateWorkItemWithChangeset.cs" />

@@ -69,7 +69,7 @@ namespace SvnBridge.Handlers
 
 			int version = int.Parse(path.Substring(revisionStart, revisionEnd - revisionStart));
 			string location = GetLocalPath("//!svn/wrk/" + activityId + itemPath);
-			ItemMetaData item = sourceControlProvider.GetItems(-1, Helper.Decode(itemPath), Recursion.None);
+			ItemMetaData item = sourceControlProvider.GetItemsWithoutProperties(-1, Helper.Decode(itemPath), Recursion.None);
 			if (item.Revision > version)
 			{
 				throw new ConflictException();

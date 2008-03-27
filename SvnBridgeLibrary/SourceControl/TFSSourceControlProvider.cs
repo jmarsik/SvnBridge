@@ -204,14 +204,14 @@ namespace SvnBridge.SourceControl
 				}
 			}
 
-			return GetItems(-1, path, Recursion.None);
+			return GetItemsWithoutProperties(-1, path, Recursion.None);
 		}
 
 		public ItemMetaData GetItems(int version,
 									 string path,
 									 Recursion recursion)
 		{
-			return GetItems(version, path, recursion, false, true);
+			return GetItems(version, path, recursion, false,true);
 		}
 
 		public ItemMetaData GetItemsWithoutProperties(int version,
@@ -299,7 +299,7 @@ namespace SvnBridge.SourceControl
 		public bool IsDirectory(int version,
 								string path)
 		{
-			ItemMetaData item = GetItems(version, path, Recursion.None);
+			ItemMetaData item = GetItemsWithoutProperties(version, path, Recursion.None);
 			if (item.ItemType == ItemType.Folder)
 			{
 				return true;
@@ -354,13 +354,14 @@ namespace SvnBridge.SourceControl
 
 		private void ClearExistingTempWorkspaces()
 		{
-			WorkspaceInfo[] workspaces = SourceControlService.GetWorkspaces(serverUrl, credentials,WorkspaceComputers.ThisComputer);
+			WorkspaceInfo[] workspaces = SourceControlService.GetWorkspaces(serverUrl, credentials,
+																			WorkspaceComputers.ThisComputer);
 			foreach (WorkspaceInfo workspace in workspaces)
 			{
 				if (workspace.Comment != Constants.WorkspaceComment)
 					continue;
-				SourceControlService.DeleteWorkspace(serverUrl, credentials, 
-				                                     workspace.Name);
+				SourceControlService.DeleteWorkspace(serverUrl, credentials,
+													 workspace.Name);
 			}
 		}
 
@@ -385,7 +386,7 @@ namespace SvnBridge.SourceControl
 					existingPath = "";
 				}
 
-				item = GetItems(-1, existingPath, Recursion.None);
+				item = GetItemsWithoutProperties(-1, existingPath, Recursion.None);
 			} while (item == null);
 			string localPath = GetLocalPath(activityId, path);
 			UpdateLocalVersion(activityId, item, localPath.Substring(0, localPath.LastIndexOf('\\')));
@@ -502,28 +503,25 @@ namespace SvnBridge.SourceControl
 			byte[] bytes = FileCache.Get(item.Name, item.Revision);
 			if (bytes != null)
 			{
-				item.Data = new FutureFile(delegate
-				{
-					return FileCache.Get(item.Name, item.Revision);
-				});
+				item.Data = new FutureFile(delegate { return FileCache.Get(item.Name, item.Revision); });
 				item.DataLoaded = true;
 				return;
 			}
 			int retry = 0;
-			ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+			ManualResetEvent resetEvent = new ManualResetEvent(false);
 			WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
 			{
 				try
 				{
 					byte[] data = WebTransferService.EndDownloadBytes(ar);
 					FileCache.Set(item.Name, item.Revision, data);
-					manualResetEvent.Set();
+					resetEvent.Set();
 				}
 				catch (Exception)
 				{
-					if(retry == 3)
+					if (retry == 3)
 					{
-						manualResetEvent.Set();
+						resetEvent.Set();
 						throw;
 					}
 					retry += 1;
@@ -531,23 +529,28 @@ namespace SvnBridge.SourceControl
 				}
 			});
 			item.Data = new FutureFile(delegate
-							   {
-								   manualResetEvent.WaitOne();
-								   manualResetEvent.Close();
-							   	byte[] results = FileCache.Get(item.Name, item.Revision);
-								if (results == null)
-									throw new CacheMissException(item.Name);
-							   	return results;
-							   });
+			{
+				return GetFileData(resetEvent, item);
+			});
 
 			item.DataLoaded = true;
 		}
 
+		private byte[] GetFileData(WaitHandle resetEvent, ItemMetaData item)
+		{
+			resetEvent.WaitOne();
+			resetEvent.Close();
+			byte[] results = FileCache.Get(item.Name, item.Revision);
+			if (results == null)
+				throw new CacheMissException(item.Name);
+			return results;
+		}
+
 		public Guid GetRepositoryUuid()
 		{
-			string cacheKey = "GetRepositoryUuid_"+serverUrl;
+			string cacheKey = "GetRepositoryUuid_" + serverUrl;
 			CachedResult result = Cache.Get(cacheKey);
-			if (result!=null)
+			if (result != null)
 				return (Guid)result.Value;
 			Guid id = SourceControlService.GetRepositoryId(serverUrl, credentials);
 			Cache.Set(cacheKey, id);
@@ -628,8 +631,8 @@ namespace SvnBridge.SourceControl
 		}
 
 		public void RemoveProperty(string activityId,
-							string path,
-							string property)
+								   string path,
+								   string property)
 		{
 			Activity activity = _activities[activityId];
 			if (!activity.Properties.ContainsKey(path))
@@ -702,15 +705,15 @@ namespace SvnBridge.SourceControl
 				if (IsPropertyFile(item.Name) && !returnPropertyFiles)
 				{
 					string itemPath = item.Name.Replace("/" + Constants.PropFolder + "/" + Constants.FolderPropFile, "");
-                    if (itemPath == Constants.PropFolder + "/" + Constants.FolderPropFile)
-                    {
-                        itemPath = "";
-                    }
+					if (itemPath == Constants.PropFolder + "/" + Constants.FolderPropFile)
+					{
+						itemPath = "";
+					}
 					itemPath = itemPath.Replace("/" + Constants.PropFolder + "/", "/");
-                    if (itemPath.StartsWith(Constants.PropFolder + "/"))
-                    {
-                        itemPath = itemPath.Substring(Constants.PropFolder.Length + 1);
-                    }
+					if (itemPath.StartsWith(Constants.PropFolder + "/"))
+					{
+						itemPath = itemPath.Substring(Constants.PropFolder.Length + 1);
+					}
 					ItemProperties itemProperties = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
 					properties[itemPath] = itemProperties;
 					itemPropertyRevision[itemPath] = item.Revision;
@@ -741,21 +744,21 @@ namespace SvnBridge.SourceControl
 			return firstItem;
 		}
 
-        private bool IsPropertyFile(string name)
-        {
-            if (name.StartsWith(Constants.PropFolder + "/") || name.Contains("/" + Constants.PropFolder + "/"))
-                return true;
-            else
-                return false;
-        }
+		private bool IsPropertyFile(string name)
+		{
+			if (name.StartsWith(Constants.PropFolder + "/") || name.Contains("/" + Constants.PropFolder + "/"))
+				return true;
+			else
+				return false;
+		}
 
-        private bool IsPropertyFolder(string name)
-        {
-            if (name == Constants.PropFolder || name.EndsWith("/" + Constants.PropFolder))
-                return true;
-            else
-                return false;
-        }
+		private bool IsPropertyFolder(string name)
+		{
+			if (name == Constants.PropFolder || name.EndsWith("/" + Constants.PropFolder))
+				return true;
+			else
+				return false;
+		}
 
 		private static void UpdateItemRevisionsBasedOnPropertyItemRevisions(IDictionary<string, FolderMetaData> folders,
 																			IEnumerable<KeyValuePair<string, int>>
@@ -848,9 +851,9 @@ namespace SvnBridge.SourceControl
 					{
 						sortedMergeResponse.Add(newItem.Path);
 
-                        string path = newItem.Path.Substring(rootPath.Length);
-                        if (path == "")
-                            path = "/";
+						string path = newItem.Path.Substring(rootPath.Length);
+						if (path == "")
+							path = "/";
 
 						MergeActivityResponseItem responseItem =
 							new MergeActivityResponseItem(newItem.FileType, path);
@@ -888,9 +891,9 @@ namespace SvnBridge.SourceControl
 
 				if (!folderFound)
 				{
-                    folderName = GetFolderName(item.Path.Substring(rootPath.Length));
-                    if (folderName == "")
-                        folderName = "/";
+					folderName = GetFolderName(item.Path.Substring(rootPath.Length));
+					if (folderName == "")
+						folderName = "/";
 					MergeActivityResponseItem responseItem = new MergeActivityResponseItem(ItemType.Folder, folderName);
 					mergeResponse.Items.Add(responseItem);
 				}
@@ -1034,7 +1037,7 @@ namespace SvnBridge.SourceControl
 			string localTargetPath = GetLocalPath(activityId, copyAction.TargetPath);
 
 			bool copyIsRename = RevertDelete(activityId, copyAction.Path);
-			ItemMetaData item = GetItems(-1, copyAction.Path, Recursion.None);
+			ItemMetaData item = GetItemsWithoutProperties(-1, copyAction.Path, Recursion.None);
 			UpdateLocalVersion(activityId, item, localPath);
 
 			if (copyIsRename)
@@ -1140,10 +1143,10 @@ namespace SvnBridge.SourceControl
 		{
 			if (itemType == ItemType.Folder)
 			{
-                if (path == "/")
-                    return "/" + Constants.PropFolder;
-                else
-				    return path + "/" + Constants.PropFolder;
+				if (path == "/")
+					return "/" + Constants.PropFolder;
+				else
+					return path + "/" + Constants.PropFolder;
 			}
 			else if (path.LastIndexOf('/') != -1)
 			{
@@ -1160,10 +1163,10 @@ namespace SvnBridge.SourceControl
 		{
 			if (itemType == ItemType.Folder)
 			{
-                if (path == "/")
-                    return "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
-                else
-				    return path + "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
+				if (path == "/")
+					return "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
+				else
+					return path + "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
 			}
 			else if (path.LastIndexOf('/') != -1)
 			{
@@ -1267,10 +1270,8 @@ namespace SvnBridge.SourceControl
 					}
 				}
 
-				properties.Properties.RemoveAll(delegate(Property obj)
-				{
-					return activity.Properties[path].Removed.Contains(obj.Name);
-				});
+				properties.Properties.RemoveAll(
+					delegate(Property obj) { return activity.Properties[path].Removed.Contains(obj.Name); });
 
 				string propertiesPath = GetPropertiesFileName(path, itemType);
 				string propertiesFolder = GetPropertiesFolderName(path, itemType);
@@ -1314,11 +1315,11 @@ namespace SvnBridge.SourceControl
 
 		private static string GetFolderName(string path)
 		{
-            if (path.Contains("/"))
-                return path.Substring(0, path.LastIndexOf('/'));
-            else
-                return "";
-        }
+			if (path.Contains("/"))
+				return path.Substring(0, path.LastIndexOf('/'));
+			else
+				return "";
+		}
 
 		private ItemMetaData GetPendingItem(string activityId,
 											string path)

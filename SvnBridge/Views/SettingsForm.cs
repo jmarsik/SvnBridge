@@ -76,7 +76,7 @@ namespace SvnBridge.Views
 				return;
 			}
 
-			if (!Helper.IsValidUrl(txtTfsUrl.Text))
+			if (GetServerUrlFromRequest.Checked == false && !Helper.IsValidUrl(txtTfsUrl.Text))
 			{
 				MessageBox.Show("The TFS Server URL does not appear to be valid.",
 								"SvnBridge",
