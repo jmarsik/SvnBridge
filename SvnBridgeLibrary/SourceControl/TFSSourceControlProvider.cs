@@ -211,7 +211,7 @@ namespace SvnBridge.SourceControl
 									 string path,
 									 Recursion recursion)
 		{
-			return GetItems(version, path, recursion, false,true);
+			return GetItems(version, path, recursion, false, true);
 		}
 
 		public ItemMetaData GetItemsWithoutProperties(int version,
@@ -673,13 +673,13 @@ namespace SvnBridge.SourceControl
 					recursionType = RecursionType.Full;
 					break;
 			}
-			VersionSpec versionSpec = new LatestVersionSpec();
-			if (version != -1)
+			ChangesetVersionSpec versionSpec = new ChangesetVersionSpec();
+			if (version == -1)
 			{
-				ChangesetVersionSpec changeSetVersionSpec = new ChangesetVersionSpec();
-				changeSetVersionSpec.cs = version;
-				versionSpec = changeSetVersionSpec;
+				version = GetLatestVersion();
 			}
+			versionSpec.cs = version;
+
 			SourceItem[] items =
 				SourceControlService.QueryItems(serverUrl,
 												credentials,
@@ -693,7 +693,7 @@ namespace SvnBridge.SourceControl
 			ItemMetaData firstItem = null;
 			for (int i = 0; i < items.Length; i++)
 			{
-				ItemMetaData item = sourceControlHelper.ConvertSourceItem(items[i]);
+				ItemMetaData item = ItemMetaData.ConvertSourceItem(items[i], rootPath);
 				if (recursion != Recursion.Full && readItemsProperties && !returnPropertyFiles)
 				{
 					if (Path.GetFileName(item.Name) != Constants.PropFolder)

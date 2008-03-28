@@ -15,10 +15,11 @@ namespace SvnBridge
 		[STAThread]
 		private static void Main(string[] args)
 		{
+			new BootStrapper().Start();
+
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
-			new BootStrapper().Start();
 
 			string tfsUrl = null;
 			int? port = null;
@@ -40,8 +41,8 @@ namespace SvnBridge
 
 			bool specifiedTfsUrl = string.IsNullOrEmpty(tfsUrl) == false;
 			bool hasPortAndServerFromRequest = (port != null && ShouldGetServerFromRequest() == true);
-			if (specifiedTfsUrl || hasPortAndServerFromRequest || 
-				TryGetSettings(ref tfsUrl, ref port, proxyInfo))
+			if (specifiedTfsUrl || hasPortAndServerFromRequest ||
+			    TryGetSettings(ref tfsUrl, ref port, proxyInfo))
 			{
 				Run(tfsUrl, port ?? 8081, proxyInfo);
 			}
@@ -69,8 +70,8 @@ namespace SvnBridge
 		}
 
 		private static bool TryGetSettings(ref string tfsUrl,
-										   ref int? port,
-										   ProxyInformation proxyInfo)
+		                                   ref int? port,
+		                                   ProxyInformation proxyInfo)
 		{
 			SettingsForm view = new SettingsForm();
 			SettingsViewPresenter presenter = new SettingsViewPresenter(view, proxyInfo);

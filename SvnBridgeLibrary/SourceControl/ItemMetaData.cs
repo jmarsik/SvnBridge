@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace SvnBridge.SourceControl
@@ -47,6 +48,37 @@ namespace SvnBridge.SourceControl
                 }
             }
         }
+
+
+		public static ItemMetaData ConvertSourceItem(SourceItem sourceItem, string rootPath)
+		{
+			ItemMetaData item;
+			if (sourceItem.ItemType == ItemType.Folder)
+			{
+				item = new FolderMetaData();
+			}
+			else
+			{
+				item = new ItemMetaData();
+			}
+
+			item.Id = sourceItem.ItemId;
+			if (rootPath.Length <= sourceItem.RemoteName.Length)
+			{
+				item.Name = sourceItem.RemoteName.Substring(rootPath.Length);
+			}
+			else
+			{
+				item.Name = "";
+			}
+
+			item.Author = "unknown";
+			item.LastModifiedDate = sourceItem.RemoteDate;
+			item.ItemRevision = sourceItem.RemoteChangesetId;
+			item.DownloadUrl = sourceItem.DownloadUrl;
+			return item;
+		}
+
     }
 }
 

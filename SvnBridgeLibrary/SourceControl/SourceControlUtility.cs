@@ -24,43 +24,12 @@ namespace SvnBridge.SourceControl
             this.serverUrl = serverUrl;
         }
 
-
         public ItemMetaData GetItem(int version,
                                     int itemId)
         {
             SourceItem[] items = sourceControlService.QueryItems(serverUrl, credentialsProvider.GetCredentials(), new int[] {itemId}, version);
-            return ConvertSourceItem(items[0]);
+			return ItemMetaData.ConvertSourceItem(items[0], rootPath);
         }
-
-        public ItemMetaData ConvertSourceItem(SourceItem sourceItem)
-        {
-            ItemMetaData item;
-            if (sourceItem.ItemType == ItemType.Folder)
-            {
-                item = new FolderMetaData();
-            }
-            else
-            {
-                item = new ItemMetaData();
-            }
-
-            item.Id = sourceItem.ItemId;
-            if (rootPath.Length <= sourceItem.RemoteName.Length)
-            {
-                item.Name = sourceItem.RemoteName.Substring(rootPath.Length);
-            }
-            else
-            {
-                item.Name = "";
-            }
-
-            item.Author = "unknown";
-            item.LastModifiedDate = sourceItem.RemoteDate;
-            item.ItemRevision = sourceItem.RemoteChangesetId;
-            item.DownloadUrl = sourceItem.DownloadUrl;
-            return item;
-        }
-
 
         public ItemMetaData FindItem(FolderMetaData folder,
                                       string name)

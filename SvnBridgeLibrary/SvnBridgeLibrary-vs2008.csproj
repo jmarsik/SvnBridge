@@ -41,6 +41,10 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SqlServerCe, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
@@ -58,6 +62,11 @@
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
+    <Compile Include="Infrastructure\Events.cs" />
+    <Compile Include="Infrastructure\MetaDataRepository.cs" />
+    <Compile Include="Infrastructure\Queries.cs" />
+    <Compile Include="Infrastructure\RepositoryBase.cs" />
+    <Compile Include="Infrastructure\SequentialGuid.cs" />
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="Interfaces\ITfsUrlValidator.cs" />
     <Compile Include="PathParsing\BasePathParser.cs" />
@@ -92,7 +101,6 @@
     <Compile Include="Infrastructure\IoC.cs" />
     <Compile Include="Cache\WebCache.cs" />
     <Compile Include="Interfaces\ICache.cs" />
-    <Compile Include="Interfaces\IItemMetaDataRepository.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />
     <Compile Include="Handlers\MkActivityHandler.cs" />
     <Compile Include="Handlers\MkColHandler.cs" />

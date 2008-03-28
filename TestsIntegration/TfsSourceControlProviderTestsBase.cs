@@ -14,8 +14,6 @@ using SvnBridge.SourceControl;
 
 namespace IntegrationTests
 {
-	using System.Web.Services.Protocols;
-
 	public abstract class TFSSourceControlProviderTestsBase : IDisposable
 	{
 		protected static string ServerUrl = Settings.Default.ServerUrl;
@@ -86,7 +84,7 @@ namespace IntegrationTests
 				MockRepository.GenerateStub<IFileCache>());
 		}
 
-		private static ICredentials GetCredentials()
+		protected static ICredentials GetCredentials()
 		{
 			if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
 			{
