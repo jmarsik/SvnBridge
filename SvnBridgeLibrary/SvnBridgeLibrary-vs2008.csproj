@@ -63,6 +63,7 @@
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
     <Compile Include="Infrastructure\Events.cs" />
+    <Compile Include="Interfaces\IMetaDataRepository.cs" />
     <Compile Include="Infrastructure\MetaDataRepository.cs" />
     <Compile Include="Infrastructure\Queries.cs" />
     <Compile Include="Infrastructure\RepositoryBase.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="SourceControl\MergeActivityResponseItem.cs" />
     <Compile Include="SourceControl\Recursion.cs" />
     <Compile Include="SourceControl\RenamedSourceItem.cs" />
+    <Compile Include="SourceControl\RepositoryFactoryHelper.cs" />
     <Compile Include="SourceControl\SourceControlUtility.cs" />
     <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
     <Compile Include="SourceControl\StubFolderMetaData.cs" />

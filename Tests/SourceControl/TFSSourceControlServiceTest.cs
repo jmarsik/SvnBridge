@@ -18,7 +18,7 @@ namespace SvnBridge.SourceControl
 
             try
             {
-                service.QueryItems(null, null, null, null, null, null, DeletedState.Any, ItemType.Any, false);
+				service.QueryItemsExtended(null, null, null, null, DeletedState.Any, ItemType.Folder);
             }
             catch (NetworkAccessDeniedException)
             {

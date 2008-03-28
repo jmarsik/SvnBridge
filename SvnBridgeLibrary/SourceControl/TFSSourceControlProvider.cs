@@ -318,28 +318,21 @@ namespace SvnBridge.SourceControl
 		public bool ItemExists(string path,
 							   int version)
 		{
-			ItemSpec spec = new ItemSpec();
-			spec.item = rootPath + path;
-			spec.recurse = RecursionType.None;
-
 			VersionSpec versionSpec = VersionSpec.Latest;
 			if (version != -1)
 			{
 				versionSpec = VersionSpec.FromChangeset(version);
 			}
 
-			ItemSet[] item =
-				SourceControlService.QueryItems(serverUrl,
+			SourceItem[] items = SourceControlService.QueryItems(serverUrl,
 												credentials,
-												null,
-												null,
-												new ItemSpec[1] { spec },
+												rootPath+path,
+												RecursionType.None,
 												versionSpec,
 												DeletedState.NonDeleted,
-												ItemType.Any,
-												false);
+												ItemType.Any);
 
-			return (item[0].Items.Length > 0);
+			return (items.Length > 0);
 		}
 
 		public void MakeActivity(string activityId)

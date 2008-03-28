@@ -22,15 +22,6 @@ namespace SvnBridge.SourceControl
                                          ItemSpec[] items,
                                          VersionSpec version);
 
-        ItemSet[] QueryItems(string tfsUrl,
-                             ICredentials credentials,
-                             string workspaceName,
-                             string workspaceOwner,
-                             ItemSpec[] items,
-                             VersionSpec version,
-                             DeletedState deletedState,
-                             ItemType itemType,
-                             bool generateDownloadUrls);
 
         void AddWorkspaceMapping(string tfsUrl,
                                  ICredentials credentials,

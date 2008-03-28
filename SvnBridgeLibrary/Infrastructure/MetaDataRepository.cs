@@ -1,24 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
-using System.IO;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using System.Data;
 
 namespace SvnBridge.Infrastructure
 {
-	public class MetaDataRepository : RepositoryBase
+	public class MetaDataRepository : RepositoryBase, IMetaDataRepository
 	{
-		private readonly ITFSSourceControlService sourceControlService;
+		private readonly ISourceControlService sourceControlService;
 		private readonly string serverUrl;
 		private readonly string rootPath;
 		private readonly ICredentials credentials;
 
 		public MetaDataRepository(
-			ITFSSourceControlService sourceControlService,
+			ISourceControlService sourceControlService,
 			ICredentials credentials,
 			string serverUrl,
 			string rootPath,
@@ -91,7 +91,7 @@ namespace SvnBridge.Infrastructure
 			Transaction(delegate
 			{
 				// another thread already cached this version, skip inserting
-				// we rely on transaction semantics to ensure safety here
+				// Note that we rely on transaction semantics to ensure safety here
 				if (IsInCache(revision))
 					return;
 

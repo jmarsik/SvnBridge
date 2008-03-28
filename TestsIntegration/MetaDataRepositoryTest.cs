@@ -12,7 +12,7 @@ namespace IntegrationTests
 {
 	public class MetaDataRepositoryTest : TFSSourceControlProviderTestsBase
 	{
-		private readonly ITFSSourceControlService sourceControlService;
+		private readonly ISourceControlService sourceControlService;
 		private readonly MetaDataRepository repository;
 		private readonly ICredentials credentials;
 
@@ -20,7 +20,7 @@ namespace IntegrationTests
 		{
 			new BootStrapper().Start();
 			credentials = GetCredentials();
-			sourceControlService = IoC.Resolve<ITFSSourceControlService>();
+			sourceControlService = IoC.Resolve<ISourceControlService>();
 			string dbFile = "Cache.sdf";
 			File.Delete(dbFile);
 			repository = new MetaDataRepository(sourceControlService, credentials, ServerUrl,
