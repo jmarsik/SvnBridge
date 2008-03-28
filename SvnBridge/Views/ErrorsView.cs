@@ -17,11 +17,28 @@ namespace SvnBridge.Views
 		public ErrorsView()
 		{
 			InitializeComponent();
-			Closing+=delegate(object sender, CancelEventArgs e)
+			Closing += delegate(object sender, CancelEventArgs e)
 			{
 				Hide();
 				e.Cancel = presenter.ShouldCloseErrorView == false;
 			};
+			foreach (Control control in GetControlsRecursive(this))
+			{
+				control.KeyUp += ErrorsView_KeyUp;
+			}
+		}
+
+		public IEnumerable<Control> GetControlsRecursive(Control ctrl)
+		{
+			yield return ctrl;
+			foreach (Control child in ctrl.Controls)
+			{
+				yield return child;
+				foreach (Control control in GetControlsRecursive(child))
+				{
+					yield return control;
+				}
+			}
 		}
 
 		public ListenerViewPresenter Presenter
@@ -31,9 +48,9 @@ namespace SvnBridge.Views
 
 		public void AddError(string title, string content)
 		{
-			if(InvokeRequired)
+			if (InvokeRequired)
 			{
-				Invoke((Action) delegate
+				Invoke((Action)delegate
 				{
 					AddError(title, content);
 				});
@@ -50,9 +67,15 @@ namespace SvnBridge.Views
 
 		private void lbErrors_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if(lbErrors.SelectedItems.Count==0)
+			if (lbErrors.SelectedItems.Count == 0)
 				return;
 			txtErrorDetails.Text = (string)lbErrors.SelectedItems[0].Tag;
+		}
+
+		private void ErrorsView_KeyUp(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Escape)
+				Hide();
 		}
 	}
 }

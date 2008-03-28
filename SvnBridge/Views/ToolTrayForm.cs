@@ -17,6 +17,7 @@ namespace SvnBridge.Views
 			{
 				presenter.ViewClosed();
 			};
+			showErrorsToolStripMenuItem.Click += OnShowErrorsClick;
         }
 
     	private void BalloonTipClicked_OnClick(object sender, EventArgs e)
