@@ -18,7 +18,7 @@ namespace SvnBridge.PathParsing
 		{
 			string url = GetUrlFromRequest(requestUrl);
 
-			if(urlValidator.IsValidTfsServerUrl("https://"+url))
+			if (urlValidator.IsValidTfsServerUrl("https://" + url))
 				return "https://" + url;
 			return "http://" + url;
 		}
@@ -27,9 +27,12 @@ namespace SvnBridge.PathParsing
 		{
 			string path = requestUrl.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
 			int firstIndexOfSlash = path.IndexOf('/');
-			
-			if(firstIndexOfSlash==-1)
-				throw new InvalidOperationException("Could not find server url in the url. Not valid when using the RequestBasePathParser");
+
+			if (firstIndexOfSlash == -1)
+			{
+				throw new InvalidOperationException("Could not find server url in the url (" + 
+					requestUrl.AbsoluteUri + "). Not valid when using the RequestBasePathParser");
+			}
 
 			string url = path.Substring(0, firstIndexOfSlash);
 			return url;
@@ -60,7 +63,7 @@ namespace SvnBridge.PathParsing
 		{
 			string url = GetUrlFromRequest(request.Url);
 			string path = url + request.ApplicationPath;
-			if(path.StartsWith("/")==false)
+			if (path.StartsWith("/") == false)
 				path = '/' + path;
 			if (path.EndsWith("/") == false)
 				path = path + '/';
