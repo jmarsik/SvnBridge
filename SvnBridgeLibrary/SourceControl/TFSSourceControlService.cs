@@ -47,6 +47,14 @@ namespace SvnBridge.SourceControl
 			return webSvc.QueryBranches(workspaceName, username, items, version);
 		}
 
+		public SourceItem QueryItems(string tfsUrl, ICredentials credentials, int itemIds, int changeSet)
+		{
+			SourceItem[] items = QueryItems(tfsUrl, credentials, new int[]{itemIds}, changeSet);
+			if(items.Length==0)
+				return null;
+			return items[0];
+		}
+
 		#endregion
 	}
 }

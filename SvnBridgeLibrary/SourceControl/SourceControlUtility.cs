@@ -27,8 +27,8 @@ namespace SvnBridge.SourceControl
         public ItemMetaData GetItem(int version,
                                     int itemId)
         {
-            SourceItem[] items = sourceControlService.QueryItems(serverUrl, credentialsProvider.GetCredentials(), new int[] {itemId}, version);
-			return ItemMetaData.ConvertSourceItem(items[0], rootPath);
+            SourceItem item = sourceControlService.QueryItems(serverUrl, credentialsProvider.GetCredentials(), itemId, version);
+			return ItemMetaData.ConvertSourceItem(item, rootPath);
         }
 
         public ItemMetaData FindItem(FolderMetaData folder,

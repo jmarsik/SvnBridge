@@ -31,6 +31,25 @@ namespace SvnBridge.Infrastructure
 			this.credentials = credentials;
 		}
 
+		public SourceItem QueryItems(int itemId, int revision)
+		{
+			EnsureRevisionIsCached(revision);
+			SourceItem item = null;
+			TransactionalCommand(delegate(IDbCommand command)
+			{
+				command.CommandText = Queries.SelectItemById;
+				Parameter(command, "ItemId", itemId);
+				Parameter(command, "Revision", revision);
+
+				using(IDataReader reader = command.ExecuteReader())
+				{
+					if (reader.Read())
+						item = HydrateSourceItem(reader);
+				}
+			});
+			return item;
+		}
+
 		public SourceItem[] QueryItems(int reversion, string path, Recursion recursion)
 		{
 			string serverPath = rootPath + path;
@@ -54,20 +73,26 @@ namespace SvnBridge.Infrastructure
 				{
 					while (reader.Read())
 					{
-						SourceItem item = new SourceItem();
-
-						item.ItemType = (bool)reader["IsFolder"] ? ItemType.Folder : ItemType.File;
-						item.ItemId = (int)reader["ItemId"];
-						item.RemoteName = (string)reader["Name"];
-						item.RemoteDate = (DateTime)reader["LastModifiedDate"];
-						item.RemoteChangesetId = (int)reader["ItemRevision"];
-						item.DownloadUrl = (string)reader["DownloadUrl"];
+						SourceItem item = HydrateSourceItem(reader);
 
 						items.Add(item);
 					}
 				}
 			});
 			return items.ToArray();
+		}
+
+		private SourceItem HydrateSourceItem(IDataRecord reader)
+		{
+			SourceItem item = new SourceItem();
+
+			item.ItemType = (bool)reader["IsFolder"] ? ItemType.Folder : ItemType.File;
+			item.ItemId = (int)reader["ItemId"];
+			item.RemoteName = (string)reader["Name"];
+			item.RemoteDate = (DateTime)reader["LastModifiedDate"];
+			item.RemoteChangesetId = (int)reader["ItemRevision"];
+			item.DownloadUrl = (string)reader["DownloadUrl"];
+			return item;
 		}
 
 		private static void SetSelectItemQuery(Recursion recursion, IDbCommand command)

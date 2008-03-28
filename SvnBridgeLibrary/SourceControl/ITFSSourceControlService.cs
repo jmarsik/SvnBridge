@@ -72,9 +72,9 @@ namespace SvnBridge.SourceControl
                                 DeletedState deletedState,
                                 ItemType itemType);
 
-        SourceItem[] QueryItems(string tfsUrl,
+        SourceItem QueryItems(string tfsUrl,
                                 ICredentials credentials,
-                                int[] itemIds,
+                                int itemIds,
                                 int changeSet);
 
         void UndoPendingChanges(string tfsUrl,

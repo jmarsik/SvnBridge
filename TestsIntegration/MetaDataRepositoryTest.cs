@@ -113,6 +113,44 @@ namespace IntegrationTests
 			AssertEquals(sourceItems, items);
 		}
 
+		[Fact]
+		public void CanGetFileById()
+		{
+			WriteFile(testPath + "/Test.txt", "blah", true);
+
+			SourceItem[] sourceItems = sourceControlService.QueryItems(
+				ServerUrl,
+				credentials,
+				Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt",
+				RecursionType.None,
+				VersionSpec.FromChangeset(_lastCommitRevision),
+				DeletedState.NonDeleted,
+				ItemType.Any);
+
+			SourceItem item = repository.QueryItems(sourceItems[0].ItemId, _lastCommitRevision);
+
+			AssertEquals(sourceItems, new SourceItem[]{item});
+		}
+
+		[Fact]
+		public void CaGetFileById_WillCacheRevision()
+		{
+			WriteFile(testPath + "/Test.txt", "blah", true);
+
+			SourceItem[] sourceItems = sourceControlService.QueryItems(
+				ServerUrl,
+				credentials,
+				Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt",
+				RecursionType.None,
+				VersionSpec.FromChangeset(_lastCommitRevision),
+				DeletedState.NonDeleted,
+				ItemType.Any);
+
+			repository.QueryItems(sourceItems[0].ItemId, _lastCommitRevision);
+
+			Assert.True(repository.IsInCache(_lastCommitRevision));
+		}
+
 		private void AssertEquals(SourceItem[] sourceItems, SourceItem[] items)
 		{
 			Assert.Equal(sourceItems.Length, items.Length);

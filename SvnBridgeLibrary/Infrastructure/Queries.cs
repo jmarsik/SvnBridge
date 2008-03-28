@@ -38,6 +38,23 @@ AND   ServerUrl = @ServerUrl
 AND	  Name LIKE @Path
 ";
 
+		public const string SelectItemById =
+			@"
+SELECT [Id]
+      ,[ItemId]
+      ,[ServerUrl]
+      ,[Name]
+      ,[Parent]
+      ,[IsFolder]
+      ,[ItemRevision]
+      ,[EffectiveRevision]
+      ,[DownloadUrl]
+      ,[LastModifiedDate]
+FROM  [ItemMetaData]
+WHERE EffectiveRevision = @Revision 
+AND   ItemID = @ItemId
+";
+
 		public const string DeleteCache =
 			@"
 DELETE FROM ItemProperties;
@@ -121,7 +138,8 @@ CREATE TABLE ItemMetaData
 	EffectiveRevision INT NOT NULL REFERENCES CachedRevisions(Revision),
 	DownloadUrl NVARCHAR(512) NOT NULL,
 	LastModifiedDate DATETIME NOT NULL,
-	CONSTRAINT ItemMetaData_ServerNameRevision UNIQUE ( ServerUrl, Name, ItemRevision, EffectiveRevision) 
+	CONSTRAINT ItemMetaData_ServerNameRevisionItemName UNIQUE ( ServerUrl, Name, EffectiveRevision),
+	CONSTRAINT ItemMetaData_ServerNameRevisionItemId UNIQUE ( ServerUrl, ItemId, EffectiveRevision) 
 );
 
 
@@ -132,7 +150,6 @@ CREATE TABLE ItemProperties
 	PropertyKey NVARCHAR(255) NOT NULL,
 	PropertyValue NTEXT NOT NULL
 );
-
 ";
 	}
 }
