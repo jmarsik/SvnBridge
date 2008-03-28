@@ -64,19 +64,6 @@ namespace SvnBridge.SourceControl
                          RecursionType recursionType,
                          int maxCount);
 
-        SourceItem[] QueryItems(string tfsUrl,
-                                ICredentials credentials,
-                                string serverPath,
-                                RecursionType recursion,
-                                VersionSpec version,
-                                DeletedState deletedState,
-                                ItemType itemType);
-
-        SourceItem QueryItems(string tfsUrl,
-                                ICredentials credentials,
-                                int itemIds,
-                                int changeSet);
-
         void UndoPendingChanges(string tfsUrl,
                                 ICredentials credentials,
                                 string workspaceName,

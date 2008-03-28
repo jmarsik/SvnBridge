@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
@@ -34,6 +35,8 @@ namespace SvnBridge
 
         public BootStrapper()
         {
+			IoC.Container.Configuration["connectionString"] = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
+
             List<Assembly> asms = new List<Assembly>();
             List<string> names = new List<string>();
             foreach (Type type in representiveComponents)

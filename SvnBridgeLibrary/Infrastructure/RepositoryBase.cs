@@ -1,11 +1,14 @@
 using System;
 using System.Data;
 using System.Data.SqlServerCe;
+using System.Diagnostics;
 
 namespace SvnBridge.Infrastructure
 {
 	public class RepositoryBase
 	{
+		public delegate void Action();
+
 		private IDbConnection connection;
 		private IDbTransaction transaction;
 		protected string connectionString;
@@ -16,8 +19,7 @@ namespace SvnBridge.Infrastructure
 		}
 
 
-		public delegate void Action();
-
+		[DebuggerNonUserCode]
 		protected void Transaction(Action action)
 		{
 			bool responsibleForClosingConnection = connection == null;
@@ -60,6 +62,7 @@ namespace SvnBridge.Infrastructure
 			}
 		}
 
+		[DebuggerNonUserCode]
 		protected void TransactionalCommand(Action<IDbCommand> action)
 		{
 			Transaction(delegate
@@ -68,6 +71,7 @@ namespace SvnBridge.Infrastructure
 			});
 		}
 
+		[DebuggerNonUserCode]
 		protected void Command(Action<IDbCommand> action)
 		{
 			using (IDbCommand command = connection.CreateCommand())

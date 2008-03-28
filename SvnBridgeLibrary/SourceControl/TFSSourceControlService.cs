@@ -2,24 +2,17 @@ using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
-using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
 {
 	public class TFSSourceControlService : SourceControlService, ITFSSourceControlService
 	{
-		private readonly ICache cache;
-		private RepositoryFactoryHelper repositoryFactoryHelper;
+		private readonly RepositoryFactoryHelper repositoryFactoryHelper;
 
-		public TFSSourceControlService(IRegistrationService registrationService,
-		                               IRepositoryWebSvcFactory webSvcFactory,
-		                               IWebTransferService webTransferService,
-		                               IFileSystem fileSystem,
-		                               ICache cache)
+		public TFSSourceControlService(IRegistrationService registrationService, IRepositoryWebSvcFactory webSvcFactory, IWebTransferService webTransferService, IFileSystem fileSystem)
 			: base(registrationService, webSvcFactory, webTransferService, fileSystem)
 		{
 			repositoryFactoryHelper = new RepositoryFactoryHelper(webSvcFactory);
-			this.cache = cache;
 		}
 
 		#region ITFSSourceControlService Members

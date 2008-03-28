@@ -69,9 +69,10 @@ namespace IntegrationTests
 			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
 																						  factory1,
 																						  webTransferService,
-																						  system, new NullCache());
+																						  system);
+			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, "Data Source=Cache.sdf");
 			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
-																					   tfsSourceControlService,
+																					   metaDataRepositoryFactory,
 																					   ServerUrl);
 			return new SourceControlServicesHub(
 				GetCredentials(),
@@ -81,7 +82,8 @@ namespace IntegrationTests
 				associateWorkItemWithChangeSet,
 				new FileLogger(),
 				new NullCache(),
-				MockRepository.GenerateStub<IFileCache>());
+				MockRepository.GenerateStub<IFileCache>(),
+				metaDataRepositoryFactory);
 		}
 
 		protected static ICredentials GetCredentials()

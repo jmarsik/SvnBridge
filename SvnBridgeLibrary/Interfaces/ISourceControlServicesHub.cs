@@ -15,5 +15,6 @@ namespace SvnBridge.Interfaces
         ILogger Logger { get; }
         ICache Cache { get; }
         IFileCache FileCache { get; }
+		IMetaDataRepositoryFactory MetaDataRepositoryFactory { get; }
     }
 }

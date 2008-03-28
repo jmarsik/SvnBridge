@@ -82,8 +82,8 @@ AND	  Name = @Path
 
 		public const string InsertCachedRevision =
 			@"
-INSERT INTO [CachedRevisions] (Revision)
-VALUES (@Revision)
+INSERT INTO [CachedRevisions] (Revision, ServerUrl, RootPath)
+VALUES (@Revision, @ServerUrl, @RootPath)
 ";
 
 		public const string InsertItemMetaData =
@@ -114,16 +114,21 @@ INSERT INTO [ItemMetaData]
 
 		public const string SelectCachedRevision =
 			@"
-SELECT Revision
+SELECT 1
 FROM CachedRevisions
-WHERE Revision = @Revision
+WHERE Revision  = @Revision
+AND   RootPath  = @RootPath
+AND	  ServerUrl = @ServerUrl
 ";
 
 		public const string CreateDatabase =
 			@"
 CREATE TABLE CachedRevisions
 (
-	Revision INT PRIMARY KEY NOT NULL
+	Revision INT NOT NULL,
+	ServerUrl NVARCHAR(256) NOT NULL,
+	RootPath NVARCHAR(256) NOT NULL,
+	CONSTRAINT CachedRevisions_PK PRIMARY KEY ( Revision, ServerUrl, RootPath )
 );
 
 CREATE TABLE ItemMetaData
@@ -135,7 +140,7 @@ CREATE TABLE ItemMetaData
 	Parent NVARCHAR(256) NOT NULL,
 	IsFolder BIT NOT NULL,
 	ItemRevision INT NOT NULL,
-	EffectiveRevision INT NOT NULL REFERENCES CachedRevisions(Revision),
+	EffectiveRevision INT NOT NULL,
 	DownloadUrl NVARCHAR(512) NOT NULL,
 	LastModifiedDate DATETIME NOT NULL,
 	CONSTRAINT ItemMetaData_ServerNameRevisionItemName UNIQUE ( ServerUrl, Name, EffectiveRevision),

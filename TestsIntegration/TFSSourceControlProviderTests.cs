@@ -36,7 +36,7 @@ namespace Tests
             TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
                                                                                           factory1,
                                                                                           webTransferService,
-                                                                                          system, new NullCache());
+                                                                                          system);
             TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
                                                                              PROJECT_NAME,
                                                                              CreateSourceControlServicesHub());

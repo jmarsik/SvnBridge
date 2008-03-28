@@ -8,17 +8,17 @@ namespace SvnBridge.SourceControl
 {
     public class ProjectInformationRepository : IProjectInformationRepository
     {
-        private readonly ITFSSourceControlService _sourceControlSvc;
+		private readonly IMetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly ICache cache;
         private readonly string serverUrl;
 
         public ProjectInformationRepository(
             ICache cache,
-            ITFSSourceControlService _sourceControlSvc,
+            IMetaDataRepositoryFactory metaDataRepositoryFactory,
             string serverUrl)
         {
             this.cache = cache;
-            this._sourceControlSvc = _sourceControlSvc;
+			this.metaDataRepositoryFactory = metaDataRepositoryFactory;
             this.serverUrl = serverUrl;
         }
 
@@ -38,14 +38,12 @@ namespace SvnBridge.SourceControl
             string[] servers = serverUrl.Split(',');
             foreach (string server in servers)
             {
-                SourceItem[] items =
-                    _sourceControlSvc.QueryItems(server,
-                                                 CredentialsHelper.GetCredentialsForServer(server, credentials),
-                                                 Constants.ServerRootPath + projectName,
-                                                 RecursionType.None,
-                                                 new LatestVersionSpec(),
-                                                 DeletedState.NonDeleted,
-                                                 ItemType.Any);
+				ICredentials credentialsForServer = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
+				int revision = metaDataRepositoryFactory.GetLatestRevision(serverUrl, credentialsForServer);
+            	SourceItem[] items = metaDataRepositoryFactory
+						.Create(credentialsForServer, serverUrl, Constants.ServerRootPath + projectName)
+							.QueryItems(revision, "", Recursion.None);
+
                 if (items != null && items.Length > 0)
                 {
                     string remoteProjectName = items[0].RemoteName.Substring(Constants.ServerRootPath.Length);

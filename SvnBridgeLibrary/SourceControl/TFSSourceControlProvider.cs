@@ -20,7 +20,7 @@ namespace SvnBridge.SourceControl
 	public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
 	{
 		private readonly ISourceControlServicesHub sourceControlServicesHub;
-
+		
 		private static readonly Regex associatedWorkItems =
 			new Regex(@"Work ?Items?: (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
 
@@ -52,6 +52,15 @@ namespace SvnBridge.SourceControl
 			get { return sourceControlServicesHub.SourceControlService; }
 		}
 
+		private IMetaDataRepository MetaDataRepository
+		{
+			get
+			{
+				 return sourceControlServicesHub.MetaDataRepositoryFactory
+					 .Create(GetCredentials(), ServerUrl, rootPath);
+			}
+		}
+
 		private IWebTransferService WebTransferService
 		{
 			get { return sourceControlServicesHub.WebTransferService; }
@@ -68,7 +77,7 @@ namespace SvnBridge.SourceControl
 			ISourceControlServicesHub sourceControlServicesHub)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
-
+			
 			if (projectName != null)
 			{
 				ProjectLocationInformation location =
@@ -82,9 +91,8 @@ namespace SvnBridge.SourceControl
 				this.serverUrl = serverUrl.Split(',')[0];
 				rootPath = Constants.ServerRootPath;
 			}
-			credentials =
-				CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
-			sourceControlHelper = new SourceControlUtility(SourceControlService, this, rootPath, serverUrl);
+			credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
+			sourceControlHelper = new SourceControlUtility(MetaDataRepository, rootPath);
 		}
 
 		#region ISourceControlProvider Members
@@ -318,19 +326,11 @@ namespace SvnBridge.SourceControl
 		public bool ItemExists(string path,
 							   int version)
 		{
-			VersionSpec versionSpec = VersionSpec.Latest;
-			if (version != -1)
-			{
-				versionSpec = VersionSpec.FromChangeset(version);
-			}
+			if (version == -1)
+				version = GetLatestVersion();
 
-			SourceItem[] items = SourceControlService.QueryItems(serverUrl,
-												credentials,
-												rootPath+path,
-												RecursionType.None,
-												versionSpec,
-												DeletedState.NonDeleted,
-												ItemType.Any);
+			SourceItem[] items = MetaDataRepository
+				.QueryItems(version, path, Recursion.None);
 
 			return (items.Length > 0);
 		}
@@ -656,31 +656,15 @@ namespace SvnBridge.SourceControl
 			}
 
 			Dictionary<string, ItemProperties> properties = new Dictionary<string, ItemProperties>();
-			RecursionType recursionType = RecursionType.None;
-			switch (recursion)
-			{
-				case Recursion.OneLevel:
-					recursionType = RecursionType.OneLevel;
-					break;
-				case Recursion.Full:
-					recursionType = RecursionType.Full;
-					break;
-			}
-			ChangesetVersionSpec versionSpec = new ChangesetVersionSpec();
+		
 			if (version == -1)
 			{
 				version = GetLatestVersion();
 			}
-			versionSpec.cs = version;
 
 			SourceItem[] items =
-				SourceControlService.QueryItems(serverUrl,
-												credentials,
-												rootPath + path,
-												recursionType,
-												versionSpec,
-												DeletedState.NonDeleted,
-												ItemType.Any);
+				MetaDataRepository.QueryItems(version, path,recursion);
+
 			Dictionary<string, FolderMetaData> folders = new Dictionary<string, FolderMetaData>();
 			Dictionary<string, int> itemPropertyRevision = new Dictionary<string, int>();
 			ItemMetaData firstItem = null;

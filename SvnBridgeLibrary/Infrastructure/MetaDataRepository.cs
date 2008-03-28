@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
+using System.Diagnostics;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
@@ -22,7 +23,7 @@ namespace SvnBridge.Infrastructure
 			ICredentials credentials,
 			string serverUrl,
 			string rootPath,
-			string connectionString) 
+			string connectionString)
 			: base(connectionString)
 		{
 			this.sourceControlService = sourceControlService;
@@ -33,7 +34,8 @@ namespace SvnBridge.Infrastructure
 
 		public SourceItem QueryItems(int itemId, int revision)
 		{
-			EnsureRevisionIsCached(revision);
+			//TODO: Need to figureout a different way to handle this this can be really slow
+			EnsureRevisionIsCached(revision, Constants.SvnVccPath);
 			SourceItem item = null;
 			TransactionalCommand(delegate(IDbCommand command)
 			{
@@ -41,7 +43,7 @@ namespace SvnBridge.Infrastructure
 				Parameter(command, "ItemId", itemId);
 				Parameter(command, "Revision", revision);
 
-				using(IDataReader reader = command.ExecuteReader())
+				using (IDataReader reader = command.ExecuteReader())
 				{
 					if (reader.Read())
 						item = HydrateSourceItem(reader);
@@ -52,8 +54,9 @@ namespace SvnBridge.Infrastructure
 
 		public SourceItem[] QueryItems(int reversion, string path, Recursion recursion)
 		{
-			string serverPath = rootPath + path;
-			EnsureRevisionIsCached(reversion);
+			string serverPath = GetServerPath(path);
+
+			EnsureRevisionIsCached(reversion, path);
 			List<SourceItem> items = new List<SourceItem>();
 			TransactionalCommand(delegate(IDbCommand command)
 			{
@@ -66,7 +69,7 @@ namespace SvnBridge.Infrastructure
 				else
 					Parameter(command, "Path", serverPath);
 
-				if(recursion==Recursion.OneLevel)
+				if (recursion == Recursion.OneLevel)
 					Parameter(command, "Parent", serverPath);
 
 				using (IDataReader reader = command.ExecuteReader())
@@ -80,6 +83,24 @@ namespace SvnBridge.Infrastructure
 				}
 			});
 			return items.ToArray();
+		}
+
+		private string GetServerPath(string path)
+		{
+			string serverPath = rootPath;
+
+			if (serverPath.EndsWith("/"))
+				serverPath = serverPath.Substring(0, serverPath.Length - 1);
+
+			if (path.StartsWith("/") == false)
+				serverPath = serverPath + '/' + path;
+			else
+				serverPath = serverPath + path;
+
+			if (serverPath.EndsWith("/"))
+				serverPath = serverPath.Substring(0, serverPath.Length - 1);
+
+			return serverPath;
 		}
 
 		private SourceItem HydrateSourceItem(IDataRecord reader)
@@ -111,79 +132,124 @@ namespace SvnBridge.Infrastructure
 			}
 		}
 
-		public void EnsureRevisionIsCached(int revision)
+		public void EnsureRevisionIsCached(int revision, string path)
 		{
 			Transaction(delegate
 			{
-				// another thread already cached this version, skip inserting
+				string serverPath = GetServerPath(path);
+
+				// already cached this version, skip inserting
 				// Note that we rely on transaction semantics to ensure safety here
-				if (IsInCache(revision))
+				if (IsInCache(revision, serverPath))
 					return;
 
 				Events.RaiseStartingCachingRevision(serverUrl, revision);
 
-				SourceItem[] items = sourceControlService.QueryItems(serverUrl,
-																	 credentials,
-																	 Constants.ServerRootPath,
-																	 RecursionType.Full,
-																	 VersionSpec.FromChangeset(revision),
-																	 DeletedState.NonDeleted,
-																	 ItemType.Any);
-
-
-
-				Command(delegate(IDbCommand command)
+				try
 				{
-					command.CommandText = Queries.InsertCachedRevision;
+					SourceItem[] items = sourceControlService.QueryItems(serverUrl,
+																		 credentials,
+																		 serverPath,
+																		 RecursionType.Full,
+																		 VersionSpec.FromChangeset(revision),
+																		 DeletedState.NonDeleted,
+																		 ItemType.Any);
 
-					Parameter(command, "Revision", revision);
-
-					command.ExecuteNonQuery();
-				});
-
-				foreach (SourceItem sourceItem in items)
-				{
-					SourceItem item = sourceItem;
 					Command(delegate(IDbCommand command)
 					{
-						command.CommandText = Queries.InsertItemMetaData;
-
-						Parameter(command, "Id", SequentialGuid.Next());
-						Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
-						Parameter(command, "ItemId", item.ItemId);
-						Parameter(command, "Name", item.RemoteName);
-						Parameter(command, "Parent", GetParentName(item.RemoteName));
+						command.CommandText = Queries.InsertCachedRevision;
 						Parameter(command, "ServerUrl", serverUrl);
-						Parameter(command, "ItemRevision", item.RemoteChangesetId);
-						Parameter(command, "EffectiveRevision", revision);
-						Parameter(command, "DownloadUrl", item.DownloadUrl);
-						Parameter(command, "LastModifiedDate", item.RemoteDate);
-
+						Parameter(command, "Revision", revision);
+						Parameter(command, "RootPath", serverPath);
 						command.ExecuteNonQuery();
-					});
-				}
 
-				Events.RaiseFinishedCachingRevision(serverUrl, revision);
+					});
+
+					foreach (SourceItem sourceItem in items)
+					{
+						SourceItem item = sourceItem;
+
+						bool alreadyExists = false;
+
+						Command(delegate(IDbCommand command)
+						{
+							command.CommandText = Queries.SelectItem;
+							Parameter(command, "ServerUrl", serverUrl);
+							Parameter(command, "Revision", revision);
+							Parameter(command, "Path", item.RemoteName);
+
+							using (IDataReader reader = command.ExecuteReader())
+							{
+								alreadyExists = reader.Read();
+							}
+						});
+
+						if (alreadyExists)
+							continue;
+
+						Command(delegate(IDbCommand command)
+						{
+							command.CommandText = Queries.InsertItemMetaData;
+
+							Parameter(command, "Id", SequentialGuid.Next());
+							Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
+							Parameter(command, "ItemId", item.ItemId);
+							Parameter(command, "Name", item.RemoteName);
+							Parameter(command, "Parent", GetParentName(item.RemoteName));
+							Parameter(command, "ServerUrl", serverUrl);
+							Parameter(command, "ItemRevision", item.RemoteChangesetId);
+							Parameter(command, "EffectiveRevision", revision);
+							Parameter(command, "DownloadUrl", item.DownloadUrl);
+							Parameter(command, "LastModifiedDate", item.RemoteDate);
+
+							command.ExecuteNonQuery();
+						});
+					}
+				}
+				finally
+				{
+					Events.RaiseFinishedCachingRevision(serverUrl, revision);
+				}
 			});
 		}
 
 		private object GetParentName(string name)
 		{
 			int lastIndexOfSlash = name.LastIndexOf('/');
-			if(lastIndexOfSlash==-1)
+			if (lastIndexOfSlash == -1)
 				return name;
 			return name.Substring(0, lastIndexOfSlash);
 		}
 
-		public bool IsInCache(int revision)
+		public bool IsInCache(int revision, string path)
 		{
 			int? maybeRevisionFromDb = null;
-			TransactionalCommand(delegate(IDbCommand command)
+
+			string serverPath = path;
+
+			do
 			{
-				command.CommandText = Queries.SelectCachedRevision;
-				Parameter(command, "Revision", revision);
-				maybeRevisionFromDb = (int?)command.ExecuteScalar();
-			});
+
+				TransactionalCommand(delegate(IDbCommand command)
+				{
+					command.CommandText = Queries.SelectCachedRevision;
+					Parameter(command, "Revision", revision);
+					Parameter(command, "ServerUrl", serverUrl);
+					Parameter(command, "RootPath", serverPath);
+					maybeRevisionFromDb = (int?)command.ExecuteScalar();
+				});
+				if (serverPath.IndexOf('/') != -1)
+				{
+					serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+				}
+				else
+				{
+					break;
+				}
+
+			} while (maybeRevisionFromDb == null);
+
+
 			return maybeRevisionFromDb != null;
 		}
 
@@ -214,6 +280,21 @@ namespace SvnBridge.Infrastructure
 				if (string.IsNullOrEmpty(command.CommandText))
 					continue;
 				command.ExecuteNonQuery();
+			}
+		}
+
+		public void EnsureDbExists()
+		{
+			try
+			{
+				Transaction(delegate
+				{
+					//empty transaction block to verify that we can access DB
+				});
+			}
+			catch
+			{
+				CreateDatabase();
 			}
 		}
 	}

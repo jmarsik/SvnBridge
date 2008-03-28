@@ -34,7 +34,8 @@ namespace SvnBridge.SourceControl
                 associateWorkItemWithChangeSet,
                 new FileLogger(),
                 new NullCache(),
-                MockRepository.GenerateStub<IFileCache>());
+                MockRepository.GenerateStub<IFileCache>(),
+				MockRepository.GenerateStub<IMetaDataRepositoryFactory>());
         }
 
         public void Dispose()

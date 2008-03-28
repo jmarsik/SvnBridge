@@ -7,27 +7,18 @@ namespace SvnBridge.SourceControl
 {
     public class SourceControlUtility : ISourceControlUtility
     {
-        private readonly string rootPath;
-        private readonly string serverUrl;
-        private readonly ITFSSourceControlService sourceControlService;
-        private readonly ICredentialsProvider credentialsProvider;
+        private readonly IMetaDataRepository metaDataRepository;
+    	private readonly string rootPath;
 
-        public SourceControlUtility(
-            ITFSSourceControlService sourceControlService,
-            ICredentialsProvider credentialsProvider,
-            string rootPath,
-            string serverUrl)
-        {
-            this.sourceControlService = sourceControlService;
-            this.credentialsProvider = credentialsProvider;
-            this.rootPath = rootPath;
-            this.serverUrl = serverUrl;
-        }
+    	public SourceControlUtility(IMetaDataRepository metaDataRepositoryFactory, string rootPath)
+    	{
+    		this.metaDataRepository = metaDataRepositoryFactory;
+    		this.rootPath = rootPath;
+    	}
 
-        public ItemMetaData GetItem(int version,
-                                    int itemId)
+    	public ItemMetaData GetItem(int version, int itemId)
         {
-            SourceItem item = sourceControlService.QueryItems(serverUrl, credentialsProvider.GetCredentials(), itemId, version);
+            SourceItem item = metaDataRepository.QueryItems(itemId, version);
 			return ItemMetaData.ConvertSourceItem(item, rootPath);
         }
 

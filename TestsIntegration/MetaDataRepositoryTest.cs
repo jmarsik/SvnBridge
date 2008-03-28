@@ -21,12 +21,12 @@ namespace IntegrationTests
 			new BootStrapper().Start();
 			credentials = GetCredentials();
 			sourceControlService = IoC.Resolve<ISourceControlService>();
-			string dbFile = "Cache.sdf";
-			File.Delete(dbFile);
+			const string dbFile = "Cache.sdf";
+
 			repository = new MetaDataRepository(sourceControlService, credentials, ServerUrl,
-			                                    Constants.ServerRootPath + PROJECT_NAME,
+												Constants.ServerRootPath + PROJECT_NAME,
 												@"Data Source=" + dbFile);
-			repository.CreateDatabase();
+			repository.EnsureDbExists();
 		}
 
 		[Fact]
@@ -34,28 +34,25 @@ namespace IntegrationTests
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);
 
-			Assert.False(repository.IsInCache(_lastCommitRevision));
+			string path = Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt";
+			Assert.False(repository.IsInCache(_lastCommitRevision, path));
 
 			repository.QueryItems(_lastCommitRevision, testPath + "/Test.txt", Recursion.None);
 
-			Assert.True(repository.IsInCache(_lastCommitRevision));
+			Assert.True(repository.IsInCache(_lastCommitRevision, path));
 		}
 
 		[Fact]
 		public void WillRaiseEventWhenCacheIsUpdated()
 		{
-			bool startEventCalled = false, endEventCalled = false;
+			bool startEventCalled = false;
 
 			Events.CachingRevisionAction startingCachingRevision = delegate { startEventCalled = true; };
 			Events.StartingCachingRevision += startingCachingRevision;
 
-			Events.CachingRevisionAction finishedCachingRevision = delegate { endEventCalled = true; };
-			Events.FinishedCachingRevision += finishedCachingRevision;
-
 			repository.QueryItems(_lastCommitRevision, testPath + "/Test.txt", Recursion.None);
 
 			Assert.True(startEventCalled);
-			Assert.True(endEventCalled);
 		}
 
 
@@ -63,15 +60,15 @@ namespace IntegrationTests
 		public void CanGetValidResultFromQueryItems_RecursionNone()
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);
-			
+
 			SourceItem[] items = repository.QueryItems(_lastCommitRevision, testPath + "/Test.txt", Recursion.None);
 			SourceItem[] sourceItems = sourceControlService.QueryItems(
-				ServerUrl, 
+				ServerUrl,
 				credentials,
-				Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt", 
+				Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt",
 				RecursionType.None,
-				VersionSpec.FromChangeset(_lastCommitRevision), 
-				DeletedState.Any, 
+				VersionSpec.FromChangeset(_lastCommitRevision),
+				DeletedState.Any,
 				ItemType.Any);
 
 			AssertEquals(sourceItems, items);
@@ -129,7 +126,7 @@ namespace IntegrationTests
 
 			SourceItem item = repository.QueryItems(sourceItems[0].ItemId, _lastCommitRevision);
 
-			AssertEquals(sourceItems, new SourceItem[]{item});
+			AssertEquals(sourceItems, new SourceItem[] { item });
 		}
 
 		[Fact]
@@ -148,7 +145,8 @@ namespace IntegrationTests
 
 			repository.QueryItems(sourceItems[0].ItemId, _lastCommitRevision);
 
-			Assert.True(repository.IsInCache(_lastCommitRevision));
+			string path = Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt";
+			Assert.True(repository.IsInCache(_lastCommitRevision, path));
 		}
 
 		private void AssertEquals(SourceItem[] sourceItems, SourceItem[] items)
@@ -166,7 +164,7 @@ namespace IntegrationTests
 				WebClient client = new WebClient();
 				client.Credentials = credentials;
 
-				if(items[i].ItemType == ItemType.Folder)
+				if (items[i].ItemType == ItemType.Folder)
 					continue;
 
 				Assert.Equal(
