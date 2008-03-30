@@ -1,14 +1,19 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{95E4E16B-0975-4705-B3A0-83700DE483C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SvnBridge</RootNamespace>
     <AssemblyName>SvnFacade.Library</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -18,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +41,10 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SqlServerCe, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
@@ -44,22 +54,41 @@
     <Compile Include="BootStrapper.cs" />
     <Compile Include="Cache\NullCache.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Exceptions\CacheMissException.cs" />
+    <Compile Include="Exceptions\EnvironmentValidationException.cs" />
     <Compile Include="Exceptions\RepositoryUnavailableException.cs" />
     <Compile Include="Handlers\CheckOutHandler.cs" />
     <Compile Include="Handlers\CopyHandler.cs" />
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
+    <Compile Include="Infrastructure\Events.cs" />
+    <Compile Include="Infrastructure\MetaDataRepositoryFactory.cs" />
+    <Compile Include="Interfaces\IMetaDataRepository.cs" />
+    <Compile Include="Infrastructure\MetaDataRepository.cs" />
+    <Compile Include="Infrastructure\Queries.cs" />
+    <Compile Include="Infrastructure\RepositoryBase.cs" />
+    <Compile Include="Infrastructure\SequentialGuid.cs" />
+    <Compile Include="Infrastructure\TfsUrlValidator.cs" />
+    <Compile Include="Interfaces\IMetaDataRepositoryFactory.cs" />
+    <Compile Include="Interfaces\ITfsUrlValidator.cs" />
+    <Compile Include="PathParsing\BasePathParser.cs" />
+    <Compile Include="PathParsing\RequestBasePathParser.cs" />
+    <Compile Include="PathParsing\StaticServerPathParser.cs" />
+    <Compile Include="PathParsing\StaticServerWithProjectNameInHostNamePathParser.cs" />
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />
     <Compile Include="Infrastructure\ExceptionHelper.cs" />
     <Compile Include="Infrastructure\FileCache.cs" />
     <Compile Include="Infrastructure\SourceControlServicesHub.cs" />
     <Compile Include="Interfaces\CachedResult.cs" />
+    <Compile Include="Interfaces\ICanValidateMyEnvironment.cs" />
     <Compile Include="Interfaces\IFileCache.cs" />
     <Compile Include="Interfaces\IInterceptor.cs" />
     <Compile Include="Interfaces\IInvocation.cs" />
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />
+    <Compile Include="Interfaces\IPathParser.cs" />
     <Compile Include="Interfaces\ISourceControlServicesHub.cs" />
+    <Compile Include="Protocol\DatedRevReportData.cs" />
     <Compile Include="Proxies\ProxyFactory.cs" />
     <Compile Include="Proxies\RemotingInvocation.cs" />
     <Compile Include="Proxies\RetryOnSocketExceptionsInterceptor.cs" />
@@ -68,7 +97,6 @@
     <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />
     <Compile Include="Infrastructure\BrokenXml.cs" />
     <Compile Include="Infrastructure\Clock.cs" />
-    <Compile Include="Infrastructure\CachingItemMetaDataRepository.cs" />
     <Compile Include="Infrastructure\FileLogger.cs" />
     <Compile Include="Infrastructure\Container.cs" />
     <Compile Include="Infrastructure\IAssociateWorkItemWithChangeset.cs" />
@@ -76,7 +104,6 @@
     <Compile Include="Infrastructure\IoC.cs" />
     <Compile Include="Cache\WebCache.cs" />
     <Compile Include="Interfaces\ICache.cs" />
-    <Compile Include="Interfaces\IItemMetaDataRepository.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />
     <Compile Include="Handlers\MkActivityHandler.cs" />
     <Compile Include="Handlers\MkColHandler.cs" />
@@ -172,6 +199,7 @@
     <Compile Include="SourceControl\MergeActivityResponseItem.cs" />
     <Compile Include="SourceControl\Recursion.cs" />
     <Compile Include="SourceControl\RenamedSourceItem.cs" />
+    <Compile Include="SourceControl\RepositoryFactoryHelper.cs" />
     <Compile Include="SourceControl\SourceControlUtility.cs" />
     <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
     <Compile Include="SourceControl\StubFolderMetaData.cs" />
