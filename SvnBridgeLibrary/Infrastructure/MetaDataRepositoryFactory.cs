@@ -1,6 +1,7 @@
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Interfaces;
+using System;
 
 namespace SvnBridge.Infrastructure
 {
@@ -17,8 +18,9 @@ namespace SvnBridge.Infrastructure
 
 		public IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath)
 		{
-			MetaDataRepository repository = new MetaDataRepository(sourceControlService, credentials, serverUrl, rootPath, connectionString);
-			repository.EnsureDbExists();
+            AppDomain.CurrentDomain.SetData("SQLServerCompactEditionUnderWebHosting", true);
+            MetaDataRepository repository = new MetaDataRepository(sourceControlService, credentials, serverUrl, rootPath, connectionString);
+            repository.EnsureDbExists();
 			return repository;
 		}
 

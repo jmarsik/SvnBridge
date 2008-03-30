@@ -287,7 +287,6 @@ namespace SvnBridge.Infrastructure
 		{
 			try
 			{
-                AppDomain.CurrentDomain.SetData("SQLServerCompactEditionUnderWebHosting", true);
 				Transaction(delegate
 				{
 					//empty transaction block to verify that we can access DB

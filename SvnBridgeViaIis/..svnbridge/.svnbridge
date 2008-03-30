@@ -6,4 +6,7 @@ obj
 obj
 FileCache
 SvnBridgeViaIis-vs2008.csproj.user
+Cache.sdf
+Error.log
+Info.log
 </Value></Property></Properties></ItemProperties>
