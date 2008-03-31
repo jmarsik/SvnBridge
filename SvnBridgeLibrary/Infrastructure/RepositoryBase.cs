@@ -77,27 +77,8 @@ namespace SvnBridge.Infrastructure
 		{
 			using (IDbCommand command = connection.CreateCommand())
 			{
+				command.Transaction = transaction;
 				action(command);
-			}
-		}
-
-		/// <summary>
-		/// SQL CE doesn't support serializable transactions, which is what
-		/// we need, so we have to do this manually.
-		/// </summary>
-		protected void Lock(string serverPath, int revision, string userName, Action action)
-		{
-			using (Mutex mutex = new Mutex(false, userName + "@" + serverPath + "@" + revision))
-			{
-				mutex.WaitOne();
-				try
-				{
-					action();
-				}
-				finally
-				{
-					mutex.ReleaseMutex();
-				}
 			}
 		}
 

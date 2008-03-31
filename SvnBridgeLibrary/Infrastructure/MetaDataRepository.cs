@@ -7,7 +7,6 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using System.Data;
-using System.Threading;
 
 namespace SvnBridge.Infrastructure
 {
@@ -141,87 +140,82 @@ namespace SvnBridge.Infrastructure
 			{
 				string serverPath = GetServerPath(path);
 
+				// already cached this version, skip inserting
+				// we rely on the transaction to serialize requests here
+				if (IsInCache(revision, serverPath))
+					return;
 
-				// We have to do this because SQL CE 
-				// doesn't support serializable transactions
-				Lock(serverPath, revision, CurrentUserName, delegate
+				serverPath = ToDirectory(serverPath, revision);
+
+				Events.RaiseStartingCachingRevision(serverUrl, revision);
+
+				try
 				{
-					// already cached this version, skip inserting
-					if (IsInCache(revision, serverPath))
-						return;
+					SourceItem[] items = sourceControlService.QueryItems(serverUrl,
+																		 credentials,
+																		 serverPath,
+																		 RecursionType.Full,
+																		 VersionSpec.FromChangeset(revision),
+																		 DeletedState.NonDeleted,
+																		 ItemType.Any);
 
-					serverPath = ToDirectory(serverPath, revision);
-
-					Events.RaiseStartingCachingRevision(serverUrl, revision);
-
-					try
+					Command(delegate(IDbCommand command)
 					{
-						SourceItem[] items = sourceControlService.QueryItems(serverUrl,
-																			 credentials,
-																			 serverPath,
-																			 RecursionType.Full,
-																			 VersionSpec.FromChangeset(revision),
-																			 DeletedState.NonDeleted,
-																			 ItemType.Any);
+						command.CommandText = Queries.InsertCachedRevision;
+						Parameter(command, "ServerUrl", serverUrl);
+						Parameter(command, "Revision", revision);
+						Parameter(command, "UserName", CurrentUserName);
+						Parameter(command, "RootPath", serverPath);
+						command.ExecuteNonQuery();
+					});
+
+					foreach (SourceItem sourceItem in items)
+					{
+						SourceItem item = sourceItem;
+
+						bool alreadyExists = false;
 
 						Command(delegate(IDbCommand command)
 						{
-							command.CommandText = Queries.InsertCachedRevision;
+							command.CommandText = Queries.SelectItem;
 							Parameter(command, "ServerUrl", serverUrl);
-							Parameter(command, "Revision", revision);
 							Parameter(command, "UserName", CurrentUserName);
-							Parameter(command, "RootPath", serverPath);
-							command.ExecuteNonQuery();
+							Parameter(command, "Revision", revision);
+							Parameter(command, "Path", item.RemoteName);
+
+							using (IDataReader reader = command.ExecuteReader())
+							{
+								alreadyExists = reader.Read();
+							}
 						});
 
-						foreach (SourceItem sourceItem in items)
+						if (alreadyExists)
+							continue;
+
+						Command(delegate(IDbCommand command)
 						{
-							SourceItem item = sourceItem;
+							command.CommandText = Queries.InsertItemMetaData;
 
-							bool alreadyExists = false;
+							Parameter(command, "Id", SequentialGuid.Next());
+							Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
+							Parameter(command, "ItemId", item.ItemId);
+							Parameter(command, "Name", item.RemoteName);
+							Parameter(command, "UserName", CurrentUserName);
+							Parameter(command, "Parent", GetParentName(item.RemoteName));
+							Parameter(command, "ServerUrl", serverUrl);
+							Parameter(command, "ItemRevision", item.RemoteChangesetId);
+							Parameter(command, "EffectiveRevision", revision);
+							Parameter(command, "DownloadUrl", item.DownloadUrl);
+							Parameter(command, "LastModifiedDate", item.RemoteDate);
 
-							Command(delegate(IDbCommand command)
-							{
-								command.CommandText = Queries.SelectItem;
-								Parameter(command, "ServerUrl", serverUrl);
-								Parameter(command, "UserName", CurrentUserName);
-								Parameter(command, "Revision", revision);
-								Parameter(command, "Path", item.RemoteName);
-
-								using (IDataReader reader = command.ExecuteReader())
-								{
-									alreadyExists = reader.Read();
-								}
-							});
-
-							if (alreadyExists)
-								continue;
-
-							Command(delegate(IDbCommand command)
-							{
-								command.CommandText = Queries.InsertItemMetaData;
-
-								Parameter(command, "Id", SequentialGuid.Next());
-								Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
-								Parameter(command, "ItemId", item.ItemId);
-								Parameter(command, "Name", item.RemoteName);
-								Parameter(command, "UserName", CurrentUserName);
-								Parameter(command, "Parent", GetParentName(item.RemoteName));
-								Parameter(command, "ServerUrl", serverUrl);
-								Parameter(command, "ItemRevision", item.RemoteChangesetId);
-								Parameter(command, "EffectiveRevision", revision);
-								Parameter(command, "DownloadUrl", item.DownloadUrl);
-								Parameter(command, "LastModifiedDate", item.RemoteDate);
-
-								command.ExecuteNonQuery();
-							});
-						}
+							command.ExecuteNonQuery();
+						});
 					}
-					finally
-					{
-						Events.RaiseFinishedCachingRevision(serverUrl, revision);
-					}
-				});
+				}
+				finally
+				{
+					Events.RaiseFinishedCachingRevision(serverUrl, revision);
+				}
 			});
 		}
 
