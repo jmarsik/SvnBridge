@@ -32,6 +32,8 @@ namespace SvnBridge.SourceControl
 		private readonly string rootPath;
 		private readonly string serverUrl;
 
+		private int? latestChangeset;
+
 		private ILogger Logger
 		{
 			get { return sourceControlServicesHub.Logger; }
@@ -229,9 +231,17 @@ namespace SvnBridge.SourceControl
 			return GetItems(version, path, recursion, false, false);
 		}
 
+		/// <summary>
+		/// We are caching the value, to avoid expensive remote calls. 
+		/// This is safe to do because <see cref="TFSSourceControlProvider"/> is a trasient
+		/// type, and will only live for the current request.
+		/// </summary>
+		/// <returns></returns>
 		public int GetLatestVersion()
 		{
-			return SourceControlService.GetLatestChangeset(serverUrl, credentials);
+			if (latestChangeset==null)
+				latestChangeset = SourceControlService.GetLatestChangeset(serverUrl, credentials);
+			return latestChangeset.Value;
 		}
 
 		public LogItem GetLog(string path,
