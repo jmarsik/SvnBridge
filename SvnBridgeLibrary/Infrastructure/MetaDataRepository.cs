@@ -32,24 +32,15 @@ namespace SvnBridge.Infrastructure
 			this.credentials = credentials;
 		}
 
-		public SourceItem QueryItems(int itemId, int revision)
+		public SourceItem QueryPreviousVersionOfItem(int itemId, int revision)
 		{
-			//TODO: Need to figureout a different way to handle this this can be really slow
-			EnsureRevisionIsCached(revision, Constants.SvnVccPath);
-			SourceItem item = null;
-			TransactionalCommand(delegate(IDbCommand command)
-			{
-				command.CommandText = Queries.SelectItemById;
-				Parameter(command, "ItemId", itemId);
-				Parameter(command, "Revision", revision);
-
-				using (IDataReader reader = command.ExecuteReader())
-				{
-					if (reader.Read())
-						item = HydrateSourceItem(reader);
-				}
-			});
-			return item;
+			SourceItem[] items = sourceControlService.QueryItems(
+				serverUrl, credentials, new int[] {itemId}, revision - 1);
+			if(items.Length==0)
+				return null;
+			SourceItem[] sourceItems = QueryItems(revision - 1, items[0].RemoteName, Recursion.None);
+			// we always have a value here, because we check that it exists in the previous version
+			return sourceItems[0];
 		}
 
 		public SourceItem[] QueryItems(int reversion, string path, Recursion recursion)
@@ -87,6 +78,9 @@ namespace SvnBridge.Infrastructure
 
 		private string GetServerPath(string path)
 		{
+			if (path.StartsWith("$/"))
+				return path;
+
 			string serverPath = rootPath;
 
 			if (serverPath.EndsWith("/"))

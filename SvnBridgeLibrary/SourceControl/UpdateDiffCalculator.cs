@@ -222,11 +222,11 @@ namespace SvnBridge.SourceControl
 								   FolderMetaData root,
 								   bool updatingForwardInTime)
 		{
+			ItemMetaData oldItem =
+				sourceControlUtility.GetPreviousVersionOfItem(change.Item);
+			
 			if (updatingForwardInTime)
 			{
-				ItemMetaData oldItem =
-					sourceControlUtility.GetItem(history.ChangeSetID - 1, change.Item.ItemId);
-
 				ProcessDeletedFile(checkoutRootPath,
 								   oldItem.Name,
 								   change,
@@ -241,9 +241,6 @@ namespace SvnBridge.SourceControl
 			}
 			else
 			{
-				ItemMetaData oldItem =
-					sourceControlUtility.GetItem(history.ChangeSetID - 1, change.Item.ItemId);
-
 				ProcessAddedItem(checkoutRootPath,
 								 oldItem.Name,
 								 change,

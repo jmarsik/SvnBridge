@@ -278,7 +278,7 @@ namespace SvnBridge.SourceControl
 					change.Item.RemoteName = change.Item.RemoteName.Substring(rootPath.Length);
 					if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
 					{
-						ItemMetaData oldItem = sourceControlHelper.GetItem(history.ChangeSetID - 1, change.Item.ItemId);
+						ItemMetaData oldItem = sourceControlHelper.GetPreviousVersionOfItem(change.Item);
 						change.Item = new RenamedSourceItem(change.Item, oldItem.Name, oldItem.Revision);
 					}
 					else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)

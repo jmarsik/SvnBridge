@@ -124,7 +124,7 @@ namespace IntegrationTests
 				DeletedState.NonDeleted,
 				ItemType.Any);
 
-			SourceItem item = repository.QueryItems(sourceItems[0].ItemId, _lastCommitRevision);
+			SourceItem item = repository.QueryPreviousVersionOfItem((sourceItems[0].ItemId), _lastCommitRevision);
 
 			AssertEquals(sourceItems, new SourceItem[] { item });
 		}
@@ -143,7 +143,7 @@ namespace IntegrationTests
 				DeletedState.NonDeleted,
 				ItemType.Any);
 
-			repository.QueryItems(sourceItems[0].ItemId, _lastCommitRevision);
+			repository.QueryPreviousVersionOfItem(sourceItems[0].ItemId, _lastCommitRevision);
 
 			string path = Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt";
 			Assert.True(repository.IsInCache(_lastCommitRevision, path));

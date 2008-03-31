@@ -16,10 +16,11 @@ namespace SvnBridge.SourceControl
     		this.rootPath = rootPath;
     	}
 
-    	public ItemMetaData GetItem(int version, int itemId)
+		public ItemMetaData GetPreviousVersionOfItem(SourceItem item)
         {
-            SourceItem item = metaDataRepository.QueryItems(itemId, version);
-			return ItemMetaData.ConvertSourceItem(item, rootPath);
+			SourceItem sourceItem = metaDataRepository
+				.QueryPreviousVersionOfItem(item.ItemId, item.RemoteChangesetId);
+			return ItemMetaData.ConvertSourceItem(sourceItem, rootPath);
         }
 
         public ItemMetaData FindItem(FolderMetaData folder,

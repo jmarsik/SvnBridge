@@ -3,12 +3,11 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Interfaces
 {
-    public interface ISourceControlUtility
-    {
-        ItemMetaData GetItem(int version,
-                             int itemId);
+	public interface ISourceControlUtility
+	{
+		ItemMetaData GetPreviousVersionOfItem(SourceItem item);
 
-        ItemMetaData FindItem(FolderMetaData folder,
-                              string name);
-    }
+		ItemMetaData FindItem(FolderMetaData folder,
+		                      string name);
+	}
 }
