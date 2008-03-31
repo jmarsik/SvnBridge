@@ -35,19 +35,11 @@ namespace SvnBridge.Infrastructure
 		public SourceItem QueryPreviousVersionOfItem(int itemId, int revision)
 		{
 			int previousRevision = (revision - 1);
-
 			SourceItem[] items = sourceControlService.QueryItems(
-				serverUrl, credentials, new int[] { itemId }, revision - 1);
+				serverUrl, credentials, new int[] { itemId }, previousRevision);
 			if (items.Length == 0)
 				return null;
-
-			SourceItem[] sourceItems = QueryItems(items[0].RemoteChangesetId, items[0].RemoteName, Recursion.None);
-			// we always have a value here, because we check that it exists in the previous version
-			if (sourceItems.Length == 0)
-			{
-				throw new InvalidOperationException("Could not find  item #" + itemId + " at revision #" + previousRevision);
-			}
-			return sourceItems[0];
+			return items[0];
 		}
 
 		public SourceItem[] QueryItems(int reversion, string path, Recursion recursion)
@@ -149,6 +141,7 @@ namespace SvnBridge.Infrastructure
 			{
 				string serverPath = GetServerPath(path);
 
+
 				// We have to do this because SQL CE 
 				// doesn't support serializable transactions
 				Lock(serverPath, revision, CurrentUserName, delegate
@@ -156,6 +149,8 @@ namespace SvnBridge.Infrastructure
 					// already cached this version, skip inserting
 					if (IsInCache(revision, serverPath))
 						return;
+
+					serverPath = ToDirectory(serverPath, revision);
 
 					Events.RaiseStartingCachingRevision(serverUrl, revision);
 
@@ -228,6 +223,24 @@ namespace SvnBridge.Infrastructure
 					}
 				});
 			});
+		}
+
+		private string ToDirectory(string serverPath, int revision)
+		{
+			SourceItem[] items = sourceControlService.QueryItems(
+				serverUrl,
+				credentials,
+				serverPath,
+				RecursionType.None,
+				VersionSpec.FromChangeset(revision),
+				DeletedState.NonDeleted,
+				ItemType.Any);
+
+			if (items.Length == 0 || items[0].ItemType == ItemType.Folder)
+				return serverPath;
+			//can't use Path.GetDirectory() here, will turn / to \
+			int lastIndexOfSlash = serverPath.LastIndexOf('/');
+			return serverPath.Substring(0, lastIndexOfSlash);
 		}
 
 		private object GetParentName(string name)
