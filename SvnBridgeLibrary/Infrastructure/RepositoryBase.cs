@@ -85,9 +85,9 @@ namespace SvnBridge.Infrastructure
 		/// SQL CE doesn't support serializable transactions, which is what
 		/// we need, so we have to do this manually.
 		/// </summary>
-		protected void Lock(string serverPath, int revision, Action action)
+		protected void Lock(string serverPath, int revision, string userName, Action action)
 		{
-			using (Mutex mutex = new Mutex(false, serverPath + "@" + revision))
+			using (Mutex mutex = new Mutex(false, userName + "@" + serverPath + "@" + revision))
 			{
 				mutex.WaitOne();
 				try

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using CodePlex.TfsLibrary.ObjectModel;
@@ -70,7 +71,8 @@ namespace IntegrationTests
 																						  factory1,
 																						  webTransferService,
 																						  system);
-			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, "Data Source=Cache.sdf");
+			string connectionString = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
+			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, connectionString);
 			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
 																					   metaDataRepositoryFactory,
 																					   ServerUrl);

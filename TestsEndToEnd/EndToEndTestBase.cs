@@ -15,7 +15,7 @@ using Xunit;
 
 namespace TestsEndToEnd
 {
-    public class EndToEndTestBase : TFSSourceControlProviderTestsBase, IDisposable
+    public class EndToEndTestBase : TFSSourceControlProviderTestsBase
     {
         #region Setup/Teardown
 

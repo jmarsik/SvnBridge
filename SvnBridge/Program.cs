@@ -37,6 +37,10 @@ namespace SvnBridge
 					port = tmp;
 				}
 			}
+			else
+			{
+				port = TryGetPortFromSettings();
+			}
 			ProxyInformation proxyInfo = GetProxyInfo();
 
 			bool specifiedTfsUrl = string.IsNullOrEmpty(tfsUrl) == false;
@@ -46,6 +50,13 @@ namespace SvnBridge
 			{
 				Run(tfsUrl, port ?? 8081, proxyInfo);
 			}
+		}
+
+		private static int? TryGetPortFromSettings()
+		{
+			if (Settings.Default.TfsPort != 0)
+				return Settings.Default.TfsPort;
+			return null;
 		}
 
 		private static ProxyInformation GetProxyInfo()

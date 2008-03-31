@@ -21,7 +21,7 @@ namespace IntegrationTests
 			new BootStrapper().Start();
 			credentials = GetCredentials();
 			sourceControlService = IoC.Resolve<ISourceControlService>();
-			const string dbFile = "Cache.sdf";
+			string dbFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
 
 			repository = new MetaDataRepository(sourceControlService, credentials, ServerUrl,
 												Constants.ServerRootPath + PROJECT_NAME,

@@ -60,6 +60,7 @@ namespace SvnBridge.Infrastructure
 			{
 				SetSelectItemQuery(recursion, command);
 				Parameter(command, "Revision", reversion);
+				Parameter(command, "UserName", CurrentUserName);
 				Parameter(command, "ServerUrl", serverUrl);
 
 				if (recursion == Recursion.Full)
@@ -81,6 +82,15 @@ namespace SvnBridge.Infrastructure
 				}
 			});
 			return items.ToArray();
+		}
+
+		private string CurrentUserName
+		{
+			get
+			{
+				NetworkCredential credential = credentials.GetCredential(new Uri(serverUrl), "Basic");
+				return credential.UserName + "@" + credential.Domain;
+			}
 		}
 
 		private string GetServerPath(string path)
@@ -141,7 +151,7 @@ namespace SvnBridge.Infrastructure
 
 				// We have to do this because SQL CE 
 				// doesn't support serializable transactions
-				Lock(serverPath, revision, delegate
+				Lock(serverPath, revision, CurrentUserName, delegate
 				{
 					// already cached this version, skip inserting
 					if (IsInCache(revision, serverPath))
@@ -164,6 +174,7 @@ namespace SvnBridge.Infrastructure
 							command.CommandText = Queries.InsertCachedRevision;
 							Parameter(command, "ServerUrl", serverUrl);
 							Parameter(command, "Revision", revision);
+							Parameter(command, "UserName", CurrentUserName);
 							Parameter(command, "RootPath", serverPath);
 							command.ExecuteNonQuery();
 						});
@@ -178,6 +189,7 @@ namespace SvnBridge.Infrastructure
 							{
 								command.CommandText = Queries.SelectItem;
 								Parameter(command, "ServerUrl", serverUrl);
+								Parameter(command, "UserName", CurrentUserName);
 								Parameter(command, "Revision", revision);
 								Parameter(command, "Path", item.RemoteName);
 
@@ -198,6 +210,7 @@ namespace SvnBridge.Infrastructure
 								Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
 								Parameter(command, "ItemId", item.ItemId);
 								Parameter(command, "Name", item.RemoteName);
+								Parameter(command, "UserName", CurrentUserName);
 								Parameter(command, "Parent", GetParentName(item.RemoteName));
 								Parameter(command, "ServerUrl", serverUrl);
 								Parameter(command, "ItemRevision", item.RemoteChangesetId);
@@ -239,6 +252,7 @@ namespace SvnBridge.Infrastructure
 					command.CommandText = Queries.SelectCachedRevision;
 					Parameter(command, "Revision", revision);
 					Parameter(command, "ServerUrl", serverUrl);
+					Parameter(command, "UserName", CurrentUserName);
 					Parameter(command, "RootPath", serverPath);
 					maybeRevisionFromDb = (int?)command.ExecuteScalar();
 				});
