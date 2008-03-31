@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
-using System.Diagnostics;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using System.Data;
+using System.Threading;
 
 namespace SvnBridge.Infrastructure
 {
@@ -34,12 +34,19 @@ namespace SvnBridge.Infrastructure
 
 		public SourceItem QueryPreviousVersionOfItem(int itemId, int revision)
 		{
+			int previousRevision = (revision - 1);
+
 			SourceItem[] items = sourceControlService.QueryItems(
-				serverUrl, credentials, new int[] {itemId}, revision - 1);
-			if(items.Length==0)
+				serverUrl, credentials, new int[] { itemId }, revision - 1);
+			if (items.Length == 0)
 				return null;
-			SourceItem[] sourceItems = QueryItems(revision - 1, items[0].RemoteName, Recursion.None);
+
+			SourceItem[] sourceItems = QueryItems(items[0].RemoteChangesetId, items[0].RemoteName, Recursion.None);
 			// we always have a value here, because we check that it exists in the previous version
+			if (sourceItems.Length == 0)
+			{
+				throw new InvalidOperationException("Could not find  item #" + itemId + " at revision #" + previousRevision);
+			}
 			return sourceItems[0];
 		}
 
@@ -132,78 +139,81 @@ namespace SvnBridge.Infrastructure
 			{
 				string serverPath = GetServerPath(path);
 
-				// already cached this version, skip inserting
-				// Note that we rely on transaction semantics to ensure safety here
-				if (IsInCache(revision, serverPath))
-					return;
-
-				Events.RaiseStartingCachingRevision(serverUrl, revision);
-
-				try
+				// We have to do this because SQL CE 
+				// doesn't support serializable transactions
+				Lock(serverPath, revision, delegate
 				{
-					SourceItem[] items = sourceControlService.QueryItems(serverUrl,
-																		 credentials,
-																		 serverPath,
-																		 RecursionType.Full,
-																		 VersionSpec.FromChangeset(revision),
-																		 DeletedState.NonDeleted,
-																		 ItemType.Any);
+					// already cached this version, skip inserting
+					if (IsInCache(revision, serverPath))
+						return;
 
-					Command(delegate(IDbCommand command)
+					Events.RaiseStartingCachingRevision(serverUrl, revision);
+
+					try
 					{
-						command.CommandText = Queries.InsertCachedRevision;
-						Parameter(command, "ServerUrl", serverUrl);
-						Parameter(command, "Revision", revision);
-						Parameter(command, "RootPath", serverPath);
-						command.ExecuteNonQuery();
-
-					});
-
-					foreach (SourceItem sourceItem in items)
-					{
-						SourceItem item = sourceItem;
-
-						bool alreadyExists = false;
+						SourceItem[] items = sourceControlService.QueryItems(serverUrl,
+																			 credentials,
+																			 serverPath,
+																			 RecursionType.Full,
+																			 VersionSpec.FromChangeset(revision),
+																			 DeletedState.NonDeleted,
+																			 ItemType.Any);
 
 						Command(delegate(IDbCommand command)
 						{
-							command.CommandText = Queries.SelectItem;
+							command.CommandText = Queries.InsertCachedRevision;
 							Parameter(command, "ServerUrl", serverUrl);
 							Parameter(command, "Revision", revision);
-							Parameter(command, "Path", item.RemoteName);
-
-							using (IDataReader reader = command.ExecuteReader())
-							{
-								alreadyExists = reader.Read();
-							}
-						});
-
-						if (alreadyExists)
-							continue;
-
-						Command(delegate(IDbCommand command)
-						{
-							command.CommandText = Queries.InsertItemMetaData;
-
-							Parameter(command, "Id", SequentialGuid.Next());
-							Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
-							Parameter(command, "ItemId", item.ItemId);
-							Parameter(command, "Name", item.RemoteName);
-							Parameter(command, "Parent", GetParentName(item.RemoteName));
-							Parameter(command, "ServerUrl", serverUrl);
-							Parameter(command, "ItemRevision", item.RemoteChangesetId);
-							Parameter(command, "EffectiveRevision", revision);
-							Parameter(command, "DownloadUrl", item.DownloadUrl);
-							Parameter(command, "LastModifiedDate", item.RemoteDate);
-
+							Parameter(command, "RootPath", serverPath);
 							command.ExecuteNonQuery();
 						});
+
+						foreach (SourceItem sourceItem in items)
+						{
+							SourceItem item = sourceItem;
+
+							bool alreadyExists = false;
+
+							Command(delegate(IDbCommand command)
+							{
+								command.CommandText = Queries.SelectItem;
+								Parameter(command, "ServerUrl", serverUrl);
+								Parameter(command, "Revision", revision);
+								Parameter(command, "Path", item.RemoteName);
+
+								using (IDataReader reader = command.ExecuteReader())
+								{
+									alreadyExists = reader.Read();
+								}
+							});
+
+							if (alreadyExists)
+								continue;
+
+							Command(delegate(IDbCommand command)
+							{
+								command.CommandText = Queries.InsertItemMetaData;
+
+								Parameter(command, "Id", SequentialGuid.Next());
+								Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
+								Parameter(command, "ItemId", item.ItemId);
+								Parameter(command, "Name", item.RemoteName);
+								Parameter(command, "Parent", GetParentName(item.RemoteName));
+								Parameter(command, "ServerUrl", serverUrl);
+								Parameter(command, "ItemRevision", item.RemoteChangesetId);
+								Parameter(command, "EffectiveRevision", revision);
+								Parameter(command, "DownloadUrl", item.DownloadUrl);
+								Parameter(command, "LastModifiedDate", item.RemoteDate);
+
+								command.ExecuteNonQuery();
+							});
+						}
 					}
-				}
-				finally
-				{
-					Events.RaiseFinishedCachingRevision(serverUrl, revision);
-				}
+					finally
+					{
+						Events.RaiseFinishedCachingRevision(serverUrl, revision);
+					}
+				});
 			});
 		}
 

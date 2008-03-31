@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics;
+using System.Threading;
 
 namespace SvnBridge.Infrastructure
 {
@@ -80,6 +81,27 @@ namespace SvnBridge.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// SQL CE doesn't support serializable transactions, which is what
+		/// we need, so we have to do this manually.
+		/// </summary>
+		protected void Lock(string serverPath, int revision, Action action)
+		{
+			using (Mutex mutex = new Mutex(false, serverPath + "@" + revision))
+			{
+				mutex.WaitOne();
+				try
+				{
+					action();
+				}
+				finally
+				{
+					mutex.ReleaseMutex();
+				}
+			}
+		}
+
+		[DebuggerNonUserCode]
 		protected static void Parameter(IDbCommand command, string name, object value)
 		{
 			IDbDataParameter parameter = command.CreateParameter();
