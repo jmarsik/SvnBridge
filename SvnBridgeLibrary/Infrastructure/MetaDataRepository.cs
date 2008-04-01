@@ -5,12 +5,14 @@ using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
+using SvnBridge.Proxies;
 using SvnBridge.SourceControl;
 using System.Data;
 
 namespace SvnBridge.Infrastructure
 {
-	public class MetaDataRepository : RepositoryBase, IMetaDataRepository
+	[Interceptor(typeof(TracingInterceptor))]
+	public class MetaDataRepository : DataAccessBase, IMetaDataRepository
 	{
 		private readonly ISourceControlService sourceControlService;
 		private readonly string serverUrl;
@@ -145,8 +147,6 @@ namespace SvnBridge.Infrastructure
 				if (IsInCache(revision, serverPath))
 					return;
 
-				serverPath = ToDirectory(serverPath, revision);
-
 				Events.RaiseStartingCachingRevision(serverUrl, revision);
 
 				try
@@ -158,6 +158,22 @@ namespace SvnBridge.Infrastructure
 																		 VersionSpec.FromChangeset(revision),
 																		 DeletedState.NonDeleted,
 																		 ItemType.Any);
+
+					// we optimize it here in case we tried to load a file, we load the entire
+					// directory. This tends to save a lot of round trips in many cases
+					if(items.Length==1 && items[0].ItemType == ItemType.File)
+					{
+						//change it to the directory name, can't use the Path class
+						// becuase that will change the '/' to '\'
+						serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+						items = sourceControlService.QueryItems(serverUrl,
+																credentials,
+																serverPath,
+																RecursionType.Full,
+																VersionSpec.FromChangeset(revision),
+																DeletedState.NonDeleted,
+																ItemType.Any);
+					}
 
 					Command(delegate(IDbCommand command)
 					{
@@ -219,24 +235,6 @@ namespace SvnBridge.Infrastructure
 			});
 		}
 
-		private string ToDirectory(string serverPath, int revision)
-		{
-			SourceItem[] items = sourceControlService.QueryItems(
-				serverUrl,
-				credentials,
-				serverPath,
-				RecursionType.None,
-				VersionSpec.FromChangeset(revision),
-				DeletedState.NonDeleted,
-				ItemType.Any);
-
-			if (items.Length == 0 || items[0].ItemType == ItemType.Folder)
-				return serverPath;
-			//can't use Path.GetDirectory() here, will turn / to \
-			int lastIndexOfSlash = serverPath.LastIndexOf('/');
-			return serverPath.Substring(0, lastIndexOfSlash);
-		}
-
 		private object GetParentName(string name)
 		{
 			int lastIndexOfSlash = name.LastIndexOf('/');
@@ -295,17 +293,6 @@ namespace SvnBridge.Infrastructure
 			{
 				ExecuteCommands(Queries.CreateDatabase.Split(new char[] { ';' }, StringSplitOptions.None), command);
 			});
-		}
-
-		private void ExecuteCommands(string[] commands, IDbCommand command)
-		{
-			foreach (string sql in commands)
-			{
-				command.CommandText = sql.Trim();
-				if (string.IsNullOrEmpty(command.CommandText))
-					continue;
-				command.ExecuteNonQuery();
-			}
 		}
 
 		public void EnsureDbExists()

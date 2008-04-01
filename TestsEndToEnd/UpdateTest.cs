@@ -7,7 +7,7 @@ namespace TestsEndToEnd
 {
     public class UpdateTest : EndToEndTestBase
     {
-        [Fact]
+        [SvnBridgeFact]
         public void CanUpdateWorkingCopy()
         {
             CheckoutAndChangeDirectory();
@@ -20,7 +20,7 @@ namespace TestsEndToEnd
                 );
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanUpdateWorkingCopyToPreviousVersion()
         {
             CheckoutAndChangeDirectory();
@@ -31,7 +31,7 @@ namespace TestsEndToEnd
             Svn("update test.txt --revision PREV");
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanUpdateWorkingCopyToPreviousVersion_AndRemoveFolder()
         {
             CheckoutAndChangeDirectory();
@@ -43,7 +43,7 @@ namespace TestsEndToEnd
             Svn("update foo --revision PREV");
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void AfterAnErrorWhenGettingFile_WillBeAbleToUpdateAgain()
         {
             CheckoutAndChangeDirectory();
@@ -65,7 +65,7 @@ namespace TestsEndToEnd
         }
 
 
-        [Fact]
+        [SvnBridgeFact]
         public void AfterAnErrorWhenGettingFile_WillBeAbleToUpdateAgain_AndGetModifiedFile()
         {
             CheckoutAndChangeDirectory();
@@ -88,7 +88,7 @@ namespace TestsEndToEnd
         }
 
 
-        [Fact]
+        [SvnBridgeFact]
         public void UpdatingFileWhenItIsMissingInWorkingCopy()
         {
             CheckoutAndChangeDirectory();
@@ -108,7 +108,7 @@ namespace TestsEndToEnd
             Assert.Equal("12312", File.ReadAllText("foo.bar"));
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void UpdatingFolderWhenItIsMissingInWorkingCopy()
         {
             CheckoutAndChangeDirectory();
@@ -131,7 +131,7 @@ namespace TestsEndToEnd
         }
 
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanGetLatestChangesWhenMovingBackward()
         {
             CheckoutAndChangeDirectory();
@@ -159,7 +159,7 @@ namespace TestsEndToEnd
             Assert.Equal("hab", File.ReadAllText("test.txt"));
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void WhenFileInFolderIsInPreviousVersionAndUpdatingToLatestShouldUpdateFile()
         {
             CheckoutAndChangeDirectory();

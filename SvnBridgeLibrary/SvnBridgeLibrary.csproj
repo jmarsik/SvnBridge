@@ -63,11 +63,14 @@
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
     <Compile Include="Infrastructure\Events.cs" />
+    <Compile Include="Infrastructure\Logging.cs" />
     <Compile Include="Infrastructure\MetaDataRepositoryFactory.cs" />
+    <Compile Include="Infrastructure\NullLogger.cs" />
+    <Compile Include="Infrastructure\SqlCeLogger.cs" />
     <Compile Include="Interfaces\IMetaDataRepository.cs" />
     <Compile Include="Infrastructure\MetaDataRepository.cs" />
     <Compile Include="Infrastructure\Queries.cs" />
-    <Compile Include="Infrastructure\RepositoryBase.cs" />
+    <Compile Include="Infrastructure\DataAccessBase.cs" />
     <Compile Include="Infrastructure\SequentialGuid.cs" />
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="Interfaces\IMetaDataRepositoryFactory.cs" />
@@ -97,7 +100,6 @@
     <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />
     <Compile Include="Infrastructure\BrokenXml.cs" />
     <Compile Include="Infrastructure\Clock.cs" />
-    <Compile Include="Infrastructure\FileLogger.cs" />
     <Compile Include="Infrastructure\Container.cs" />
     <Compile Include="Infrastructure\IAssociateWorkItemWithChangeset.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
@@ -121,6 +123,7 @@
     <Compile Include="Net\FinishedHandlingEventArgs.cs" />
     <Compile Include="Net\Proxy.cs" />
     <Compile Include="Net\ProxyInformation.cs" />
+    <Compile Include="Proxies\TracingInterceptor.cs" />
     <Compile Include="SourceControl\Dto\Activity.cs" />
     <Compile Include="SourceControl\Dto\ActivityItem.cs" />
     <Compile Include="SourceControl\Dto\ActivityItemAction.cs" />
@@ -134,6 +137,7 @@
     <Compile Include="Interfaces\ICredentialsProvider.cs" />
     <Compile Include="Interfaces\ISourceControlUtility.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />
+    <Compile Include="SourceControl\MissingItemMetaData.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
     <Compile Include="SourceControl\ProjectInformationRepository.cs" />
     <Compile Include="Net\ListenerContext.cs" />

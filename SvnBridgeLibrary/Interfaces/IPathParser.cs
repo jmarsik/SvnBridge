@@ -11,6 +11,8 @@ namespace SvnBridge.Interfaces
 		string GetProjectName(IHttpRequest request);
 		string GetApplicationPath(IHttpRequest request);
 		string GetActivityId(string href);
+		string GetActivityIdFromDestination(string href);
 		string ToApplicationPath(IHttpRequest request, string href);
+		string GetPathFromDestination(string href);
 	}
 }

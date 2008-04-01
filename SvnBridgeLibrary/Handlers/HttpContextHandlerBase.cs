@@ -121,5 +121,10 @@ namespace SvnBridge.Handlers
 				return ApplicationPath + href.Substring(1);
 			return ApplicationPath + href;
 		}
+
+		public string GetLocalPathFromUrl(string path)
+		{
+			return PathParser.GetLocalPath(httpContext.Request, path);
+		}
 	}
 }

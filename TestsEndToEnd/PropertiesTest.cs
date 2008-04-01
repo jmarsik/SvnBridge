@@ -5,7 +5,7 @@ namespace TestsEndToEnd
 {
     public class PropertiesTest : EndToEndTestBase
     {
-        [Fact]
+        [SvnBridgeFact]
         public void CanSetAndGetProperty()
         {
             CheckoutAndChangeDirectory();
@@ -21,7 +21,7 @@ namespace TestsEndToEnd
             Assert.Equal("WorkItem: %BUGID%"+Environment.NewLine, actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanSetAndGetSvnIgnore()
         {
             CheckoutAndChangeDirectory();
@@ -38,7 +38,7 @@ namespace TestsEndToEnd
         }
 
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanSetAndGetProperty_WithColon()
         {
             CheckoutAndChangeDirectory();
@@ -54,7 +54,7 @@ namespace TestsEndToEnd
             Assert.Equal("WorkItem: %BUGID%"+Environment.NewLine, actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanWriteAndReadBugTrackingProperties()
         {
             CheckoutAndChangeDirectory();
@@ -85,7 +85,7 @@ namespace TestsEndToEnd
             Assert.Equal("true", svn.Trim());
         }
 
-    	[Fact]
+    	[SvnBridgeFact]
     	public void CanRemoveProperty()
     	{
 			CheckoutAndChangeDirectory();

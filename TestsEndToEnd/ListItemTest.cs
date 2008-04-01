@@ -6,7 +6,7 @@ namespace TestsEndToEnd
 {
     public class ListItemTest : EndToEndTestBase
     {
-        [Fact]
+        [SvnBridgeFact]
         public void CanListFolderAndFile()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -19,7 +19,7 @@ test.txt
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListFolders()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -32,7 +32,7 @@ TestFolder2/
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListFoldersAndFilesRecursively()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -48,7 +48,7 @@ TestFolder2/text.txt
         }
 
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListPreviousVersion()
         {
             int version = CreateFolder(testPath + "/TestFolder1", true);
@@ -61,7 +61,7 @@ TestFolder2/text.txt
         }
 
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListPreviousVersion_UsingPrev()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -75,7 +75,7 @@ TestFolder2/text.txt
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListPreviousVersion_WhenDirectoryDoesNotExists()
         {
             CheckoutAndChangeDirectory();
@@ -86,7 +86,7 @@ TestFolder2/text.txt
                 );
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListPreviousVersionUsingDate()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -104,7 +104,7 @@ TestFolder2/text.txt
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListLatestUsingDate()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -118,7 +118,7 @@ test.txt
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListUsingDateBeforeRepositoryCreated()
         {
             CreateFolder(testPath + "/TestFolder1", true);
@@ -129,7 +129,7 @@ test.txt
             Assert.Contains("Unable to find repository location for", actual);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanListSingleFolder()
         {
             CreateFolder(testPath + "/TestFolder", true);

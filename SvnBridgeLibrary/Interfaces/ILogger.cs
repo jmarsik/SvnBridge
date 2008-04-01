@@ -7,5 +7,6 @@ namespace SvnBridge.Interfaces
     {
         void Error(string message, Exception exception);
         void Info(string message, Exception exception);
+		void Trace(string message, params object[] args);
     }
 }

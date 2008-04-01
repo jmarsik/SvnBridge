@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using SvnBridge.Interfaces;
+using SvnBridge.Net;
 
 namespace SvnBridge.Protocol
 {
@@ -27,9 +29,9 @@ namespace SvnBridge.Protocol
             get { return Entries[0].StartEmpty && Entries.Count == 1; }
         }
 
-        public bool IsMissing(string name)
+        public bool IsMissing(string localPath,string name)
         {
-            string path = new Uri(SrcPath).LocalPath;
+            string path = localPath;
             if (path.StartsWith("/"))
                 path = path.Substring(1);
             if (path.EndsWith("/") == false)

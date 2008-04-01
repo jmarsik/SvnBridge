@@ -40,10 +40,15 @@ namespace SvnBridge.PathParsing
 
 		public override string GetLocalPath(IHttpRequest request)
 		{
-			return GetLocalPath(request, request.Url.AbsoluteUri);
+			return GetLocalPath(request.Url.AbsoluteUri);
 		}
 
 		public override string GetLocalPath(IHttpRequest request, string url)
+		{
+			return GetLocalPath(url);
+		}
+
+		private string GetLocalPath(string url)
 		{
 			Uri urlAsUri = new Uri(url);
 			string path = urlAsUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
@@ -68,6 +73,11 @@ namespace SvnBridge.PathParsing
 			if (path.EndsWith("/") == false)
 				path = path + '/';
 			return path;
+		}
+
+		public override string GetPathFromDestination(string href)
+		{
+			return GetLocalPath(href);
 		}
 	}
 }

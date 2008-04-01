@@ -17,7 +17,7 @@ namespace IntegrationTests
 {
 	public abstract class TFSSourceControlProviderTestsBase : IDisposable
 	{
-		protected static string ServerUrl = Settings.Default.ServerUrl;
+		public string ServerUrl = Settings.Default.ServerUrl;
 		protected const string PROJECT_NAME = "SvnBridgeTesting";
 		protected readonly string _activityId;
 		protected string _activityIdRoot;
@@ -82,7 +82,7 @@ namespace IntegrationTests
 				tfsSourceControlService,
 				repository,
 				associateWorkItemWithChangeSet,
-				new FileLogger(),
+				new NullLogger(),
 				new NullCache(),
 				MockRepository.GenerateStub<IFileCache>(),
 				metaDataRepositoryFactory);

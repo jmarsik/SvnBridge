@@ -16,6 +16,7 @@ namespace SvnBridge.SourceControl
 	using Utility;
 	using System.Threading;
 
+	[Interceptor(typeof(TracingInterceptor))]
 	[Interceptor(typeof(RetryOnSocketExceptionsInterceptor))]
 	public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
 	{
@@ -31,8 +32,6 @@ namespace SvnBridge.SourceControl
 		private readonly string projectName;
 		private readonly string rootPath;
 		private readonly string serverUrl;
-
-		private int? latestChangeset;
 
 		private ILogger Logger
 		{
@@ -239,9 +238,7 @@ namespace SvnBridge.SourceControl
 		/// <returns></returns>
 		public int GetLatestVersion()
 		{
-			if (latestChangeset==null)
-				latestChangeset = SourceControlService.GetLatestChangeset(serverUrl, credentials);
-			return latestChangeset.Value;
+			return SourceControlService.GetLatestChangeset(serverUrl, credentials);
 		}
 
 		public LogItem GetLog(string path,

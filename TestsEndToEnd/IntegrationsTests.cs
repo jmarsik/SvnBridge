@@ -18,7 +18,7 @@ namespace TestsEndToEnd
         /// <summary>
         /// http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=9315
         /// </summary>
-        [Fact]
+        [SvnBridgeFact]
         public void FailToAddFileOnUpdateAfterAdd()
         {
             CheckoutAndChangeDirectory();
@@ -28,7 +28,7 @@ namespace TestsEndToEnd
             Svn("update");
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CommitRenamesOfFiles()
         {
             CheckoutAndChangeDirectory();
@@ -47,7 +47,7 @@ namespace TestsEndToEnd
             Svn("commit -m ren");
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CommitRenamesAndModificationOfFiles()
         {
             CheckoutAndChangeDirectory();
@@ -69,7 +69,7 @@ namespace TestsEndToEnd
             Svn("commit -m ren");
         }
 
-    	[Fact]
+    	[SvnBridgeFact]
     	public void WillClearExistingTempWorkSpacesOnCommit()
     	{
     		WriteFile(testPath + "/test1234", "!", true);
@@ -81,7 +81,7 @@ namespace TestsEndToEnd
 			Svn("commit -m test");
     	}
 
-		[Fact]
+		[SvnBridgeFact]
 		public void VerySlowCalculationOfUpdateDiff_ShouldNotCauseError()
 		{
 			CheckoutAndChangeDirectory();

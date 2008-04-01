@@ -38,6 +38,24 @@ AND	  Name LIKE @Path
 AND	  UserName = @UserName
 ";
 
+		public static string CreateLoggingDatabase = 
+			@"
+CREATE TABLE Logs
+(
+	[Id] INT IDENTITY PRIMARY KEY,
+	[Date] DATETIME DEFAULT(getdate()) NOT NULL,
+	[Level] NVARCHAR(15) NOT NULL,
+	[Message] NVARCHAR(500) NOT NULL,
+	[Exception] NVARCHAR(2000) NULL
+);
+";
+
+		public static string InsertLog = 
+			@"
+INSERT INTO Logs ([Level], [Message], [Exception])
+VALUES ( @Level, @Message, @Exception );
+";
+
 		public const string DeleteCache =
 			@"
 DELETE FROM ItemMetaData;

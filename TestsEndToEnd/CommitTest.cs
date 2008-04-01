@@ -6,7 +6,7 @@ namespace TestsEndToEnd
 {
     public class CommitTest : EndToEndTestBase
     {
-        [Fact]
+        [SvnBridgeFact]
         public void CanCommitNewFile()
         {
             CheckoutAndChangeDirectory();
@@ -18,7 +18,7 @@ namespace TestsEndToEnd
                 );
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanCommitBigFile()
         {
             CheckoutAndChangeDirectory();
@@ -33,6 +33,78 @@ namespace TestsEndToEnd
             string expected = File.ReadAllText(originalPath);
             Assert.Equal(expected, actual);
         }
+
+		[SvnBridgeFact]
+		public void CanCopyFile()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", "blah");
+			Svn("add test.txt");
+			Svn("commit -m \"big file\" ");
+			Svn("copy test.txt test2.txt");
+			Svn("commit -m copy");
+		}
+
+		[SvnBridgeFact]
+		public void CanRenamFile()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", "blah");
+			Svn("add test.txt");
+			Svn("commit -m \"big file\" ");
+			Svn("ren test.txt test2.txt");
+			Svn("commit -m copy");
+		}
+
+		[SvnBridgeFact]
+		public void CanRenamAndEditFile()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", "blah");
+			Svn("add test.txt");
+			Svn("commit -m \"big file\" ");
+			Svn("ren test.txt test2.txt");
+			File.WriteAllText("test.txt", "blah2");
+			Svn("commit -m copy");
+		}
+
+		[SvnBridgeFact]
+		public void CanEditAndRenamFile()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", "blah");
+			Svn("add test.txt");
+			Svn("commit -m \"big file\" ");
+			File.WriteAllText("test.txt", "blah2");
+			Svn("ren --force test.txt test2.txt");
+			File.WriteAllText("test.txt", "blah3");
+			Svn("commit -m copy");
+		}
+
+		[SvnBridgeFact]
+		public void CanCopyThenDeleteFile()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", "blah");
+			Svn("add test.txt");
+			Svn("commit -m \"big file\" ");
+			Svn("copy test.txt test2.txt");
+			Svn("del test.txt");
+			Svn("commit -m copy");
+		}
+
+		[SvnBridgeFact]
+		public void CanCopyEditThenDeleteFile()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", "blah");
+			Svn("add test.txt");
+			Svn("commit -m \"big file\" ");
+			Svn("copy test.txt test2.txt");
+			File.WriteAllText("test2.txt", "blah2");
+			Svn("del test.txt");
+			Svn("commit -m copy");
+		}
 
         private static void GenerateFile()
         {

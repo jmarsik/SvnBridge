@@ -32,7 +32,7 @@ namespace SvnBridge.Handlers
 			}
 		}
 
-		private static void PropPatch(ISourceControlProvider sourceControlProvider,
+		private void PropPatch(ISourceControlProvider sourceControlProvider,
 							   PropertyUpdateData request,
 							   string path,
 							   TextWriter output)
@@ -50,7 +50,7 @@ namespace SvnBridge.Handlers
 				if (request.Set.Prop.Properties[0].LocalName == "log")
 					OutputLogResponse(path, request, sourceControlProvider, activityId, output);
 				else
-					OutputSetPropertiesResponse(path, activityPath, request, sourceControlProvider, activityId, output, itemPath);
+					OutputSetPropertiesResponse(path, request, sourceControlProvider, activityId, output, itemPath);
 			}
 			else if (request.Remove.Prop.Properties.Count > 0)
 			{
@@ -58,7 +58,7 @@ namespace SvnBridge.Handlers
 				output.Write(
 					"<D:multistatus xmlns:D=\"DAV:\" xmlns:ns3=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns2=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
 				output.Write("<D:response>\n");
-				output.Write("<D:href>/" + Helper.Encode(path) + "</D:href>\n");
+				output.Write("<D:href>" + GetLocalPath("/"+ Helper.Encode(path)) + "</D:href>\n");
 				output.Write("<D:propstat>\n");
 
 				foreach (XmlElement element in request.Remove.Prop.Properties)
@@ -82,7 +82,7 @@ namespace SvnBridge.Handlers
 			return propertyName;
 		}
 
-		private static void OutputSetPropertiesResponse(string path, string activityPath, PropertyUpdateData request, ISourceControlProvider sourceControlProvider, string activityId, TextWriter output, string itemPath)
+		private void OutputSetPropertiesResponse(string path, PropertyUpdateData request, ISourceControlProvider sourceControlProvider, string activityId, TextWriter output, string itemPath)
 		{
 			foreach (XmlElement prop in request.Set.Prop.Properties)
 			{
@@ -95,7 +95,7 @@ namespace SvnBridge.Handlers
 			output.Write(
 				"<D:multistatus xmlns:D=\"DAV:\" xmlns:ns3=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns2=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
 			output.Write("<D:response>\n");
-			output.Write("<D:href>/" + Helper.Encode(path) + "</D:href>\n");
+			output.Write("<D:href>" + GetLocalPath("/"+Helper.Encode(path)) + "</D:href>\n");
 			output.Write("<D:propstat>\n");
 			foreach (XmlElement element in request.Set.Prop.Properties)
 			{
@@ -121,14 +121,14 @@ namespace SvnBridge.Handlers
 			output.Write("</D:prop>\n");
 		}
 
-		private static void OutputLogResponse(string path, PropertyUpdateData request, ISourceControlProvider sourceControlProvider, string activityId, TextWriter output)
+		private void OutputLogResponse(string path, PropertyUpdateData request, ISourceControlProvider sourceControlProvider, string activityId, TextWriter output)
 		{
 			sourceControlProvider.SetActivityComment(activityId, request.Set.Prop.Properties[0].InnerText);
 			output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 			output.Write(
 				"<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:ns0=\"DAV:\">\n");
 			output.Write("<D:response>\n");
-			output.Write("<D:href>/" + path + "</D:href>\n");
+			output.Write("<D:href>" + GetLocalPath("/"+path) + "</D:href>\n");
 			output.Write("<D:propstat>\n");
 			output.Write("<D:prop>\n");
 			output.Write("<ns1:log/>\r\n");

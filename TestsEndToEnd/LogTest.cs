@@ -4,7 +4,7 @@ namespace TestsEndToEnd
 {
     public class LogTest : EndToEndTestBase
     {
-        [Fact]
+        [SvnBridgeFact]
         public void CanAskForLogOfItemThatDoesNotExists()
         {
             string command = ExecuteCommandAndGetError("log " + testUrl + " --revision 1");
@@ -13,7 +13,7 @@ namespace TestsEndToEnd
                             command);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanGetLogByUrl()
         {
             int revision = CreateFolder(testPath + "/Test4", true);
@@ -27,7 +27,7 @@ namespace TestsEndToEnd
                 );
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanGetLogOfAllChanges_WithoutLimit()
         {
             CheckoutAndChangeDirectory();

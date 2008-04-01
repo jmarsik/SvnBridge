@@ -17,10 +17,8 @@ namespace SvnBridge.Handlers
 
             SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
 
-            string destination = Helper.DecodeC(request.Headers["Destination"]);
-            destination = destination.Substring(destination.IndexOf("/", destination.IndexOf("://") + 3));
-
-            string activityId = request.Headers["Destination"].Split('/')[6];
+			string activityId = PathParser.GetActivityIdFromDestination(request.Headers["Destination"]);
+			string destination = PathParser.GetPathFromDestination(Helper.DecodeC(request.Headers["Destination"]));
             path = path.Substring(path.IndexOf('/', 9));
             string targetPath = destination.Substring(destination.IndexOf('/', 12));
             sourceControlProvider.CopyItem(activityId, path, targetPath);

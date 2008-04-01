@@ -25,4 +25,13 @@ namespace SvnBridge.SourceControl
             get { return ItemType.Folder; }
         }
     }
+
+	 public class MissingFolderMetaData : FolderMetaData
+	 {
+	 	public MissingFolderMetaData(string name, int revision)
+	 	{
+	 		Name = name;
+	 		ItemRevision = revision;
+	 	}
+	 }
 }

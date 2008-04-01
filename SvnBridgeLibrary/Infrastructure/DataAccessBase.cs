@@ -2,19 +2,20 @@ using System;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics;
-using System.Threading;
 
 namespace SvnBridge.Infrastructure
 {
-	public class RepositoryBase
+	public class DataAccessBase
 	{
 		public delegate void Action();
 
-		private IDbConnection connection;
-		private IDbTransaction transaction;
+		[ThreadStatic]
+		private static IDbConnection connection;
+		[ThreadStatic]
+		private static IDbTransaction transaction;
 		protected string connectionString;
 
-		public RepositoryBase(string connectionString)
+		public DataAccessBase(string connectionString)
 		{
 			this.connectionString = connectionString;
 		}
@@ -62,6 +63,18 @@ namespace SvnBridge.Infrastructure
 				}
 			}
 		}
+
+		protected void ExecuteCommands(string[] commands, IDbCommand command)
+		{
+			foreach (string sql in commands)
+			{
+				command.CommandText = sql.Trim();
+				if (string.IsNullOrEmpty(command.CommandText))
+					continue;
+				command.ExecuteNonQuery();
+			}
+		}
+
 
 		[DebuggerNonUserCode]
 		protected void TransactionalCommand(Action<IDbCommand> action)

@@ -129,5 +129,14 @@ namespace SvnBridge.Properties {
                 this["ServerUrlFromRequest"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TraceEnabled {
+            get {
+                return ((bool)(this["TraceEnabled"]));
+            }
+        }
     }
 }

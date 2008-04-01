@@ -11,11 +11,17 @@ namespace SvnBridge.PathParsing
 		public abstract string GetLocalPath(IHttpRequest request, string url);
 		public abstract string GetProjectName(IHttpRequest request);
 		public abstract string GetApplicationPath(IHttpRequest request);
+		public abstract string GetPathFromDestination(string href);
 
 		public string GetActivityId(string href)
 		{
 			int activityIdStart = href.LastIndexOf('/') + 1;
 			return href.Substring(activityIdStart);
+		}
+
+		public string GetActivityIdFromDestination(string href)
+		{
+			return href.Split('/')[6];
 		}
 
 		public string ToApplicationPath(IHttpRequest request, string href)

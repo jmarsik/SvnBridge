@@ -1,5 +1,6 @@
 using System;
 using CodePlex.TfsLibrary.ObjectModel;
+using Rhino.Mocks.Impl;
 using Xunit;
 using Rhino.Mocks;
 using SvnBridge.Cache;
@@ -32,7 +33,7 @@ namespace SvnBridge.SourceControl
                 MockRepository.GenerateStub<ITFSSourceControlService>(),
                 MockRepository.GenerateStub<IProjectInformationRepository>(),
                 associateWorkItemWithChangeSet,
-                new FileLogger(),
+                new SvnBridge.Infrastructure.NullLogger(),
                 new NullCache(),
                 MockRepository.GenerateStub<IFileCache>(),
 				MockRepository.GenerateStub<IMetaDataRepositoryFactory>());

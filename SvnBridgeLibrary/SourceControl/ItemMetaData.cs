@@ -79,6 +79,10 @@ namespace SvnBridge.SourceControl
 			return item;
 		}
 
+		public override string ToString()
+		{
+			return Name + " @" + Revision;
+		}
     }
 }
 

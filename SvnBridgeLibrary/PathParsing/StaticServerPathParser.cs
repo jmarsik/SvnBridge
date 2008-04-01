@@ -45,5 +45,10 @@ namespace SvnBridge.PathParsing
 		{
 			return request.ApplicationPath;
 		}
+
+		public override string GetPathFromDestination(string href)
+		{
+			return href.Substring(href.IndexOf("/", href.IndexOf("://") + 3));
+		}
 	}
 }

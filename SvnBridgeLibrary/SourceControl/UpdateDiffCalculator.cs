@@ -68,6 +68,18 @@ namespace SvnBridge.SourceControl
 				}
 			}
 			FlattenDeletedFolders(root);
+			VerifyNoMissingItemMetaDataRemained(root);
+		}
+
+		private void VerifyNoMissingItemMetaDataRemained(FolderMetaData root)
+		{
+			foreach (ItemMetaData item in root.Items)
+			{
+				if(item is MissingItemMetaData || item is MissingFolderMetaData)
+					throw new InvalidOperationException("Found missing item metadata :" + item + " but those should not be returned from UpdateDiffCalculator");
+				if (item is FolderMetaData)
+					VerifyNoMissingItemMetaDataRemained((FolderMetaData)item);
+			}
 		}
 
 		private FindOrCreateResults FindItemOrCreateItem(FolderMetaData root, string pathRoot, string path, int targetVersion)
@@ -438,7 +450,14 @@ namespace SvnBridge.SourceControl
 					ItemMetaData item = sourceControlUtility.FindItem(folder, itemName);
 					if (item == null)
 					{
-						item = sourceControlProvider.GetItems(change.Item.RemoteChangesetId, itemName, Recursion.None);
+						item = sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
+						if (item == null)
+						{
+							if(lastNamePart)
+								item = new MissingItemMetaData(itemName, targetVersion);
+							else
+								item = new MissingFolderMetaData(itemName, targetVersion);
+						}
 						if (!lastNamePart)
 						{
 							StubFolderMetaData stubFolder = new StubFolderMetaData();

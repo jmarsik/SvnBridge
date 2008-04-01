@@ -15,6 +15,8 @@ namespace SvnBridge
 		[STAThread]
 		private static void Main(string[] args)
 		{
+			Logging.TraceEnabled = Settings.Default.TraceEnabled;
+
 			new BootStrapper().Start();
 
 			Application.EnableVisualStyles();

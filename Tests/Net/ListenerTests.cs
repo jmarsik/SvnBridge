@@ -11,7 +11,7 @@ namespace SvnBridge.Net
         [Fact]
         public void SetPortAfterStartThrows()
         {
-            Listener listener = new Listener(new FileLogger());
+            Listener listener = new Listener(new NullLogger());
             listener.Port = 10011;
             listener.Start(new StaticServerPathParser("http://foo"));
 
@@ -24,7 +24,7 @@ namespace SvnBridge.Net
         [Fact]
         public void StartWithoutSettingPortThrows()
         {
-            Listener listener = new Listener(new FileLogger());
+			Listener listener = new Listener(new NullLogger());
             
             Assert.Throws<InvalidOperationException>(
 				delegate { listener.Start(new StaticServerPathParser("http://foo")); });

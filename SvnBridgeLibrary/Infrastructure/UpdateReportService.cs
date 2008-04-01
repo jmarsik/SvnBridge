@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Handlers;
 using SvnBridge.Interfaces;
@@ -33,8 +34,8 @@ namespace SvnBridge.Infrastructure
             else
             {
                 bool existingFile = false;
-                if (!updateReportRequest.IsCheckOut &&
-                    updateReportRequest.IsMissing(item.Name) == false &&
+            	if (!updateReportRequest.IsCheckOut &&
+					updateReportRequest.IsMissing(handler.GetLocalPathFromUrl(updateReportRequest.SrcPath), item.Name) == false &&
                     sourceControlProvider.ItemExists(item.Name, int.Parse(updateReportRequest.Entries[0].Rev)))
                 {
                     existingFile = true;
@@ -120,8 +121,9 @@ namespace SvnBridge.Infrastructure
                 }
                 else
                 {
-                    if (!updateReportRequest.IsCheckOut &&
-                        updateReportRequest.IsMissing(folder.Name) == false &&
+                	string localPath = handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
+                	if (!updateReportRequest.IsCheckOut &&
+						updateReportRequest.IsMissing(localPath, folder.Name) == false &&
                         sourceControlProvider.ItemExists(folder.Name, int.Parse(updateReportRequest.Entries[0].Rev)))
                     {
                         existingFolder = true;
