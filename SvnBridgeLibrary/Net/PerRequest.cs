@@ -19,7 +19,7 @@ namespace SvnBridge.Net
 			{
 				if (HttpContext.Current != null)
 					return HttpContext.Current.Items;
-				return currentItems;
+				return currentItems ?? new Hashtable();
 			}
 		}
 	}
