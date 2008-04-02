@@ -15,12 +15,16 @@ namespace TestsEndToEnd
 	{
 		protected override IEnumerable<ITestCommand> EnumerateTestCommands(MethodInfo method)
 		{
-			IEnumerable<ITestCommand> commands = base.EnumerateTestCommands(method);
-			foreach (ITestCommand command in commands)
+			foreach (ITestCommand command in GetTestCommandsFromBase(method))
 			{
 				yield return new UsingStaticServerPathParser(command);
 				yield return new UsingRequestBasePathParser(command);
 			}
+		}
+
+		private IEnumerable<ITestCommand> GetTestCommandsFromBase(MethodInfo method)
+		{
+			return base.EnumerateTestCommands(method);
 		}
 	}
 
