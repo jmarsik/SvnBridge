@@ -9,10 +9,8 @@ namespace SvnBridge.Infrastructure
 	{
 		public delegate void Action();
 
-		[ThreadStatic]
-		private static IDbConnection connection;
-		[ThreadStatic]
-		private static IDbTransaction transaction;
+		private IDbConnection connection;
+		private IDbTransaction transaction;
 		protected string connectionString;
 
 		public DataAccessBase(string connectionString)

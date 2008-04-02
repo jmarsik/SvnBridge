@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Text;
+using Rhino.Mocks.Impl;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using Xunit;
 using Assert=CodePlex.NUnitExtensions.Assert;
 
@@ -93,7 +96,7 @@ namespace SvnBridge.Net
             StubStream stream = new StubStream(Encoding.ASCII.GetBytes(buffer.ToString()));
 
             Assert.DoesNotThrow(
-                delegate { new ListenerRequest(stream); });
+                delegate { new ListenerRequest(stream, new SvnBridge.NullImpl.NullLogger()); });
         }
 
         [Fact]
@@ -107,7 +110,7 @@ namespace SvnBridge.Net
             buffer.Append("12345");
             StubStream stream = new StubStream(Encoding.ASCII.GetBytes(buffer.ToString()));
 
-            ListenerRequest request = new ListenerRequest(stream);
+            ListenerRequest request = new ListenerRequest(stream, new NullImpl.NullLogger());
 
             Assert.Equal<string>("/foo/bar", request.Url.LocalPath);
         }

@@ -6,6 +6,9 @@ using System.Xml;
 using System.Xml.Serialization;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
+using SvnBridge.NullImpl;
 using Xunit;
 using SvnBridge;
 using SvnBridge.Net;
@@ -68,7 +71,7 @@ namespace Tests
             long responseStart = HttpStream.Position;
             HttpStream.Position = 0;
 
-            ListenerContext context = new ListenerContext(HttpStream);
+            ListenerContext context = new ListenerContext(HttpStream, new NullLogger());
             HttpDispatcher.Dispatch(context);
             context.Response.Close();
 

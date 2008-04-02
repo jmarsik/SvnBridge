@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.PathParsing;
 
@@ -95,7 +96,7 @@ namespace SvnBridge.Net
 
         private void Process(TcpClient tcpClient)
         {
-        	IHttpContext connection = new ListenerContext(tcpClient.GetStream());
+        	IHttpContext connection = new ListenerContext(tcpClient.GetStream(), logger);
             try
             {
                 DateTime start = DateTime.Now;

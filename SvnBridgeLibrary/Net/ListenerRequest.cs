@@ -16,11 +16,11 @@ namespace SvnBridge.Net
 		private string path;
 		private Uri url;
 
-		public ListenerRequest(Stream stream)
+		public ListenerRequest(Stream stream, ILogger logger)
 		{
 			headers = new NameValueCollection();
 
-			ParseRequest(stream);
+			ParseRequest(stream, logger);
 		}
 
 
@@ -79,7 +79,7 @@ namespace SvnBridge.Net
 			}
 		}
 
-		private void ParseRequest(Stream stream)
+		private void ParseRequest(Stream stream, ILogger logger)
 		{
 			MemoryStream buffer = new MemoryStream();
 
@@ -102,7 +102,7 @@ namespace SvnBridge.Net
 				buffer.Position = 0;
 				StreamReader reader = new StreamReader(buffer);
 				string message = reader.ReadToEnd();
-				IoC.Resolve<ILogger>().TraceMessage(message);
+				logger.TraceMessage(message);
 				buffer.Position = position;
 			}
 		}

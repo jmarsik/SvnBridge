@@ -1,4 +1,6 @@
 using System.IO;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Net
 {
@@ -7,9 +9,9 @@ namespace SvnBridge.Net
         private readonly ListenerRequest request;
         private readonly ListenerResponse response;
 
-        public ListenerContext(Stream stream)
+        public ListenerContext(Stream stream, ILogger logger)
         {
-            request = new ListenerRequest(stream);
+            request = new ListenerRequest(stream, logger);
             response = new ListenerResponse(request, stream);
         }
 
