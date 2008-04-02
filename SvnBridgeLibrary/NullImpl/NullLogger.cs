@@ -1,7 +1,7 @@
 using System;
 using SvnBridge.Interfaces;
 
-namespace SvnBridge.Infrastructure
+namespace SvnBridge.NullImpl
 {
 	public class NullLogger : ILogger
 	{
@@ -17,6 +17,11 @@ namespace SvnBridge.Infrastructure
 
 		public void Trace(string message, params object[] args)
 		{
+		}
+
+		public void TraceMessage(string message)
+		{
+			
 		}
 
 		#endregion

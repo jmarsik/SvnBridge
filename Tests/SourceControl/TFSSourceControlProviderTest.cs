@@ -6,6 +6,7 @@ using Rhino.Mocks;
 using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
+using NullLogger=SvnBridge.NullImpl.NullLogger;
 
 namespace SvnBridge.SourceControl
 {
@@ -33,7 +34,7 @@ namespace SvnBridge.SourceControl
                 MockRepository.GenerateStub<ITFSSourceControlService>(),
                 MockRepository.GenerateStub<IProjectInformationRepository>(),
                 associateWorkItemWithChangeSet,
-                new SvnBridge.Infrastructure.NullLogger(),
+                new NullLogger(),
                 new NullCache(),
                 MockRepository.GenerateStub<IFileCache>(),
 				MockRepository.GenerateStub<IMetaDataRepositoryFactory>());

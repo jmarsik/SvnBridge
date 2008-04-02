@@ -101,7 +101,7 @@ namespace SvnBridge.Infrastructure
 			else
 				serverPath = serverPath + path;
 
-			if (serverPath.EndsWith("/"))
+			if (serverPath.EndsWith("/") && serverPath != "$/")
 				serverPath = serverPath.Substring(0, serverPath.Length - 1);
 
 			return serverPath;
@@ -161,7 +161,7 @@ namespace SvnBridge.Infrastructure
 
 					// we optimize it here in case we tried to load a file, we load the entire
 					// directory. This tends to save a lot of round trips in many cases
-					if(items.Length==1 && items[0].ItemType == ItemType.File)
+					if (items.Length == 1 && items[0].ItemType == ItemType.File)
 					{
 						//change it to the directory name, can't use the Path class
 						// becuase that will change the '/' to '\'

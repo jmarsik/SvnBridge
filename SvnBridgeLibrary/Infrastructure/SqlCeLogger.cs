@@ -31,18 +31,33 @@ namespace SvnBridge.Infrastructure
 			Log("Trace", string.Format(message, args), null);
 		}
 
+		public void TraceMessage(string message)
+		{
+			if (Logging.TraceEnabled == false)
+				return;
+			Log("TraceMessage", message, null);
+		}
+
 		#endregion
 
 		private void Log(string level, string message, string exception)
 		{
-			TransactionalCommand(delegate(IDbCommand command)
+			try
 			{
-				command.CommandText = Queries.InsertLog;
-				Parameter(command, "Level", level);
-				Parameter(command, "Message", message);
-				Parameter(command, "Exception", exception);
-				command.ExecuteNonQuery();
-			});
+				TransactionalCommand(delegate(IDbCommand command)
+				{
+					command.CommandText = Queries.InsertLog;
+					Parameter(command, "Level", level);
+					Parameter(command, "Message", message);
+					Parameter(command, "Exception", exception);
+					command.ExecuteNonQuery();
+				});
+			}
+			catch (Exception)
+			{
+				//We don't have anything to do here, can't 
+				// fix errors in error handling code
+			}
 		}
 
 		public void EnsureDbExists()
@@ -62,13 +77,20 @@ namespace SvnBridge.Infrastructure
 
 		public void CreateDatabase()
 		{
-			SqlCeEngine engine = new SqlCeEngine(connectionString);
-			engine.CreateDatabase();
-
-			TransactionalCommand(delegate(IDbCommand command)
+			try
 			{
-				ExecuteCommands(Queries.CreateLoggingDatabase.Split(new char[] { ';' }, StringSplitOptions.None), command);
-			});
+				SqlCeEngine engine = new SqlCeEngine(connectionString);
+				engine.CreateDatabase();
+
+				TransactionalCommand(delegate(IDbCommand command)
+				{
+					ExecuteCommands(Queries.CreateLoggingDatabase.Split(new char[] { ';' }, StringSplitOptions.None), command);
+				});
+			}
+			catch (Exception)
+			{
+				// if we fail, nothing much we can do
+			}
 		}
 
 		#region ICanValidateMyEnvironment Members

@@ -3,6 +3,8 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Net
 {
@@ -94,6 +96,15 @@ namespace SvnBridge.Net
 			}
 
 			ReadMessageBody(stream, buffer);
+			if(Logging.TraceEnabled)
+			{
+				long position = buffer.Position;
+				buffer.Position = 0;
+				StreamReader reader = new StreamReader(buffer);
+				string message = reader.ReadToEnd();
+				IoC.Resolve<ILogger>().TraceMessage(message);
+				buffer.Position = position;
+			}
 		}
 
 		private static string ReadLine(Stream stream,

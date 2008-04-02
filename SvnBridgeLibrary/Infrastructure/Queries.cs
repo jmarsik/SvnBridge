@@ -38,15 +38,15 @@ AND	  Name LIKE @Path
 AND	  UserName = @UserName
 ";
 
-		public static string CreateLoggingDatabase = 
+		public static string CreateLoggingDatabase =
 			@"
 CREATE TABLE Logs
 (
 	[Id] INT IDENTITY PRIMARY KEY,
 	[Date] DATETIME DEFAULT(getdate()) NOT NULL,
 	[Level] NVARCHAR(15) NOT NULL,
-	[Message] NVARCHAR(500) NOT NULL,
-	[Exception] NVARCHAR(2000) NULL
+	[Message] NTEXT NOT NULL,
+	[Exception] NTEXT NULL
 );
 ";
 

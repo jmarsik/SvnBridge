@@ -11,6 +11,7 @@ using Rhino.Mocks;
 using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
+using SvnBridge.NullImpl;
 using SvnBridge.SourceControl;
 
 namespace IntegrationTests

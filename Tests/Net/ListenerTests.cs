@@ -1,7 +1,7 @@
 using System;
+using SvnBridge.NullImpl;
 using SvnBridge.PathParsing;
 using Xunit;
-using SvnBridge.Infrastructure;
 using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace SvnBridge.Net

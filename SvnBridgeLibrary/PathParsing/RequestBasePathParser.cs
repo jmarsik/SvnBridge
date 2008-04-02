@@ -28,11 +28,14 @@ namespace SvnBridge.PathParsing
 			string path = requestUrl.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
 			int firstIndexOfSlash = path.IndexOf('/');
 
-			if (firstIndexOfSlash == -1)
+			if (string.IsNullOrEmpty(path))
 			{
 				throw new InvalidOperationException("Could not find server url in the url (" + 
 					requestUrl.AbsoluteUri + "). Not valid when using the RequestBasePathParser");
 			}
+			
+			if(firstIndexOfSlash==-1)
+				return path;
 
 			string url = path.Substring(0, firstIndexOfSlash);
 			return url;

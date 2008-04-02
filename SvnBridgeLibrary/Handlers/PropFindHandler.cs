@@ -133,7 +133,7 @@ namespace SvnBridge.Handlers
 
 			if (item == null)
 			{
-				throw new InvalidOperationException("There is no item " + requestPath + " in revision " + revision);
+				throw new FileNotFoundException("There is no item " + requestPath + " in revision " + revision);
 			}
 
 			using (StreamWriter writer = new StreamWriter(outputStream))
