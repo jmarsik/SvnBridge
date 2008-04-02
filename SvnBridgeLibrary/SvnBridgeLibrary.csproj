@@ -65,6 +65,7 @@
     <Compile Include="Infrastructure\Events.cs" />
     <Compile Include="Infrastructure\Logging.cs" />
     <Compile Include="Infrastructure\MetaDataRepositoryFactory.cs" />
+    <Compile Include="Net\PerRequest.cs" />
     <Compile Include="NullImpl\NullLogger.cs" />
     <Compile Include="Infrastructure\SqlCeLogger.cs" />
     <Compile Include="Interfaces\IMetaDataRepository.cs" />

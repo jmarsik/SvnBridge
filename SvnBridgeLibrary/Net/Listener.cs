@@ -101,6 +101,7 @@ namespace SvnBridge.Net
                 DateTime start = DateTime.Now;
                 try
                 {
+					PerRequest.Init();
                     dispatcher.Dispatch(connection);
                 }
                 catch (Exception exception)

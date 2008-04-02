@@ -1,3 +1,5 @@
+using SvnBridge.Net;
+
 namespace SvnBridge.SourceControl
 {
 	using System;
@@ -238,7 +240,12 @@ namespace SvnBridge.SourceControl
 		/// <returns></returns>
 		public int GetLatestVersion()
 		{
-			return SourceControlService.GetLatestChangeset(serverUrl, credentials);
+			const string latestVersion = "Repository.Latest.Version";
+			if (PerRequest.Items[latestVersion] != null)
+				return (int) PerRequest.Items[latestVersion];
+			int changeset = SourceControlService.GetLatestChangeset(serverUrl, credentials);
+			PerRequest.Items[latestVersion] = changeset;
+			return changeset;
 		}
 
 		public LogItem GetLog(string path,
