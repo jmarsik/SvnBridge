@@ -6,6 +6,7 @@ using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using SvnBridge.Presenters;
 using SvnBridge.Properties;
+using SvnBridge.Utility;
 using SvnBridge.Views;
 
 namespace SvnBridge
@@ -46,7 +47,11 @@ namespace SvnBridge
 			ProxyInformation proxyInfo = GetProxyInfo();
 
 			bool specifiedTfsUrl = string.IsNullOrEmpty(tfsUrl) == false;
-			bool hasPortAndServerFromRequest = (port != null && ShouldGetServerFromRequest() == true);
+			bool hasPortAndServerFromRequest = 
+				port != null && 
+				ShouldGetServerFromRequest() == true && 
+				Helper.IsPortInUseOnLocalHost(port.Value);
+
 			if (specifiedTfsUrl || hasPortAndServerFromRequest ||
 			    TryGetSettings(ref tfsUrl, ref port, proxyInfo))
 			{
