@@ -174,5 +174,65 @@ namespace TestsEndToEnd
             Svn("update");
             Assert.Equal("def", File.ReadAllText("TestFolder1/blah.txt"));
         }
+
+
+		[SvnBridgeFact]
+		public void UpdateAfterEditAndRenameOperation()
+		{
+			CheckoutAndChangeDirectory();
+
+			CreateFolder(testPath + "/TestFolder1", true);
+			WriteFile(testPath + "/TestFolder1/blah.txt", "abc", true);
+			RenameItem(testPath + "/TestFolder1/blah.txt", testPath+"/TestFolder1/blah2.txt", false);
+			UpdateFile(testPath + "/TestFolder1/blah2.txt", "bcd", true);
+
+			Svn("update");
+
+			Assert.Equal("bcd", File.ReadAllText("TestFolder1/blah2.txt"));
+		}
+
+
+		[SvnBridgeFact]
+		public void UpdateAfterEditThenBackOneVersion()
+		{
+			CheckoutAndChangeDirectory();
+
+			CreateFolder(testPath + "/TestFolder1", true);
+			WriteFile(testPath + "/TestFolder1/blah.txt", "abc", true);
+			Svn("update");
+			WriteFile(testPath + "/test.txt", "abc", true);
+			CreateFolder(testPath + "/TestFolder2", true);
+			Svn("update TestFolder1 -r PREV");
+		}
+
+		[SvnBridgeFact]
+		public void UpdateAfterEditAndMovePathOperation()
+		{
+			CheckoutAndChangeDirectory();
+
+			CreateFolder(testPath + "/TestFolder1", true);
+			WriteFile(testPath + "/TestFolder1/blah.txt", "abc", true);
+			Svn("update");
+			WriteFile(testPath + "/test.txt", "abc", true);
+			CreateFolder(testPath + "/TestFolder2", true);
+			Svn("update");
+
+			RenameItem(testPath + "/TestFolder1/blah.txt", testPath + "/TestFolder2/blah.txt", true);
+
+			Svn("propset test file .");
+
+			// the root directory will now be at the head revision, but the other 
+			// directories are not updated, so we have different versions
+			Svn("commit -m \"force different versions in directories\" ");
+
+			UpdateFile(testPath + "/TestFolder1/blah.txt", "143", true);
+			UpdateFile(testPath + "/TestFolder2/blah.txt", "bcd", true);
+			UpdateFile(testPath + "/TestFolder1/blah.txt", "cvb", true);
+
+
+			Svn("update");
+
+			Assert.Equal("bcd", File.ReadAllText("TestFolder2/blah.txt"));
+		}
     }
 }
