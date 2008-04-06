@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Xml;
 using IntegrationTests;
 using SvnBridge;
 using SvnBridge.Cache;
@@ -151,6 +152,41 @@ namespace TestsEndToEnd
 				_provider.MakeActivity(_activityId);
 			}
 			return output.ToString();
+		}
+
+		protected XmlDocument SvnXml(string command)
+		{
+			StringBuilder output = new StringBuilder();
+			string err = null;
+			ExecuteInternal(command, delegate(Process svn)
+			{
+				ThreadPool.QueueUserWorkItem(delegate
+				{
+					err = svn.StandardError.ReadToEnd();
+				});
+				ThreadPool.QueueUserWorkItem(delegate
+				{
+					string line;
+					while ((line = svn.StandardOutput.ReadLine()) != null)
+					{
+						Console.WriteLine(line);
+						output.AppendLine(line);
+					}
+				});
+			});
+			if (string.IsNullOrEmpty(err) == false)
+			{
+				throw new InvalidOperationException("Failed to execute command: " + err);
+			}
+			if (command.StartsWith("commit"))
+			{
+				// we need to recreate the work space, because
+				// a commit will kill all existing workspaces
+				_provider.MakeActivity(_activityId);
+			}
+			XmlDocument document = new XmlDocument();
+			document.LoadXml(output.ToString());
+			return document;
 		}
 
 		private static void ExecuteInternal(string command, Action<Process> process)

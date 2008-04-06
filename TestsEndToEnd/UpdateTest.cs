@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Xml;
 using Xunit;
 
 namespace TestsEndToEnd
@@ -233,6 +234,32 @@ namespace TestsEndToEnd
 			Svn("update");
 
 			Assert.Equal("bcd", File.ReadAllText("TestFolder2/blah.txt"));
+		}
+
+		[SvnBridgeFact]
+		public void UpdateFileInSubSubDirectoryThenUpdateRepositoryWillUpdateAllRevisions()
+		{
+			CheckoutAndChangeDirectory();
+
+			CreateFolder(testPath + "/trunk", true);
+			WriteFile(testPath + "/test.txt", "blah", true);
+			CreateFolder(testPath + "/trunk/b", true);
+			WriteFile(testPath + "/trunk/test.txt", "blah", true);
+			WriteFile(testPath + "/trunk/b/asdf.txt", "blah", true);
+
+			Svn("update");
+
+			File.WriteAllText("trunk/b/asdf.txt", "adsa");
+
+			Svn("commit trunk/b/asdf.txt -m test");
+			Svn("update");
+			XmlDocument xml = SvnXml("info --xml -R");
+			int version = base._provider.GetLatestVersion();
+			foreach (XmlNode node in xml.SelectNodes("/info/entry/@revision"))
+			{
+				Assert.Equal(version, int.Parse(node.Value));
+			}
+
 		}
     }
 }
