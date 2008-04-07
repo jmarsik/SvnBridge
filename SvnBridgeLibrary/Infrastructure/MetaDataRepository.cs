@@ -151,29 +151,11 @@ namespace SvnBridge.Infrastructure
 
 				try
 				{
-					SourceItem[] items = sourceControlService.QueryItems(serverUrl,
+					SourceItemReader items = ((TFSSourceControlService)sourceControlService).QueryItemsReader(serverUrl,
 																		 credentials,
 																		 serverPath,
 																		 RecursionType.Full,
-																		 VersionSpec.FromChangeset(revision),
-																		 DeletedState.NonDeleted,
-																		 ItemType.Any);
-
-					// we optimize it here in case we tried to load a file, we load the entire
-					// directory. This tends to save a lot of round trips in many cases
-					if (items.Length == 1 && items[0].ItemType == ItemType.File)
-					{
-						//change it to the directory name, can't use the Path class
-						// becuase that will change the '/' to '\'
-						serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
-						items = sourceControlService.QueryItems(serverUrl,
-																credentials,
-																serverPath,
-																RecursionType.Full,
-																VersionSpec.FromChangeset(revision),
-																DeletedState.NonDeleted,
-																ItemType.Any);
-					}
+																		 VersionSpec.FromChangeset(revision));
 
 					Command(delegate(IDbCommand command)
 					{
@@ -185,9 +167,26 @@ namespace SvnBridge.Infrastructure
 						command.ExecuteNonQuery();
 					});
 
-					foreach (SourceItem sourceItem in items)
+                    bool firstRead = true;
+                    while (items.Read())
 					{
-						SourceItem item = sourceItem;
+                        // we optimize it here in case we tried to load a file, we load the entire
+                        // directory. This tends to save a lot of round trips in many cases
+                        if (firstRead && items.SourceItem.ItemType == ItemType.File)
+                        {
+                            //change it to the directory name, can't use the Path class
+                            // because that will change the '/' to '\'
+                            serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+                            items = ((TFSSourceControlService)sourceControlService).QueryItemsReader(serverUrl,
+                                                                    credentials,
+                                                                    serverPath,
+                                                                    RecursionType.Full,
+                                                                    VersionSpec.FromChangeset(revision));
+                            items.Read();
+                        }
+                        firstRead = false;
+
+                        SourceItem item = items.SourceItem;
 
 						bool alreadyExists = false;
 

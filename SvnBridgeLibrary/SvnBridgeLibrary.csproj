@@ -207,6 +207,7 @@
     <Compile Include="SourceControl\RepositoryFactoryHelper.cs" />
     <Compile Include="SourceControl\SourceControlUtility.cs" />
     <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
+    <Compile Include="SourceControl\SourceItemReader.cs" />
     <Compile Include="SourceControl\StubFolderMetaData.cs" />
     <Compile Include="SourceControl\TFSSourceControlService.cs" />
     <Compile Include="SourceControl\TFSSourceControlProvider.cs">

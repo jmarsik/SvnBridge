@@ -36,6 +36,7 @@ WHERE EffectiveRevision = @Revision
 AND   ServerUrl = @ServerUrl
 AND	  Name LIKE @Path
 AND	  UserName = @UserName
+ORDER BY [Name]
 ";
 
 		public static string CreateLoggingDatabase =
