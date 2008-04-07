@@ -6,7 +6,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
-using IntegrationTests.Properties;
+using TestsIntegration.Properties;
 using Rhino.Mocks;
 using SvnBridge.Cache;
 using SvnBridge.Infrastructure;

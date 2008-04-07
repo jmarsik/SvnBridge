@@ -7,8 +7,8 @@
     <ProjectGuid>{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IntegrationTests</RootNamespace>
-    <AssemblyName>IntegrationTests</AssemblyName>
+    <RootNamespace>TestsIntegration</RootNamespace>
+    <AssemblyName>TestsIntegration</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
