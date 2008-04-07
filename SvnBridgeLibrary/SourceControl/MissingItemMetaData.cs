@@ -11,5 +11,10 @@ namespace SvnBridge.SourceControl
 			Name = name;
 			ItemRevision = revision;
 		}
+
+		public override string ToString()
+		{
+			return "Missing: " + base.ToString();
+		}
 	}
 }

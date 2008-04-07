@@ -17,7 +17,9 @@ namespace TestsEndToEnd
 		{
 			foreach (ITestCommand command in GetTestCommandsFromBase(method))
 			{
+				Console.WriteLine("Test (UsingStaticServerPathParser): {0}", method);
 				yield return new UsingStaticServerPathParser(command);
+				Console.WriteLine("Test (UsingRequestBasePathParser): {0}", method); 
 				yield return new UsingRequestBasePathParser(command);
 			}
 		}

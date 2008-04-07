@@ -163,6 +163,11 @@ namespace SvnBridge.SourceControl
 						}
 						else if (IsEditOperation(change))
 						{
+							// We may have edit & rename operations
+							if (IsRenameOperation(change))
+							{
+								PerformRename(targetVersion, checkoutRootPath, history, change, root, updatingForwardInTime);
+							}
 							if (updatingForwardInTime == false)
 							{
 								change.Item.RemoteChangesetId -= 1;// we turn the edit around, basically
