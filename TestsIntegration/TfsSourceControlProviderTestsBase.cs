@@ -93,7 +93,7 @@ namespace IntegrationTests
 		{
 			if (string.IsNullOrEmpty(Settings.Default.Username.Trim()))
 			{
-				return null;
+				return CredentialCache.DefaultNetworkCredentials;
 			}
 			return new NetworkCredential(Settings.Default.Username, Settings.Default.Password, Settings.Default.Domain);
 		}
