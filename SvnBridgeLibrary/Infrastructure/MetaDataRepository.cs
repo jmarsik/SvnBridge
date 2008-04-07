@@ -14,13 +14,13 @@ namespace SvnBridge.Infrastructure
 	[Interceptor(typeof(TracingInterceptor))]
 	public class MetaDataRepository : DataAccessBase, IMetaDataRepository
 	{
-		private readonly ISourceControlService sourceControlService;
+		private readonly ITFSSourceControlService sourceControlService;
 		private readonly string serverUrl;
 		private readonly string rootPath;
 		private readonly ICredentials credentials;
 
 		public MetaDataRepository(
-			ISourceControlService sourceControlService,
+			ITFSSourceControlService sourceControlService,
 			ICredentials credentials,
 			string serverUrl,
 			string rootPath,
@@ -151,7 +151,7 @@ namespace SvnBridge.Infrastructure
 
 				try
 				{
-					SourceItemReader items = ((TFSSourceControlService)sourceControlService).QueryItemsReader(serverUrl,
+					SourceItemReader items = sourceControlService.QueryItemsReader(serverUrl,
 																		 credentials,
 																		 serverPath,
 																		 RecursionType.Full,
@@ -177,7 +177,7 @@ namespace SvnBridge.Infrastructure
                             //change it to the directory name, can't use the Path class
                             // because that will change the '/' to '\'
                             serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
-                            items = ((TFSSourceControlService)sourceControlService).QueryItemsReader(serverUrl,
+                            items = sourceControlService.QueryItemsReader(serverUrl,
                                                                     credentials,
                                                                     serverPath,
                                                                     RecursionType.Full,
