@@ -37,6 +37,9 @@ namespace SvnBridge.Protocol
 
 		public bool IsMissing(string localPath, string name)
 		{
+			if (Missing == null || Missing.Count == 0)
+				return false;
+
 			string path = localPath;
 			if (path.StartsWith("/"))
 				path = path.Substring(1);
@@ -44,7 +47,15 @@ namespace SvnBridge.Protocol
 				path += "/";
 			if (name.StartsWith(path))
 				name = name.Substring(path.Length);
-			return Missing != null && Missing.Contains(name);
+			
+			if(Missing.Contains(name))
+				return true;
+			foreach (string missing in Missing)
+			{
+				if(name.StartsWith(missing))// the missing is the parent of this item
+					return true;
+			}
+			return false;
 		}
 
 		/// <summary>

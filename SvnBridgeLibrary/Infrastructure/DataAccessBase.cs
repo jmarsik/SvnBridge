@@ -20,6 +20,7 @@ namespace SvnBridge.Infrastructure
 
 
 		[DebuggerNonUserCode]
+		[DebuggerStepThrough]
 		protected void Transaction(Action action)
 		{
 			bool responsibleForClosingConnection = connection == null;
@@ -75,6 +76,7 @@ namespace SvnBridge.Infrastructure
 
 
 		[DebuggerNonUserCode]
+		[DebuggerStepThrough]
 		protected void TransactionalCommand(Action<IDbCommand> action)
 		{
 			Transaction(delegate
@@ -84,6 +86,7 @@ namespace SvnBridge.Infrastructure
 		}
 
 		[DebuggerNonUserCode]
+		[DebuggerStepThrough]
 		protected void Command(Action<IDbCommand> action)
 		{
 			using (IDbCommand command = connection.CreateCommand())
@@ -94,6 +97,7 @@ namespace SvnBridge.Infrastructure
 		}
 
 		[DebuggerNonUserCode]
+		[DebuggerStepThrough]
 		protected static void Parameter(IDbCommand command, string name, object value)
 		{
 			IDbDataParameter parameter = command.CreateParameter();

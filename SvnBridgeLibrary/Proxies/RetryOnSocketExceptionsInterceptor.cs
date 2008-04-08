@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -7,6 +8,7 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.Proxies
 {
+	[DebuggerStepThrough]
     public class RetryOnSocketExceptionsInterceptor : IInterceptor
     {
         private readonly ILogger logger;

@@ -315,6 +315,51 @@ namespace TestsEndToEnd
 		}
 
 
+		[SvnBridgeFact]
+		public void UpdateAfterRemovingFolderFromFileSystemShouldReturnFolder()
+		{
+			CreateFolder(testPath + "/testFolder1", true);
+			CheckoutAndChangeDirectory();
+
+			ForAllFilesIn("testFolder1", delegate(FileInfo info)
+			{
+				info.Attributes = info.Attributes & ~FileAttributes.ReadOnly;
+			});
+			Directory.Delete("testFolder1", true);
+
+			Svn("update");
+			Assert.True(Directory.Exists("testFolder1"));
+		}
+
+		[SvnBridgeFact]
+		public void UpdateAfterRemovingFolderFromFileSystemShouldReturnFolderAndAllItsFiles()
+		{
+			CreateFolder(testPath + "/testFolder1", true);
+			WriteFile(testPath + "/testFolder1/blah.txt", "aas", true);
+			CheckoutAndChangeDirectory();
+			Assert.Equal("aas", File.ReadAllText("testFolder1/blah.txt"));
+		
+			ForAllFilesIn("testFolder1", delegate(FileInfo info)
+			{
+				info.Attributes = info.Attributes & ~FileAttributes.ReadOnly;
+			});
+			Directory.Delete("testFolder1", true);
+
+			Svn("update");
+			Assert.Equal("aas", File.ReadAllText("testFolder1/blah.txt"));
+		}
+
+
+		[SvnBridgeFact]
+		public void UpdateAfterRemovingFileFromFileSystemShouldReturnFile()
+		{
+			WriteFile(testPath + "/test.txt", "abc", true);
+			CheckoutAndChangeDirectory();
+			File.Delete("test.txt");
+			Svn("update");
+			Assert.Equal("abc", File.ReadAllText("test.txt"));
+		}
+
 		[SvnBridgeFact(Skip = "This requires sending diffs to the client")]
 		public void UpdateAfterCommitShouldMergeChangesFromRepository()
 		{

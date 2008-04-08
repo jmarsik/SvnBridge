@@ -15,6 +15,9 @@ namespace TestsEndToEnd
 	{
 		protected override IEnumerable<ITestCommand> EnumerateTestCommands(MethodInfo method)
 		{
+			if (Skip != null)
+				yield return new SkipCommand(method);
+
 			foreach (ITestCommand command in GetTestCommandsFromBase(method))
 			{
 				using(new ConsoleColorer(ConsoleColor.Gray))

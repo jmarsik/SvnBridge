@@ -84,12 +84,12 @@ namespace TestsEndToEnd
 		protected int port;
 		private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 
-		private static void ForAllFilesInCurrentDirectory(Action<FileInfo> action)
+		protected static void ForAllFilesInCurrentDirectory(Action<FileInfo> action)
 		{
 			ForAllFilesIn(Environment.CurrentDirectory, action);
 		}
 
-		private static void ForAllFilesIn(string directory,
+		protected static void ForAllFilesIn(string directory,
 										  Action<FileInfo> action)
 		{
 			foreach (string file in Directory.GetFiles(directory))

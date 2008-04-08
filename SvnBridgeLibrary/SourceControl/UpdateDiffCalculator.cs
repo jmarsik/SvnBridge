@@ -48,7 +48,7 @@ namespace SvnBridge.SourceControl
 						continue;
 					if (itemVersionFrom != versionTo)
 					{
-						FindOrCreateResults results = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo);
+						FindOrCreateResults results = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo, Recursion.None);
 
 						bool changed = CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, root,
 													   itemVersionFrom, versionTo);
@@ -61,7 +61,7 @@ namespace SvnBridge.SourceControl
 			{
 				if (sourceControlProvider.ItemExists(checkoutRootPath + "/" + missingItem, versionTo))
 				{
-					FindItemOrCreateItem(root, checkoutRootPath, missingItem, versionTo);
+					FindItemOrCreateItem(root, checkoutRootPath, missingItem, versionTo, Recursion.Full);
 				}
 			}
 			FlattenDeletedFolders(root);
@@ -79,7 +79,8 @@ namespace SvnBridge.SourceControl
 			}
 		}
 
-		private FindOrCreateResults FindItemOrCreateItem(FolderMetaData root, string pathRoot, string path, int targetVersion)
+		private FindOrCreateResults FindItemOrCreateItem(FolderMetaData root, 
+			string pathRoot, string path, int targetVersion, Recursion recursion)
 		{
 			FindOrCreateResults results = new FindOrCreateResults();
 			FolderMetaData folder = root;
@@ -95,11 +96,11 @@ namespace SvnBridge.SourceControl
 				{
 					if (lastNamePart)
 					{
-						item = sourceControlProvider.GetItemsWithoutProperties(targetVersion, itemName, Recursion.None);
+						item = sourceControlProvider.GetItems(targetVersion, itemName, recursion);
 					}
 					else
 					{
-						FolderMetaData subFolder = (FolderMetaData)sourceControlProvider.GetItemsWithoutProperties(targetVersion, itemName, Recursion.None);
+						FolderMetaData subFolder = (FolderMetaData)sourceControlProvider.GetItems(targetVersion, itemName, recursion);
 						item = subFolder;
 					}
 

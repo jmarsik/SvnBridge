@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
 using SvnBridge.Infrastructure;
@@ -7,6 +8,7 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.Proxies
 {
+	[DebuggerStepThrough]
 	public class TracingInterceptor : IInterceptor
 	{
 		private static IDictionary<Type, XmlSerializer> typeToXmlSerializers = new Dictionary<Type, XmlSerializer>();
