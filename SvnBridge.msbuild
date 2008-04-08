@@ -43,11 +43,10 @@
 
 	<Target Name="EndToEndTest" DependsOnTargets="Build">
 		<xunit Assembly="TestsEndToEnd\bin\$(BuildType)\TestsEndToEnd.dll" Xml="TestsEndToEnd.results.xml"/>
-		<!-- <Exec Command="References\xunit.console.exe  TestsEndToEnd\bin\$(BuildType)\TestsEndToEnd.dll /xml TestsEndToEnd.results.xml "/> -->
 	</Target>
 	
 	<Target Name="IntegrationTest" DependsOnTargets="Build">
-		<Exec Command="References\xunit.console.exe  TestsIntegration\bin\$(BuildType)\TestsIntegration.dll  /xml TestsIntegration.results.xml "/>
+		<xunit Assembly="TestsIntegration\bin\$(BuildType)\TestsIntegration.dll" Xml="TestsIntegration.results.xml"/>
 	</Target>
 
 	<Target Name="TestAll" DependsOnTargets="UnitTest;ProtocolTest;IntegrationTest;EndToEndTest">
