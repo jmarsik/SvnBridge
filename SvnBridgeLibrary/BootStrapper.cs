@@ -36,9 +36,9 @@ namespace SvnBridge
         public BootStrapper()
         {
 			IoC.Container.Configuration["connectionString"] = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
-			IoC.Container.Configuration["loggerConnectionString"] = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs.sdf");
-
-            List<Assembly> asms = new List<Assembly>();
+        	IoC.Container.Configuration["loggerConnectionString"] = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs.sdf");
+			
+			List<Assembly> asms = new List<Assembly>();
             List<string> names = new List<string>();
             foreach (Type type in representiveComponents)
             {

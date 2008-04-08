@@ -17,6 +17,7 @@ namespace SvnBridge
 		private static void Main(string[] args)
 		{
 			Logging.TraceEnabled = Settings.Default.TraceEnabled;
+			Logging.MethodTraceEnabled = false;
 
 			new BootStrapper().Start();
 
@@ -50,7 +51,7 @@ namespace SvnBridge
 			bool hasPortAndServerFromRequest = 
 				port != null && 
 				ShouldGetServerFromRequest() == true && 
-				Helper.IsPortInUseOnLocalHost(port.Value);
+				Helper.IsPortInUseOnLocalHost(port.Value) == false;
 
 			if (specifiedTfsUrl || hasPortAndServerFromRequest ||
 			    TryGetSettings(ref tfsUrl, ref port, proxyInfo))

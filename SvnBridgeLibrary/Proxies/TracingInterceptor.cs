@@ -20,7 +20,7 @@ namespace SvnBridge.Proxies
 
 		public void Invoke(IInvocation invocation)
 		{
-			if (Logging.TraceEnabled)
+			if (Logging.MethodTraceEnabled)
 				TraceCallAndParamters(invocation);
 
 			invocation.Proceed();
