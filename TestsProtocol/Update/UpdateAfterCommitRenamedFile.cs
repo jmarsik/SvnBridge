@@ -4,7 +4,7 @@ using CodePlex.TfsLibrary;
 using Xunit;
 using SvnBridge.SourceControl;
 
-namespace Tests
+namespace ProtocolTests
 {
     public class UpdateAfterCommitRenamedFile : ProtocolTestsBase
     {

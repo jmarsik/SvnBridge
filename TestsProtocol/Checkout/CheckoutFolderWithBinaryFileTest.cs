@@ -5,7 +5,7 @@ using Xunit;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 
-namespace Tests
+namespace ProtocolTests
 {
     public class CheckoutFolderWithBinaryFileTest : ProtocolTestsBase
     {

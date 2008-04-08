@@ -3,7 +3,7 @@ using Xunit;
 using SvnBridge.Exceptions;
 using SvnBridge.SourceControl;
 
-namespace Tests
+namespace ProtocolTests
 {
     public class CommitAddFolderThatAlreadyExistsTest : ProtocolTestsBase
     {

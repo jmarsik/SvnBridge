@@ -7,7 +7,7 @@ using SvnBridge.Exceptions;
 using SvnBridge.SourceControl;
 using SvnBridge.Infrastructure;
 
-namespace Tests
+namespace IntegrationTests
 {
 	using IntegrationTests;
 	using Xunit;

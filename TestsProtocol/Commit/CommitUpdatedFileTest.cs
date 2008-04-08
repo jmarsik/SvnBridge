@@ -5,7 +5,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using Xunit;
 using SvnBridge.SourceControl;
 
-namespace Tests
+namespace ProtocolTests
 {
     public class CommitUpdatedFileTest : ProtocolTestsBase
     {
