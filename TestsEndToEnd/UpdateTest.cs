@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -259,6 +258,81 @@ namespace TestsEndToEnd
 			{
 				Assert.Equal(version, int.Parse(node.Value));
 			}
+		}
+
+		[SvnBridgeFact]
+		public void UpdateAfterCommitShouldNotGetAnything()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", @"1
+2
+3
+4
+5");
+			Svn("add test.txt");
+
+			Svn("commit -m test");
+
+			string svn = Svn("update");
+			int version = _provider.GetLatestVersion();
+			Assert.Equal("At revision " + version + ".", svn.Trim());
+		}
+
+
+		[SvnBridgeFact]
+		public void UpdateAfterCommitShouldGetChangesFromRepositoryToAnotherFile()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", @"1
+2
+3
+4
+5");
+			Svn("add test.txt");
+
+			Svn("commit -m test");
+
+			WriteFile(testPath + "/test2.txt", "12345", true);
+
+			string svn = Svn("update");
+			int version = _provider.GetLatestVersion();
+			Assert.Equal("A    test2.txt\r\nUpdated to revision " + version + ".", svn.Trim());
+		}
+
+		[SvnBridgeFact(Skip = "This requires sending diffs to the client")]
+		public void UpdateAfterCommitShouldMergeChangesFromRepository()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", @"1
+2
+3
+4
+5");
+			Svn("add test.txt");
+
+			Svn("commit -m test");
+
+			UpdateFile(testPath + "/test.txt", @"0
+1
+2
+3
+4
+5", true);
+			File.WriteAllText("test.txt", @"1
+2
+3
+4
+5
+6");
+			Svn("update");
+			
+			Assert.Equal(@"0
+1
+2
+3
+4
+5
+6", File.ReadAllText("test.txt"));
 		}
 	}
 }
