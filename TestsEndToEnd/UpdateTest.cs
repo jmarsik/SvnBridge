@@ -226,14 +226,14 @@ namespace TestsEndToEnd
 			// directories are not updated, so we have different versions
 			Svn("commit -m \"force different versions in directories\" ");
 
-			UpdateFile(testPath + "/TestFolder1/blah.txt", "143", true);
+			WriteFile(testPath + "/TestFolder1/blah.txt", "143", true);
 			UpdateFile(testPath + "/TestFolder2/blah.txt", "bcd", true);
-			UpdateFile(testPath + "/TestFolder1/blah.txt", "cvb", true);
 
 
 			Svn("update");
 
 			Assert.Equal("bcd", File.ReadAllText("TestFolder2/blah.txt"));
+			Assert.Equal("143", File.ReadAllText("TestFolder1/blah.txt"));
 		}
 
 		[SvnBridgeFact]
@@ -259,7 +259,7 @@ namespace TestsEndToEnd
 			{
 				Assert.Equal(version, int.Parse(node.Value));
 			}
-
 		}
+
     }
 }

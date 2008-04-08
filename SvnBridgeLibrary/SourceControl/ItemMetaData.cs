@@ -83,6 +83,17 @@ namespace SvnBridge.SourceControl
 		{
 			return Name + " @" + Revision;
 		}
+
+		public string StripBasePath(string basePath)
+		{
+			if (Name.StartsWith(basePath) == false)
+				return Name;
+
+			string name = Name.Substring(basePath.Length);
+			if (name.StartsWith(@"/"))
+				name = name.Substring(1);
+			return name;
+		}
     }
 }
 

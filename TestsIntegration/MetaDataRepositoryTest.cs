@@ -43,20 +43,6 @@ namespace IntegrationTests
 		}
 
 		[Fact]
-		public void WillRaiseEventWhenCacheIsUpdated()
-		{
-			bool startEventCalled = false;
-
-			Events.CachingRevisionAction startingCachingRevision = delegate { startEventCalled = true; };
-			Events.StartingCachingRevision += startingCachingRevision;
-
-			repository.QueryItems(_lastCommitRevision, testPath + "/Test.txt", Recursion.None);
-
-			Assert.True(startEventCalled);
-		}
-
-
-		[Fact]
 		public void CanGetValidResultFromQueryItems_RecursionNone()
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);

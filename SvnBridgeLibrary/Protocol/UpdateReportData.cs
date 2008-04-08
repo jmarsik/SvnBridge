@@ -7,38 +7,72 @@ using SvnBridge.Net;
 
 namespace SvnBridge.Protocol
 {
-    [XmlRoot("update-report", Namespace = WebDav.Namespaces.SVN)]
-    public class UpdateReportData
-    {
-        [XmlElement("entry", Namespace = WebDav.Namespaces.SVN)] public List<EntryData> Entries = null;
+	[XmlRoot("update-report", Namespace = WebDav.Namespaces.SVN)]
+	public class UpdateReportData
+	{
+		[XmlElement("entry", Namespace = WebDav.Namespaces.SVN)]
+		public List<EntryData> Entries = null;
 
-        [XmlElement("missing", Namespace = WebDav.Namespaces.SVN)] public List<string> Missing = null;
+		[XmlElement("missing", Namespace = WebDav.Namespaces.SVN)]
+		public List<string> Missing = null;
 
-        [XmlAttribute("send-all", DataType = "boolean", Form = XmlSchemaForm.Unqualified)] public bool SendAll = false;
+		[XmlAttribute("send-all", DataType = "boolean", Form = XmlSchemaForm.Unqualified)]
+		public bool SendAll = false;
 
-        [XmlElement("src-path", Namespace = WebDav.Namespaces.SVN, DataType = "string")] public string SrcPath = null;
+		[XmlElement("src-path", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
+		public string SrcPath = null;
 
-        [XmlElement("target-revision", Namespace = WebDav.Namespaces.SVN, DataType = "string")] public string
-            TargetRevision = null;
+		[XmlElement("target-revision", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
+		public string
+			TargetRevision = null;
 
-        [XmlElement("update-target", Namespace = WebDav.Namespaces.SVN, DataType = "string")] public string UpdateTarget
-            = null;
+		[XmlElement("update-target", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
+		public string UpdateTarget
+			= null;
 
-        public bool IsCheckOut
-        {
-            get { return Entries[0].StartEmpty && Entries.Count == 1; }
-        }
+		public bool IsCheckOut
+		{
+			get { return Entries[0].StartEmpty && Entries.Count == 1; }
+		}
 
-        public bool IsMissing(string localPath,string name)
-        {
-            string path = localPath;
-            if (path.StartsWith("/"))
-                path = path.Substring(1);
-            if (path.EndsWith("/") == false)
-                path += "/";
-            if (name.StartsWith(path))
-                name = name.Substring(path.Length);
-            return Missing != null && Missing.Contains(name);
-        }
-    }
+		public bool IsMissing(string localPath, string name)
+		{
+			string path = localPath;
+			if (path.StartsWith("/"))
+				path = path.Substring(1);
+			if (path.EndsWith("/") == false)
+				path += "/";
+			if (name.StartsWith(path))
+				name = name.Substring(path.Length);
+			return Missing != null && Missing.Contains(name);
+		}
+
+		/// <summary>
+		/// This will try to find the most deeply nested parent of the file
+		/// with the specified name
+		/// </summary>
+		public int GetClientRevisionFor(string name)
+		{
+			EntryData bestMatch = Entries[0];
+
+			foreach (EntryData entry in Entries)
+			{
+				if (entry.path == name)// found a best match
+				{
+					bestMatch = entry;
+					break;
+				}
+
+				if (entry.path == null || name.StartsWith(entry.path) == false)
+					continue;
+
+				// if the current entry is longer than the previous best match, than this
+				// is a better match, because it is more deeply nested, so likely
+				// to be a better parent
+				if (bestMatch.path == null || bestMatch.path.Length < entry.path.Length)
+					bestMatch = entry;
+			}
+			return int.Parse(bestMatch.Rev);
+		}
+	}
 }

@@ -130,7 +130,7 @@ test.txt
         }
 
         [SvnBridgeFact]
-        public void CanListSingleFolder()
+        public void CanListSingleFolderUsingUrl()
         {
             CreateFolder(testPath + "/TestFolder", true);
             string actual = Svn("list " + testUrl);

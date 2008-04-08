@@ -164,7 +164,7 @@ namespace SvnBridge.Handlers
 				new AsyncItemLoader(metadata, sourceControlProvider).Start();
 			});
 
-			IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
+			IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider, basePath);
 
 			output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 			output.Write(

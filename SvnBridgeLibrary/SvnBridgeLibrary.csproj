@@ -62,7 +62,6 @@
     <Compile Include="Handlers\DeleteHandler.cs" />
     <Compile Include="Handlers\Renderers\FolderRenderer.cs" />
     <Compile Include="Handlers\GetHandler.cs" />
-    <Compile Include="Infrastructure\Events.cs" />
     <Compile Include="Infrastructure\Logging.cs" />
     <Compile Include="Infrastructure\MetaDataRepositoryFactory.cs" />
     <Compile Include="Net\PerRequest.cs" />

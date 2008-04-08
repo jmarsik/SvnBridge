@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Handlers;
 using SvnBridge.Interfaces;
@@ -16,11 +15,13 @@ namespace SvnBridge.Infrastructure
     {
         private readonly HttpContextHandlerBase handler;
         private readonly ISourceControlProvider sourceControlProvider;
+    	private readonly string basePath;
 
-        public UpdateReportService(HttpContextHandlerBase handler, ISourceControlProvider sourceControlProvider)
+    	public UpdateReportService(HttpContextHandlerBase handler, ISourceControlProvider sourceControlProvider, string basePath)
         {
             this.handler = handler;
             this.sourceControlProvider = sourceControlProvider;
+        	this.basePath = basePath;
         }
 
         public void ProcessUpdateReportForFile(UpdateReportData updateReportRequest,
@@ -34,9 +35,10 @@ namespace SvnBridge.Infrastructure
             else
             {
                 bool existingFile = false;
+				int clientRevisionForItem = updateReportRequest.GetClientRevisionFor(item.StripBasePath(basePath));
             	if (!updateReportRequest.IsCheckOut &&
 					updateReportRequest.IsMissing(handler.GetLocalPathFromUrl(updateReportRequest.SrcPath), item.Name) == false &&
-                    sourceControlProvider.ItemExists(item.Name, int.Parse(updateReportRequest.Entries[0].Rev)))
+                    sourceControlProvider.ItemExists(item.Name, clientRevisionForItem))
                 {
                     existingFile = true;
                 }
@@ -122,9 +124,11 @@ namespace SvnBridge.Infrastructure
                 else
                 {
                 	string localPath = handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
-                	if (!updateReportRequest.IsCheckOut &&
+
+					int clientRevisionForItem = updateReportRequest.GetClientRevisionFor(folder.StripBasePath(basePath));
+					if (!updateReportRequest.IsCheckOut &&
 						updateReportRequest.IsMissing(localPath, folder.Name) == false &&
-                        sourceControlProvider.ItemExists(folder.Name, int.Parse(updateReportRequest.Entries[0].Rev)))
+						sourceControlProvider.ItemExists(folder.Name, clientRevisionForItem))
                     {
                         existingFolder = true;
                     }

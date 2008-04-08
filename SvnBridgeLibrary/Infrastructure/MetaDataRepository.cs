@@ -147,90 +147,82 @@ namespace SvnBridge.Infrastructure
 				if (IsInCache(revision, serverPath))
 					return;
 
-				Events.RaiseStartingCachingRevision(serverUrl, revision);
+				SourceItemReader items = sourceControlService.QueryItemsReader(serverUrl,
+																	 credentials,
+																	 serverPath,
+																	 RecursionType.Full,
+																	 VersionSpec.FromChangeset(revision));
 
-				try
+				Command(delegate(IDbCommand command)
 				{
-					SourceItemReader items = sourceControlService.QueryItemsReader(serverUrl,
-																		 credentials,
-																		 serverPath,
-																		 RecursionType.Full,
-																		 VersionSpec.FromChangeset(revision));
+					command.CommandText = Queries.InsertCachedRevision;
+					Parameter(command, "ServerUrl", serverUrl);
+					Parameter(command, "Revision", revision);
+					Parameter(command, "UserName", CurrentUserName);
+					Parameter(command, "RootPath", serverPath);
+					command.ExecuteNonQuery();
+				});
+
+				bool firstRead = true;
+				while (items.Read())
+				{
+					// we optimize it here in case we tried to load a file, we load the entire
+					// directory. This tends to save a lot of round trips in many cases
+					if (firstRead && items.SourceItem.ItemType == ItemType.File)
+					{
+						//change it to the directory name, can't use the Path class
+						// because that will change the '/' to '\'
+						serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+						items = sourceControlService.QueryItemsReader(serverUrl,
+																credentials,
+																serverPath,
+																RecursionType.Full,
+																VersionSpec.FromChangeset(revision));
+						items.Read();
+					}
+					firstRead = false;
+
+					SourceItem item = items.SourceItem;
+
+					bool alreadyExists = false;
 
 					Command(delegate(IDbCommand command)
 					{
-						command.CommandText = Queries.InsertCachedRevision;
+						command.CommandText = Queries.SelectItem;
 						Parameter(command, "ServerUrl", serverUrl);
-						Parameter(command, "Revision", revision);
 						Parameter(command, "UserName", CurrentUserName);
-						Parameter(command, "RootPath", serverPath);
-						command.ExecuteNonQuery();
+						Parameter(command, "Revision", revision);
+						Parameter(command, "Path", item.RemoteName);
+
+						using (IDataReader reader = command.ExecuteReader())
+						{
+							alreadyExists = reader.Read();
+						}
 					});
 
-                    bool firstRead = true;
-                    while (items.Read())
+					if (alreadyExists)
+						continue;
+
+					Command(delegate(IDbCommand command)
 					{
-                        // we optimize it here in case we tried to load a file, we load the entire
-                        // directory. This tends to save a lot of round trips in many cases
-                        if (firstRead && items.SourceItem.ItemType == ItemType.File)
-                        {
-                            //change it to the directory name, can't use the Path class
-                            // because that will change the '/' to '\'
-                            serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
-                            items = sourceControlService.QueryItemsReader(serverUrl,
-                                                                    credentials,
-                                                                    serverPath,
-                                                                    RecursionType.Full,
-                                                                    VersionSpec.FromChangeset(revision));
-                            items.Read();
-                        }
-                        firstRead = false;
+						command.CommandText = Queries.InsertItemMetaData;
 
-                        SourceItem item = items.SourceItem;
+						Parameter(command, "Id", SequentialGuid.Next());
+						Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
+						Parameter(command, "ItemId", item.ItemId);
+						Parameter(command, "Name", item.RemoteName);
+						Parameter(command, "UserName", CurrentUserName);
+						Parameter(command, "Parent", GetParentName(item.RemoteName));
+						Parameter(command, "ServerUrl", serverUrl);
+						Parameter(command, "ItemRevision", item.RemoteChangesetId);
+						Parameter(command, "EffectiveRevision", revision);
+						Parameter(command, "DownloadUrl", item.DownloadUrl);
+						Parameter(command, "LastModifiedDate", item.RemoteDate);
 
-						bool alreadyExists = false;
-
-						Command(delegate(IDbCommand command)
-						{
-							command.CommandText = Queries.SelectItem;
-							Parameter(command, "ServerUrl", serverUrl);
-							Parameter(command, "UserName", CurrentUserName);
-							Parameter(command, "Revision", revision);
-							Parameter(command, "Path", item.RemoteName);
-
-							using (IDataReader reader = command.ExecuteReader())
-							{
-								alreadyExists = reader.Read();
-							}
-						});
-
-						if (alreadyExists)
-							continue;
-
-						Command(delegate(IDbCommand command)
-						{
-							command.CommandText = Queries.InsertItemMetaData;
-
-							Parameter(command, "Id", SequentialGuid.Next());
-							Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
-							Parameter(command, "ItemId", item.ItemId);
-							Parameter(command, "Name", item.RemoteName);
-							Parameter(command, "UserName", CurrentUserName);
-							Parameter(command, "Parent", GetParentName(item.RemoteName));
-							Parameter(command, "ServerUrl", serverUrl);
-							Parameter(command, "ItemRevision", item.RemoteChangesetId);
-							Parameter(command, "EffectiveRevision", revision);
-							Parameter(command, "DownloadUrl", item.DownloadUrl);
-							Parameter(command, "LastModifiedDate", item.RemoteDate);
-
-							command.ExecuteNonQuery();
-						});
-					}
+						command.ExecuteNonQuery();
+					});
 				}
-				finally
-				{
-					Events.RaiseFinishedCachingRevision(serverUrl, revision);
-				}
+
 			});
 		}
 

@@ -17,9 +17,15 @@ namespace TestsEndToEnd
 		{
 			foreach (ITestCommand command in GetTestCommandsFromBase(method))
 			{
-				Console.WriteLine("Test (UsingStaticServerPathParser): {0}", method);
+				using(new ConsoleColorer(ConsoleColor.Gray))
+				{
+					Console.WriteLine("Test (UsingStaticServerPathParser): {0}", method);
+				}
 				yield return new UsingStaticServerPathParser(command);
-				Console.WriteLine("Test (UsingRequestBasePathParser): {0}", method); 
+				using (new ConsoleColorer(ConsoleColor.Gray))
+				{
+					Console.WriteLine("Test (UsingRequestBasePathParser): {0}", method);
+				}
 				yield return new UsingRequestBasePathParser(command);
 			}
 		}
@@ -44,9 +50,21 @@ namespace TestsEndToEnd
 		public MethodResult Execute(object testClass)
 		{
 			var test = (EndToEndTestBase) testClass;
-			string testUrl = "http://" + IPAddress.Loopback + ":" + test.Port + "/SvnBridgeTesting" + test.TestPath;
-			(test).Initialize(testUrl, new StaticServerPathParser(test.ServerUrl));
-			return command.Execute(testClass);
+			string testUrl = "http://" + IPAddress.Loopback + ":" + test.Port + 
+				"/SvnBridgeTesting" + test.TestPath;
+			test.Initialize(testUrl, new StaticServerPathParser(test.ServerUrl));
+			try
+			{
+				return command.Execute(testClass);
+			}
+			catch (Exception e)
+			{
+				using(new ConsoleColorer(ConsoleColor.Red))
+				{
+					Console.WriteLine("Failed: {0}", e.Message);
+				}
+				throw;
+			}
 		}
 
 		public string Name
@@ -83,7 +101,18 @@ namespace TestsEndToEnd
 			IPathParser parser = new RequestBasePathParser(new TfsUrlValidator(new WebCache()));
 
 			((EndToEndTestBase) testClass).Initialize(testUrl, parser);
-			return command.Execute(testClass);
+			try
+			{
+				return command.Execute(testClass);
+			}
+			catch (Exception e)
+			{
+				using (new ConsoleColorer(ConsoleColor.Red))
+				{
+					Console.WriteLine("Failed: {0}", e.Message);
+				}
+				throw;
+			}
 		}
 
 		public string Name
@@ -94,6 +123,27 @@ namespace TestsEndToEnd
 		public object[] Parameters
 		{
 			get { return command.Parameters; }
+		}
+
+		#endregion
+
+	}
+
+	public class ConsoleColorer : IDisposable
+	{
+		public ConsoleColorer(ConsoleColor newColor)
+		{
+			this.oldColor = Console.ForegroundColor;
+			Console.ForegroundColor = newColor;
+		}
+
+		private ConsoleColor oldColor;
+
+		#region IDisposable Members
+
+		public void Dispose()
+		{
+			Console.ForegroundColor = oldColor;
 		}
 
 		#endregion

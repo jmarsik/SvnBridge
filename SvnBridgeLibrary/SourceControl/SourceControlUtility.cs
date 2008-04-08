@@ -32,6 +32,13 @@ namespace SvnBridge.SourceControl
                 {
                     return item;
                 }
+				FolderMetaData subFolder = item as FolderMetaData;
+            	if(subFolder!=null)
+            	{
+            		ItemMetaData result = FindItem(subFolder, name);
+					if(result!=null)
+						return result;
+            	}
             }
 
             return null;
