@@ -1,5 +1,7 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+	<UsingTask AssemblyFile="References\xunitext.runner.msbuild.dll" TaskName="XunitExt.Runner.MSBuild.xunit"/>
+
 	<!-- Settings -->
 
 	<PropertyGroup>
@@ -40,7 +42,8 @@
 	</Target>
 
 	<Target Name="EndToEndTest" DependsOnTargets="Build">
-		<Exec Command="References\xunit.console.exe  TestsEndToEnd\bin\$(BuildType)\TestsEndToEnd.dll /xml TestsEndToEnd.results.xml "/>
+		<xunit Assembly="TestsEndToEnd\bin\$(BuildType)\TestsEndToEnd.dll" Xml="TestsEndToEnd.results.xml"/>
+		<!-- <Exec Command="References\xunit.console.exe  TestsEndToEnd\bin\$(BuildType)\TestsEndToEnd.dll /xml TestsEndToEnd.results.xml "/> -->
 	</Target>
 	
 	<Target Name="IntegrationTest" DependsOnTargets="Build">
