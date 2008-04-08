@@ -18,6 +18,7 @@ WHERE EffectiveRevision = @Revision
 AND	  (Name = @Path OR Parent = @Parent)
 AND   ServerUrl = @ServerUrl
 AND	  UserName = @UserName
+ORDER BY [Name]
 ";
 
 		public static string SelectItemFullRecursion =
@@ -79,6 +80,7 @@ WHERE EffectiveRevision = @Revision
 AND   ServerUrl = @ServerUrl
 AND	  Name = @Path
 AND	  UserName = @UserName
+ORDER BY [Name]
 ";
 
 		public const string InsertCachedRevision =
