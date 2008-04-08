@@ -8,7 +8,6 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using TestsIntegration.Properties;
 using Rhino.Mocks;
-using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.NullImpl;

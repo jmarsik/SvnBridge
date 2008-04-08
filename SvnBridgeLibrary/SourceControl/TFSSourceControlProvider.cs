@@ -23,7 +23,7 @@ namespace SvnBridge.SourceControl
 	public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
 	{
 		private readonly ISourceControlServicesHub sourceControlServicesHub;
-		
+
 		private static readonly Regex associatedWorkItems =
 			new Regex(@"Work ?Items?: (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
 
@@ -59,8 +59,8 @@ namespace SvnBridge.SourceControl
 		{
 			get
 			{
-				 return sourceControlServicesHub.MetaDataRepositoryFactory
-					 .Create(GetCredentials(), ServerUrl, rootPath);
+				return sourceControlServicesHub.MetaDataRepositoryFactory
+					.Create(GetCredentials(), ServerUrl, rootPath);
 			}
 		}
 
@@ -76,11 +76,11 @@ namespace SvnBridge.SourceControl
 
 		public TFSSourceControlProvider(
 			string serverUrl,
-			string projectName,
+			string projectName,	
 			ISourceControlServicesHub sourceControlServicesHub)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
-			
+
 			if (projectName != null)
 			{
 				ProjectLocationInformation location =
@@ -242,7 +242,7 @@ namespace SvnBridge.SourceControl
 		{
 			const string latestVersion = "Repository.Latest.Version";
 			if (PerRequest.Items[latestVersion] != null)
-				return (int) PerRequest.Items[latestVersion];
+				return (int)PerRequest.Items[latestVersion];
 			int changeset = SourceControlService.GetLatestChangeset(serverUrl, credentials);
 			PerRequest.Items[latestVersion] = changeset;
 			return changeset;
@@ -514,33 +514,41 @@ namespace SvnBridge.SourceControl
 				item.DataLoaded = true;
 				return;
 			}
-			int retry = 0;
 			ManualResetEvent resetEvent = new ManualResetEvent(false);
-			WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
-			{
-				try
-				{
-					byte[] data = WebTransferService.EndDownloadBytes(ar);
-					FileCache.Set(item.Name, item.Revision, data);
-					resetEvent.Set();
-				}
-				catch (Exception)
-				{
-					if (retry == 3)
-					{
-						resetEvent.Set();
-						throw;
-					}
-					retry += 1;
-					ReadFileAsync(item);
-				}
-			});
+			DownloadFileAsync(item, resetEvent, 0);
 			item.Data = new FutureFile(delegate
 			{
 				return GetFileData(resetEvent, item);
 			});
 
 			item.DataLoaded = true;
+		}
+
+		private void DownloadFileAsync(ItemMetaData item, EventWaitHandle waitHandle, int retry)
+		{
+			Logger.Trace("Starting to download {0}", item.Name);
+			WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
+			{
+				try
+				{
+					byte[] data = WebTransferService.EndDownloadBytes(ar);
+					FileCache.Set(item.Name, item.Revision, data);
+					Logger.Trace("Finished downloading {0}", item.Name);
+					waitHandle.Set();
+				}
+				catch (Exception e)
+				{
+					retry = retry + 1;
+					if (retry == 3)
+					{
+						Logger.Error("Failed to download " + item.Name + ", max retry count reached, aborting", e);
+						waitHandle.Set();
+						throw;
+					}
+					Logger.Error("Failed to download " + item.Name + " retry #" + retry, e);
+					DownloadFileAsync(item, waitHandle, retry);
+				}
+			});
 		}
 
 		private byte[] GetFileData(WaitHandle resetEvent, ItemMetaData item)
@@ -670,14 +678,14 @@ namespace SvnBridge.SourceControl
 			}
 
 			Dictionary<string, ItemProperties> properties = new Dictionary<string, ItemProperties>();
-		
+
 			if (version == -1)
 			{
 				version = GetLatestVersion();
 			}
 
 			SourceItem[] items =
-				MetaDataRepository.QueryItems(version, path,recursion);
+				MetaDataRepository.QueryItems(version, path, recursion);
 
 			Dictionary<string, FolderMetaData> folders = new Dictionary<string, FolderMetaData>();
 			Dictionary<string, int> itemPropertyRevision = new Dictionary<string, int>();

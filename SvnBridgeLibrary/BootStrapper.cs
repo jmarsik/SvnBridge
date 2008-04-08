@@ -103,6 +103,9 @@ namespace SvnBridge
 
         private bool ValidTypeForRegistration(Type type)
         {
+			if (type.Namespace == "SvnBridge.NullImpl")
+				return false;
+
             if (type.IsInterface || type.IsAbstract)
             {
                 return false;
