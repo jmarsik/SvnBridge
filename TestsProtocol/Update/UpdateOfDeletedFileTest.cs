@@ -1,6 +1,7 @@
 using CodePlex.TfsLibrary;
 using Xunit;
 using SvnBridge.SourceControl;
+using Tests;
 
 namespace ProtocolTests
 {

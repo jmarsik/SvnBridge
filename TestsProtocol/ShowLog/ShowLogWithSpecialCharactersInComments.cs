@@ -5,6 +5,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using Xunit;
 using SvnBridge.SourceControl;
+using Tests;
 
 namespace ProtocolTests
 {

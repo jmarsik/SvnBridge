@@ -3,6 +3,7 @@ using CodePlex.TfsLibrary;
 using Xunit;
 using SvnBridge.Exceptions;
 using SvnBridge.SourceControl;
+using Tests;
 
 namespace ProtocolTests
 {
