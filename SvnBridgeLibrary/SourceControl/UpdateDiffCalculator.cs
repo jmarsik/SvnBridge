@@ -75,8 +75,8 @@ namespace SvnBridge.SourceControl
 		{
 			foreach (ItemMetaData item in root.Items)
 			{
-				if(item is MissingItemMetaData || item is MissingFolderMetaData)
-					throw new InvalidOperationException("Found missing item metadata :" + item + " but those should not be returned from UpdateDiffCalculator");
+				if(item is MissingFolderMetaData)
+					throw new InvalidOperationException("Found missing item:" + item + " but those should not be returned from UpdateDiffCalculator");
 				if (item is FolderMetaData)
 					VerifyNoMissingItemMetaDataRemained((FolderMetaData)item);
 			}
@@ -458,10 +458,7 @@ namespace SvnBridge.SourceControl
 						item = sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
 						if (item == null)
 						{
-							if(lastNamePart)
-								item = new MissingItemMetaData(itemName, targetVersion);
-							else
-								item = new MissingFolderMetaData(itemName, targetVersion);
+							item = new MissingFolderMetaData(itemName, targetVersion);
 						}
 						if (!lastNamePart)
 						{

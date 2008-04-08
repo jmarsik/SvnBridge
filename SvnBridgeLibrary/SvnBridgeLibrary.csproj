@@ -138,7 +138,6 @@
     <Compile Include="Interfaces\ISourceControlUtility.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />
     <Compile Include="SourceControl\MissingFolderMetaData.cs" />
-    <Compile Include="SourceControl\MissingItemMetaData.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
     <Compile Include="SourceControl\ProjectInformationRepository.cs" />
     <Compile Include="Net\ListenerContext.cs" />
