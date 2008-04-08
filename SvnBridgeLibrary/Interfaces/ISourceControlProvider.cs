@@ -81,5 +81,7 @@ namespace SvnBridge.Interfaces
 		Guid GetRepositoryUuid();
 
 		int GetVersionForDate(DateTime date);
+
+		ItemMetaData GetPreviousVersionOfItem(SourceItem item);
 	}
 }

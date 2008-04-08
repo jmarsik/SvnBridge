@@ -299,6 +299,22 @@ namespace TestsEndToEnd
 			Assert.Equal("A    test2.txt\r\nUpdated to revision " + version + ".", svn.Trim());
 		}
 
+		[SvnBridgeFact]
+		public void UpdateAfterDelete()
+		{
+			CheckoutAndChangeDirectory();
+			File.WriteAllText("test.txt", @"1");
+			Svn("add test.txt");
+			Svn("commit -m test");
+
+			Svn("del test.txt");
+
+			Svn("commit -m delete");
+
+			Svn("update");
+		}
+
+
 		[SvnBridgeFact(Skip = "This requires sending diffs to the client")]
 		public void UpdateAfterCommitShouldMergeChangesFromRepository()
 		{

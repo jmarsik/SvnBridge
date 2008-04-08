@@ -135,7 +135,6 @@
     <Compile Include="SourceControl\FutureFile.cs" />
     <Compile Include="SourceControl\FutureInvocationException.cs" />
     <Compile Include="Interfaces\ICredentialsProvider.cs" />
-    <Compile Include="Interfaces\ISourceControlUtility.cs" />
     <Compile Include="SourceControl\ITFSSourceControlService.cs" />
     <Compile Include="SourceControl\MissingFolderMetaData.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
@@ -204,7 +203,6 @@
     <Compile Include="SourceControl\Recursion.cs" />
     <Compile Include="SourceControl\RenamedSourceItem.cs" />
     <Compile Include="SourceControl\RepositoryFactoryHelper.cs" />
-    <Compile Include="SourceControl\SourceControlUtility.cs" />
     <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
     <Compile Include="SourceControl\SourceItemReader.cs" />
     <Compile Include="SourceControl\StubFolderMetaData.cs" />

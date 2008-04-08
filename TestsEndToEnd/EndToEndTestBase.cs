@@ -57,7 +57,17 @@ namespace TestsEndToEnd
 
 			base.Dispose();
 			ForAllFilesInCurrentDirectory(
-				delegate(FileInfo file) { file.Attributes = file.Attributes & ~FileAttributes.ReadOnly; });
+				delegate(FileInfo file)
+				{
+					try
+					{
+						file.Attributes = file.Attributes & ~FileAttributes.ReadOnly;
+					}
+					catch (Exception)
+					{
+						// nothign much to do here
+					}
+				});
 
 			Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
 

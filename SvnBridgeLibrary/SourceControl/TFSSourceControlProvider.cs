@@ -27,7 +27,6 @@ namespace SvnBridge.SourceControl
 		private static readonly Regex associatedWorkItems =
 			new Regex(@"Work ?Items?: (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
 
-		private readonly ISourceControlUtility sourceControlHelper;
 		private static readonly Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
 		private readonly ICredentials credentials;
 
@@ -95,7 +94,6 @@ namespace SvnBridge.SourceControl
 				rootPath = Constants.ServerRootPath;
 			}
 			credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
-			sourceControlHelper = new SourceControlUtility(MetaDataRepository, rootPath);
 		}
 
 		#region ISourceControlProvider Members
@@ -195,7 +193,7 @@ namespace SvnBridge.SourceControl
 				return root;
 			}
 
-			UpdateDiffCalculator udc = new UpdateDiffCalculator(this, sourceControlHelper);
+			UpdateDiffCalculator udc = new UpdateDiffCalculator(this);
 			udc.CalculateDiff(path, versionTo, versionFrom, root, reportData);
 
 			return root;
@@ -292,7 +290,7 @@ namespace SvnBridge.SourceControl
 					change.Item.RemoteName = change.Item.RemoteName.Substring(rootPath.Length);
 					if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
 					{
-						ItemMetaData oldItem = sourceControlHelper.GetPreviousVersionOfItem(change.Item);
+						ItemMetaData oldItem = GetPreviousVersionOfItem(change.Item);
 						change.Item = new RenamedSourceItem(change.Item, oldItem.Name, oldItem.Revision);
 					}
 					else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
@@ -1364,7 +1362,7 @@ namespace SvnBridge.SourceControl
 				else
 				{
 					string folderName = GetFolderName(itemProperties.Key);
-					item = sourceControlHelper.FindItem(folders[folderName.ToLowerInvariant()], itemProperties.Key);
+					item = folders[folderName.ToLowerInvariant()].FindItem(itemProperties.Key);
 				}
 				if (item != null)
 					foreach (Property property in itemProperties.Value.Properties)
@@ -1375,6 +1373,13 @@ namespace SvnBridge.SourceControl
 		public ICredentials GetCredentials()
 		{
 			return credentials;
+		}
+
+		public ItemMetaData GetPreviousVersionOfItem(SourceItem item)
+		{
+			SourceItem sourceItem = MetaDataRepository
+				.QueryPreviousVersionOfItem(item.ItemId, item.RemoteChangesetId);
+			return ItemMetaData.ConvertSourceItem(sourceItem, rootPath);
 		}
 	}
 }

@@ -15,13 +15,11 @@ namespace SvnBridge.Infrastructure
     {
         private readonly HttpContextHandlerBase handler;
         private readonly ISourceControlProvider sourceControlProvider;
-    	private readonly string basePath;
 
-    	public UpdateReportService(HttpContextHandlerBase handler, ISourceControlProvider sourceControlProvider, string basePath)
+    	public UpdateReportService(HttpContextHandlerBase handler, ISourceControlProvider sourceControlProvider)
         {
             this.handler = handler;
             this.sourceControlProvider = sourceControlProvider;
-        	this.basePath = basePath;
         }
 
         public void ProcessUpdateReportForFile(UpdateReportData updateReportRequest,
@@ -35,9 +33,10 @@ namespace SvnBridge.Infrastructure
             else
             {
                 bool existingFile = false;
-				int clientRevisionForItem = updateReportRequest.GetClientRevisionFor(item.StripBasePath(basePath));
-            	if (!updateReportRequest.IsCheckOut &&
-					updateReportRequest.IsMissing(handler.GetLocalPathFromUrl(updateReportRequest.SrcPath), item.Name) == false &&
+            	string srcPath = GetSrcPath(updateReportRequest);
+				int clientRevisionForItem = updateReportRequest.GetClientRevisionFor(item.StripBasePath(srcPath));
+				if (!updateReportRequest.IsCheckOut &&
+					updateReportRequest.IsMissing(srcPath, item.Name) == false &&
                     sourceControlProvider.ItemExists(item.Name, clientRevisionForItem))
                 {
                     existingFile = true;
@@ -105,7 +104,14 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-        public void ProcessUpdateReportForDirectory(UpdateReportData updateReportRequest,
+    	private string GetSrcPath(UpdateReportData updateReportRequest)
+    	{
+    		string srcPath = handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
+    		srcPath = srcPath.Substring(1);// remove '/' from start of path
+    		return srcPath;
+    	}
+
+    	public void ProcessUpdateReportForDirectory(UpdateReportData updateReportRequest,
                                                     FolderMetaData folder,
                                                     StreamWriter output,
                                                     bool rootFolder)
@@ -123,11 +129,10 @@ namespace SvnBridge.Infrastructure
                 }
                 else
                 {
-                	string localPath = handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
-
-					int clientRevisionForItem = updateReportRequest.GetClientRevisionFor(folder.StripBasePath(basePath));
+					string srcPath = GetSrcPath(updateReportRequest);
+					int clientRevisionForItem = updateReportRequest.GetClientRevisionFor(folder.StripBasePath(srcPath));
 					if (!updateReportRequest.IsCheckOut &&
-						updateReportRequest.IsMissing(localPath, folder.Name) == false &&
+						updateReportRequest.IsMissing(srcPath, folder.Name) == false &&
 						sourceControlProvider.ItemExists(folder.Name, clientRevisionForItem))
                     {
                         existingFolder = true;

@@ -50,7 +50,12 @@ namespace Tests
             throw new NotImplementedException();
         }
 
-        public virtual MergeActivityResponse MergeActivity(string activityId)
+    	public virtual ItemMetaData GetPreviousVersionOfItem(SourceItem item)
+    	{
+    		throw new NotImplementedException();
+    	}
+
+    	public virtual MergeActivityResponse MergeActivity(string activityId)
         {
             throw new Exception("The method or operation is not implemented.");
         }

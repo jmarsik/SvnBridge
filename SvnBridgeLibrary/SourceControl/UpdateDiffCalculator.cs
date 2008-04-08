@@ -10,19 +10,16 @@ namespace SvnBridge.SourceControl
 	public class UpdateDiffCalculator
 	{
 		private readonly ISourceControlProvider sourceControlProvider;
-		private readonly ISourceControlUtility sourceControlUtility;
-
+	
 		private readonly IDictionary<ItemMetaData, bool> additionForPropertyChangeOnly =
 			new Dictionary<ItemMetaData, bool>();
 
 		private Dictionary<string, int> clientExistingFiles;
 		private Dictionary<string, string> clientDeletedFiles;
 
-		public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider,
-									ISourceControlUtility sourceControlUtility)
+		public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider)
 		{
 			this.sourceControlProvider = sourceControlProvider;
-			this.sourceControlUtility = sourceControlUtility;
 		}
 
 		public void CalculateDiff(string checkoutRootPath,
@@ -92,7 +89,7 @@ namespace SvnBridge.SourceControl
 			for (int i = 0; i < parts.Length; i++)
 			{
 				itemName += "/" + parts[i];
-				item = sourceControlUtility.FindItem(folder, itemName);
+				item = folder.FindItem(itemName);
 				bool lastNamePart = i == parts.Length - 1;
 				if (item == null)
 				{
@@ -240,7 +237,7 @@ namespace SvnBridge.SourceControl
 								   bool updatingForwardInTime)
 		{
 			ItemMetaData oldItem =
-				sourceControlUtility.GetPreviousVersionOfItem(change.Item);
+				sourceControlProvider.GetPreviousVersionOfItem(change.Item);
 			
 			if (updatingForwardInTime)
 			{
@@ -452,7 +449,7 @@ namespace SvnBridge.SourceControl
 						lastNamePart = true;
 
 					itemName += "/" + nameParts[i];
-					ItemMetaData item = sourceControlUtility.FindItem(folder, itemName);
+					ItemMetaData item = folder.FindItem(itemName);
 					if (item == null)
 					{
 						item = sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
@@ -526,6 +523,7 @@ namespace SvnBridge.SourceControl
 																						  clientDeletedFiles);
 			if (alreadyChangedInCurrentClientState)
 			{
+				root.RemoveMissingItem(remoteName);
 				return;
 			}
 
@@ -536,7 +534,7 @@ namespace SvnBridge.SourceControl
 			{
 				bool isLastNamePart = i == nameParts.Length - 1;
 				folderName += "/" + nameParts[i];
-				ItemMetaData item = sourceControlUtility.FindItem(folder, folderName);
+				ItemMetaData item = folder.FindItem(folderName);
 				if (item == null)
 				{
 					if (isLastNamePart)
