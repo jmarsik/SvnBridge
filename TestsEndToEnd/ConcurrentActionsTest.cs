@@ -59,6 +59,7 @@ namespace TestsEndToEnd
 		{
 			try
 			{
+				Console.WriteLine("Running: " + test);
 				object instance = Activator.CreateInstance(test.DeclaringType);
 				command.Execute(instance);
 			}

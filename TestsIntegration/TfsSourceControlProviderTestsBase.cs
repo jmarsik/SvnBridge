@@ -72,7 +72,7 @@ namespace IntegrationTests
 																						  webTransferService,
 																						  system,
 																						  new NullLogger());
-			string connectionString = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
+			string connectionString = "default lock timeout=600000;Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
 			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, connectionString);
 			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
 																					   metaDataRepositoryFactory,
