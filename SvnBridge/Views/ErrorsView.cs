@@ -57,7 +57,7 @@ namespace SvnBridge.Views
 			}
 			else
 			{
-				ListViewItem item = new ListViewItem(title);
+				ListViewItem item = new ListViewItem(new string[]{ title, DateTime.Now.ToString() });
 				item.Tag = content;
 				lbErrors.Items.Add(item);
 			}
@@ -76,6 +76,12 @@ namespace SvnBridge.Views
 		{
 			if (e.KeyCode == Keys.Escape)
 				Hide();
+		}
+
+		private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			lbErrors.Items.Clear();
+			txtErrorDetails.Text = "";
 		}
 	}
 }
