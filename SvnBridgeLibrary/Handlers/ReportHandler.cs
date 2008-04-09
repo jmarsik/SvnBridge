@@ -100,7 +100,7 @@ namespace SvnBridge.Handlers
 			writer.Write("</S:get-locks-report>\n");
 		}
 
-		private static void GetLocationsReport(ISourceControlProvider sourceControlProvider,
+		private void GetLocationsReport(ISourceControlProvider sourceControlProvider,
 										GetLocationsReportData getLocationsReport,
 										string path,
 										StreamWriter output)
@@ -123,7 +123,9 @@ namespace SvnBridge.Handlers
 			output.Write("<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
 			if (item != null)
 			{
-				output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + path + "\"/>\n");
+				output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + 
+					GetLocalPath(path) + 
+					"\"/>\n");
 			}
 			output.Write("</S:get-locations-report>\n");
 		}
