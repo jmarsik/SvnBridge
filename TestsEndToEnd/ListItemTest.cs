@@ -62,7 +62,7 @@ TestFolder2/text.txt
 
 
         [SvnBridgeFact]
-        public void CanListPreviousVersion_UsingPrev()
+        public void CanListPreviosuVersion_UsingPrev()
         {
             CreateFolder(testPath + "/TestFolder1", true);
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version

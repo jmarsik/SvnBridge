@@ -1,19 +1,28 @@
+using System;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using System.Text;
 using System.IO;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
 {
 	public class TFSSourceControlService : SourceControlService, ITFSSourceControlService
 	{
+		private readonly ILogger logger;
 		private readonly RepositoryFactoryHelper repositoryFactoryHelper;
 
-		public TFSSourceControlService(IRegistrationService registrationService, IRepositoryWebSvcFactory webSvcFactory, IWebTransferService webTransferService, IFileSystem fileSystem)
+		public TFSSourceControlService(
+			IRegistrationService registrationService, 
+			IRepositoryWebSvcFactory webSvcFactory, 
+			IWebTransferService webTransferService, 
+			IFileSystem fileSystem,
+			ILogger logger)
 			: base(registrationService, webSvcFactory, webTransferService, fileSystem)
 		{
+			this.logger = logger;
 			repositoryFactoryHelper = new RepositoryFactoryHelper(webSvcFactory);
 		}
 
@@ -74,7 +83,19 @@ namespace SvnBridge.SourceControl
             stream.Write(data, 0, data.Length);
             stream.Close();
 
-            return new SourceItemReader(tfsUrl, request.GetResponse().GetResponseStream());
+        	try
+        	{
+        		return new SourceItemReader(tfsUrl, request.GetResponse().GetResponseStream());
+        	}
+        	catch (WebException e)
+        	{
+				using (StreamReader sr = new StreamReader(e.Response.GetResponseStream()))
+				{
+					string errorPage = sr.ReadToEnd();
+					logger.Error("Could not query items from server. Error page is: " + errorPage, e);
+				}
+        		throw;
+        	}
         }
  	}
 }

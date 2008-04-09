@@ -13,7 +13,7 @@ namespace SvnBridge.SourceControl
         public void TestNetworkAccessDeniedExceptionIsReturnedWhenAccessDeniedToServer()
         {
             IRepositoryWebSvcFactory webSvcFactory = new StubRepositoryWebSvcFactory();
-            TFSSourceControlService service = new TFSSourceControlService(null, webSvcFactory, null, null);
+            TFSSourceControlService service = new TFSSourceControlService(null, webSvcFactory, null, null, null);
             bool passed = false;
 
             try

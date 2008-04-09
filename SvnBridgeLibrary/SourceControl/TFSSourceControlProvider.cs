@@ -27,7 +27,6 @@ namespace SvnBridge.SourceControl
 		private static readonly Regex associatedWorkItems =
 			new Regex(@"Work ?Items?: (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
 
-		private static readonly Dictionary<string, Activity> _activities = new Dictionary<string, Activity>();
 		private readonly ICredentials credentials;
 
 		private readonly string projectName;
@@ -108,14 +107,17 @@ namespace SvnBridge.SourceControl
 							 string targetPath)
 		{
 			CopyAction copyAction = new CopyAction(path, targetPath, false);
-			_activities[activityId].CopiedItems.Add(copyAction);
+			ActivityRepository.Use(activityId,delegate(Activity activity)
+			{
+				activity.CopiedItems.Add(copyAction);	
+			});
 			ProcessCopyItem(activityId, copyAction, false);
 		}
 
 		public void DeleteActivity(string activityId)
 		{
 			SourceControlService.DeleteWorkspace(serverUrl, credentials, activityId);
-			_activities.Remove(activityId);
+			ActivityRepository.Delete(activityId);
 		}
 
 		public bool DeleteItem(string activityId,
@@ -126,43 +128,45 @@ namespace SvnBridge.SourceControl
 				return false;
 			}
 
-			Activity activity = _activities[activityId];
-			bool postCommitDelete = false;
-			foreach (CopyAction copy in activity.CopiedItems)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				if (copy.Path.StartsWith(path + "/"))
-				{
-					if (!activity.PostCommitDeletedItems.Contains(path))
-					{
-						activity.PostCommitDeletedItems.Add(path);
-					}
-
-					if (!copy.Rename)
-					{
-						ConvertCopyToRename(activityId, copy);
-					}
-
-					postCommitDelete = true;
-				}
-			}
-
-			if (!postCommitDelete)
-			{
-				bool deleteIsRename = false;
+				bool postCommitDelete = false;
 				foreach (CopyAction copy in activity.CopiedItems)
 				{
-					if (copy.Path == path)
+					if (copy.Path.StartsWith(path + "/"))
 					{
-						ConvertCopyToRename(activityId, copy);
-						deleteIsRename = true;
+						if (!activity.PostCommitDeletedItems.Contains(path))
+						{
+							activity.PostCommitDeletedItems.Add(path);
+						}
+
+						if (!copy.Rename)
+						{
+							ConvertCopyToRename(activityId, copy);
+						}
+
+						postCommitDelete = true;
 					}
 				}
-				if (!deleteIsRename)
+
+				if (!postCommitDelete)
 				{
-					ProcessDeleteItem(activityId, path);
-					activity.DeletedItems.Add(path);
+					bool deleteIsRename = false;
+					foreach (CopyAction copy in activity.CopiedItems)
+					{
+						if (copy.Path == path)
+						{
+							ConvertCopyToRename(activityId, copy);
+							deleteIsRename = true;
+						}
+					}
+					if (!deleteIsRename)
+					{
+						ProcessDeleteItem(activityId, path);
+						activity.DeletedItems.Add(path);
+					}
 				}
-			}
+			});
 			return true;
 		}
 
@@ -203,16 +207,17 @@ namespace SvnBridge.SourceControl
 		public ItemMetaData GetItemInActivity(string activityId,
 											  string path)
 		{
-			Activity activity = _activities[activityId];
 
-			foreach (CopyAction copy in activity.CopiedItems)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				if (path.StartsWith(copy.TargetPath))
+				foreach (CopyAction copy in activity.CopiedItems)
 				{
-					path = copy.Path + path.Substring(copy.TargetPath.Length);
+					if (path.StartsWith(copy.TargetPath))
+					{
+						path = copy.Path + path.Substring(copy.TargetPath.Length);
+					}
 				}
-			}
-
+			});
 			return GetItemsWithoutProperties(-1, path, Recursion.None);
 		}
 
@@ -354,7 +359,7 @@ namespace SvnBridge.SourceControl
 			SourceControlService.CreateWorkspace(serverUrl, credentials, activityId, Constants.WorkspaceComment);
 			string localPath = GetLocalPath(activityId, "");
 			SourceControlService.AddWorkspaceMapping(serverUrl, credentials, activityId, rootPath, localPath);
-			_activities[activityId] = new Activity();
+			ActivityRepository.Create(activityId);
 		}
 
 		private void ClearExistingTempWorkspaces()
@@ -399,57 +404,65 @@ namespace SvnBridge.SourceControl
 			List<PendRequest> pendRequests = new List<PendRequest>();
 			pendRequests.Add(PendRequest.AddFolder(localPath));
 			SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
-			_activities[activityId].MergeList.Add(
-				new ActivityItem(rootPath + path, ItemType.Folder, ActivityItemAction.New));
-			_activities[activityId].Collections.Add(path);
+			ActivityRepository.Use(activityId, delegate(Activity activity)
+			{
+				activity.MergeList.Add(
+					new ActivityItem(rootPath + path, ItemType.Folder, ActivityItemAction.New));
+				activity.Collections.Add(path);	
+			});
+			
 		}
 
 		public MergeActivityResponse MergeActivity(string activityId)
 		{
 			UpdateProperties(activityId);
-
+			MergeActivityResponse response = null;
 			List<string> commitServerList = new List<string>();
-			Activity activity = _activities[activityId];
-			foreach (ActivityItem item in activity.MergeList)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				if (item.Action != ActivityItemAction.RenameDelete)
+				foreach (ActivityItem item in activity.MergeList)
 				{
-					commitServerList.Add(item.Path);
+					if (item.Action != ActivityItemAction.RenameDelete)
+					{
+						commitServerList.Add(item.Path);
+					}
 				}
-			}
 
-			int changesetId;
-			if (commitServerList.Count > 0)
-			{
-				changesetId =
-					SourceControlService.Commit(serverUrl,
-												credentials,
-												activityId,
-												_activities[activityId].Comment,
-												commitServerList);
-			}
-			else
-			{
-				changesetId = GetLatestVersion();
-			}
-
-			if (_activities[activityId].PostCommitDeletedItems.Count > 0)
-			{
-				commitServerList.Clear();
-				foreach (string path in _activities[activityId].PostCommitDeletedItems)
+				int changesetId;
+				if (commitServerList.Count > 0)
 				{
-					ProcessDeleteItem(activityId, path);
-					commitServerList.Add(rootPath + path);
+					changesetId =
+						SourceControlService.Commit(serverUrl,
+													credentials,
+													activityId,
+													activity.Comment,
+													commitServerList);
 				}
-				changesetId =
-					SourceControlService.Commit(serverUrl,
-												credentials,
-												activityId,
-												_activities[activityId].Comment,
-												commitServerList);
-			}
-			AssociateWorkItemsWithChangeSet(activity.Comment, changesetId);
-			return GenerateMergeResponse(activityId, changesetId);
+				else
+				{
+					changesetId = GetLatestVersion();
+				}
+
+				if (activity.PostCommitDeletedItems.Count > 0)
+				{
+					commitServerList.Clear();
+					foreach (string path in activity.PostCommitDeletedItems)
+					{
+						ProcessDeleteItem(activityId, path);
+						commitServerList.Add(rootPath + path);
+					}
+					changesetId =
+						SourceControlService.Commit(serverUrl,
+													credentials,
+													activityId,
+													activity.Comment,
+													commitServerList);
+				}
+				AssociateWorkItemsWithChangeSet(activity.Comment, changesetId);
+				response = GenerateMergeResponse(activityId, changesetId);
+			});
+
+			return response;
 		}
 
 		public void AssociateWorkItemsWithChangeSet(string comment, int changesetId)
@@ -625,7 +638,10 @@ namespace SvnBridge.SourceControl
 		public void SetActivityComment(string activityId,
 									   string comment)
 		{
-			_activities[activityId].Comment = comment;
+			ActivityRepository.Use(activityId, delegate(Activity activity)
+			{
+				activity.Comment = comment;
+			});
 		}
 
 		public void SetProperty(string activityId,
@@ -633,26 +649,29 @@ namespace SvnBridge.SourceControl
 								string property,
 								string value)
 		{
-			Activity activity = _activities[activityId];
-
-			if (!activity.Properties.ContainsKey(path))
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				activity.Properties[path] = new Properties();
-			}
+				if (!activity.Properties.ContainsKey(path))
+				{
+					activity.Properties[path] = new Properties();
+				}
 
-			activity.Properties[path].Added[property] = value;
+				activity.Properties[path].Added[property] = value;
+			});
 		}
 
 		public void RemoveProperty(string activityId,
 								   string path,
 								   string property)
 		{
-			Activity activity = _activities[activityId];
-			if (!activity.Properties.ContainsKey(path))
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				activity.Properties[path] = new Properties();
-			}
-			activity.Properties[path].Removed.Add(property);
+				if (!activity.Properties.ContainsKey(path))
+				{
+					activity.Properties[path] = new Properties();
+				}
+				activity.Properties[path].Removed.Add(property);
+			});
 		}
 
 		public bool WriteFile(string activityId,
@@ -785,25 +804,27 @@ namespace SvnBridge.SourceControl
 		private bool RevertDelete(string activityId,
 								  string path)
 		{
-			Activity activity = _activities[activityId];
 			bool reverted = false;
-			if (activity.DeletedItems.Contains(path))
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				SourceControlService.UndoPendingChanges(serverUrl,
-														credentials,
-														activityId,
-														new string[] { rootPath + path });
-				activity.DeletedItems.Remove(path);
-				for (int j = activity.MergeList.Count - 1; j >= 0; j--)
+				if (activity.DeletedItems.Contains(path))
 				{
-					if (activity.MergeList[j].Path == rootPath + path)
+					SourceControlService.UndoPendingChanges(serverUrl,
+					                                        credentials,
+					                                        activityId,
+					                                        new string[] {rootPath + path});
+					activity.DeletedItems.Remove(path);
+					for (int j = activity.MergeList.Count - 1; j >= 0; j--)
 					{
-						activity.MergeList.RemoveAt(j);
+						if (activity.MergeList[j].Path == rootPath + path)
+						{
+							activity.MergeList.RemoveAt(j);
+						}
 					}
-				}
 
-				reverted = true;
-			}
+					reverted = true;
+				}
+			});
 			return reverted;
 		}
 
@@ -827,43 +848,46 @@ namespace SvnBridge.SourceControl
 			MergeActivityResponse mergeResponse = new MergeActivityResponse(changesetId, DateTime.Now, "unknown");
 			List<string> baseFolders = new List<string>();
 			List<string> sortedMergeResponse = new List<string>();
-			foreach (ActivityItem item in _activities[activityId].MergeList)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				ActivityItem newItem = item;
-				if (!item.Path.EndsWith("/" + Constants.PropFolder))
+				foreach (ActivityItem item in activity.MergeList)
 				{
-					if (item.Path.Contains("/" + Constants.PropFolder + "/"))
+					ActivityItem newItem = item;
+					if (!item.Path.EndsWith("/" + Constants.PropFolder))
 					{
-						string path = item.Path.Replace("/" + Constants.PropFolder + "/", "/");
-						ItemType newItemType = item.FileType;
-						if (path.EndsWith("/" + Constants.FolderPropFile))
+						if (item.Path.Contains("/" + Constants.PropFolder + "/"))
 						{
-							path = path.Replace("/" + Constants.FolderPropFile, "");
-							newItemType = ItemType.Folder;
-						}
-						newItem = new ActivityItem(path, newItemType, item.Action);
-					}
-
-					if (!sortedMergeResponse.Contains(newItem.Path))
-					{
-						sortedMergeResponse.Add(newItem.Path);
-
-						string path = newItem.Path.Substring(rootPath.Length);
-						if (path == "")
-							path = "/";
-
-						MergeActivityResponseItem responseItem =
-							new MergeActivityResponseItem(newItem.FileType, path);
-						if (newItem.Action != ActivityItemAction.Deleted && newItem.Action != ActivityItemAction.Branch &&
-							newItem.Action != ActivityItemAction.RenameDelete)
-						{
-							mergeResponse.Items.Add(responseItem);
+							string path = item.Path.Replace("/" + Constants.PropFolder + "/", "/");
+							ItemType newItemType = item.FileType;
+							if (path.EndsWith("/" + Constants.FolderPropFile))
+							{
+								path = path.Replace("/" + Constants.FolderPropFile, "");
+								newItemType = ItemType.Folder;
+							}
+							newItem = new ActivityItem(path, newItemType, item.Action);
 						}
 
-						AddBaseFolderIfRequired(activityId, newItem, baseFolders, mergeResponse);
+						if (!sortedMergeResponse.Contains(newItem.Path))
+						{
+							sortedMergeResponse.Add(newItem.Path);
+
+							string path = newItem.Path.Substring(rootPath.Length);
+							if (path == "")
+								path = "/";
+
+							MergeActivityResponseItem responseItem =
+								new MergeActivityResponseItem(newItem.FileType, path);
+							if (newItem.Action != ActivityItemAction.Deleted && newItem.Action != ActivityItemAction.Branch &&
+								newItem.Action != ActivityItemAction.RenameDelete)
+							{
+								mergeResponse.Items.Add(responseItem);
+							}
+
+							AddBaseFolderIfRequired(activityId, newItem, baseFolders, mergeResponse);
+						}
 					}
 				}
-			}
+			});
 			return mergeResponse;
 		}
 
@@ -878,13 +902,17 @@ namespace SvnBridge.SourceControl
 			{
 				baseFolders.Add(folderName);
 				bool folderFound = false;
-				foreach (ActivityItem folderItem in _activities[activityId].MergeList)
+				
+				ActivityRepository.Use(activityId, delegate(Activity activity)
 				{
-					if (folderItem.FileType == ItemType.Folder && folderItem.Path == folderName)
+					foreach (ActivityItem folderItem in activity.MergeList)
 					{
-						folderFound = true;
+						if (folderItem.FileType == ItemType.Folder && folderItem.Path == folderName)
+						{
+							folderFound = true;
+						}
 					}
-				}
+				});
 
 				if (!folderFound)
 				{
@@ -903,81 +931,83 @@ namespace SvnBridge.SourceControl
 							   bool reportUpdatedFile)
 		{
 			bool replaced = RevertDelete(activityId, path);
-
-			Activity activity = _activities[activityId];
-			ItemMetaData item;
-			string existingPath = path.Substring(1);
-
-			do
-			{
-				int lastIndexOf = existingPath.LastIndexOf('/');
-				if (lastIndexOf != -1)
-					existingPath = existingPath.Substring(0, lastIndexOf);
-				else
-					existingPath = "";
-
-				item = GetItems(-1, existingPath, Recursion.None, true, false);
-			} while (item == null);
-
-			string localPath = GetLocalPath(activityId, path);
-			List<LocalUpdate> updates = new List<LocalUpdate>();
-			updates.Add(LocalUpdate.FromLocal(item.Id,
-											  localPath.Substring(0, localPath.LastIndexOf('\\')),
-											  item.Revision));
-
-			item = GetItems(-1, path.Substring(1), Recursion.None, true, false);
-			if (item != null)
-			{
-				updates.Add(LocalUpdate.FromLocal(item.Id, localPath, item.Revision));
-			}
-
-			SourceControlService.UpdateLocalVersions(serverUrl, credentials, activityId, updates);
-
-			List<PendRequest> pendRequests = new List<PendRequest>();
-
 			bool newFile = true;
-			bool addToMergeList = true;
-			if (item != null)
+
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				pendRequests.Add(PendRequest.Edit(localPath));
-				newFile = false;
-			}
-			else
-			{
-				ItemMetaData pendingItem = GetPendingItem(activityId, path);
-				if (pendingItem == null)
+				ItemMetaData item;
+				string existingPath = path.Substring(1);
+
+				do
 				{
-					pendRequests.Add(PendRequest.AddFile(localPath, TfsUtil.CodePage_ANSI));
+					int lastIndexOf = existingPath.LastIndexOf('/');
+					if (lastIndexOf != -1)
+						existingPath = existingPath.Substring(0, lastIndexOf);
+					else
+						existingPath = "";
+
+					item = GetItems(-1, existingPath, Recursion.None, true, false);
+				} while (item == null);
+
+				string localPath = GetLocalPath(activityId, path);
+				List<LocalUpdate> updates = new List<LocalUpdate>();
+				updates.Add(LocalUpdate.FromLocal(item.Id,
+												  localPath.Substring(0, localPath.LastIndexOf('\\')),
+												  item.Revision));
+
+				item = GetItems(-1, path.Substring(1), Recursion.None, true, false);
+				if (item != null)
+				{
+					updates.Add(LocalUpdate.FromLocal(item.Id, localPath, item.Revision));
 				}
-				else
+
+				SourceControlService.UpdateLocalVersions(serverUrl, credentials, activityId, updates);
+
+				List<PendRequest> pendRequests = new List<PendRequest>();
+
+				bool addToMergeList = true;
+				if (item != null)
 				{
-					UpdateLocalVersion(activityId, pendingItem, localPath);
 					pendRequests.Add(PendRequest.Edit(localPath));
 					newFile = false;
 				}
-				foreach (CopyAction copy in activity.CopiedItems)
-				{
-					if (copy.TargetPath == path)
-					{
-						addToMergeList = false;
-					}
-				}
-			}
-
-			SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
-			SourceControlService.UploadFileFromBytes(serverUrl, credentials, activityId, fileData, rootPath + path);
-
-			if (addToMergeList)
-			{
-				if (!replaced && (!newFile || reportUpdatedFile))
-				{
-					activity.MergeList.Add(new ActivityItem(rootPath + path, ItemType.File, ActivityItemAction.Updated));
-				}
 				else
 				{
-					activity.MergeList.Add(new ActivityItem(rootPath + path, ItemType.File, ActivityItemAction.New));
+					ItemMetaData pendingItem = GetPendingItem(activityId, path);
+					if (pendingItem == null)
+					{
+						pendRequests.Add(PendRequest.AddFile(localPath, TfsUtil.CodePage_ANSI));
+					}
+					else
+					{
+						UpdateLocalVersion(activityId, pendingItem, localPath);
+						pendRequests.Add(PendRequest.Edit(localPath));
+						newFile = false;
+					}
+					foreach (CopyAction copy in activity.CopiedItems)
+					{
+						if (copy.TargetPath == path)
+						{
+							addToMergeList = false;
+						}
+					}
 				}
-			}
+
+				SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
+				SourceControlService.UploadFileFromBytes(serverUrl, credentials, activityId, fileData, rootPath + path);
+
+				if (addToMergeList)
+				{
+					if (!replaced && (!newFile || reportUpdatedFile))
+					{
+						activity.MergeList.Add(new ActivityItem(rootPath + path, ItemType.File, ActivityItemAction.Updated));
+					}
+					else
+					{
+						activity.MergeList.Add(new ActivityItem(rootPath + path, ItemType.File, ActivityItemAction.New));
+					}
+				}
+			});
 
 			return newFile;
 		}
@@ -985,21 +1015,23 @@ namespace SvnBridge.SourceControl
 		private void ConvertCopyToRename(string activityId,
 										 CopyAction copy)
 		{
-			Activity activity = _activities[activityId];
 
-			SourceControlService.UndoPendingChanges(serverUrl,
+			ActivityRepository.Use(activityId, delegate(Activity activity)
+			{
+				SourceControlService.UndoPendingChanges(serverUrl,
 													credentials,
 													activityId,
 													new string[] { rootPath + copy.TargetPath });
-			for (int i = activity.MergeList.Count - 1; i >= 0; i--)
-			{
-				if (activity.MergeList[i].Path == rootPath + copy.TargetPath)
+				for (int i = activity.MergeList.Count - 1; i >= 0; i--)
 				{
-					activity.MergeList.RemoveAt(i);
+					if (activity.MergeList[i].Path == rootPath + copy.TargetPath)
+					{
+						activity.MergeList.RemoveAt(i);
+					}
 				}
-			}
 
-			ProcessCopyItem(activityId, copy, true);
+				ProcessCopyItem(activityId, copy, true);
+			});
 		}
 
 		private static string GetLocalPath(string activityId,
@@ -1029,110 +1061,112 @@ namespace SvnBridge.SourceControl
 									 CopyAction copyAction,
 									 bool forceRename)
 		{
-			Activity activity = _activities[activityId];
-			string localPath = GetLocalPath(activityId, copyAction.Path);
-			string localTargetPath = GetLocalPath(activityId, copyAction.TargetPath);
-
-			bool copyIsRename = RevertDelete(activityId, copyAction.Path);
-			ItemMetaData item = GetItemsWithoutProperties(-1, copyAction.Path, Recursion.None);
-			UpdateLocalVersion(activityId, item, localPath);
-
-			if (copyIsRename)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				activity.MergeList.Add(
-					new ActivityItem(rootPath + copyAction.Path, item.ItemType, ActivityItemAction.RenameDelete));
-			}
+				string localPath = GetLocalPath(activityId, copyAction.Path);
+				string localTargetPath = GetLocalPath(activityId, copyAction.TargetPath);
 
-			if (!copyIsRename)
-			{
-				foreach (CopyAction copy in activity.CopiedItems)
+				bool copyIsRename = RevertDelete(activityId, copyAction.Path);
+				ItemMetaData item = GetItemsWithoutProperties(-1, copyAction.Path, Recursion.None);
+				UpdateLocalVersion(activityId, item, localPath);
+
+				if (copyIsRename)
 				{
-					if (copyAction.Path.StartsWith(copy.Path + "/"))
+					activity.MergeList.Add(
+						new ActivityItem(rootPath + copyAction.Path, item.ItemType, ActivityItemAction.RenameDelete));
+				}
+
+				if (!copyIsRename)
+				{
+					foreach (CopyAction copy in activity.CopiedItems)
 					{
-						string path = copy.TargetPath + copyAction.Path.Substring(copy.Path.Length);
-						for (int i = activity.DeletedItems.Count - 1; i >= 0; i--)
+						if (copyAction.Path.StartsWith(copy.Path + "/"))
 						{
-							if (activity.DeletedItems[i] == path)
+							string path = copy.TargetPath + copyAction.Path.Substring(copy.Path.Length);
+							for (int i = activity.DeletedItems.Count - 1; i >= 0; i--)
 							{
-								copyIsRename = true;
-								SourceControlService.UndoPendingChanges(serverUrl,
-																		credentials,
-																		activityId,
-																		new string[] { rootPath + activity.DeletedItems[i] });
-								for (int j = activity.MergeList.Count - 1; j >= 0; j--)
+								if (activity.DeletedItems[i] == path)
 								{
-									if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
+									copyIsRename = true;
+									SourceControlService.UndoPendingChanges(serverUrl,
+																			credentials,
+																			activityId,
+																			new string[] { rootPath + activity.DeletedItems[i] });
+									for (int j = activity.MergeList.Count - 1; j >= 0; j--)
 									{
-										activity.MergeList.RemoveAt(j);
+										if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
+										{
+											activity.MergeList.RemoveAt(j);
+										}
 									}
+
+									activity.DeletedItems.RemoveAt(i);
+									localPath = GetLocalPath(activityId, path);
+									ItemMetaData pendingItem = GetPendingItem(activityId, path);
+									UpdateLocalVersion(activityId, pendingItem, localPath);
 								}
-
-								activity.DeletedItems.RemoveAt(i);
-								localPath = GetLocalPath(activityId, path);
-								ItemMetaData pendingItem = GetPendingItem(activityId, path);
-								UpdateLocalVersion(activityId, pendingItem, localPath);
 							}
 						}
 					}
 				}
-			}
-			if (!copyIsRename)
-			{
-				for (int i = activity.DeletedItems.Count - 1; i >= 0; i--)
+				if (!copyIsRename)
 				{
-					if (copyAction.Path.StartsWith(activity.DeletedItems[i] + "/"))
+					for (int i = activity.DeletedItems.Count - 1; i >= 0; i--)
 					{
-						copyIsRename = true;
-						activity.PostCommitDeletedItems.Add(activity.DeletedItems[i]);
-						SourceControlService.UndoPendingChanges(serverUrl,
-																credentials,
-																activityId,
-																new string[] { rootPath + activity.DeletedItems[i] });
-						for (int j = activity.MergeList.Count - 1; j >= 0; j--)
+						if (copyAction.Path.StartsWith(activity.DeletedItems[i] + "/"))
 						{
-							if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
+							copyIsRename = true;
+							activity.PostCommitDeletedItems.Add(activity.DeletedItems[i]);
+							SourceControlService.UndoPendingChanges(serverUrl,
+																	credentials,
+																	activityId,
+																	new string[] { rootPath + activity.DeletedItems[i] });
+							for (int j = activity.MergeList.Count - 1; j >= 0; j--)
 							{
-								activity.MergeList.RemoveAt(j);
+								if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
+								{
+									activity.MergeList.RemoveAt(j);
+								}
 							}
+
+							activity.DeletedItems.RemoveAt(i);
 						}
-
-						activity.DeletedItems.RemoveAt(i);
 					}
 				}
-			}
-			if (!copyIsRename)
-			{
-				foreach (string deletedItem in activity.PostCommitDeletedItems)
+				if (!copyIsRename)
 				{
-					if (copyAction.Path.StartsWith(deletedItem + "/"))
+					foreach (string deletedItem in activity.PostCommitDeletedItems)
 					{
-						copyIsRename = true;
+						if (copyAction.Path.StartsWith(deletedItem + "/"))
+						{
+							copyIsRename = true;
+						}
 					}
 				}
-			}
 
-			List<PendRequest> pendRequests = new List<PendRequest>();
-			if (copyIsRename || forceRename)
-			{
-				pendRequests.Add(PendRequest.Rename(localPath, localTargetPath));
-				copyAction.Rename = true;
-			}
-			else
-			{
-				pendRequests.Add(PendRequest.Copy(localPath, localTargetPath));
-			}
+				List<PendRequest> pendRequests = new List<PendRequest>();
+				if (copyIsRename || forceRename)
+				{
+					pendRequests.Add(PendRequest.Rename(localPath, localTargetPath));
+					copyAction.Rename = true;
+				}
+				else
+				{
+					pendRequests.Add(PendRequest.Copy(localPath, localTargetPath));
+				}
 
-			SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
-			if (copyAction.Rename)
-			{
-				activity.MergeList.Add(
-					new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.New));
-			}
-			else
-			{
-				activity.MergeList.Add(
-					new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.Branch));
-			}
+				SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
+				if (copyAction.Rename)
+				{
+					activity.MergeList.Add(
+						new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.New));
+				}
+				else
+				{
+					activity.MergeList.Add(
+						new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.Branch));
+				}
+			});
 		}
 
 		private static string GetPropertiesFolderName(string path,
@@ -1142,17 +1176,11 @@ namespace SvnBridge.SourceControl
 			{
 				if (path == "/")
 					return "/" + Constants.PropFolder;
-				else
-					return path + "/" + Constants.PropFolder;
+				return path + "/" + Constants.PropFolder;
 			}
-			else if (path.LastIndexOf('/') != -1)
-			{
+			if (path.LastIndexOf('/') != -1)
 				return path.Substring(0, path.LastIndexOf('/')) + "/" + Constants.PropFolder;
-			}
-			else
-			{
-				return Constants.PropFolder;
-			}
+			return Constants.PropFolder;
 		}
 
 		private static string GetPropertiesFileName(string path,
@@ -1162,46 +1190,45 @@ namespace SvnBridge.SourceControl
 			{
 				if (path == "/")
 					return "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
-				else
-					return path + "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
+				return path + "/" + Constants.PropFolder + "/" + Constants.FolderPropFile;
 			}
-			else if (path.LastIndexOf('/') != -1)
+			if (path.LastIndexOf('/') != -1)
 			{
 				return
 					path.Substring(0, path.LastIndexOf('/')) + "/" + Constants.PropFolder +
 					path.Substring(path.LastIndexOf('/'));
 			}
-			else
-			{
-				return Constants.PropFolder + "/" + path;
-			}
+			return Constants.PropFolder + "/" + path;
 		}
 
 		private void ProcessDeleteItem(string activityId,
 									   string path)
 		{
-			Activity activity = _activities[activityId];
-			string localPath = GetLocalPath(activityId, path);
-
-			ItemMetaData item = GetItems(-1, path, Recursion.None, true, false);
-			if (item == null)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				item = GetPendingItem(activityId, path);
-			}
+				string localPath = GetLocalPath(activityId, path);
 
-			UpdateLocalVersion(activityId, item, localPath);
+				ItemMetaData item = GetItems(-1, path, Recursion.None, true, false);
+				if (item == null)
+				{
+					item = GetPendingItem(activityId, path);
+				}
 
-			if (item.ItemType != ItemType.Folder)
-			{
-				string propertiesFile = GetPropertiesFileName(path, item.ItemType);
-				DeleteItem(activityId, propertiesFile);
-			}
+				UpdateLocalVersion(activityId, item, localPath);
 
-			List<PendRequest> pendRequests = new List<PendRequest>();
-			pendRequests.Add(PendRequest.Delete(localPath));
-			SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
+				if (item.ItemType != ItemType.Folder)
+				{
+					string propertiesFile = GetPropertiesFileName(path, item.ItemType);
+					DeleteItem(activityId, propertiesFile);
+				}
 
-			activity.MergeList.Add(new ActivityItem(rootPath + path, item.ItemType, ActivityItemAction.Deleted));
+				List<PendRequest> pendRequests = new List<PendRequest>();
+				pendRequests.Add(PendRequest.Delete(localPath));
+				SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
+
+				activity.MergeList.Add(new ActivityItem(rootPath + path, item.ItemType, ActivityItemAction.Deleted));
+		
+			});	
 		}
 
 		private ItemProperties ReadPropertiesForItem(string path,
@@ -1242,51 +1269,53 @@ namespace SvnBridge.SourceControl
 
 		private void UpdateProperties(string activityId)
 		{
-			Activity activity = _activities[activityId];
-			ItemMetaData item;
-			ItemType itemType;
-
-			foreach (string path in activity.Properties.Keys)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				ItemProperties properties = GetItemProperties(activity, path, out item, out itemType);
+				ItemMetaData item;
+				ItemType itemType;
 
-				foreach (KeyValuePair<string, string> property in activity.Properties[path].Added)
+				foreach (string path in activity.Properties.Keys)
 				{
-					bool found = false;
-					foreach (Property currentProperty in properties.Properties)
+					ItemProperties properties = GetItemProperties(activity, path, out item, out itemType);
+
+					foreach (KeyValuePair<string, string> property in activity.Properties[path].Added)
 					{
-						if (currentProperty.Name == property.Key)
+						bool found = false;
+						foreach (Property currentProperty in properties.Properties)
 						{
-							currentProperty.Value = property.Value;
-							found = true;
+							if (currentProperty.Name == property.Key)
+							{
+								currentProperty.Value = property.Value;
+								found = true;
+							}
+						}
+						if (!found)
+						{
+							properties.Properties.Add(new Property(property.Key, property.Value));
 						}
 					}
-					if (!found)
+
+					properties.Properties.RemoveAll(
+						delegate(Property obj) { return activity.Properties[path].Removed.Contains(obj.Name); });
+
+					string propertiesPath = GetPropertiesFileName(path, itemType);
+					string propertiesFolder = GetPropertiesFolderName(path, itemType);
+					ItemMetaData propertiesFolderItem = GetItems(-1, propertiesFolder, Recursion.None, true, false);
+					if ((propertiesFolderItem == null) && !activity.Collections.Contains(propertiesFolder))
 					{
-						properties.Properties.Add(new Property(property.Key, property.Value));
+						MakeCollection(activityId, propertiesFolder);
+					}
+
+					if (item != null)
+					{
+						WriteFile(activityId, propertiesPath, Helper.SerializeXml(properties), true);
+					}
+					else
+					{
+						WriteFile(activityId, propertiesPath, Helper.SerializeXml(properties));
 					}
 				}
-
-				properties.Properties.RemoveAll(
-					delegate(Property obj) { return activity.Properties[path].Removed.Contains(obj.Name); });
-
-				string propertiesPath = GetPropertiesFileName(path, itemType);
-				string propertiesFolder = GetPropertiesFolderName(path, itemType);
-				ItemMetaData propertiesFolderItem = GetItems(-1, propertiesFolder, Recursion.None, true, false);
-				if ((propertiesFolderItem == null) && !activity.Collections.Contains(propertiesFolder))
-				{
-					MakeCollection(activityId, propertiesFolder);
-				}
-
-				if (item != null)
-				{
-					WriteFile(activityId, propertiesPath, Helper.SerializeXml(properties), true);
-				}
-				else
-				{
-					WriteFile(activityId, propertiesPath, Helper.SerializeXml(properties));
-				}
-			}
+			});
 		}
 
 		private ItemProperties GetItemProperties(Activity activity, string path, out ItemMetaData item, out ItemType itemType)
@@ -1331,21 +1360,16 @@ namespace SvnBridge.SourceControl
 														DeletedState.NonDeleted,
 														ItemType.Any);
 			if (items[0].Length == 0)
-			{
 				return null;
-			}
-			else
+			ItemMetaData pendingItem = new ItemMetaData();
+			if (items[0][0].type == ItemType.Folder)
 			{
-				ItemMetaData pendingItem = new ItemMetaData();
-				if (items[0][0].type == ItemType.Folder)
-				{
-					pendingItem = new FolderMetaData();
-				}
-
-				pendingItem.Id = items[0][0].itemid;
-				pendingItem.ItemRevision = items[0][0].latest;
-				return pendingItem;
+				pendingItem = new FolderMetaData();
 			}
+
+			pendingItem.Id = items[0][0].itemid;
+			pendingItem.ItemRevision = items[0][0].latest;
+			return pendingItem;
 		}
 
 

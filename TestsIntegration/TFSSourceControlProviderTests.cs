@@ -4,6 +4,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using SvnBridge.Cache;
 using SvnBridge.Exceptions;
+using SvnBridge.NullImpl;
 using SvnBridge.SourceControl;
 using SvnBridge.Infrastructure;
 
@@ -36,7 +37,8 @@ namespace IntegrationTests
             TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
                                                                                           factory1,
                                                                                           webTransferService,
-                                                                                          system);
+                                                                                          system,
+																						  new NullLogger());
             TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
                                                                              PROJECT_NAME,
                                                                              CreateSourceControlServicesHub());

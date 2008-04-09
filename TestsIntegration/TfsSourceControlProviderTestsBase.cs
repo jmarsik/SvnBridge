@@ -70,7 +70,8 @@ namespace IntegrationTests
 			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
 																						  factory1,
 																						  webTransferService,
-																						  system);
+																						  system,
+																						  new NullLogger());
 			string connectionString = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
 			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, connectionString);
 			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),

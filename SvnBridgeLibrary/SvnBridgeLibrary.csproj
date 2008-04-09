@@ -14,6 +14,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <GenerateResourceNeverLockTypeAssemblies>true</GenerateResourceNeverLockTypeAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -124,6 +125,7 @@
     <Compile Include="Net\Proxy.cs" />
     <Compile Include="Net\ProxyInformation.cs" />
     <Compile Include="Proxies\TracingInterceptor.cs" />
+    <Compile Include="SourceControl\ActivityRepository.cs" />
     <Compile Include="SourceControl\Dto\Activity.cs" />
     <Compile Include="SourceControl\Dto\ActivityItem.cs" />
     <Compile Include="SourceControl\Dto\ActivityItemAction.cs" />
