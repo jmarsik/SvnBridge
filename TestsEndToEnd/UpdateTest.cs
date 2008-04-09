@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -55,7 +56,7 @@ namespace TestsEndToEnd
 
 			WriteFile(testPath + "/test.txt", "as", true);
 			File.WriteAllText("test.txt", "hab");
-			ExecuteCommandAndGetError("update");
+			SvnExpectError("update");
 			File.Delete("test.txt");
 
 			string svn = Svn("update");
@@ -77,7 +78,7 @@ namespace TestsEndToEnd
 
 			WriteFile(testPath + "/test.txt", "as", true);
 			File.WriteAllText("test.txt", "hab");
-			ExecuteCommandAndGetError("update");
+			SvnExpectError("update");
 			File.Delete("test.txt");
 
 			WriteFile(testPath + "/foo.bar", "12312", true);
@@ -359,6 +360,34 @@ namespace TestsEndToEnd
 			Svn("update");
 			Assert.Equal("abc", File.ReadAllText("test.txt"));
 		}
+
+		[SvnBridgeFact]
+		public void AfterAbortedCheckoutShouldUpdateFiles()
+		{
+			WriteFile(testPath + "/test.txt", "abc", true);
+			WriteFile(testPath + "/test2.txt", "abc", true);
+
+			string dir = Path.Combine(Environment.CurrentDirectory, testPath.Substring(1));
+			Console.WriteLine("md " + dir);
+			Directory.CreateDirectory(dir);
+
+			string test1File = Path.Combine(dir, "test.txt");
+			string test2File = Path.Combine(dir, "test2.txt");
+
+			Console.WriteLine("echo sfg  "+test1File);
+			File.WriteAllText(test1File, "sfg");
+
+			SvnExpectError("co " + testUrl);
+
+			Console.WriteLine("del " + test1File);
+			File.Delete(test1File);
+
+			Svn("update " + dir);
+
+			Assert.Equal("abc", File.ReadAllText(test1File));
+			Assert.Equal("abc", File.ReadAllText(test2File));
+		}
+
 
 		[SvnBridgeFact(Skip = "This requires sending diffs to the client")]
 		public void UpdateAfterCommitShouldMergeChangesFromRepository()

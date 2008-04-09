@@ -79,7 +79,7 @@ TestFolder2/text.txt
         public void CanListPreviousVersion_WhenDirectoryDoesNotExists()
         {
             CheckoutAndChangeDirectory();
-            string actual = ExecuteCommandAndGetError("list --revision PREV");
+            string actual = SvnExpectError("list --revision PREV");
             string expected = @"svn: Unable to find repository location for '' in revision";
             Assert.True(
                 actual.StartsWith(expected)
@@ -125,7 +125,7 @@ test.txt
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
 
             string actual =
-                ExecuteCommandAndGetError("list " + testUrl + " --revision {" + new DateTime(2000,1,1).ToString("yyyyMMddTHHmmss") + "}");
+                SvnExpectError("list " + testUrl + " --revision {" + new DateTime(2000,1,1).ToString("yyyyMMddTHHmmss") + "}");
             Assert.Contains("Unable to find repository location for", actual);
         }
 

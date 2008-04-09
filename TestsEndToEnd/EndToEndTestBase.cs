@@ -121,13 +121,14 @@ namespace TestsEndToEnd
 			Console.WriteLine("cd " + Environment.CurrentDirectory);
 		}
 
-		protected static string ExecuteCommandAndGetError(string command)
+		protected static string SvnExpectError(string command)
 		{
 			string err = null;
 			ExecuteInternal(command, delegate(Process svn)
 			{
 				err = svn.StandardError.ReadToEnd();
 			});
+			Console.WriteLine(err);
 			return err;
 		}
 
