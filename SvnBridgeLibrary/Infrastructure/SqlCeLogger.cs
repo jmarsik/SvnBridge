@@ -44,7 +44,7 @@ namespace SvnBridge.Infrastructure
 		{
 			try
 			{
-				TransactionalCommand(delegate(IDbCommand command)
+				TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
 				{
 					command.CommandText = Queries.InsertLog;
 					Parameter(command, "Level", level);
@@ -64,7 +64,7 @@ namespace SvnBridge.Infrastructure
 		{
 			try
 			{
-				Transaction(delegate
+				Transaction(IsolationLevel.Serializable, delegate
 				{
 					//empty transaction block to verify that we can access DB
 				});
@@ -82,7 +82,7 @@ namespace SvnBridge.Infrastructure
 				SqlCeEngine engine = new SqlCeEngine(connectionString);
 				engine.CreateDatabase();
 
-				TransactionalCommand(delegate(IDbCommand command)
+				TransactionalCommand(IsolationLevel.Serializable, delegate(IDbCommand command)
 				{
 					ExecuteCommands(Queries.CreateLoggingDatabase.Split(new char[] { ';' }, StringSplitOptions.None), command);
 				});

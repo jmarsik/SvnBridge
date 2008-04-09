@@ -21,7 +21,7 @@ namespace SvnBridge.Infrastructure
 
 		[DebuggerNonUserCode]
 		[DebuggerStepThrough]
-		protected void Transaction(Action action)
+		protected void Transaction(IsolationLevel isolationLevel, Action action)
 		{
 			bool responsibleForClosingConnection = connection == null;
 			connection = connection ?? new SqlCeConnection(connectionString);
@@ -31,7 +31,7 @@ namespace SvnBridge.Infrastructure
 					connection.Open();
 
 				bool responsibleForCommitedTransaction = transaction == null;
-				transaction = transaction ?? connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				transaction = transaction ?? connection.BeginTransaction(isolationLevel);
 				try
 				{
 					action();
@@ -77,9 +77,9 @@ namespace SvnBridge.Infrastructure
 
 		[DebuggerNonUserCode]
 		[DebuggerStepThrough]
-		protected void TransactionalCommand(Action<IDbCommand> action)
+		protected void TransactionalCommand(IsolationLevel isolationLevel, Action<IDbCommand> action)
 		{
-			Transaction(delegate
+			Transaction(isolationLevel, delegate
 			{
 				Command(action);
 			});

@@ -1,28 +1,31 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Xml;
 using IntegrationTests;
 using SvnBridge;
-using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
-using SvnBridge.PathParsing;
 
 namespace TestsEndToEnd
 {
-	public class EndToEndTestBase : TFSSourceControlProviderTestsBase
+	public abstract class EndToEndTestBase : TFSSourceControlProviderTestsBase
 	{
 		#region Setup/Teardown
 
-		public EndToEndTestBase()
+		protected EndToEndTestBase()
 		{
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 			port = new Random().Next(1024, short.MaxValue);
+		}
+
+		public string TestUrl
+		{
+			get { return testUrl; }
+			set { testUrl = value; }
 		}
 
 		public virtual void Initialize(string url, IPathParser parser)

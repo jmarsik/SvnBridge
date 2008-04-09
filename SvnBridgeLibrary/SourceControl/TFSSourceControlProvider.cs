@@ -370,6 +370,8 @@ namespace SvnBridge.SourceControl
 			{
 				if (workspace.Comment != Constants.WorkspaceComment)
 					continue;
+				if (ActivityRepository.Exists(workspace.Name))
+					continue;
 				SourceControlService.DeleteWorkspace(serverUrl, credentials,
 													 workspace.Name);
 			}

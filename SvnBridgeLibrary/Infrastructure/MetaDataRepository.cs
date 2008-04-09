@@ -49,7 +49,7 @@ namespace SvnBridge.Infrastructure
 
 			EnsureRevisionIsCached(reversion, path);
 			List<SourceItem> items = new List<SourceItem>();
-			TransactionalCommand(delegate(IDbCommand command)
+			TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
 			{
 				SetSelectItemQuery(recursion, command);
 				Parameter(command, "Revision", reversion);
@@ -138,7 +138,7 @@ namespace SvnBridge.Infrastructure
 
 		public void EnsureRevisionIsCached(int revision, string path)
 		{
-			Transaction(delegate
+			Transaction(IsolationLevel.Serializable, delegate
 			{
 				string serverPath = GetServerPath(path);
 
@@ -148,10 +148,10 @@ namespace SvnBridge.Infrastructure
 					return;
 
 				SourceItemReader items = sourceControlService.QueryItemsReader(serverUrl,
-																	 credentials,
-																	 serverPath,
-																	 RecursionType.Full,
-																	 VersionSpec.FromChangeset(revision));
+				                                                               credentials,
+				                                                               serverPath,
+				                                                               RecursionType.Full,
+				                                                               VersionSpec.FromChangeset(revision));
 
 				Command(delegate(IDbCommand command)
 				{
@@ -174,10 +174,10 @@ namespace SvnBridge.Infrastructure
 						// because that will change the '/' to '\'
 						serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
 						items = sourceControlService.QueryItemsReader(serverUrl,
-																credentials,
-																serverPath,
-																RecursionType.Full,
-																VersionSpec.FromChangeset(revision));
+						                                              credentials,
+						                                              serverPath,
+						                                              RecursionType.Full,
+						                                              VersionSpec.FromChangeset(revision));
 						items.Read();
 					}
 					firstRead = false;
@@ -243,7 +243,7 @@ namespace SvnBridge.Infrastructure
 			do
 			{
 
-				TransactionalCommand(delegate(IDbCommand command)
+				TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
 				{
 					command.CommandText = Queries.SelectCachedRevision;
 					Parameter(command, "Revision", revision);
@@ -269,7 +269,7 @@ namespace SvnBridge.Infrastructure
 
 		public void ClearCache()
 		{
-			TransactionalCommand(delegate(IDbCommand command)
+			TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
 			{
 				ExecuteCommands(Queries.DeleteCache.Split(new char[] { ';' }, StringSplitOptions.None), command);
 			});
@@ -280,7 +280,7 @@ namespace SvnBridge.Infrastructure
 			SqlCeEngine engine = new SqlCeEngine(connectionString);
 			engine.CreateDatabase();
 
-			TransactionalCommand(delegate(IDbCommand command)
+			TransactionalCommand(IsolationLevel.Serializable, delegate(IDbCommand command)
 			{
 				ExecuteCommands(Queries.CreateDatabase.Split(new char[] { ';' }, StringSplitOptions.None), command);
 			});
@@ -290,7 +290,7 @@ namespace SvnBridge.Infrastructure
 		{
 			try
 			{
-				Transaction(delegate
+				Transaction(IsolationLevel.Serializable, delegate
 				{
 					//empty transaction block to verify that we can access DB
 				});
