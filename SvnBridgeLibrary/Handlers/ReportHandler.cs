@@ -124,7 +124,7 @@ namespace SvnBridge.Handlers
 			if (item != null)
 			{
 				output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + 
-					GetLocalPath(path) + 
+					path + 
 					"\"/>\n");
 			}
 			output.Write("</S:get-locations-report>\n");
