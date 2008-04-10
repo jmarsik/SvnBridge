@@ -159,12 +159,6 @@ namespace TestsEndToEnd
 			{
 				throw new InvalidOperationException("Failed to execute command: " + err);
 			}
-			if (command.StartsWith("commit"))
-			{
-				// we need to recreate the work space, because
-				// a commit will kill all existing workspaces
-				_provider.MakeActivity(_activityId);
-			}
 			return output.ToString();
 		}
 
