@@ -138,12 +138,17 @@ namespace SvnBridge.Infrastructure
 
 		public void EnsureRevisionIsCached(int revision, string path)
 		{
+			string serverPath = GetServerPath(path);
+
+			// already cached this version, skip inserting
+			if (IsInCache(revision, serverPath))
+				return;
+
 			Transaction(IsolationLevel.Serializable, delegate
 			{
-				string serverPath = GetServerPath(path);
-
-				// already cached this version, skip inserting
 				// we rely on the transaction to serialize requests here
+				// we have to make a second test here, to ensure that another thread
+				// did not already read this version
 				if (IsInCache(revision, serverPath))
 					return;
 

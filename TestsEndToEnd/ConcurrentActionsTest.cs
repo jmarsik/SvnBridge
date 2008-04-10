@@ -8,7 +8,7 @@ namespace TestsEndToEnd
 {
 	public class ConcurrentActionsTest : EndToEndTestBase
 	{
-		[SvnBridgeFact(Skip = "Doesn't really work - locking issues")]
+		[SvnBridgeFact]
 		public void RunAllTestsConcurrentyly()
 		{
 			List<MethodInfo> tests = new List<MethodInfo>();

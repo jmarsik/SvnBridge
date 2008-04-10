@@ -204,7 +204,6 @@
     <Compile Include="SourceControl\MergeActivityResponseItem.cs" />
     <Compile Include="SourceControl\Recursion.cs" />
     <Compile Include="SourceControl\RenamedSourceItem.cs" />
-    <Compile Include="SourceControl\RepositoryFactoryHelper.cs" />
     <Compile Include="SourceControl\SourceControlProviderFactory.cs" />
     <Compile Include="SourceControl\SourceItemReader.cs" />
     <Compile Include="SourceControl\StubFolderMetaData.cs" />

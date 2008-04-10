@@ -12,7 +12,7 @@ namespace SvnBridge.SourceControl
 	public class TFSSourceControlService : SourceControlService, ITFSSourceControlService
 	{
 		private readonly ILogger logger;
-		private readonly RepositoryFactoryHelper repositoryFactoryHelper;
+		private readonly IRepositoryWebSvcFactory webSvcFactory;
 
 		public TFSSourceControlService(
 			IRegistrationService registrationService, 
@@ -22,8 +22,8 @@ namespace SvnBridge.SourceControl
 			ILogger logger)
 			: base(registrationService, webSvcFactory, webTransferService, fileSystem)
 		{
+			this.webSvcFactory = webSvcFactory;
 			this.logger = logger;
-			repositoryFactoryHelper = new RepositoryFactoryHelper(webSvcFactory);
 		}
 
 		public ExtendedItem[][] QueryItemsExtended(string tfsUrl,
@@ -33,9 +33,14 @@ namespace SvnBridge.SourceControl
 		                                           DeletedState deletedState,
 		                                           ItemType itemType)
 		{
-			Repository webSvc = repositoryFactoryHelper.TryCreateProxy(tfsUrl, credentials);
+			Repository webSvc = CreateProxy(tfsUrl, credentials);
 			string username = TfsUtil.GetUsername(credentials, tfsUrl);
 			return webSvc.QueryItemsExtended(workspaceName, username, items, deletedState, itemType);
+		}
+
+		private Repository CreateProxy(string tfsUrl, ICredentials credentials)
+		{
+			return (Repository)webSvcFactory.Create(tfsUrl, credentials);
 		}
 
 		public BranchRelative[][] QueryBranches(string tfsUrl,
@@ -44,7 +49,7 @@ namespace SvnBridge.SourceControl
 		                                        ItemSpec[] items,
 		                                        VersionSpec version)
 		{
-			Repository webSvc = repositoryFactoryHelper.TryCreateProxy(tfsUrl, credentials);
+			Repository webSvc = CreateProxy(tfsUrl, credentials);
 			string username = TfsUtil.GetUsername(credentials, tfsUrl);
 			return webSvc.QueryBranches(workspaceName, username, items, version);
 		}
@@ -66,7 +71,7 @@ namespace SvnBridge.SourceControl
             string itemsXml = "";
             if (serverPath != null)
             {
-                itemsXml = "<items><ItemSpec recurse=\"" + recursion.ToString() + "\" item=\"" + serverPath + "\" /></items>";
+                itemsXml = "<items><ItemSpec recurse=\"" + recursion + "\" item=\"" + serverPath + "\" /></items>";
             }
 
             string postData =
@@ -89,6 +94,8 @@ namespace SvnBridge.SourceControl
         	}
         	catch (WebException e)
         	{
+				if (e.Response == null)
+					throw;
 				using (StreamReader sr = new StreamReader(e.Response.GetResponseStream()))
 				{
 					string errorPage = sr.ReadToEnd();

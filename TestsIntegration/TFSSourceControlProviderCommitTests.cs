@@ -10,6 +10,27 @@ namespace IntegrationTests
 	public class TFSSourceControlProviderCommitTests : TFSSourceControlProviderTestsBase
 	{
 		[Fact]
+		public void TestConcurrentCommits()
+		{
+			string activity1 = Guid.NewGuid().ToString();
+			string activity2 = Guid.NewGuid().ToString();
+			_provider.MakeActivity(activity1);
+			_provider.MakeActivity(activity2);
+
+			_provider.WriteFile(activity1, testPath + "/Fun.txt", new byte[] { 1, 2, 3, 4 });
+			_provider.WriteFile(activity2, testPath + "/Fun2.txt", new byte[] { 1, 2, 3, 4 });
+
+			_provider.MergeActivity(activity2);
+
+			_provider.MergeActivity(activity1);
+
+			FolderMetaData items = (FolderMetaData)_provider.GetItems(_provider.GetLatestVersion(), testPath, Recursion.Full);
+			Assert.Equal(2, items.Items.Count);
+			Assert.Equal(testPath + "/Fun.txt", "/" + items.Items[0].Name);
+			Assert.Equal(testPath + "/Fun2.txt", "/" + items.Items[1].Name);
+		}
+
+		[Fact]
 		public void TestCommitBranchFile()
 		{
 			WriteFile(testPath + "/Fun.txt", "Fun text", true);
@@ -282,7 +303,7 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, testPath + "/TestFile2.txt", "mime-type4", "mime4");
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal("mime1", item.Items[0].Properties["mime-type1"]);
 			Assert.Equal("mime2", item.Items[0].Properties["mime-type2"]);
 			Assert.Equal("mime3", item.Items[1].Properties["mime-type3"]);
@@ -305,7 +326,7 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, testPath + "/Folder2", "mime-type4", "mime4");
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal("mime1", item.Items[0].Properties["mime-type1"]);
 			Assert.Equal("mime2", item.Items[0].Properties["mime-type2"]);
 			Assert.Equal("mime3", item.Items[1].Properties["mime-type3"]);
@@ -346,21 +367,21 @@ namespace IntegrationTests
 			Assert.True(ResponseContains(response, testPath, ItemType.Folder));
 		}
 
-        [Fact]
-        public void TestCommitNewFolderInRoot()
-        {
-            CreateRootProvider();
+		[Fact]
+		public void TestCommitNewFolderInRoot()
+		{
+			CreateRootProvider();
 
-            _providerRoot.MakeCollection(_activityIdRoot, "/TestFolder");
-            MergeActivityResponse response = CommitRoot();
+			_providerRoot.MakeCollection(_activityIdRoot, "/TestFolder");
+			MergeActivityResponse response = CommitRoot();
 
-            Assert.True(_provider.ItemExists(testPath + "/TestFolder"));
-            Assert.Equal(ItemType.Folder, _provider.GetItems(-1, testPath + "/TestFolder", Recursion.None).ItemType);
-            Assert.Equal(_provider.GetLatestVersion(), response.Version);
-            Assert.Equal(2, response.Items.Count);
-            Assert.True(ResponseContains(response, "/TestFolder", ItemType.Folder));
-            Assert.True(ResponseContains(response, "/", ItemType.Folder));
-        }
+			Assert.True(_provider.ItemExists(testPath + "/TestFolder"));
+			Assert.Equal(ItemType.Folder, _provider.GetItems(-1, testPath + "/TestFolder", Recursion.None).ItemType);
+			Assert.Equal(_provider.GetLatestVersion(), response.Version);
+			Assert.Equal(2, response.Items.Count);
+			Assert.True(ResponseContains(response, "/TestFolder", ItemType.Folder));
+			Assert.True(ResponseContains(response, "/", ItemType.Folder));
+		}
 
 		[Fact]
 		public void TestCommitNewFolderContainingNewFile()
@@ -389,7 +410,7 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, path, "mime-type", mimeType);
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal(mimeType, item.Items[0].Properties["mime-type"]);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(1, response.Items.Count);
@@ -404,28 +425,28 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, testPath, "ignore", ignore);
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal(ignore, item.Properties["ignore"]);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(1, response.Items.Count);
 			Assert.True(ResponseContains(response, testPath, ItemType.Folder));
 		}
 
-        [Fact]
-        public void TestCommitNewPropertyOnRootFolder()
-        {
-            CreateRootProvider();
-            string ignore = "*.bad\n";
+		[Fact]
+		public void TestCommitNewPropertyOnRootFolder()
+		{
+			CreateRootProvider();
+			string ignore = "*.bad\n";
 
-            _providerRoot.SetProperty(_activityIdRoot, "/", "ignore", ignore);
-            MergeActivityResponse response = CommitRoot();
+			_providerRoot.SetProperty(_activityIdRoot, "/", "ignore", ignore);
+			MergeActivityResponse response = CommitRoot();
 
-            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
-            Assert.Equal(ignore, item.Properties["ignore"]);
-            Assert.Equal(_provider.GetLatestVersion(), response.Version);
-            Assert.Equal(1, response.Items.Count);
-            Assert.True(ResponseContains(response, "/", ItemType.Folder));
-        }
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
+			Assert.Equal(ignore, item.Properties["ignore"]);
+			Assert.Equal(_provider.GetLatestVersion(), response.Version);
+			Assert.Equal(1, response.Items.Count);
+			Assert.True(ResponseContains(response, "/", ItemType.Folder));
+		}
 
 		[Fact]
 		public void TestCommitNewPropertyOnNewFileInSameCommit()
@@ -436,7 +457,7 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, testPath + "/TestFile1.txt", "mime-type1", "mime1");
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal("mime1", item.Items[0].Properties["mime-type1"]);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(2, response.Items.Count);
@@ -451,7 +472,7 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, testPath + "/Folder1", "mime-type1", "mime1");
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal("mime1", item.Items[0].Properties["mime-type1"]);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(2, response.Items.Count);
@@ -468,7 +489,7 @@ namespace IntegrationTests
 
 			Assert.True(_provider.ItemExists(testPath + "/TestFolder/SubFolder"));
 			Assert.Equal(ItemType.Folder,
-			             _provider.GetItems(-1, testPath + "/TestFolder/SubFolder", Recursion.None).ItemType);
+						 _provider.GetItems(-1, testPath + "/TestFolder/SubFolder", Recursion.None).ItemType);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(3, response.Items.Count);
 			Assert.True(ResponseContains(response, testPath + "/TestFolder", ItemType.Folder));
@@ -741,7 +762,7 @@ namespace IntegrationTests
 			Assert.True(ResponseContains(response, "/TestFile.txt", ItemType.File));
 		}
 
-		[Fact(Skip="Not implemented yet")]
+		[Fact(Skip = "Not implemented yet")]
 		//[ExpectedException(typeof (ConflictException))]
 		public void TestCommitUpdatedFileAtSameTimeAsAnotherUserThrowsConflictException()
 		{
@@ -770,7 +791,7 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, path, "mime-type", mimeType2);
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal(mimeType2, item.Items[0].Properties["mime-type"]);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(1, response.Items.Count);
@@ -787,7 +808,7 @@ namespace IntegrationTests
 			_provider.SetProperty(_activityId, testPath, "ignore", ignore2);
 			MergeActivityResponse response = Commit();
 
-			FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, testPath, Recursion.Full);
+			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
 			Assert.Equal(ignore2, item.Properties["ignore"]);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(1, response.Items.Count);
