@@ -94,13 +94,7 @@ namespace SvnBridge.SourceControl
         	}
         	catch (WebException e)
         	{
-				if (e.Response == null)
-					throw;
-				using (StreamReader sr = new StreamReader(e.Response.GetResponseStream()))
-				{
-					string errorPage = sr.ReadToEnd();
-					logger.Error("Could not query items from server. Error page is: " + errorPage, e);
-				}
+				logger.Error("Could not query items from server.", e);
         		throw;
         	}
         }

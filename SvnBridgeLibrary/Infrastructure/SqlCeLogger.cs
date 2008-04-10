@@ -1,6 +1,9 @@
 using System;
 using System.Data;
 using System.Data.SqlServerCe;
+using System.IO;
+using System.Net;
+using System.Text;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.Infrastructure
@@ -16,6 +19,17 @@ namespace SvnBridge.Infrastructure
 
 		public void Error(string message, Exception exception)
 		{
+			WebException we = exception as WebException;
+			if (we != null && we.Response != null)
+			{
+				using (StreamReader sr = new StreamReader(we.Response.GetResponseStream()))
+				{
+					StringBuilder sb = new StringBuilder(message);
+					sb.AppendLine(" Error page is:");
+					sb.AppendLine(sr.ReadToEnd());
+					message = sb.ToString();
+				}
+			}
 			Log("Error", message, exception.ToString());
 		}
 

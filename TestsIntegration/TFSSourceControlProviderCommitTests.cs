@@ -1,7 +1,6 @@
 using System;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using SvnBridge.Exceptions;
 using SvnBridge.SourceControl;
 using Xunit;
 

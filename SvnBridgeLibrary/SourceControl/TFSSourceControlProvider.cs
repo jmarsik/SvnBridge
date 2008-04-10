@@ -74,7 +74,7 @@ namespace SvnBridge.SourceControl
 
 		public TFSSourceControlProvider(
 			string serverUrl,
-			string projectName,	
+			string projectName,
 			ISourceControlServicesHub sourceControlServicesHub)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
@@ -107,9 +107,9 @@ namespace SvnBridge.SourceControl
 							 string targetPath)
 		{
 			CopyAction copyAction = new CopyAction(path, targetPath, false);
-			ActivityRepository.Use(activityId,delegate(Activity activity)
+			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
-				activity.CopiedItems.Add(copyAction);	
+				activity.CopiedItems.Add(copyAction);
 			});
 			ProcessCopyItem(activityId, copyAction, false);
 		}
@@ -410,9 +410,9 @@ namespace SvnBridge.SourceControl
 			{
 				activity.MergeList.Add(
 					new ActivityItem(rootPath + path, ItemType.Folder, ActivityItemAction.New));
-				activity.Collections.Add(path);	
+				activity.Collections.Add(path);
 			});
-			
+
 		}
 
 		public MergeActivityResponse MergeActivity(string activityId)
@@ -812,9 +812,9 @@ namespace SvnBridge.SourceControl
 				if (activity.DeletedItems.Contains(path))
 				{
 					SourceControlService.UndoPendingChanges(serverUrl,
-					                                        credentials,
-					                                        activityId,
-					                                        new string[] {rootPath + path});
+															credentials,
+															activityId,
+															new string[] { rootPath + path });
 					activity.DeletedItems.Remove(path);
 					for (int j = activity.MergeList.Count - 1; j >= 0; j--)
 					{
@@ -904,7 +904,7 @@ namespace SvnBridge.SourceControl
 			{
 				baseFolders.Add(folderName);
 				bool folderFound = false;
-				
+
 				ActivityRepository.Use(activityId, delegate(Activity activity)
 				{
 					foreach (ActivityItem folderItem in activity.MergeList)
@@ -1229,8 +1229,8 @@ namespace SvnBridge.SourceControl
 				SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
 
 				activity.MergeList.Add(new ActivityItem(rootPath + path, item.ItemType, ActivityItemAction.Deleted));
-		
-			});	
+
+			});
 		}
 
 		private ItemProperties ReadPropertiesForItem(string path,
