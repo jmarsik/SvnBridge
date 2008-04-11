@@ -78,6 +78,11 @@ namespace TestsEndToEnd
 
 			CheckoutAndChangeDirectory();
 			File.WriteAllText("test1234", "blah");
+
+    		Assert.Throws<InvalidOperationException>(delegate
+    		{
+    			Svn("commit -m test");
+    		});
 			Svn("commit -m test");
     	}
 

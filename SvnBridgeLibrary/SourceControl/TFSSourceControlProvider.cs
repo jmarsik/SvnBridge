@@ -1,3 +1,4 @@
+using CodePlex.TfsLibrary;
 using SvnBridge.Net;
 
 namespace SvnBridge.SourceControl
@@ -354,7 +355,7 @@ namespace SvnBridge.SourceControl
 
 		public void MakeActivity(string activityId)
 		{
-			ClearExistingTempWorkspaces();
+			ClearExistingTempWorkspaces(true);
 
 			SourceControlService.CreateWorkspace(serverUrl, credentials, activityId, Constants.WorkspaceComment);
 			string localPath = GetLocalPath(activityId, "");
@@ -362,7 +363,7 @@ namespace SvnBridge.SourceControl
 			ActivityRepository.Create(activityId);
 		}
 
-		private void ClearExistingTempWorkspaces()
+		private void ClearExistingTempWorkspaces(bool skipExistingActivities)
 		{
 			WorkspaceInfo[] workspaces = SourceControlService.GetWorkspaces(serverUrl, credentials,
 																			WorkspaceComputers.ThisComputer);
@@ -370,10 +371,11 @@ namespace SvnBridge.SourceControl
 			{
 				if (workspace.Comment != Constants.WorkspaceComment)
 					continue;
-				if (ActivityRepository.Exists(workspace.Name))
+				if (skipExistingActivities && ActivityRepository.Exists(workspace.Name))
 					continue;
 				SourceControlService.DeleteWorkspace(serverUrl, credentials,
 													 workspace.Name);
+				ActivityRepository.Delete(workspace.Name);
 			}
 		}
 
@@ -417,11 +419,11 @@ namespace SvnBridge.SourceControl
 
 		public MergeActivityResponse MergeActivity(string activityId)
 		{
-			UpdateProperties(activityId);
 			MergeActivityResponse response = null;
-			List<string> commitServerList = new List<string>();
 			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
+				UpdateProperties(activityId);
+				List<string> commitServerList = new List<string>();
 				foreach (ActivityItem item in activity.MergeList)
 				{
 					if (item.Action != ActivityItemAction.RenameDelete)
@@ -433,12 +435,25 @@ namespace SvnBridge.SourceControl
 				int changesetId;
 				if (commitServerList.Count > 0)
 				{
-					changesetId =
-						SourceControlService.Commit(serverUrl,
-													credentials,
-													activityId,
-													activity.Comment,
-													commitServerList);
+					try
+					{
+						changesetId =
+							SourceControlService.Commit(serverUrl,
+							                            credentials,
+							                            activityId,
+							                            activity.Comment,
+							                            commitServerList);
+					}
+					catch (TfsFailureException)
+					{
+						// we just failed a commit, this tends to happen when we have a conflicts 
+						// between previously partially commited changes and the current changes.
+						// We will wipe all the user's temporary workspaces and allow the user to 
+						// try again
+						ClearExistingTempWorkspaces(false);
+
+						throw;
+					}
 				}
 				else
 				{

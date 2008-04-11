@@ -22,12 +22,16 @@ namespace SvnBridge.Infrastructure
 			WebException we = exception as WebException;
 			if (we != null && we.Response != null)
 			{
-				using (StreamReader sr = new StreamReader(we.Response.GetResponseStream()))
+				HttpWebResponse hwr = we.Response as HttpWebResponse;
+				if (hwr != null && hwr.StatusCode != HttpStatusCode.Unauthorized)
 				{
-					StringBuilder sb = new StringBuilder(message);
-					sb.AppendLine(" Error page is:");
-					sb.AppendLine(sr.ReadToEnd());
-					message = sb.ToString();
+					using (StreamReader sr = new StreamReader(we.Response.GetResponseStream()))
+					{
+						StringBuilder sb = new StringBuilder(message);
+						sb.AppendLine(" Error page is:");
+						sb.AppendLine(sr.ReadToEnd());
+						message = sb.ToString();
+					}
 				}
 			}
 			Log("Error", message, exception.ToString());

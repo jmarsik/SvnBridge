@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using CodePlex.TfsLibrary;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 
@@ -8,6 +9,8 @@ namespace SvnBridge.SourceControl
 {
     public class ItemMetaData
     {
+    	private FolderMetaData parent;
+
         public string Author;
         public FutureFile Data;
         public bool DataLoaded = false;
@@ -94,6 +97,18 @@ namespace SvnBridge.SourceControl
 				name = name.Substring(1);
 			return name;
 		}
+
+    	public void RemoveFromParent()
+    	{
+    		Guard.ArgumentNotNull(parent, "parent");
+    		parent.Items.Remove(this);
+    		parent = null;
+    	}
+
+    	public void SetParent(FolderMetaData parentFolder)
+    	{
+    		parent = parentFolder;
+    	}
     }
 }
 

@@ -45,6 +45,45 @@ namespace TestsEndToEnd
 		}
 
 		[SvnBridgeFact]
+		public void RemoveFolderLocallyThenRemoveFileInFolderAtServerWillNotRetreiveFile()
+		{
+			CheckoutAndChangeDirectory();
+			Directory.CreateDirectory("foo");
+			File.WriteAllText("foo/test.txt", "hab");
+			Svn("add foo");
+			Svn("commit -m blah");
+			Svn("update"); 
+
+			RmDir("foo");
+			Assert.False(File.Exists("foo/test.txt"));
+
+			DeleteItem(testPath + "/foo/test.txt", true);
+			string svn = Svn("update");
+			Assert.Contains("A    foo", svn);
+			Assert.False(File.Exists("foo/test.txt"));
+		}
+
+		[SvnBridgeFact]
+		public void RemoveFolderLocallyThenRemoveFolderInFolderAtServerWillNotRetreiveFolder()
+		{
+			CheckoutAndChangeDirectory();
+			Directory.CreateDirectory("foo");
+			File.WriteAllText("foo/test.txt", "hab");
+			Svn("add foo");
+			Svn("commit -m blah");
+			Svn("update");
+
+			RmDir("foo");
+			Assert.False(File.Exists("foo/test.txt"));
+
+			DeleteItem(testPath + "/foo", true);
+			string svn = Svn("update");
+			Assert.Equal("D    foo\r\nUpdated to revision " + _provider.GetLatestVersion() + ".", svn.Trim());
+			Assert.False(Directory.Exists("foo"));
+		}
+
+
+		[SvnBridgeFact]
 		public void AfterAnErrorWhenGettingFile_WillBeAbleToUpdateAgain()
 		{
 			CheckoutAndChangeDirectory();
@@ -322,14 +361,19 @@ namespace TestsEndToEnd
 			CreateFolder(testPath + "/testFolder1", true);
 			CheckoutAndChangeDirectory();
 
-			ForAllFilesIn("testFolder1", delegate(FileInfo info)
-			{
-				info.Attributes = info.Attributes & ~FileAttributes.ReadOnly;
-			});
-			Directory.Delete("testFolder1", true);
+			RmDir("testFolder1");
 
 			Svn("update");
 			Assert.True(Directory.Exists("testFolder1"));
+		}
+
+		private void RmDir(string directory)
+		{
+			ForAllFilesIn(directory, delegate(FileInfo info)
+			{
+				info.Attributes = info.Attributes & ~FileAttributes.ReadOnly;
+			});
+			Directory.Delete(directory, true);
 		}
 
 		[SvnBridgeFact]
@@ -359,6 +403,35 @@ namespace TestsEndToEnd
 			File.Delete("test.txt");
 			Svn("update");
 			Assert.Equal("abc", File.ReadAllText("test.txt"));
+		}
+
+
+		[SvnBridgeFact]
+		public void UpdateAfterRename()
+		{
+			WriteFile(testPath + "/test.txt", "abc", true);
+			CreateFolder(testPath + "/TestFolder1", true);
+			CheckoutAndChangeDirectory();
+			Svn("rename test.txt TestFolder1/test.txt");
+			Svn("commit -m move");
+			Svn("update");
+		}
+
+
+		[SvnBridgeFact]
+		public void UpdateUsingMixRevisionRepositoryWhenEntryIsDeletedInFuture()
+		{
+			WriteFile(testPath + "/test.txt", "abc", true);
+			CheckoutAndChangeDirectory();
+			Svn("del test.txt");
+			int version = _provider.GetLatestVersion();
+			Svn("commit -m del");
+			Svn("up -r " + version);
+			
+			Svn("propset b a .");
+			Svn("commit -m update_root_to_new_rev");
+
+			Svn("update");
 		}
 
 		[SvnBridgeFact]

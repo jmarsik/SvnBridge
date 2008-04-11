@@ -16,7 +16,7 @@ namespace SvnBridge.SourceControl
         }
 
 
-        public override List<ItemMetaData> Items
+		public override IList<ItemMetaData> Items
         {
             get { return RealFolder.Items; }
         }

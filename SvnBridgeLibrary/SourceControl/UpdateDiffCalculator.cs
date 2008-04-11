@@ -10,7 +10,7 @@ namespace SvnBridge.SourceControl
 	public class UpdateDiffCalculator
 	{
 		private readonly ISourceControlProvider sourceControlProvider;
-	
+
 		private readonly IDictionary<ItemMetaData, bool> additionForPropertyChangeOnly =
 			new Dictionary<ItemMetaData, bool>();
 
@@ -72,14 +72,14 @@ namespace SvnBridge.SourceControl
 		{
 			foreach (ItemMetaData item in root.Items)
 			{
-				if(item is MissingFolderMetaData)
+				if (item is MissingFolderMetaData)
 					throw new InvalidOperationException("Found missing item:" + item + " but those should not be returned from UpdateDiffCalculator");
 				if (item is FolderMetaData)
 					VerifyNoMissingItemMetaDataRemained((FolderMetaData)item);
 			}
 		}
 
-		private FindOrCreateResults FindItemOrCreateItem(FolderMetaData root, 
+		private FindOrCreateResults FindItemOrCreateItem(FolderMetaData root,
 			string pathRoot, string path, int targetVersion, Recursion recursion)
 		{
 			FindOrCreateResults results = new FindOrCreateResults();
@@ -103,7 +103,7 @@ namespace SvnBridge.SourceControl
 						FolderMetaData subFolder = (FolderMetaData)sourceControlProvider.GetItems(targetVersion, itemName, recursion);
 						item = subFolder;
 					}
-
+					item = item ?? new MissingFolderMetaData(itemName, targetVersion);
 					folder.Items.Add(item);
 					if (results.FirstItemAdded == null)
 					{
@@ -239,7 +239,7 @@ namespace SvnBridge.SourceControl
 		{
 			ItemMetaData oldItem =
 				sourceControlProvider.GetPreviousVersionOfItem(change.Item);
-			
+
 			if (updatingForwardInTime)
 			{
 				ProcessDeletedFile(checkoutRootPath,
@@ -528,76 +528,87 @@ namespace SvnBridge.SourceControl
 				return;
 			}
 
-			string[] nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split('/');
 			string folderName = checkoutRootPath;
+			string[] nameParts = remoteName.Substring(checkoutRootPath.Length)
+				.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+			
+			if(nameParts.Length==0)
+			{
+				HandleDeleteItem(remoteName, change, folderName, ref root, true, targetVersion);
+				return;
+			}
+
 			FolderMetaData folder = root;
 			for (int i = 0; i < nameParts.Length; i++)
 			{
 				bool isLastNamePart = i == nameParts.Length - 1;
 				folderName += "/" + nameParts[i];
-				ItemMetaData item = folder.FindItem(folderName);
-				if (item == null)
-				{
-					if (isLastNamePart)
-					{
-						if (change.Item.ItemType == ItemType.File)
-						{
-							item = new DeleteMetaData();
-						}
-						else
-						{
-							item = new DeleteFolderMetaData();
-						}
+				HandleDeleteItem(remoteName, change, folderName, ref folder, isLastNamePart, targetVersion);
+			}
+		}
 
-						item.Name = remoteName;
+		private void HandleDeleteItem(string remoteName, SourceItemChange change, string folderName, ref FolderMetaData folder, bool isLastNamePart, int targetVersion)
+		{
+			ItemMetaData item = folder.FindItem(folderName);
+			if (item is DeleteFolderMetaData)
+				return;
+
+			if (item == null)
+			{
+				if (isLastNamePart)
+				{
+					if (change.Item.ItemType == ItemType.File)
+					{
+						item = new DeleteMetaData();
 					}
 					else
 					{
-						item = sourceControlProvider.GetItemsWithoutProperties(targetVersion, folderName, Recursion.None);
-						if (item == null)
-						{
-							item = new DeleteFolderMetaData();
-							item.Name = folderName;
-						}
+						item = new DeleteFolderMetaData();
 					}
-					folder.Items.Add(item);
-					if (i != nameParts.Length - 1)
-					{
-						folder = (FolderMetaData)item;
-					}
+
+					item.Name = remoteName;
 				}
-				else if (item is DeleteFolderMetaData)
+				else
 				{
-					return;
-				}
-				else if (isLastNamePart)// we need to revert the item addition
-				{
-					if (item is StubFolderMetaData)
+					item = sourceControlProvider.GetItemsWithoutProperties(targetVersion, folderName, Recursion.None);
+					if (item == null)
 					{
-						DeleteFolderMetaData removeFolder = new DeleteFolderMetaData();
-						removeFolder.Name = item.Name;
-						folder.Items.Remove(item);
-						folder.Items.Add(removeFolder);
-					}
-					else if (additionForPropertyChangeOnly.ContainsKey(item) && additionForPropertyChangeOnly[item])
-					{
-						ItemMetaData removeFolder = item is FolderMetaData ? (ItemMetaData)new DeleteFolderMetaData() : new DeleteMetaData();
-						removeFolder.Name = item.Name;
-						folder.Items.Remove(item);
-						folder.Items.Add(removeFolder);
-					}
-					else
-					{
-						folder.Items.Remove(item);
+						item = new DeleteFolderMetaData();
+						item.Name = folderName;
 					}
 				}
+				folder.Items.Add(item);
 				if (isLastNamePart == false)
 				{
 					folder = (FolderMetaData)item;
 				}
 			}
+			else if (isLastNamePart)// we need to revert the item addition
+			{
+				if (item is StubFolderMetaData)
+				{
+					DeleteFolderMetaData removeFolder = new DeleteFolderMetaData();
+					removeFolder.Name = item.Name;
+					folder.Items.Remove(item);
+					folder.Items.Add(removeFolder);
+				}
+				else if (additionForPropertyChangeOnly.ContainsKey(item) && additionForPropertyChangeOnly[item])
+				{
+					ItemMetaData removeFolder = item is FolderMetaData ? (ItemMetaData)new DeleteFolderMetaData() : new DeleteMetaData();
+					removeFolder.Name = item.Name;
+					folder.Items.Remove(item);
+					folder.Items.Add(removeFolder);
+				}
+				else
+				{
+					folder.Items.Remove(item);
+				}
+			}
+			if (isLastNamePart == false)
+			{
+				folder = (FolderMetaData)item;
+			}
 		}
-
 
 		private static bool IsChangeAlreadyCurrentInClientState(ChangeType changeType,
 																string itemPath,

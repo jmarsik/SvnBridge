@@ -19,7 +19,7 @@ namespace SvnBridge.SourceControl
 			//it does absolutely nothing and has no meaning whatsoever
 			timer.GetHashCode();
 
-			rwLock.AcquireWriterLock(-1);
+			rwLock.AcquireWriterLock(Timeout.Infinite);
 			try
 			{
 				foreach (KeyValuePair<string, DateTime> pair in new Dictionary<string, DateTime>(activitiesTimeStamps))
@@ -37,7 +37,7 @@ namespace SvnBridge.SourceControl
 
 		public static void Create(string activityId)
 		{
-			rwLock.AcquireWriterLock(-1);
+			rwLock.AcquireWriterLock(Timeout.Infinite);
 			try
 			{
 				activities[activityId] = new Activity();
@@ -51,21 +51,35 @@ namespace SvnBridge.SourceControl
 
 		public static void Delete(string activityId)
 		{
-			rwLock.AcquireWriterLock(-1);
+			bool upgradedToWriterLcok = false;
+			LockCookie writerLock = new LockCookie();
 			try
 			{
+				if (rwLock.IsReaderLockHeld)
+				{
+					writerLock = rwLock.UpgradeToWriterLock(Timeout.Infinite);
+					upgradedToWriterLcok = true;
+				}
+				else
+				{
+					rwLock.AcquireWriterLock(Timeout.Infinite);
+				}
+			
 				activities.Remove(activityId);
 				activitiesTimeStamps.Remove(activityId);
 			}
 			finally
 			{
-				rwLock.ReleaseWriterLock();
+				if(upgradedToWriterLcok)
+					rwLock.DowngradeFromWriterLock(ref writerLock);
+				else
+					rwLock.ReleaseWriterLock();
 			}
 		}
 
 		public static void Use(string activityId, Action<Activity> action)
 		{
-			rwLock.AcquireReaderLock(-1);
+			rwLock.AcquireReaderLock(Timeout.Infinite);
 			try
 			{
 				Activity activity = activities[activityId];
@@ -82,7 +96,7 @@ namespace SvnBridge.SourceControl
 
 		public static bool Exists(string activityId)
 		{
-			rwLock.AcquireReaderLock(-1);
+			rwLock.AcquireReaderLock(Timeout.Infinite);
 			try
 			{
 				return activities.ContainsKey(activityId);

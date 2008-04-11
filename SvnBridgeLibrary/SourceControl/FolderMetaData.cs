@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using CodePlex.TfsLibrary;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace SvnBridge.SourceControl
@@ -7,15 +9,17 @@ namespace SvnBridge.SourceControl
     {
         public FolderMetaData(string name) : base(name)
         {
+        	_items = new NoNullAllowedItemsCollection(this);
         }
 
         public FolderMetaData()
         {
+			_items = new NoNullAllowedItemsCollection(this);
         }
 
-        private readonly List<ItemMetaData> _items = new List<ItemMetaData>();
+		private readonly IList<ItemMetaData> _items;
 
-        public virtual List<ItemMetaData> Items
+		public virtual IList<ItemMetaData> Items
         {
             get { return _items; }
         }
@@ -61,6 +65,30 @@ namespace SvnBridge.SourceControl
 				}
 			}
 			return null;
+		}
+
+		private class NoNullAllowedItemsCollection : Collection<ItemMetaData>
+		{
+			public NoNullAllowedItemsCollection(FolderMetaData parent)
+			{
+				this.parent = parent;
+			}
+
+			private readonly FolderMetaData parent;
+
+			protected override void InsertItem(int index, ItemMetaData item)
+			{
+				Guard.ArgumentNotNull(item, "item");
+				item.SetParent(parent);
+				base.InsertItem(index, item);
+			}
+
+			protected override void SetItem(int index, ItemMetaData item)
+			{
+				Guard.ArgumentNotNull(item, "item");
+				item.SetParent(parent);
+				base.SetItem(index, item);
+			}
 		}
     }
 }

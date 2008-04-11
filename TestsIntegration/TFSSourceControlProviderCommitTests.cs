@@ -750,10 +750,6 @@ namespace IntegrationTests
 			bool created = _providerRoot.WriteFile(_activityIdRoot, "/TestFile.txt", testFile);
 			MergeActivityResponse response = CommitRoot();
 
-			//it was removed when we created a new workspace
-			// we have to recreate it.
-			_provider.MakeActivity(_activityId);
-
 			Assert.Equal(GetString(testFile), ReadFile(testPath + "/TestFile.txt"));
 			Assert.Equal(false, created);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
