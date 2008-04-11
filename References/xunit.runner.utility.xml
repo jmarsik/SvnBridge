@@ -23,6 +23,12 @@
             Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
             </summary>
         </member>
+        <member name="M:Xunit.ExecutorWrapper.EnumerateTests">
+            <summary>
+            Enumerates the tests in an assembly.
+            </summary>
+            <returns>The fully-formed assembly node of the XML</returns>
+        </member>
         <member name="M:Xunit.ExecutorWrapper.GetAssemblyTestCount">
             <summary>
             Gets a count of the tests in the assembly.
@@ -36,6 +42,33 @@
             </summary>
             <param name="callback">The callback which is called as each test/class/assembly is
             finished. Returns XML nodes that are part of the xUnit XML output format.</param>
+            <returns>Returns the fully-formed assembly node for the assembly that was just run.</returns>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.RunClass(System.String,System.Action{System.Xml.XmlNode})">
+            <summary>
+            Runs all the tests in the given class.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="callback">The callback.</param>
+            <returns>Returns the fully-formed class node for the class that was just run.</returns>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.RunTest(System.String,System.String,System.Action{System.Xml.XmlNode})">
+            <summary>
+            Runs a single test in a class.
+            </summary>
+            <param name="type">The type to run.</param>
+            <param name="method">The method to run.</param>
+            <param name="callback">The callback.</param>
+            <returns>Returns the fully-formed class node for the class of the test that was just run.</returns>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.RunTests(System.String,System.Collections.Generic.List{System.String},System.Action{System.Xml.XmlNode})">
+            <summary>
+            Runs several tests in a single class.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="methods">The methods to run.</param>
+            <param name="callback">The callback.</param>
+            <returns>Returns the fully-formed class node for the class of the tests that were just run.</returns>
         </member>
         <member name="P:Xunit.ExecutorWrapper.AssemblyFilename">
             <summary>
