@@ -35,9 +35,9 @@ namespace SvnBridge
 
         public BootStrapper()
         {
-			IoC.Container.Configuration["connectionString"] = "default lock timeout=600000; Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
-        	IoC.Container.Configuration["loggerConnectionString"] = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs.sdf");
-			
+        	IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
+			IoC.Container.Configuration["persistentCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
+             
 			List<Assembly> asms = new List<Assembly>();
             List<string> names = new List<string>();
             foreach (Type type in representiveComponents)

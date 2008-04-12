@@ -1,36 +1,35 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
 using SvnBridge.Proxies;
 using SvnBridge.SourceControl;
-using System.Data;
 
 namespace SvnBridge.Infrastructure
 {
 	[Interceptor(typeof(TracingInterceptor))]
-	public class MetaDataRepository : DataAccessBase, IMetaDataRepository
+	public class MetaDataRepository : IMetaDataRepository
 	{
 		private readonly ITFSSourceControlService sourceControlService;
 		private readonly string serverUrl;
 		private readonly string rootPath;
 		private readonly ICredentials credentials;
+		private readonly IPersistentCache persistentCache;
 
 		public MetaDataRepository(
 			ITFSSourceControlService sourceControlService,
 			ICredentials credentials,
+			IPersistentCache persistentCache,
 			string serverUrl,
-			string rootPath,
-			string connectionString)
-			: base(connectionString)
+			string rootPath)
 		{
 			this.sourceControlService = sourceControlService;
 			this.serverUrl = serverUrl;
 			this.rootPath = rootPath;
 			this.credentials = credentials;
+			this.persistentCache = persistentCache;
 		}
 
 		public SourceItem QueryPreviousVersionOfItem(int itemId, int revision)
@@ -43,38 +42,35 @@ namespace SvnBridge.Infrastructure
 			return items[0];
 		}
 
-		public SourceItem[] QueryItems(int reversion, string path, Recursion recursion)
+		public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
 		{
 			string serverPath = GetServerPath(path);
 
-			EnsureRevisionIsCached(reversion, path);
-			List<SourceItem> items = new List<SourceItem>();
-			TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
+			EnsureRevisionIsCached(revision, path);
+
+			string cacheKey = GetItemsListCacheKey(recursion, revision, serverPath);
+
+			List<SourceItem> list = persistentCache.GetList<SourceItem>(cacheKey);
+			list.Sort(delegate(SourceItem x, SourceItem y)
 			{
-				SetSelectItemQuery(recursion, command);
-				Parameter(command, "Revision", reversion);
-				Parameter(command, "UserName", CurrentUserName);
-				Parameter(command, "ServerUrl", serverUrl);
-
-				if (recursion == Recursion.Full)
-					Parameter(command, "Path", serverPath + '%');
-				else
-					Parameter(command, "Path", serverPath);
-
-				if (recursion == Recursion.OneLevel)
-					Parameter(command, "Parent", serverPath);
-
-				using (IDataReader reader = command.ExecuteReader())
-				{
-					while (reader.Read())
-					{
-						SourceItem item = HydrateSourceItem(reader);
-
-						items.Add(item);
-					}
-				}
+				 return x.RemoteName.CompareTo(y.RemoteName);
 			});
-			return items.ToArray();
+			return list.ToArray();
+		}
+
+		private string GetItemsListCacheKey(Recursion recursion, int revision, string path)
+		{
+			switch (recursion)
+			{
+				case Recursion.Full:
+					return GetItemFullPathCacheKey(revision, path);
+				case Recursion.OneLevel:
+					return GetItemOneLevelCacheKey(revision, path);
+				case Recursion.None:
+					return GetItemCacheKey(revision, path);
+				default:
+					throw new NotSupportedException();
+			}
 		}
 
 		private string CurrentUserName
@@ -107,35 +103,6 @@ namespace SvnBridge.Infrastructure
 			return serverPath;
 		}
 
-		private SourceItem HydrateSourceItem(IDataRecord reader)
-		{
-			SourceItem item = new SourceItem();
-
-			item.ItemType = (bool)reader["IsFolder"] ? ItemType.Folder : ItemType.File;
-			item.ItemId = (int)reader["ItemId"];
-			item.RemoteName = (string)reader["Name"];
-			item.RemoteDate = (DateTime)reader["LastModifiedDate"];
-			item.RemoteChangesetId = (int)reader["ItemRevision"];
-			item.DownloadUrl = (string)reader["DownloadUrl"];
-			return item;
-		}
-
-		private static void SetSelectItemQuery(Recursion recursion, IDbCommand command)
-		{
-			switch (recursion)
-			{
-				case Recursion.None:
-					command.CommandText = Queries.SelectItem;
-					break;
-				case Recursion.OneLevel:
-					command.CommandText = Queries.SelectItemOneLevel;
-					break;
-				case Recursion.Full:
-					command.CommandText = Queries.SelectItemFullRecursion;
-					break;
-			}
-		}
-
 		public void EnsureRevisionIsCached(int revision, string path)
 		{
 			string serverPath = GetServerPath(path);
@@ -143,95 +110,91 @@ namespace SvnBridge.Infrastructure
 			// already cached this version, skip inserting
 			if (IsInCache(revision, serverPath))
 				return;
-
-			Transaction(IsolationLevel.Serializable, delegate
+			string cacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
+			persistentCache.Lock(cacheKey, delegate
 			{
-				// we rely on the transaction to serialize requests here
 				// we have to make a second test here, to ensure that another thread
 				// did not already read this version
 				if (IsInCache(revision, serverPath))
 					return;
 
 				SourceItemReader items = sourceControlService.QueryItemsReader(serverUrl,
-				                                                               credentials,
-				                                                               serverPath,
-				                                                               RecursionType.Full,
-				                                                               VersionSpec.FromChangeset(revision));
-
-				Command(delegate(IDbCommand command)
-				{
-					command.CommandText = Queries.InsertCachedRevision;
-					Parameter(command, "ServerUrl", serverUrl);
-					Parameter(command, "Revision", revision);
-					Parameter(command, "UserName", CurrentUserName);
-					Parameter(command, "RootPath", serverPath);
-					command.ExecuteNonQuery();
-				});
+																			   credentials,
+																			   serverPath,
+																			   RecursionType.Full,
+																			   VersionSpec.FromChangeset(revision));
 
 				bool firstRead = true;
 				while (items.Read())
 				{
-					// we optimize it here in case we tried to load a file, we load the entire
-					// directory. This tends to save a lot of round trips in many cases
-					if (firstRead && items.SourceItem.ItemType == ItemType.File)
+					if(firstRead)
 					{
-						//change it to the directory name, can't use the Path class
-						// because that will change the '/' to '\'
-						serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
-						items = sourceControlService.QueryItemsReader(serverUrl,
-						                                              credentials,
-						                                              serverPath,
-						                                              RecursionType.Full,
-						                                              VersionSpec.FromChangeset(revision));
-						items.Read();
+						items = QueryFolderIfCurrentlyReadingFile(revision, ref serverPath, items);
+						firstRead = false;
 					}
-					firstRead = false;
 
-					SourceItem item = items.SourceItem;
+					string itemCacheKey = GetItemCacheKey(revision, items.SourceItem.RemoteName);
 
-					bool alreadyExists = false;
 
-					Command(delegate(IDbCommand command)
+					persistentCache.Set(itemCacheKey, items.SourceItem);
+					
+					persistentCache.Add(GetItemOneLevelCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
+					persistentCache.Add(GetItemFullPathCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
+						
+					string parentDirectory = GetParentName(items.SourceItem.RemoteName);
+					persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), itemCacheKey);
+
+					do
 					{
-						command.CommandText = Queries.SelectItem;
-						Parameter(command, "ServerUrl", serverUrl);
-						Parameter(command, "UserName", CurrentUserName);
-						Parameter(command, "Revision", revision);
-						Parameter(command, "Path", item.RemoteName);
+						persistentCache.Add(GetItemFullPathCacheKey(revision, parentDirectory), itemCacheKey);
+						parentDirectory = GetParentName(parentDirectory);
+					} while (parentDirectory != "$" && string.IsNullOrEmpty(parentDirectory) == false);
 
-						using (IDataReader reader = command.ExecuteReader())
-						{
-							alreadyExists = reader.Read();
-						}
-					});
-
-					if (alreadyExists)
-						continue;
-
-					Command(delegate(IDbCommand command)
-					{
-						command.CommandText = Queries.InsertItemMetaData;
-
-						Parameter(command, "Id", SequentialGuid.Next());
-						Parameter(command, "IsFolder", item.ItemType == ItemType.Folder);
-						Parameter(command, "ItemId", item.ItemId);
-						Parameter(command, "Name", item.RemoteName);
-						Parameter(command, "UserName", CurrentUserName);
-						Parameter(command, "Parent", GetParentName(item.RemoteName));
-						Parameter(command, "ServerUrl", serverUrl);
-						Parameter(command, "ItemRevision", item.RemoteChangesetId);
-						Parameter(command, "EffectiveRevision", revision);
-						Parameter(command, "DownloadUrl", item.DownloadUrl);
-						Parameter(command, "LastModifiedDate", item.RemoteDate);
-
-						command.ExecuteNonQuery();
-					});
 				}
 
+				persistentCache.Set(cacheKey, true);
 			});
+
 		}
 
-		private object GetParentName(string name)
+		private SourceItemReader QueryFolderIfCurrentlyReadingFile(int revision, ref string serverPath, SourceItemReader items)
+		{
+			// we optimize it here in case we tried to load a file, we load the entire
+			// directory. This tends to save a lot of round trips in many cases
+			if (items.SourceItem.ItemType == ItemType.File)
+			{
+				//change it to the directory name, can't use the Path class
+				// because that will change the '/' to '\'
+				serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+				items = sourceControlService.QueryItemsReader(serverUrl,
+				                                              credentials,
+				                                              serverPath,
+				                                              RecursionType.Full,
+				                                              VersionSpec.FromChangeset(revision));
+				items.Read();
+			}
+			return items;
+		}
+
+		private string GetItemFullPathCacheKey(int revision, string parentDirectory)
+		{
+			return "Full path of " + GetItemCacheKey(revision, parentDirectory);
+		}
+
+		private string GetItemOneLevelCacheKey(int revision, string parentDirectory)
+		{
+			return "One Level of " + GetItemCacheKey(revision, parentDirectory);
+		}
+
+		private string GetItemCacheKey(int revision, string path)
+		{
+			return "ServerUrl: " + serverUrl +
+				   ", UserName: " + CurrentUserName +
+				   ", Revision: " + revision +
+				   ", Path: " + path;
+		}
+
+		private string GetParentName(string name)
 		{
 			int lastIndexOfSlash = name.LastIndexOf('/');
 			if (lastIndexOfSlash == -1)
@@ -241,69 +204,34 @@ namespace SvnBridge.Infrastructure
 
 		public bool IsInCache(int revision, string path)
 		{
-			int? maybeRevisionFromDb = null;
-
+			CachedResult result;
 			string serverPath = path;
-
 			do
 			{
+				string cacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
+				result = persistentCache.Get(cacheKey);
 
-				TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
-				{
-					command.CommandText = Queries.SelectCachedRevision;
-					Parameter(command, "Revision", revision);
-					Parameter(command, "ServerUrl", serverUrl);
-					Parameter(command, "UserName", CurrentUserName);
-					Parameter(command, "RootPath", serverPath);
-					maybeRevisionFromDb = (int?)command.ExecuteScalar();
-				});
-				if (serverPath.IndexOf('/') != -1)
-				{
-					serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
-				}
-				else
-				{
+				if (serverPath.IndexOf('/') == -1)
 					break;
-				}
 
-			} while (maybeRevisionFromDb == null);
+				serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+			} while (result == null);
 
 
-			return maybeRevisionFromDb != null;
+			return result != null;
+		}
+
+		private string CreateRevisionAndPathCacheKey(int revision, string serverPath)
+		{
+			return "Revision: " + revision +
+				   ", ServerUrl: " + serverUrl +
+				   ", UserName: " + CurrentUserName +
+				   ", RootPath: " + serverPath;
 		}
 
 		public void ClearCache()
 		{
-			TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
-			{
-				ExecuteCommands(Queries.DeleteCache.Split(new char[] { ';' }, StringSplitOptions.None), command);
-			});
-		}
-
-		public void CreateDatabase()
-		{
-			SqlCeEngine engine = new SqlCeEngine(connectionString);
-			engine.CreateDatabase();
-
-			TransactionalCommand(IsolationLevel.Serializable, delegate(IDbCommand command)
-			{
-				ExecuteCommands(Queries.CreateDatabase.Split(new char[] { ';' }, StringSplitOptions.None), command);
-			});
-		}
-
-		public void EnsureDbExists()
-		{
-			try
-			{
-				Transaction(IsolationLevel.Serializable, delegate
-				{
-					//empty transaction block to verify that we can access DB
-				});
-			}
-			catch
-			{
-				CreateDatabase();
-			}
+			persistentCache.Clear();
 		}
 	}
 }

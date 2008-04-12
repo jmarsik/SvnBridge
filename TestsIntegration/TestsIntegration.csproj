@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticateAsLowPrivilegeUser.cs" />
+    <Compile Include="FileBasedPersistentCacheTest.cs" />
     <Compile Include="FileCacheTest.cs" />
     <Compile Include="MetaDataRepositoryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -69,23 +69,6 @@ namespace TestsEndToEnd
             Svn("commit -m ren");
         }
 
-    	[SvnBridgeFact]
-    	public void WillClearExistingTempWorkSpacesOnCommit()
-    	{
-    		WriteFile(testPath + "/test1234", "!", true);
-
-			RenameItem(testPath+"/test1234", testPath+"/test5678", false);
-
-			CheckoutAndChangeDirectory();
-			File.WriteAllText("test1234", "blah");
-
-    		Assert.Throws<InvalidOperationException>(delegate
-    		{
-    			Svn("commit -m test");
-    		});
-			Svn("commit -m test");
-    	}
-
 		[SvnBridgeFact]
 		public void VerySlowCalculationOfUpdateDiff_ShouldNotCauseError()
 		{

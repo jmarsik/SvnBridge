@@ -17,10 +17,17 @@ namespace SvnBridge.Net
 		{
 			get
 			{
+				EnsureInitialized();
 				if (HttpContext.Current != null)
 					return HttpContext.Current.Items;
-				return currentItems ?? new Hashtable();
+				return currentItems;
 			}
+		}
+
+		public static void EnsureInitialized()
+		{
+			if(HttpContext.Current==null && currentItems==null)
+				throw new InvalidOperationException("Cannot use PerRequest Items if it wasn't initialized");
 		}
 	}
 }

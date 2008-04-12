@@ -42,10 +42,6 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SqlServerCe, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
@@ -53,6 +49,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BootStrapper.cs" />
+    <Compile Include="Cache\FileBasedPersistentCache.cs" />
+    <Compile Include="Cache\FileNameHashing.cs" />
+    <Compile Include="Cache\HashSet.cs" />
+    <Compile Include="Cache\ISet.cs" />
+    <Compile Include="Interfaces\IPersistentCache.cs" />
     <Compile Include="NullImpl\NullCache.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Exceptions\CacheMissException.cs" />
@@ -67,11 +68,10 @@
     <Compile Include="Infrastructure\MetaDataRepositoryFactory.cs" />
     <Compile Include="Net\PerRequest.cs" />
     <Compile Include="NullImpl\NullLogger.cs" />
-    <Compile Include="Infrastructure\SqlCeLogger.cs" />
+    <Compile Include="Infrastructure\DefaultLogger.cs" />
     <Compile Include="Interfaces\IMetaDataRepository.cs" />
     <Compile Include="Infrastructure\MetaDataRepository.cs" />
     <Compile Include="Infrastructure\Queries.cs" />
-    <Compile Include="Infrastructure\DataAccessBase.cs" />
     <Compile Include="Infrastructure\SequentialGuid.cs" />
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="Interfaces\IMetaDataRepositoryFactory.cs" />
@@ -82,7 +82,7 @@
     <Compile Include="PathParsing\StaticServerWithProjectNameInHostNamePathParser.cs" />
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />
     <Compile Include="Infrastructure\ExceptionHelper.cs" />
-    <Compile Include="Infrastructure\FileCache.cs" />
+    <Compile Include="Cache\FileCache.cs" />
     <Compile Include="Infrastructure\SourceControlServicesHub.cs" />
     <Compile Include="Interfaces\CachedResult.cs" />
     <Compile Include="Interfaces\ICanValidateMyEnvironment.cs" />
@@ -95,7 +95,7 @@
     <Compile Include="Protocol\DatedRevReportData.cs" />
     <Compile Include="Proxies\ProxyFactory.cs" />
     <Compile Include="Proxies\RemotingInvocation.cs" />
-    <Compile Include="Proxies\RetryOnSocketExceptionsInterceptor.cs" />
+    <Compile Include="Proxies\RetryOnExceptionsInterceptor.cs" />
     <Compile Include="Interfaces\IItemLoader.cs" />
     <Compile Include="Interfaces\IUpdateReportService.cs" />
     <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />

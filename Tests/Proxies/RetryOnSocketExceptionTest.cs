@@ -10,7 +10,7 @@ namespace SvnBridge.Proxies
 {
     public class RetryOnSocketExceptionTest : IDisposable
     {
-        private MockRepository mocks;
+        private readonly MockRepository mocks;
 
         public RetryOnSocketExceptionTest()
         {
@@ -25,7 +25,7 @@ namespace SvnBridge.Proxies
         [Fact]
         public void WillNotFailOnFirstSocketException()
         {
-            RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
+			RetryOnExceptionsInterceptor<SocketException> interceptor = new RetryOnExceptionsInterceptor<SocketException>(mocks.Stub<ILogger>());
             IInvocation mock = mocks.CreateMock<IInvocation>();
             // first call throws
             Expect.Call(mock.Proceed).Throw(new SocketException());
@@ -41,7 +41,7 @@ namespace SvnBridge.Proxies
         [Fact]
         public void WillNotFailOnFirstWebException()
         {
-            RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
+            RetryOnExceptionsInterceptor<WebException> interceptor = new RetryOnExceptionsInterceptor<WebException>(mocks.Stub<ILogger>());
             IInvocation mock = mocks.CreateMock<IInvocation>();
             // first call throws
             Expect.Call(mock.Proceed).Throw(new WebException());
@@ -57,7 +57,7 @@ namespace SvnBridge.Proxies
         [Fact]
         public void WillFailOnNonSocketOrWebException()
         {
-            RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
+            RetryOnExceptionsInterceptor<WebException> interceptor = new RetryOnExceptionsInterceptor<WebException>(mocks.Stub<ILogger>());
             IInvocation mock = mocks.CreateMock<IInvocation>();
           
             Expect.Call(mock.Proceed).Throw(new InvalidOperationException());
@@ -72,7 +72,7 @@ namespace SvnBridge.Proxies
         [Fact]
         public void WillThrowAfterThreeAttempts()
         {
-            RetryOnSocketExceptionsInterceptor interceptor = new RetryOnSocketExceptionsInterceptor(mocks.Stub<ILogger>());
+			RetryOnExceptionsInterceptor<SocketException> interceptor = new RetryOnExceptionsInterceptor<SocketException>(mocks.Stub<ILogger>());
             IInvocation mock = mocks.CreateMock<IInvocation>();
             Expect.Call(mock.Proceed).Throw(new SocketException()).Repeat.Times(3);
 

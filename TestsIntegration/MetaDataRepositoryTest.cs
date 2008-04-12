@@ -1,14 +1,15 @@
-using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using IntegrationTests;
 using SvnBridge;
 using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using Xunit;
 
-namespace IntegrationTests
+namespace TestsIntegration
 {
 	public class MetaDataRepositoryTest : TFSSourceControlProviderTestsBase
 	{
@@ -18,15 +19,11 @@ namespace IntegrationTests
 
 		public MetaDataRepositoryTest()
 		{
-			new BootStrapper().Start();
 			credentials = GetCredentials();
 			sourceControlService = IoC.Resolve<ITFSSourceControlService>();
-			string dbFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
 
-			repository = new MetaDataRepository(sourceControlService, credentials, ServerUrl,
-												Constants.ServerRootPath + PROJECT_NAME,
-												@"Data Source=" + dbFile);
-			repository.EnsureDbExists();
+			repository = new MetaDataRepository(sourceControlService, credentials,
+												IoC.Resolve<IPersistentCache>(), ServerUrl, Constants.ServerRootPath + PROJECT_NAME);
 		}
 
 		[Fact]
@@ -79,6 +76,33 @@ namespace IntegrationTests
 		}
 
 		[Fact]
+		public void QueryItemsAndQueryItemsReaderReturnSameResults()
+		{
+			WriteFile(testPath + "/Test.txt", "blah", true);
+			List<SourceItem> fromReader = new List<SourceItem>();
+			SourceItemReader reader = sourceControlService.QueryItemsReader(
+				ServerUrl,
+				credentials,
+				Constants.ServerRootPath + PROJECT_NAME,
+				RecursionType.OneLevel,
+				VersionSpec.FromChangeset(_lastCommitRevision));
+
+			while (reader.Read())
+				fromReader.Add(reader.SourceItem);
+
+			SourceItem[] sourceItems = sourceControlService.QueryItems(
+				ServerUrl,
+				credentials,
+				Constants.ServerRootPath + PROJECT_NAME,
+				RecursionType.OneLevel,
+				VersionSpec.FromChangeset(_lastCommitRevision),
+				DeletedState.NonDeleted,
+				ItemType.Any);
+
+			AssertEquals(sourceItems, fromReader.ToArray());
+		}
+
+		[Fact]
 		public void CanGetValidResultFromQueryItems_RecursionFull()
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);
@@ -96,11 +120,10 @@ namespace IntegrationTests
 			AssertEquals(sourceItems, items);
 		}
 
-		[Fact(Skip="Failing, will investigate later")]
-		public void CanGetFileById()
+		[Fact]
+		public void CanGetPreviousVersionOfFile()
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);
-
 			SourceItem[] sourceItems = sourceControlService.QueryItems(
 				ServerUrl,
 				credentials,
@@ -109,30 +132,12 @@ namespace IntegrationTests
 				VersionSpec.FromChangeset(_lastCommitRevision),
 				DeletedState.NonDeleted,
 				ItemType.Any);
+
+			RenameItem(testPath + "/Test.txt", testPath + "/blah.txt", true);
 
 			SourceItem item = repository.QueryPreviousVersionOfItem((sourceItems[0].ItemId), _lastCommitRevision);
 
-			AssertEquals(sourceItems, new SourceItem[] { item });
-		}
-
-        [Fact(Skip = "Failing, will investigate later")]
-        public void CaGetFileById_WillCacheRevision()
-		{
-			WriteFile(testPath + "/Test.txt", "blah", true);
-
-			SourceItem[] sourceItems = sourceControlService.QueryItems(
-				ServerUrl,
-				credentials,
-				Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt",
-				RecursionType.None,
-				VersionSpec.FromChangeset(_lastCommitRevision),
-				DeletedState.NonDeleted,
-				ItemType.Any);
-
-			repository.QueryPreviousVersionOfItem(sourceItems[0].ItemId, _lastCommitRevision);
-
-			string path = Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt";
-			Assert.True(repository.IsInCache(_lastCommitRevision, path));
+			Assert.Equal("$/SvnBridgeTesting" + testPath + "/Test.txt", item.RemoteName);
 		}
 
 		private void AssertEquals(SourceItem[] sourceItems, SourceItem[] items)

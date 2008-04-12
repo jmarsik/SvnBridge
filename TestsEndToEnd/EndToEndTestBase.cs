@@ -30,6 +30,7 @@ namespace TestsEndToEnd
 
 		public virtual void Initialize(string url, IPathParser parser)
 		{
+			initialized = true;
 			testUrl = url;
 
 			new BootStrapper().Start();
@@ -55,8 +56,11 @@ namespace TestsEndToEnd
 
 		public override void Dispose()
 		{
-			if (listener != null)
-				listener.Stop();
+
+			if (initialized==false)
+				return;
+			
+			listener.Stop();
 
 			base.Dispose();
 			ForAllFilesInCurrentDirectory(
@@ -68,13 +72,9 @@ namespace TestsEndToEnd
 					}
 					catch (Exception)
 					{
-						// nothign much to do here
+						// nothing much to do here
 					}
 				});
-
-			Environment.CurrentDirectory = Path.GetPathRoot(Environment.CurrentDirectory);
-
-			//Directory.Delete(checkoutFolder, true);
 
 			authenticateAsLowPrivilegeUser.Dispose();
 		}
@@ -86,6 +86,7 @@ namespace TestsEndToEnd
 		protected string testUrl;
 		protected int port;
 		private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
+		private bool initialized;
 
 		protected static void ForAllFilesInCurrentDirectory(Action<FileInfo> action)
 		{

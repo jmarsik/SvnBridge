@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using CodePlex.TfsLibrary;
 using SvnBridge.Net;
 
@@ -20,7 +21,8 @@ namespace SvnBridge.SourceControl
 	using System.Threading;
 
 	[Interceptor(typeof(TracingInterceptor))]
-	[Interceptor(typeof(RetryOnSocketExceptionsInterceptor))]
+	[Interceptor(typeof(RetryOnExceptionsInterceptor<WebException>))]
+	[Interceptor(typeof(RetryOnExceptionsInterceptor<SocketException>))]
 	public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
 	{
 		private readonly ISourceControlServicesHub sourceControlServicesHub;
@@ -124,7 +126,7 @@ namespace SvnBridge.SourceControl
 		public bool DeleteItem(string activityId,
 							   string path)
 		{
-			if ((GetItems(-1, path, Recursion.None, true, false) == null) && (GetPendingItem(activityId, path) == null))
+			if ((GetItems(-1, path, Recursion.None, true) == null) && (GetPendingItem(activityId, path) == null))
 			{
 				return false;
 			}
@@ -226,14 +228,14 @@ namespace SvnBridge.SourceControl
 									 string path,
 									 Recursion recursion)
 		{
-			return GetItems(version, path, recursion, false, true);
+			return GetItems(version, path, recursion, false);
 		}
 
 		public ItemMetaData GetItemsWithoutProperties(int version,
 													  string path,
 													  Recursion recursion)
 		{
-			return GetItems(version, path, recursion, false, false);
+			return GetItems(version, path, recursion, false);
 		}
 
 		/// <summary>
@@ -700,11 +702,7 @@ namespace SvnBridge.SourceControl
 
 		#endregion
 
-		private ItemMetaData GetItems(int version,
-									  string path,
-									  Recursion recursion,
-									  bool returnPropertyFiles,
-									  bool readItemsProperties)
+		private ItemMetaData GetItems(int version, string path, Recursion recursion, bool returnPropertyFiles)
 		{
 			if (path.StartsWith("/"))
 			{
@@ -727,7 +725,7 @@ namespace SvnBridge.SourceControl
 			for (int i = 0; i < items.Length; i++)
 			{
 				ItemMetaData item = ItemMetaData.ConvertSourceItem(items[i], rootPath);
-				if (recursion != Recursion.Full && readItemsProperties && !returnPropertyFiles)
+				if (!returnPropertyFiles)
 				{
 					if (Path.GetFileName(item.Name) != Constants.PropFolder)
 					{
@@ -963,7 +961,7 @@ namespace SvnBridge.SourceControl
 					else
 						existingPath = "";
 
-					item = GetItems(-1, existingPath, Recursion.None, true, false);
+					item = GetItems(-1, existingPath, Recursion.None, true);
 				} while (item == null);
 
 				string localPath = GetLocalPath(activityId, path);
@@ -972,7 +970,7 @@ namespace SvnBridge.SourceControl
 												  localPath.Substring(0, localPath.LastIndexOf('\\')),
 												  item.Revision));
 
-				item = GetItems(-1, path.Substring(1), Recursion.None, true, false);
+				item = GetItems(-1, path.Substring(1), Recursion.None, true);
 				if (item != null)
 				{
 					updates.Add(LocalUpdate.FromLocal(item.Id, localPath, item.Revision));
@@ -1225,7 +1223,7 @@ namespace SvnBridge.SourceControl
 			{
 				string localPath = GetLocalPath(activityId, path);
 
-				ItemMetaData item = GetItems(-1, path, Recursion.None, true, false);
+				ItemMetaData item = GetItems(-1, path, Recursion.None, true);
 				if (item == null)
 				{
 					item = GetPendingItem(activityId, path);
@@ -1268,7 +1266,7 @@ namespace SvnBridge.SourceControl
 
 			if (cachedResult == null)
 			{
-				item = GetItems(-1, propertiesPath, Recursion.None, true, false);
+				item = GetItems(-1, propertiesPath, Recursion.None, true);
 				Cache.Set(cacheKey, item);
 			}
 			else
@@ -1317,7 +1315,7 @@ namespace SvnBridge.SourceControl
 
 					string propertiesPath = GetPropertiesFileName(path, itemType);
 					string propertiesFolder = GetPropertiesFolderName(path, itemType);
-					ItemMetaData propertiesFolderItem = GetItems(-1, propertiesFolder, Recursion.None, true, false);
+					ItemMetaData propertiesFolderItem = GetItems(-1, propertiesFolder, Recursion.None, true);
 					if ((propertiesFolderItem == null) && !activity.Collections.Contains(propertiesFolder))
 					{
 						MakeCollection(activityId, propertiesFolder);

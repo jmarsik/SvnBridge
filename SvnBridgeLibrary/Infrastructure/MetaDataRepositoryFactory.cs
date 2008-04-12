@@ -1,7 +1,5 @@
 using System.Net;
-using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Interfaces;
-using System;
 using SvnBridge.SourceControl;
 
 namespace SvnBridge.Infrastructure
@@ -9,19 +7,19 @@ namespace SvnBridge.Infrastructure
 	public class MetaDataRepositoryFactory : IMetaDataRepositoryFactory
 	{
 		private readonly ITFSSourceControlService sourceControlService;
-		private string connectionString;
+		private readonly IPersistentCache persistentCache;
 
-		public MetaDataRepositoryFactory(ITFSSourceControlService sourceControlService, string connectionString)
+		public MetaDataRepositoryFactory(ITFSSourceControlService sourceControlService, IPersistentCache persistentCache)
 		{
 			this.sourceControlService = sourceControlService;
-			this.connectionString = connectionString;
+			this.persistentCache = persistentCache;
 		}
 
 		public IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath)
 		{
-            AppDomain.CurrentDomain.SetData("SQLServerCompactEditionUnderWebHosting", true);
-            MetaDataRepository repository = new MetaDataRepository(sourceControlService, credentials, serverUrl, rootPath, connectionString);
-            repository.EnsureDbExists();
+			MetaDataRepository repository = new MetaDataRepository(sourceControlService, credentials, 
+				persistentCache,
+				serverUrl, rootPath);
 			return repository;
 		}
 

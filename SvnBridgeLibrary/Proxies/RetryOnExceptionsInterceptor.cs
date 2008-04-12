@@ -9,11 +9,12 @@ using SvnBridge.Interfaces;
 namespace SvnBridge.Proxies
 {
 	[DebuggerStepThrough]
-    public class RetryOnSocketExceptionsInterceptor : IInterceptor
+    public class RetryOnExceptionsInterceptor<TException> : IInterceptor
+		where TException : Exception
     {
         private readonly ILogger logger;
 
-        public RetryOnSocketExceptionsInterceptor(ILogger logger)
+        public RetryOnExceptionsInterceptor(ILogger logger)
         {
             this.logger = logger;
         }
@@ -28,22 +29,16 @@ namespace SvnBridge.Proxies
                     invocation.Proceed();
                     return;
                 }
-                catch (WebException we)
+                catch (TException we)
                 {
                     exception = we;
                     // we will retry here, since we assume that the failure is trasient
-                    logger.Info("Web Exception occured, attempt #" + (i + 1) + ", retrying...", we);
-                }
-                catch (SocketException se)
-                {
-                    exception = se;
-                    // we will retry here, since we assume that the failure is trasient
-                    logger.Info("Socket Error occured, attempt #" + (i + 1) + ", retrying...", se);
+                    logger.Info("Exception occured, attempt #" + (i + 1) + ", retrying...", we);
                 }
 
-                // if we are here we got an network exception, we will assume this is a
+                // if we are here we got an exception, we will assume this is a
                 // trasient situation and wait a bit, hopefully it will clear up
-                Thread.Sleep(500);
+                Thread.Sleep(100);
             }
             if (exception == null)
                 return;

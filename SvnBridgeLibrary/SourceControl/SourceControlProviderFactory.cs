@@ -29,8 +29,7 @@ namespace SvnBridge.SourceControl
                 deps["serverUrl"] = serverUrl;
                 deps["projectName"] = projectName;
                 deps["credentials"] = credentials;
-                deps["rootCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
-                return IoC.Resolve<ISourceControlProvider>(deps);
+				return IoC.Resolve<ISourceControlProvider>(deps);
             }
             else
             {

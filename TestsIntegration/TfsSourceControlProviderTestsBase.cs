@@ -6,6 +6,8 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
+using SvnBridge;
+using SvnBridge.Net;
 using TestsIntegration.Properties;
 using Rhino.Mocks;
 using SvnBridge.Infrastructure;
@@ -32,6 +34,10 @@ namespace IntegrationTests
 
 		public TFSSourceControlProviderTestsBase()
 		{
+			PerRequest.Init();
+			new BootStrapper().Start();
+			IoC.Resolve<IPersistentCache>().Clear();
+
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 
 			_activityId = Guid.NewGuid().ToString();
@@ -72,8 +78,7 @@ namespace IntegrationTests
 																						  webTransferService,
 																						  system,
 																						  new NullLogger());
-			string connectionString = "default lock timeout=600000;Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache.sdf");
-			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, connectionString);
+			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<IPersistentCache>());
 			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
 																					   metaDataRepositoryFactory,
 																					   ServerUrl);
@@ -149,6 +154,7 @@ namespace IntegrationTests
 			_lastCommitRevision = response.Version;
 			_provider.DeleteActivity(_activityId);
 			_provider.MakeActivity(_activityId);
+			PerRequest.Init();
 			return response;
 		}
 
@@ -156,6 +162,7 @@ namespace IntegrationTests
 		{
 			MergeActivityResponse response = _providerRoot.MergeActivity(_activityIdRoot);
 			_lastCommitRevision = response.Version;
+			PerRequest.Init();
 			_providerRoot.DeleteActivity(_activityIdRoot);
 			_providerRoot.MakeActivity(_activityIdRoot);
 			return response;

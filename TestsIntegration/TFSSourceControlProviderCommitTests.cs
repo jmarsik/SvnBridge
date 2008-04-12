@@ -1,6 +1,8 @@
 using System;
+using CodePlex.TfsLibrary;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using Xunit;
 
@@ -22,6 +24,7 @@ namespace IntegrationTests
 			_provider.MergeActivity(activity2);
 
 			_provider.MergeActivity(activity1);
+			PerRequest.Init();
 
 			FolderMetaData items = (FolderMetaData)_provider.GetItems(_provider.GetLatestVersion(), testPath, Recursion.Full);
 			Assert.Equal(2, items.Items.Count);

@@ -1,20 +1,14 @@
 using System;
-using System.Data;
-using System.Data.SqlServerCe;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Xml;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.Infrastructure
 {
-	public class SqlCeLogger : DataAccessBase, ILogger, ICanValidateMyEnvironment
+	public class DefaultLogger : ILogger, ICanValidateMyEnvironment
 	{
-		public SqlCeLogger(string loggerConnectionString)
-			: base(loggerConnectionString)
-		{
-		}
-
 		#region ILogger Members
 
 		public void Error(string message, Exception exception)
@@ -58,18 +52,11 @@ namespace SvnBridge.Infrastructure
 
 		#endregion
 
-		private void Log(string level, string message, string exception)
+		private static void Log(string level, string message, string exception)
 		{
 			try
 			{
-				TransactionalCommand(IsolationLevel.ReadCommitted, delegate(IDbCommand command)
-				{
-					command.CommandText = Queries.InsertLog;
-					Parameter(command, "Level", level);
-					Parameter(command, "Message", message);
-					Parameter(command, "Exception", exception);
-					command.ExecuteNonQuery();
-				});
+				WriteLogMessageWithNoExceptionHandling(level, message, exception);
 			}
 			catch (Exception)
 			{
@@ -78,36 +65,16 @@ namespace SvnBridge.Infrastructure
 			}
 		}
 
-		public void EnsureDbExists()
+		private static void WriteLogMessageWithNoExceptionHandling(string level, string message, string exception)
 		{
-			try
+			using(XmlWriter writer = XmlWriter.Create(File.AppendText(level+".log")))
 			{
-				Transaction(IsolationLevel.Serializable, delegate
-				{
-					//empty transaction block to verify that we can access DB
-				});
-			}
-			catch
-			{
-				CreateDatabase();
-			}
-		}
-
-		public void CreateDatabase()
-		{
-			try
-			{
-				SqlCeEngine engine = new SqlCeEngine(connectionString);
-				engine.CreateDatabase();
-
-				TransactionalCommand(IsolationLevel.Serializable, delegate(IDbCommand command)
-				{
-					ExecuteCommands(Queries.CreateLoggingDatabase.Split(new char[] { ';' }, StringSplitOptions.None), command);
-				});
-			}
-			catch (Exception)
-			{
-				// if we fail, nothing much we can do
+				writer.WriteStartElement("log");
+				writer.WriteAttributeString("level", level);
+				writer.WriteElementString("message", message);
+				if(string.IsNullOrEmpty(exception)==false)
+					writer.WriteElementString("exception", exception);
+				writer.WriteEndElement();
 			}
 		}
 
@@ -115,7 +82,7 @@ namespace SvnBridge.Infrastructure
 
 		public void ValidateEnvironment()
 		{
-			EnsureDbExists();
+			WriteLogMessageWithNoExceptionHandling("test", "can write to file", null);
 		}
 
 		#endregion
