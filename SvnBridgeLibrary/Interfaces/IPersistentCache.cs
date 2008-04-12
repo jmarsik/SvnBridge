@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 namespace SvnBridge.Interfaces
 {
+	public delegate void Action();
+
 	public interface IPersistentCache
 	{
 		CachedResult Get(string key);
 
 		void Set(string key, object obj);
 
-		void Lock(string key, Action<string> action);
+		void Lock(string key, Action action);
 		
 		bool Contains(string key);
 

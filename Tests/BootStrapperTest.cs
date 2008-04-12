@@ -3,7 +3,6 @@ using System.Collections;
 using System.Net;
 using Xunit;
 using Rhino.Mocks;
-using Rhino.Mocks.Constraints;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
@@ -32,6 +31,13 @@ namespace SvnBridge
 		{
 			new BootStrapper().Start();
 			Assert.NotNull(IoC.Resolve<ICache>());
+		}
+
+		[Fact]
+		public void AfterStartingBootStrapper_WillResolveSameInstanceForPersistentCache()
+		{
+			new BootStrapper().Start();
+			Assert.Same(IoC.Resolve<IPersistentCache>(), IoC.Resolve<IPersistentCache>());
 		}
 
 		[Fact]

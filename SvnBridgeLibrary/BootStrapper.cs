@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -6,6 +7,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
+using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
@@ -36,7 +38,6 @@ namespace SvnBridge
         public BootStrapper()
         {
         	IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
-			IoC.Container.Configuration["persistentCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
              
 			List<Assembly> asms = new List<Assembly>();
             List<string> names = new List<string>();

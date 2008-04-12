@@ -11,6 +11,5 @@ namespace SvnBridge.Infrastructure
         }
 
         public Type Interceptor;
-
     }
 }

@@ -9,17 +9,9 @@ using Xunit;
 
 namespace TestsIntegration
 {
-	public class FileBasedPersistentCacheTest
+	public class PersistentCacheTestBase
 	{
-		private readonly IPersistentCache cache;
-
-		public FileBasedPersistentCacheTest()
-		{
-			cache = new FileBasedPersistentCache("Cache");
-			cache.Clear();
-
-			PerRequest.Init();
-		}
+		protected IPersistentCache cache;
 
 		[Fact]
 		public void IfItemDoesNotExists_WillReturnNull()
@@ -31,16 +23,16 @@ namespace TestsIntegration
 		public void CanSetAndGetItems()
 		{
 			cache.Set("test", 15);
-			Assert.Equal(15, cache.Get("test").Value);
+			Assert.Equal<object>(15, cache.Get("test").Value);
 		}
 
 		[Fact]
 		public void CanOverwriteValues()
 		{
 			cache.Set("test", 15);
-			Assert.Equal(15, cache.Get("test").Value);
+			Assert.Equal<object>(15, cache.Get("test").Value);
 			cache.Set("test", "blah");
-			Assert.Equal("blah", cache.Get("test").Value);
+			Assert.Equal<object>("blah", cache.Get("test").Value);
 		}
 
 		[Fact]
@@ -96,6 +88,17 @@ namespace TestsIntegration
 			{
 				Assert.Equal(i, list[i]);
 			}
+		}
+	}
+
+	public class MemoryBasedPersistentCacheTest : PersistentCacheTestBase
+	{
+		public MemoryBasedPersistentCacheTest()
+		{
+			cache = new MemoryBasedPersistentCache();
+			cache.Clear();
+
+			PerRequest.Init();
 		}
 	}
 }

@@ -53,7 +53,7 @@ namespace SvnBridge.Infrastructure
 			List<SourceItem> list = persistentCache.GetList<SourceItem>(cacheKey);
 			list.Sort(delegate(SourceItem x, SourceItem y)
 			{
-				 return x.RemoteName.CompareTo(y.RemoteName);
+				return x.RemoteName.CompareTo(y.RemoteName);
 			});
 			return list.ToArray();
 		}
@@ -67,10 +67,15 @@ namespace SvnBridge.Infrastructure
 				case Recursion.OneLevel:
 					return GetItemOneLevelCacheKey(revision, path);
 				case Recursion.None:
-					return GetItemCacheKey(revision, path);
+					return GetItemNoRecursionCacheKey(revision, path);
 				default:
 					throw new NotSupportedException();
 			}
+		}
+
+		private string GetItemNoRecursionCacheKey(int revision, string path)
+		{
+			return "No recursion of: " + GetItemCacheKey(revision, path);
 		}
 
 		private string CurrentUserName
@@ -127,7 +132,7 @@ namespace SvnBridge.Infrastructure
 				bool firstRead = true;
 				while (items.Read())
 				{
-					if(firstRead)
+					if (firstRead)
 					{
 						items = QueryFolderIfCurrentlyReadingFile(revision, ref serverPath, items);
 						firstRead = false;
@@ -137,10 +142,11 @@ namespace SvnBridge.Infrastructure
 
 
 					persistentCache.Set(itemCacheKey, items.SourceItem);
-					
+
+					persistentCache.Add(GetItemNoRecursionCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
 					persistentCache.Add(GetItemOneLevelCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
 					persistentCache.Add(GetItemFullPathCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
-						
+
 					string parentDirectory = GetParentName(items.SourceItem.RemoteName);
 					persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), itemCacheKey);
 
@@ -167,10 +173,10 @@ namespace SvnBridge.Infrastructure
 				// because that will change the '/' to '\'
 				serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
 				items = sourceControlService.QueryItemsReader(serverUrl,
-				                                              credentials,
-				                                              serverPath,
-				                                              RecursionType.Full,
-				                                              VersionSpec.FromChangeset(revision));
+															  credentials,
+															  serverPath,
+															  RecursionType.Full,
+															  VersionSpec.FromChangeset(revision));
 				items.Read();
 			}
 			return items;

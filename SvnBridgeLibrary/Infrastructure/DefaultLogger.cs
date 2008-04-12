@@ -67,8 +67,12 @@ namespace SvnBridge.Infrastructure
 
 		private static void WriteLogMessageWithNoExceptionHandling(string level, string message, string exception)
 		{
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.OmitXmlDeclaration = true;
+
 			using(StreamWriter text = File.AppendText(level+".log"))
-			using(XmlWriter writer = XmlWriter.Create(text))
+			using(XmlWriter writer = XmlWriter.Create(text,settings))
 			{
 				writer.WriteStartElement("log");
 				writer.WriteAttributeString("level", level);

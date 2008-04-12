@@ -37,10 +37,31 @@ namespace SvnBridge.Infrastructure
 
 		public void Register(Type service, Type impl)
 		{
-			Register(service, delegate(Container c, IDictionary deps)
-					 {
-						 return CreateInstance(impl, deps);
-					 });
+			bool singleton = impl.GetCustomAttributes(typeof(SingletonAttribute), true).Length != 0;
+			if (singleton)
+			{
+				object locker = new object();
+				object singleInstance = null;
+				Register(service, delegate(Container c, IDictionary deps)
+				{
+					if (singleInstance == null)
+					{
+						lock (locker)
+						{
+							if (singleInstance == null)
+								singleInstance = CreateInstance(impl, deps);
+						}
+					}
+					return singleInstance;
+				});
+			}
+			else
+			{
+				Register(service, delegate(Container c, IDictionary deps)
+				{
+					return CreateInstance(impl, deps);
+				});
+			}
 		}
 
 		public void Register(Type service, Type impl, params Type[] interceptorsType)
@@ -54,7 +75,7 @@ namespace SvnBridge.Infrastructure
 			Register(service, delegate(Container c, IDictionary deps)
 			{
 				object instance = CreateInstance(impl, deps);
-				List<IInterceptor> interceptors = new List<IInterceptor>();
+				var interceptors = new List<IInterceptor>();
 				foreach (Type interceptorType in interceptorsType)
 				{
 					interceptors.Add((IInterceptor)Resolve(interceptorType, deps));
@@ -98,7 +119,7 @@ namespace SvnBridge.Infrastructure
 
 		private void PerformEnvironmentValidation(Type type, object resolve)
 		{
-			ICanValidateMyEnvironment validator = resolve as ICanValidateMyEnvironment;
+			var validator = resolve as ICanValidateMyEnvironment;
 			if (validator == null)
 				return;
 			if (performedValidation.ContainsKey(type) == false)
@@ -131,7 +152,7 @@ namespace SvnBridge.Infrastructure
 		private static object CreateInstance(Type type,
 											 IDictionary dictionary)
 		{
-			List<object> args = new List<object>();
+			var args = new List<object>();
 			ConstructorInfo[] constructors = type.GetConstructors();
 			if (constructors.Length != 0)
 			{
@@ -177,10 +198,12 @@ namespace SvnBridge.Infrastructure
 
 		public void OverrideRegisteration(Type type, object service)
 		{
-			typeToCreator[type] = delegate
-			{
-				return service;
-			};
+			typeToCreator[type] = delegate { return service; };
+		}
+
+		public void OverrideRegisteration<TService>(Creator creator)
+		{
+			typeToCreator[typeof(TService)] = creator;
 		}
 	}
 }
