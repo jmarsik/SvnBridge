@@ -100,8 +100,13 @@ namespace SvnBridge.Net
 			{
 				long position = buffer.Position;
 				buffer.Position = 0;
+				byte[]bytes= new byte[position];
 				StreamReader reader = new StreamReader(buffer);
 				string message = reader.ReadToEnd();
+				if (message.Contains("\0"))
+				{
+					message = message.Substring(0, message.IndexOf("\0"));
+				}
 				logger.TraceMessage(message);
 				buffer.Position = position;
 			}

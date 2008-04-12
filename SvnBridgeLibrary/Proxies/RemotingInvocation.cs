@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
@@ -8,7 +9,8 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.Proxies
 {
-    public class RemotingInvocation : IInvocation
+	[DebuggerStepThrough]
+	public class RemotingInvocation : IInvocation
     {
         private readonly IMethodCallMessage message;
         private readonly object target;

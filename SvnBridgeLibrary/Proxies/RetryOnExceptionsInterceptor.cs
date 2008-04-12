@@ -1,15 +1,11 @@
 using System;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.Proxies
 {
-	[DebuggerStepThrough]
-    public class RetryOnExceptionsInterceptor<TException> : IInterceptor
+	 public class RetryOnExceptionsInterceptor<TException> : IInterceptor
 		where TException : Exception
     {
         private readonly ILogger logger;

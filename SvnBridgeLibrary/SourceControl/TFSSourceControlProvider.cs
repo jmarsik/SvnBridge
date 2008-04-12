@@ -21,7 +21,6 @@ namespace SvnBridge.SourceControl
 	using System.Threading;
 
 	[Interceptor(typeof(TracingInterceptor))]
-	[Interceptor(typeof(RetryOnExceptionsInterceptor<WebException>))]
 	[Interceptor(typeof(RetryOnExceptionsInterceptor<SocketException>))]
 	public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
 	{

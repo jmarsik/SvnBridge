@@ -231,13 +231,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Infrastructure\AssociateWorkItemWithChangeSetMessage.xml" />
+    <EmbeddedResource Include="Infrastructure\Messages\GetWorkItemInformationMessage.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Infrastructure\GetWorkItemInformationMessage.xml" />
+    <EmbeddedResource Include="Infrastructure\Messages\AssociateWorkItemWithChangeSetMessage.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Infrastructure\SetWorkItemStatusToFixedMessage.xml" />
+    <EmbeddedResource Include="Infrastructure\Messages\SetWorkItemStatusToFixedMessage.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

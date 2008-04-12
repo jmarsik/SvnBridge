@@ -67,15 +67,23 @@ namespace SvnBridge.Infrastructure
 
 		private static void WriteLogMessageWithNoExceptionHandling(string level, string message, string exception)
 		{
-			using(XmlWriter writer = XmlWriter.Create(File.AppendText(level+".log")))
+			using(StreamWriter text = File.AppendText(level+".log"))
+			using(XmlWriter writer = XmlWriter.Create(text))
 			{
 				writer.WriteStartElement("log");
 				writer.WriteAttributeString("level", level);
-				writer.WriteElementString("message", message);
+				WriteCDataElement(writer, "message", message);
 				if(string.IsNullOrEmpty(exception)==false)
-					writer.WriteElementString("exception", exception);
+					WriteCDataElement(writer, "exception", exception);
 				writer.WriteEndElement();
 			}
+		}
+
+		private static void WriteCDataElement(XmlWriter writer, string name, string message)
+		{
+			writer.WriteStartElement(name);
+			writer.WriteCData(message);
+			writer.WriteEndElement();
 		}
 
 		#region ICanValidateMyEnvironment Members

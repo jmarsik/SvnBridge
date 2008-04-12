@@ -36,22 +36,23 @@ namespace SvnBridge.Infrastructure
         static AssociateWorkItemWithChangeSet()
         {
             using (Stream stream = typeof(AssociateWorkItemWithChangeSet).Assembly.GetManifestResourceStream(
-                "SvnBridge.Infrastructure.AssociateWorkItemWithChangeSetMessage.xml"))
+                "SvnBridge.Infrastructure.Messages.AssociateWorkItemWithChangeSetMessage.xml"))
             {
                 associateWorkItemWithChangeSetMessage = new StreamReader(stream).ReadToEnd();
             }
 
+			
             using (Stream stream = typeof(AssociateWorkItemWithChangeSet).Assembly.GetManifestResourceStream(
-               "SvnBridge.Infrastructure.GetWorkItemInformationMessage.xml"))
+			   "SvnBridge.Infrastructure.Messages.GetWorkItemInformationMessage.xml"))
             {
                 getWorkItemInformationMessage = new StreamReader(stream).ReadToEnd();
             }
-            using (Stream stream = typeof(AssociateWorkItemWithChangeSet).Assembly.GetManifestResourceStream(
-             "SvnBridge.Infrastructure.SetWorkItemStatusToFixedMessage.xml"))
-            {
-                setWorkItemStatusToFixedMessage = new StreamReader(stream).ReadToEnd();
-            }
 
+			using (Stream stream = typeof(AssociateWorkItemWithChangeSet).Assembly.GetManifestResourceStream(
+		   "SvnBridge.Infrastructure.Messages.SetWorkItemStatusToFixedMessage.xml"))
+			{
+				setWorkItemStatusToFixedMessage = new StreamReader(stream).ReadToEnd();
+			}
         }
 
         public void Associate(int workItemId, int changeSetId)
@@ -68,7 +69,7 @@ namespace SvnBridge.Infrastructure
                 {
                     int workItemRevisionId = GetWorkItemInformation(workItemId).Revision;
                     string text =
-                        associateWorkItemWithChangeSetMessage
+						GetAssociateWorkItemWithChangeSetMessage()
                             .Replace("{Guid}", Guid.NewGuid().ToString())
                             .Replace("{WorkItemId}", workItemId.ToString())
                             .Replace("{ChangeSetId}", changeSetId.ToString())
@@ -94,7 +95,7 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-        public void SetWorkItemFixed(int workItemId)
+    	public void SetWorkItemFixed(int workItemId)
         {
 
             HttpWebRequest request = GetWebRequest();
@@ -111,7 +112,7 @@ namespace SvnBridge.Infrastructure
                         return; // already fixed
                     int workItemRevisionId = information.Revision;
                     string text =
-                        setWorkItemStatusToFixedMessage
+                        GetSetWorkItemStatusToFixedMessage()
                             .Replace("{Guid}", Guid.NewGuid().ToString())
                             .Replace("{WorkItemId}", workItemId.ToString())
                             .Replace("{RevisionId}", workItemRevisionId.ToString())
@@ -136,7 +137,23 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-        public WorkItemInformation GetWorkItemInformation(int workItemId)
+    	private string GetSetWorkItemStatusToFixedMessage()
+    	{
+			string custom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SetWorkItemStatusToFixedMessage.xml");
+			if (File.Exists(custom))
+				return File.ReadAllText(custom);
+    		return setWorkItemStatusToFixedMessage;
+    	}
+
+		private string GetAssociateWorkItemWithChangeSetMessage()
+		{
+			string custom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AssociateWorkItemWithChangeSetMessage.xml");
+			if (File.Exists(custom))
+				return File.ReadAllText(custom);
+			return associateWorkItemWithChangeSetMessage;
+		}
+
+    	public WorkItemInformation GetWorkItemInformation(int workItemId)
         {
             HttpWebRequest request = GetWebRequest();
             request.ContentType =

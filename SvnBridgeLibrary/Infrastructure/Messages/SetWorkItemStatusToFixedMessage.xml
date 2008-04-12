@@ -34,48 +34,6 @@
 					</UpdateWorkItem>
 				</Package>
 			</package>
-			<metadataHave>
-				<MetadataTableHaveEntry>
-					<TableName>Hierarchy</TableName>
-					<RowVersion>15843</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>Fields</TableName>
-					<RowVersion>4884</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>HierarchyProperties</TableName>
-					<RowVersion>15884</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>Constants</TableName>
-					<RowVersion>16420</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>Rules</TableName>
-					<RowVersion>16206</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>ConstantSets</TableName>
-					<RowVersion>16425</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>FieldUsages</TableName>
-					<RowVersion>4885</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>WorkItemTypes</TableName>
-					<RowVersion>15886</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>WorkItemTypeUsages</TableName>
-					<RowVersion>15898</RowVersion>
-				</MetadataTableHaveEntry>
-				<MetadataTableHaveEntry>
-					<TableName>Actions</TableName>
-					<RowVersion>15901</RowVersion>
-				</MetadataTableHaveEntry>
-			</metadataHave>
 		</Update>
 	</soap:Body>
 </soap:Envelope>
