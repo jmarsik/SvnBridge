@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Xml;
 using SvnBridge.Interfaces;
+using System.Configuration;
 
 namespace SvnBridge.Infrastructure
 {
@@ -71,7 +72,9 @@ namespace SvnBridge.Infrastructure
 			settings.Indent = true;
 			settings.OmitXmlDeclaration = true;
 
-			using(StreamWriter text = File.AppendText(level+".log"))
+            string logFile = Path.Combine(ConfigurationManager.AppSettings["LogPath"], level + ".log");
+
+			using(StreamWriter text = File.AppendText(logFile))
 			using(XmlWriter writer = XmlWriter.Create(text,settings))
 			{
 				writer.WriteStartElement("log");
