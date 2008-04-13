@@ -4,7 +4,7 @@ using SvnBridge.Cache;
 using SvnBridge.Exceptions;
 using Xunit;
 
-namespace TestsIntegration
+namespace IntegrationTests
 {
 	public class FileCacheTest
 	{

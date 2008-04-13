@@ -7,7 +7,7 @@
     <ProjectGuid>{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestsIntegration</RootNamespace>
+    <RootNamespace>IntegrationTests</RootNamespace>
     <AssemblyName>TestsIntegration</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>

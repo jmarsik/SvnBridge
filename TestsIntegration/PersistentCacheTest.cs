@@ -7,7 +7,7 @@ using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using Xunit;
 
-namespace TestsIntegration
+namespace IntegrationTests
 {
 	public abstract class PersistentCacheTestBase
 	{

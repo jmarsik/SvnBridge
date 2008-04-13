@@ -9,7 +9,7 @@ using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using Xunit;
 
-namespace TestsIntegration
+namespace IntegrationTests
 {
 	public class MetaDataRepositoryTest : TFSSourceControlProviderTestsBase
 	{
