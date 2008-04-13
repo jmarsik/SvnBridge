@@ -9,7 +9,7 @@ using Xunit;
 
 namespace TestsIntegration
 {
-	public class PersistentCacheTestBase
+	public abstract class PersistentCacheTestBase
 	{
 		protected IPersistentCache cache;
 
