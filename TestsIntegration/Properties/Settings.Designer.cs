@@ -25,7 +25,7 @@ namespace IntegrationTests.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://tfsrtm08:8080/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://codeplex-tfs3:8080/")]
         public string ServerUrl {
             get {
                 return ((string)(this["ServerUrl"]));
