@@ -72,7 +72,11 @@ namespace SvnBridge.Infrastructure
 			settings.Indent = true;
 			settings.OmitXmlDeclaration = true;
 
-            string logFile = Path.Combine(ConfigurationManager.AppSettings["LogPath"], level + ".log");
+            string logPath = ConfigurationManager.AppSettings["LogPath"];
+            if (logPath == null)
+                logPath = "";
+
+            string logFile = Path.Combine(logPath, level + ".log");
 
 			using(StreamWriter text = File.AppendText(logFile))
 			using(XmlWriter writer = XmlWriter.Create(text,settings))
