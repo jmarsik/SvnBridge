@@ -32,16 +32,6 @@ namespace SvnBridge.Infrastructure
 			this.persistentCache = persistentCache;
 		}
 
-		public SourceItem QueryPreviousVersionOfItem(int itemId, int revision)
-		{
-			int previousRevision = (revision - 1);
-			SourceItem[] items = sourceControlService.QueryItems(
-				serverUrl, credentials, new int[] { itemId }, previousRevision);
-			if (items.Length == 0)
-				return null;
-			return items[0];
-		}
-
 		public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
 		{
 			string serverPath = GetServerPath(path);

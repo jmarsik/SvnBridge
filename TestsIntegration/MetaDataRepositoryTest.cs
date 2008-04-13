@@ -120,26 +120,6 @@ namespace IntegrationTests
 			AssertEquals(sourceItems, items);
 		}
 
-		[Fact]
-		public void CanGetPreviousVersionOfFile()
-		{
-			WriteFile(testPath + "/Test.txt", "blah", true);
-			SourceItem[] sourceItems = sourceControlService.QueryItems(
-				ServerUrl,
-				credentials,
-				Constants.ServerRootPath + PROJECT_NAME + testPath + "/Test.txt",
-				RecursionType.None,
-				VersionSpec.FromChangeset(_lastCommitRevision),
-				DeletedState.NonDeleted,
-				ItemType.Any);
-
-			RenameItem(testPath + "/Test.txt", testPath + "/blah.txt", true);
-
-			SourceItem item = repository.QueryPreviousVersionOfItem((sourceItems[0].ItemId), _lastCommitRevision);
-
-			Assert.Equal("$/SvnBridgeTesting" + testPath + "/Test.txt", item.RemoteName);
-		}
-
 		private void AssertEquals(SourceItem[] sourceItems, SourceItem[] items)
 		{
 			Assert.Equal(sourceItems.Length, items.Length);

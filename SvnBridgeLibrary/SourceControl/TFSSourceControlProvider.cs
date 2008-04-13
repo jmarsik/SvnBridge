@@ -1415,9 +1415,11 @@ namespace SvnBridge.SourceControl
 
 		public ItemMetaData GetPreviousVersionOfItem(SourceItem item)
 		{
-			SourceItem sourceItem = MetaDataRepository
-				.QueryPreviousVersionOfItem(item.ItemId, item.RemoteChangesetId);
-			return ItemMetaData.ConvertSourceItem(sourceItem, rootPath);
+            int previousRevision = (item.RemoteChangesetId - 1);
+            SourceItem[] items = SourceControlService.QueryItems(
+                serverUrl, credentials, new int[] { item.ItemId }, previousRevision);
+
+            return ItemMetaData.ConvertSourceItem(items[0], rootPath);
 		}
 	}
 }
