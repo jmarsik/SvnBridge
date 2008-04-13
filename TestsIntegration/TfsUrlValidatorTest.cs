@@ -1,4 +1,4 @@
-using TestsIntegration.Properties;
+using IntegrationTests.Properties;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using Xunit;

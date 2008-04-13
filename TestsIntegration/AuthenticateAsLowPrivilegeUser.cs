@@ -1,6 +1,6 @@
 using System;
 using System.Net;
-using TestsIntegration.Properties;
+using IntegrationTests.Properties;
 using SvnBridge.SourceControl;
 
 namespace IntegrationTests
