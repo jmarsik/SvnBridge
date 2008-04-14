@@ -292,13 +292,13 @@ namespace SvnBridge.SourceControl
 
 			foreach (SourceItemHistory history in logItem.History)
 			{
+                List<SourceItem> renamedItems = new List<SourceItem>();
 				foreach (SourceItemChange change in history.Changes)
 				{
 					change.Item.RemoteName = change.Item.RemoteName.Substring(rootPath.Length);
 					if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
 					{
-						ItemMetaData oldItem = GetPreviousVersionOfItem(change.Item);
-						change.Item = new RenamedSourceItem(change.Item, oldItem.Name, oldItem.Revision);
+                        renamedItems.Add(change.Item);
 					}
 					else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
 					{
@@ -318,7 +318,25 @@ namespace SvnBridge.SourceControl
 						change.Item = new RenamedSourceItem(change.Item, oldName, oldRevision);
 					}
 				}
-			}
+                if (renamedItems.Count > 0)
+                {
+                    ItemMetaData[] oldItems = GetPreviousVersionOfItems(renamedItems.ToArray(), history.ChangeSetID);
+                    Dictionary<int, ItemMetaData> oldItemsByKey = new Dictionary<int, ItemMetaData>();
+                    foreach (ItemMetaData oldItem in oldItems)
+                    {
+                        oldItemsByKey[oldItem.Id] = oldItem;
+                    }
+
+                    foreach (SourceItemChange change in history.Changes)
+                    {
+                        ItemMetaData oldItem;
+                        if (oldItemsByKey.TryGetValue(change.Item.ItemId, out oldItem))
+                        {
+                            change.Item = new RenamedSourceItem(change.Item, oldItem.Name, oldItem.Revision);
+                        }
+                    }
+                }
+            }
 
 			return logItem;
 		}
@@ -1413,13 +1431,21 @@ namespace SvnBridge.SourceControl
 			return credentials;
 		}
 
-		public ItemMetaData GetPreviousVersionOfItem(SourceItem item)
+		public ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset)
 		{
-            int previousRevision = (item.RemoteChangesetId - 1);
-            SourceItem[] items = SourceControlService.QueryItems(
-                serverUrl, credentials, new int[] { item.ItemId }, previousRevision);
+            int previousRevision = (changeset - 1);
 
-            return ItemMetaData.ConvertSourceItem(items[0], rootPath);
+            List<int> itemIds = new List<int>();
+            foreach (SourceItem item in items)
+                itemIds.Add(item.ItemId);
+
+            SourceItem[] sourceItems = SourceControlService.QueryItems(serverUrl, credentials, itemIds.ToArray(), previousRevision);
+
+            List<ItemMetaData> result = new List<ItemMetaData>();
+            foreach (SourceItem sourceItem in sourceItems)
+                result.Add(ItemMetaData.ConvertSourceItem(sourceItem, rootPath));
+
+            return result.ToArray();
 		}
 	}
 }

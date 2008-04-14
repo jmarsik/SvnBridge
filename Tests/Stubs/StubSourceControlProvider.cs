@@ -50,7 +50,7 @@ namespace Tests
             throw new NotImplementedException();
         }
 
-    	public virtual ItemMetaData GetPreviousVersionOfItem(SourceItem item)
+    	public virtual ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset)
     	{
     		throw new NotImplementedException();
     	}

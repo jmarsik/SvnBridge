@@ -82,6 +82,6 @@ namespace SvnBridge.Interfaces
 
 		int GetVersionForDate(DateTime date);
 
-		ItemMetaData GetPreviousVersionOfItem(SourceItem item);
+        ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset);
 	}
 }

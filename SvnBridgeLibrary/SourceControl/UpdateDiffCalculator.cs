@@ -237,8 +237,7 @@ namespace SvnBridge.SourceControl
 								   FolderMetaData root,
 								   bool updatingForwardInTime)
 		{
-			ItemMetaData oldItem =
-				sourceControlProvider.GetPreviousVersionOfItem(change.Item);
+			ItemMetaData oldItem = sourceControlProvider.GetPreviousVersionOfItems(new SourceItem[] { change.Item }, change.Item.RemoteChangesetId)[0];
 
 			if (updatingForwardInTime)
 			{
