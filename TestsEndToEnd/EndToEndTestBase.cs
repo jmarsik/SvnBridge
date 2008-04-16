@@ -15,12 +15,14 @@ namespace TestsEndToEnd
 	public abstract class EndToEndTestBase : TFSSourceControlProviderTestsBase
 	{
 		#region Setup/Teardown
+        private string originalCurrentDirectory;
 
 		protected EndToEndTestBase()
 		{
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 			port = new Random().Next(1024, short.MaxValue);
-		}
+            originalCurrentDirectory = Environment.CurrentDirectory;
+        }
 
 		public string TestUrl
 		{
@@ -56,6 +58,7 @@ namespace TestsEndToEnd
 
 		public override void Dispose()
 		{
+            Environment.CurrentDirectory = originalCurrentDirectory;
 
 			if (initialized==false)
 				return;

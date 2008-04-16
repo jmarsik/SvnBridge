@@ -25,15 +25,6 @@ namespace IntegrationTests.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://codeplex-tfs3:8080/")]
-        public string ServerUrl {
-            get {
-                return ((string)(this["ServerUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Username {
             get {
@@ -56,6 +47,15 @@ namespace IntegrationTests.Properties {
         public string Domain {
             get {
                 return ((string)(this["Domain"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://codeplex-tfs4:8080/")]
+        public string ServerUrl {
+            get {
+                return ((string)(this["ServerUrl"]));
             }
         }
     }
