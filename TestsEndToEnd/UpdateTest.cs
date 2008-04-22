@@ -455,7 +455,7 @@ namespace TestsEndToEnd
 			Console.WriteLine("del " + test1File);
 			File.Delete(test1File);
 
-			Svn("update " + dir);
+			Svn("update \"" + dir + "\"");
 
 			Assert.Equal("abc", File.ReadAllText(test1File));
 			Assert.Equal("abc", File.ReadAllText(test2File));
