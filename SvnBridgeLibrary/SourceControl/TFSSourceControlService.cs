@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
@@ -62,7 +63,7 @@ namespace SvnBridge.SourceControl
 			return items[0];
 		}
 
-        public SourceItemReader QueryItemsReader(string tfsUrl, ICredentials credentials, string serverPath, RecursionType recursion, VersionSpec version)
+        public IEnumerable<SourceItem> QueryItemsReader(string tfsUrl, ICredentials credentials, string serverPath, RecursionType recursion, VersionSpec version)
         {
             string versionXml = "<version xsi:type=\"LatestVersionSpec\" />";
             if (version is ChangesetVersionSpec)

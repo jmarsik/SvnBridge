@@ -117,12 +117,12 @@ namespace SvnBridge.Infrastructure
                 if (IsInCache(revision, serverPath))
                     return;
 
-                SourceItemReader items = sourceControlService.QueryItemsReader(serverUrl,
-                                                                               credentials,
-                                                                               serverPath,
-                                                                               RecursionType.Full,
-                                                                               VersionSpec.FromChangeset(revision));
-
+                IEnumerator<SourceItem> items = sourceControlService.QueryItemsReader(serverUrl,
+                                                                                      credentials,
+                                                                                      serverPath,
+                                                                                      RecursionType.Full,
+                                                                                      VersionSpec.FromChangeset(revision))
+                                                                            .GetEnumerator();
                 bool firstRead = true;
                 while (items.MoveNext())
                 {
@@ -157,7 +157,7 @@ namespace SvnBridge.Infrastructure
 
         }
 
-        private SourceItemReader QueryFolderIfCurrentlyReadingFile(int revision, ref string serverPath, SourceItemReader items)
+        private IEnumerator<SourceItem> QueryFolderIfCurrentlyReadingFile(int revision, ref string serverPath, IEnumerator<SourceItem> items)
         {
             // we optimize it here in case we tried to load a file, we load the entire
             // directory. This tends to save a lot of round trips in many cases
@@ -170,7 +170,8 @@ namespace SvnBridge.Infrastructure
                                                               credentials,
                                                               serverPath,
                                                               RecursionType.Full,
-                                                              VersionSpec.FromChangeset(revision));
+                                                              VersionSpec.FromChangeset(revision))
+                                .GetEnumerator();
                 items.MoveNext();
             }
             return items;

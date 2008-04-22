@@ -23,7 +23,7 @@ namespace SvnBridge.SourceControl
                                          VersionSpec version);
 
 
-    	SourceItemReader QueryItemsReader(string tfsUrl, ICredentials credentials, string serverPath,
+    	IEnumerable<SourceItem> QueryItemsReader(string tfsUrl, ICredentials credentials, string serverPath,
     	                                  RecursionType recursion, VersionSpec version);
     }
 }

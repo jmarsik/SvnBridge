@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using IntegrationTests;
@@ -80,12 +82,13 @@ namespace IntegrationTests
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);
 			List<SourceItem> fromReader = new List<SourceItem>();
-			SourceItemReader reader = sourceControlService.QueryItemsReader(
+			IEnumerator<SourceItem> reader = sourceControlService.QueryItemsReader(
 				ServerUrl,
 				credentials,
 				Constants.ServerRootPath + PROJECT_NAME,
 				RecursionType.OneLevel,
-				VersionSpec.FromChangeset(_lastCommitRevision));
+				VersionSpec.FromChangeset(_lastCommitRevision))
+                .GetEnumerator();
 
 			while (reader.MoveNext())
 				fromReader.Add(reader.Current);
