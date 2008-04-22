@@ -462,7 +462,7 @@ namespace TestsEndToEnd
 		}
 
 
-		[SvnBridgeFact(Skip = "This requires sending diffs to the client")]
+		[SvnBridgeFact]
 		public void UpdateAfterCommitShouldMergeChangesFromRepository()
 		{
 			CheckoutAndChangeDirectory();
