@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -8,12 +9,12 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace SvnBridge.SourceControl
 {
-    public class SourceItemReader : IDisposable
+    public class SourceItemReader : IEnumerable<SourceItem>, IEnumerator<SourceItem>
     {
-        private Stream _requestStream;
-        private XmlReader _reader;
-        private SourceItem _sourceItem;
-        private string _tfsUrl;
+        private readonly Stream _requestStream;
+        private readonly XmlReader _reader;
+        private SourceItem current;
+        private readonly string _tfsUrl;
 
         public SourceItemReader(string tfsUrl, Stream requestStream)
         {
@@ -30,12 +31,31 @@ namespace SvnBridge.SourceControl
             ((IDisposable)_reader).Dispose();
         }
 
-        public SourceItem SourceItem
+
+        #region IEnumerator<SourceItem> Members
+
+        public SourceItem Current
         {
-            get { return _sourceItem; }
+            get { return current; }
         }
 
-        public bool Read()
+        #endregion
+
+        #region IEnumerator Members
+
+        public void Reset()
+        {
+            throw new NotSupportedException();
+        }
+
+        object IEnumerator.Current
+        {
+            get { return current; }
+        }
+
+        #endregion
+
+        public bool MoveNext()
         {
             if (!_reader.ReadToFollowing("Item"))
                 return false;
@@ -75,8 +95,26 @@ namespace SvnBridge.SourceControl
                         break;
                 }
             }
-            _sourceItem = item;
+            current = item;
             return true;
         }
+
+        #region IEnumerable<SourceItem> Members
+
+        IEnumerator<SourceItem> IEnumerable<SourceItem>.GetEnumerator()
+        {
+            return this;
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        public IEnumerator GetEnumerator()
+        {
+            return ((IEnumerable<SourceItem>) this).GetEnumerator();
+        }
+
+        #endregion
     }
 }

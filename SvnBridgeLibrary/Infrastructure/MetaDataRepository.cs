@@ -124,7 +124,7 @@ namespace SvnBridge.Infrastructure
                                                                                VersionSpec.FromChangeset(revision));
 
                 bool firstRead = true;
-                while (items.Read())
+                while (items.MoveNext())
                 {
                     if (firstRead)
                     {
@@ -132,16 +132,16 @@ namespace SvnBridge.Infrastructure
                         firstRead = false;
                     }
 
-                    string itemCacheKey = GetItemCacheKey(revision, items.SourceItem.RemoteName);
+                    string itemCacheKey = GetItemCacheKey(revision, items.Current.RemoteName);
 
 
-                    persistentCache.Set(itemCacheKey, items.SourceItem);
+                    persistentCache.Set(itemCacheKey, items.Current);
 
-                    persistentCache.Add(GetItemNoRecursionCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
-                    persistentCache.Add(GetItemOneLevelCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
-                    persistentCache.Add(GetItemFullPathCacheKey(revision, items.SourceItem.RemoteName), itemCacheKey);
+                    persistentCache.Add(GetItemNoRecursionCacheKey(revision, items.Current.RemoteName), itemCacheKey);
+                    persistentCache.Add(GetItemOneLevelCacheKey(revision, items.Current.RemoteName), itemCacheKey);
+                    persistentCache.Add(GetItemFullPathCacheKey(revision, items.Current.RemoteName), itemCacheKey);
 
-                    string parentDirectory = GetParentName(items.SourceItem.RemoteName);
+                    string parentDirectory = GetParentName(items.Current.RemoteName);
                     persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), itemCacheKey);
 
                     do
@@ -161,7 +161,7 @@ namespace SvnBridge.Infrastructure
         {
             // we optimize it here in case we tried to load a file, we load the entire
             // directory. This tends to save a lot of round trips in many cases
-            if (items.SourceItem.ItemType == ItemType.File)
+            if (items.Current.ItemType == ItemType.File)
             {
                 //change it to the directory name, can't use the Path class
                 // because that will change the '/' to '\'
@@ -171,7 +171,7 @@ namespace SvnBridge.Infrastructure
                                                               serverPath,
                                                               RecursionType.Full,
                                                               VersionSpec.FromChangeset(revision));
-                items.Read();
+                items.MoveNext();
             }
             return items;
         }

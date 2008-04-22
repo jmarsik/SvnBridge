@@ -87,8 +87,8 @@ namespace IntegrationTests
 				RecursionType.OneLevel,
 				VersionSpec.FromChangeset(_lastCommitRevision));
 
-			while (reader.Read())
-				fromReader.Add(reader.SourceItem);
+			while (reader.MoveNext())
+				fromReader.Add(reader.Current);
 
 			SourceItem[] sourceItems = sourceControlService.QueryItems(
 				ServerUrl,
