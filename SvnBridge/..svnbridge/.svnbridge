@@ -4,4 +4,5 @@ obj
 obj
 </Value></Property><Property><Name>svn:ignore</Name><Value>bin
 obj
+SvnBridge.csproj.user
 </Value></Property></Properties></ItemProperties>

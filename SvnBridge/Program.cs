@@ -11,159 +11,183 @@ using SvnBridge.Views;
 
 namespace SvnBridge
 {
-	internal static class Program
-	{
-		[STAThread]
-		private static void Main(string[] args)
-		{
-			Logging.TraceEnabled = Settings.Default.TraceEnabled;
-			Logging.MethodTraceEnabled = false;
+    internal static class Program
+    {
+        [STAThread]
+        private static void Main(string[] args)
+        {
+            Logging.TraceEnabled = Settings.Default.TraceEnabled;
+            Logging.MethodTraceEnabled = false;
 
-			new BootStrapper().Start();
+            new BootStrapper().Start();
 
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-
-
-			string tfsUrl = null;
-			int? port = null;
-
-			if (args.Length > 0)
-			{
-				tfsUrl = args[0];
-			}
-
-			if (args.Length > 1)
-			{
-				int tmp;
-				if (int.TryParse(args[1], out tmp))
-				{
-					port = tmp;
-				}
-			}
-			else
-			{
-				port = TryGetPortFromSettings();
-			}
-			ProxyInformation proxyInfo = GetProxyInfo();
-
-			bool specifiedTfsUrl = string.IsNullOrEmpty(tfsUrl) == false;
-			bool hasPortAndServerFromRequest = 
-				port != null && 
-				ShouldGetServerFromRequest() == true && 
-				Helper.IsPortInUseOnLocalHost(port.Value) == false;
-
-			if (specifiedTfsUrl || hasPortAndServerFromRequest ||
-			    TryGetSettings(ref tfsUrl, ref port, proxyInfo))
-			{
-				Run(tfsUrl, port ?? 8081, proxyInfo);
-			}
-		}
-
-		private static int? TryGetPortFromSettings()
-		{
-			if (Settings.Default.TfsPort != 0)
-				return Settings.Default.TfsPort;
-			return null;
-		}
-
-		private static ProxyInformation GetProxyInfo()
-		{
-			ProxyInformation proxyInfo = new ProxyInformation();
-			proxyInfo.UseProxy = Settings.Default.UseProxy;
-			proxyInfo.Url = Settings.Default.ProxyUrl;
-			proxyInfo.Port = Settings.Default.ProxyPort;
-			proxyInfo.UseDefaultCredentails = Settings.Default.ProxyUseDefaultCredentials;
-			proxyInfo.Username = Settings.Default.ProxyUsername;
-
-			if (Settings.Default.ProxyEncryptedPassword != null)
-			{
-				byte[] password = ProtectedData.Unprotect(
-					Settings.Default.ProxyEncryptedPassword,
-					Encoding.UTF8.GetBytes("ProxyEncryptedPassword"),
-					DataProtectionScope.CurrentUser
-					);
-				proxyInfo.Password = Encoding.UTF8.GetString(password);
-			}
-			return proxyInfo;
-		}
-
-		private static bool TryGetSettings(ref string tfsUrl,
-		                                   ref int? port,
-		                                   ProxyInformation proxyInfo)
-		{
-			SettingsForm view = new SettingsForm();
-			SettingsViewPresenter presenter = new SettingsViewPresenter(view, proxyInfo);
-			presenter.TfsUrl = tfsUrl ?? Settings.Default.TfsUrl;
-			presenter.Port = port ?? Settings.Default.TfsPort;
-			presenter.Show();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
 
-			if (!presenter.Cancelled)
-			{
-				tfsUrl = Settings.Default.TfsUrl = presenter.TfsUrl;
-				port = Settings.Default.TfsPort = presenter.Port;
+            string tfsUrl = null;
+            int? port = null;
 
-				Settings.Default.UseProxy = proxyInfo.UseProxy;
-				Settings.Default.ProxyUrl = proxyInfo.Url;
-				Settings.Default.ProxyPort = proxyInfo.Port;
-				Settings.Default.ProxyUseDefaultCredentials = proxyInfo.UseDefaultCredentails;
-				Settings.Default.ProxyUsername = proxyInfo.Username;
-				// we need to use this so Settings will handle bool?
-				Settings.Default.ServerUrlFromRequest = presenter.GetServerUrlFromRequest.ToString();
+            if (args.Length > 0)
+            {
+                tfsUrl = args[0];
+                Uri result;
+                if (Uri.TryCreate(tfsUrl, UriKind.Absolute, out result) == false)
+                {
+                    MessageBox.Show("Invalid url detected: " + tfsUrl);
+                    return;
+                }
+                if(result.Scheme.StartsWith("http",StringComparison.InvariantCultureIgnoreCase)==false)
+                {
+                    MessageBox.Show("Only http/https URL are supported");
+                    return;
+                }
+            }
 
-				byte[] password = null;
-				if (proxyInfo.Password != null)
-				{
-					password = ProtectedData.Protect(
-						Encoding.UTF8.GetBytes(proxyInfo.Password),
-						Encoding.UTF8.GetBytes("ProxyEncryptedPassword"),
-						DataProtectionScope.CurrentUser
-						);
-				}
-				Settings.Default.ProxyEncryptedPassword = password;
+            if (args.Length > 1)
+            {
+                ushort tmp;
+                if (ushort.TryParse(args[1], out tmp))
+                {
+                    port = tmp;
+                }
+                else
+                {
+                    MessageBox.Show("Could not parse port: " + args[1] + ". If the port is explicitly specified it must be numeric 0 - 65536");
+                    return;
+                }
+            }
+            else
+            {
+                port = TryGetPortFromSettings();
+            }
+            ProxyInformation proxyInfo = GetProxyInfo();
 
-				Settings.Default.Save();
-			}
-			return !presenter.Cancelled;
-		}
+            bool specifiedTfsUrl = string.IsNullOrEmpty(tfsUrl) == false;
+            bool hasPortAndServerFromRequest =
+                port != null &&
+                ShouldGetServerFromRequest() == true &&
+                Helper.IsPortInUseOnLocalHost(port.Value) == false;
 
-		private static void Run(string tfsUrl, int port, ProxyInformation proxyInformation)
-		{
-			Proxy.Set(proxyInformation);
-			IListener listener = IoC.Resolve<IListener>();
+            if (specifiedTfsUrl || hasPortAndServerFromRequest ||
+                TryGetSettings(ref tfsUrl, ref port, proxyInfo))
+            {
+                Run(tfsUrl, port ?? 8081, proxyInfo);
+            }
+        }
 
-			listener.Port = port;
+        private static int? TryGetPortFromSettings()
+        {
+            if (Settings.Default.TfsPort != 0)
+                return Settings.Default.TfsPort;
+            return null;
+        }
 
-			ToolTrayForm view = new ToolTrayForm();
-			ListenerViewPresenter presenter = new ListenerViewPresenter(
-				view,
-				new ErrorsView(),
-				listener,
-				tfsUrl,
-				ShouldGetServerFromRequest());
+        private static ProxyInformation GetProxyInfo()
+        {
+            ProxyInformation proxyInfo = new ProxyInformation();
+            proxyInfo.UseProxy = Settings.Default.UseProxy;
+            proxyInfo.Url = Settings.Default.ProxyUrl;
+            proxyInfo.Port = Settings.Default.ProxyPort;
+            proxyInfo.UseDefaultCredentails = Settings.Default.ProxyUseDefaultCredentials;
+            proxyInfo.Username = Settings.Default.ProxyUsername;
 
-			try
-			{
-				presenter.Show();
-				presenter.StartListener();
+            if (Settings.Default.ProxyEncryptedPassword != null)
+            {
+                byte[] password = ProtectedData.Unprotect(
+                    Settings.Default.ProxyEncryptedPassword,
+                    Encoding.UTF8.GetBytes("ProxyEncryptedPassword"),
+                    DataProtectionScope.CurrentUser
+                    );
+                proxyInfo.Password = Encoding.UTF8.GetString(password);
+            }
+            return proxyInfo;
+        }
 
-				Application.Run(view);
-			}
-			finally
-			{
-				presenter.StopListener();
-			}
-		}
+        private static bool TryGetSettings(ref string tfsUrl,
+                                           ref int? port,
+                                           ProxyInformation proxyInfo)
+        {
+            SettingsForm view = new SettingsForm();
+            SettingsViewPresenter presenter = new SettingsViewPresenter(view, proxyInfo);
+            presenter.TfsUrl = tfsUrl ?? Settings.Default.TfsUrl;
+            presenter.Port = port ?? Settings.Default.TfsPort;
+            presenter.Show();
 
-		private static bool? ShouldGetServerFromRequest()
-		{
-			bool? getServerFromRequest = null;
-			bool tmp;
-			// we store this as string because we can't use bool? in the settings file
-			if (bool.TryParse(Settings.Default.ServerUrlFromRequest, out tmp))
-				getServerFromRequest = tmp;
-			return getServerFromRequest;
-		}
-	}
+
+            if (!presenter.Cancelled)
+            {
+                tfsUrl = Settings.Default.TfsUrl = presenter.TfsUrl;
+                port = Settings.Default.TfsPort = presenter.Port;
+
+                Settings.Default.UseProxy = proxyInfo.UseProxy;
+                Settings.Default.ProxyUrl = proxyInfo.Url;
+                Settings.Default.ProxyPort = proxyInfo.Port;
+                Settings.Default.ProxyUseDefaultCredentials = proxyInfo.UseDefaultCredentails;
+                Settings.Default.ProxyUsername = proxyInfo.Username;
+                // we need to use this so Settings will handle bool?
+                Settings.Default.ServerUrlFromRequest = presenter.GetServerUrlFromRequest.ToString();
+
+                byte[] password = null;
+                if (proxyInfo.Password != null)
+                {
+                    password = ProtectedData.Protect(
+                        Encoding.UTF8.GetBytes(proxyInfo.Password),
+                        Encoding.UTF8.GetBytes("ProxyEncryptedPassword"),
+                        DataProtectionScope.CurrentUser
+                        );
+                }
+                Settings.Default.ProxyEncryptedPassword = password;
+
+                Settings.Default.Save();
+            }
+            return !presenter.Cancelled;
+        }
+
+        private static void Run(string tfsUrl, int port, ProxyInformation proxyInformation)
+        {
+            Proxy.Set(proxyInformation);
+            IListener listener = IoC.Resolve<IListener>();
+
+            listener.Port = port;
+
+            ToolTrayForm view = new ToolTrayForm();
+            ListenerViewPresenter presenter = new ListenerViewPresenter(
+                view,
+                new ErrorsView(),
+                listener,
+                tfsUrl,
+                ShouldGetServerFromRequest());
+
+            try
+            {
+                presenter.Show();
+                try
+                {
+                    presenter.StartListener();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(string.Format("Could not start listening: {0}{1}{2}", e.Message, Environment.NewLine, e));
+                    return;
+                }
+
+                Application.Run(view);
+            }
+            finally
+            {
+                presenter.StopListener();
+            }
+        }
+
+        private static bool? ShouldGetServerFromRequest()
+        {
+            bool? getServerFromRequest = null;
+            bool tmp;
+            // we store this as string because we can't use bool? in the settings file
+            if (bool.TryParse(Settings.Default.ServerUrlFromRequest, out tmp))
+                getServerFromRequest = tmp;
+            return getServerFromRequest;
+        }
+    }
 }
