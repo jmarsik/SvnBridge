@@ -35,17 +35,8 @@ namespace SvnBridge.Views
             startToolStripMenuItem.Enabled = false;
             stopToolStripMenuItem.Enabled = true;
 
-        	string text;
-			if (presenter.GetServerUrlFromRequest == true)
-			{
-				text = "Started on port " + presenter.Port + "\r\nForward by request url. Sample:\r\n" +
+        	string text = "Started on port " + presenter.Port + "\r\nForward by request url. Sample:\r\n" +
 					"http://localhost:" + presenter.Port + "/tfs03.codeplex.com/SvnBridge";
-			}
-			else
-			{
-				text = "Started on port " + presenter.Port + "\r\nForwarding to " +
-					   presenter.TfsUrl;
-			}
 
         	notifyIcon.ShowBalloonTip(500,
                                       "SvnBridge",

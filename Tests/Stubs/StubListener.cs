@@ -12,7 +12,6 @@ namespace SvnBridge.Stubs
     public class StubListener : IListener
     {
         public int Get_Port;
-        public string Get_TfsUrl;
         public int Set_Port;
         public bool Start_Called;
         public StartDelegate Start_Delegate;

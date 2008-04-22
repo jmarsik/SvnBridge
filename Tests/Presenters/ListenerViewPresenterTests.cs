@@ -2,18 +2,35 @@ using System.Windows.Forms;
 using Xunit;
 using SvnBridge.Stubs;
 using Assert = CodePlex.NUnitExtensions.Assert;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
+using System;
 
 namespace SvnBridge.Presenters
 {
-	public class ListenerViewPresenterTests
+	public class ListenerViewPresenterTests : IDisposable
 	{
 		#region Setup/Teardown
 
         public ListenerViewPresenterTests()
         {
+            IoC.Container.Register(typeof(ITfsUrlValidator), typeof(StubTfsUrlValidator));
             stubListener = new StubListener();
             stubView = new StubListenerView();
             stubErrorView = new StubErrorsView();
+        }
+
+        public void Dispose()
+        {
+            IoC.Reset();
+        }
+
+        public class StubTfsUrlValidator : ITfsUrlValidator
+        {
+            public bool IsValidTfsServerUrl(string url)
+            {
+                throw new System.NotImplementedException();
+            }
         }
 
 		#endregion
@@ -24,21 +41,19 @@ namespace SvnBridge.Presenters
 
 		private ListenerViewPresenter CreatePresenter()
 		{
-			return new ListenerViewPresenter(stubView, stubErrorView, stubListener, "http://foo", null);
+			return new ListenerViewPresenter(stubView, stubErrorView, stubListener);
 		}
 
 		[Fact]
 		public void TestCancelChangeSettingsDoesntStopListener()
 		{
 			stubListener.Get_Port = 8081;
-			stubListener.Get_TfsUrl = "http://foo";
 			ListenerViewPresenter presenter = CreatePresenter();
 			StubSettingsView stubSettingsView = new StubSettingsView();
 			stubSettingsView.Show_Delegate =
 				delegate
 				{
 					stubSettingsView.Presenter.Port = 8082;
-					stubSettingsView.Presenter.TfsUrl = "http://foo";
 					stubSettingsView.DialogResult_Return = DialogResult.Cancel;
 				};
 
@@ -51,28 +66,24 @@ namespace SvnBridge.Presenters
 		public void TestChangeSettingsDefaultsToExistingSettings()
 		{
 			stubListener.Get_Port = 8081;
-			stubListener.Get_TfsUrl = "http://foo";
 			ListenerViewPresenter presenter = CreatePresenter();
 			StubSettingsView stubSettingsView = new StubSettingsView();
 
 			presenter.ChangeSettings(stubSettingsView);
 
 			Assert.Equal(stubSettingsView.Presenter.Port, 8081);
-			Assert.Equal(stubSettingsView.Presenter.TfsUrl, "http://foo");
 		}
 
 		[Fact]
 		public void TestChangeSettingsWithChangesStopsAndStartsListener()
 		{
 			stubListener.Get_Port = 8081;
-			stubListener.Get_TfsUrl = "http://foo";
 			ListenerViewPresenter presenter = CreatePresenter();
 			StubSettingsView stubSettingsView = new StubSettingsView();
 			stubSettingsView.Show_Delegate =
 				delegate
 				{
 					stubSettingsView.Presenter.Port = 8082;
-					stubSettingsView.Presenter.TfsUrl = "http://foo";
 				};
 
 			presenter.ChangeSettings(stubSettingsView);
@@ -85,14 +96,12 @@ namespace SvnBridge.Presenters
 		public void TestChangeSettingsWithNoChangesDoesntStopListener()
 		{
 			stubListener.Get_Port = 8081;
-			stubListener.Get_TfsUrl = "http://foo";
 			ListenerViewPresenter presenter = CreatePresenter();
 			StubSettingsView stubSettingsView = new StubSettingsView();
 			stubSettingsView.Show_Delegate =
 				delegate
 				{
 					stubSettingsView.Presenter.Port = 8081;
-					stubSettingsView.Presenter.TfsUrl = "http://foo";
 				};
 
 			presenter.ChangeSettings(stubSettingsView);
@@ -117,17 +126,6 @@ namespace SvnBridge.Presenters
 			stubListener.Get_Port = 8081;
 
 			Assert.Equal(expected, presenter.Port);
-		}
-
-		[Fact]
-		public void TestGetTfsUrlReturnsListenersTfsUrl()
-		{
-			string expected = "http://foo";
-			ListenerViewPresenter presenter = CreatePresenter();
-
-			stubListener.Get_TfsUrl = "http://foo";
-
-			Assert.Equal(expected, presenter.TfsUrl);
 		}
 
 		[Fact]
@@ -202,5 +200,5 @@ namespace SvnBridge.Presenters
 
 			Assert.True(stubListener.Stop_Called);
 		}
-	}
+    }
 }

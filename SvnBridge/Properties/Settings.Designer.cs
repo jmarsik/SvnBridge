@@ -25,18 +25,6 @@ namespace SvnBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TfsUrl {
-            get {
-                return ((string)(this["TfsUrl"]));
-            }
-            set {
-                this["TfsUrl"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("8081")]
         public int TfsPort {
             get {
@@ -115,18 +103,6 @@ namespace SvnBridge.Properties {
             }
             set {
                 this["ProxyEncryptedPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public string ServerUrlFromRequest {
-            get {
-                return ((string)(this["ServerUrlFromRequest"]));
-            }
-            set {
-                this["ServerUrlFromRequest"] = value;
             }
         }
         

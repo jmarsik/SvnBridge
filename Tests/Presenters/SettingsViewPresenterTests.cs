@@ -64,18 +64,5 @@ namespace SvnBridge.Presenters
 
             Assert.Equal(expected, presenter.Port);
         }
-
-        [Fact]
-        public void TestViewSetsTfsUrl()
-        {
-            string expected = "http://foo";
-            stubView.Show_Delegate =
-                delegate { stubView.Presenter.TfsUrl = "http://foo"; };
-            SettingsViewPresenter presenter = CreatePresenter();
-
-            presenter.Show();
-
-            Assert.Equal(expected, presenter.TfsUrl);
-        }
     }
 }

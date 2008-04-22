@@ -25,11 +25,6 @@ namespace SvnBridge.Views
 		public new void Show()
 		{
 			txtPortNumber.Text = presenter.Port.ToString();
-			txtTfsUrl.Text = presenter.TfsUrl;
-			if (presenter.GetServerUrlFromRequest!=null)
-				GetServerUrlFromRequest.Checked = presenter.GetServerUrlFromRequest.Value;
-			else
-				GetServerUrlFromRequest.Checked = true;
 			ShowDialog();
 		}
 
@@ -76,38 +71,7 @@ namespace SvnBridge.Views
 				return;
 			}
 
-			if (GetServerUrlFromRequest.Checked == false && !Helper.IsValidUrl(txtTfsUrl.Text))
-			{
-				MessageBox.Show("The TFS Server URL does not appear to be valid.",
-								"SvnBridge",
-								MessageBoxButtons.OK,
-								MessageBoxIcon.Error);
-				txtTfsUrl.Focus();
-				txtTfsUrl.SelectAll();
-				return;
-			}
-
-			Cursor = Cursors.WaitCursor;
-			bool validTfsUrl = 
-				GetServerUrlFromRequest.Checked ||
-				Helper.IsValidTFSUrl(txtTfsUrl.Text, presenter.ProxyInformation);
-
-			Cursor = Cursors.Default;
-			if (!validTfsUrl)
-			{
-				MessageBox.Show("The TFS Server URL does not appear to a TFS server.",
-								"SvnBridge",
-								MessageBoxButtons.OK,
-								MessageBoxIcon.Error);
-				txtTfsUrl.Focus();
-				txtTfsUrl.SelectAll();
-				return;
-			}
-
 			presenter.Port = int.Parse(txtPortNumber.Text);
-			presenter.TfsUrl = txtTfsUrl.Text;
-			presenter.GetServerUrlFromRequest = GetServerUrlFromRequest.Checked;
-
 			DialogResult = DialogResult.OK;
 			Close();
 		}
@@ -117,11 +81,6 @@ namespace SvnBridge.Views
 		{
 			DialogResult = DialogResult.Cancel;
 			Close();
-		}
-
-		private void GetServerUrlFromRequest_CheckedChanged(object sender, EventArgs e)
-		{
-			txtTfsUrl.Enabled = GetServerUrlFromRequest.Checked == false;
 		}
 	}
 }

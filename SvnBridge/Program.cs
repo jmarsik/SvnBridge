@@ -24,36 +24,18 @@ namespace SvnBridge
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-
-            string tfsUrl = null;
             int? port = null;
 
             if (args.Length > 0)
             {
-                tfsUrl = args[0];
-                Uri result;
-                if (Uri.TryCreate(tfsUrl, UriKind.Absolute, out result) == false)
-                {
-                    MessageBox.Show("Invalid url detected: " + tfsUrl);
-                    return;
-                }
-                if(result.Scheme.StartsWith("http",StringComparison.InvariantCultureIgnoreCase)==false)
-                {
-                    MessageBox.Show("Only http/https URL are supported");
-                    return;
-                }
-            }
-
-            if (args.Length > 1)
-            {
                 ushort tmp;
-                if (ushort.TryParse(args[1], out tmp))
+                if (ushort.TryParse(args[0], out tmp))
                 {
                     port = tmp;
                 }
                 else
                 {
-                    MessageBox.Show("Could not parse port: " + args[1] + ". If the port is explicitly specified it must be numeric 0 - 65536");
+                    MessageBox.Show("Could not parse port: " + args[0] + ". If the port is explicitly specified it must be numeric 0 - 65536");
                     return;
                 }
             }
@@ -63,16 +45,13 @@ namespace SvnBridge
             }
             ProxyInformation proxyInfo = GetProxyInfo();
 
-            bool specifiedTfsUrl = string.IsNullOrEmpty(tfsUrl) == false;
-            bool hasPortAndServerFromRequest =
+            bool hasPortFromRequest =
                 port != null &&
-                ShouldGetServerFromRequest() == true &&
                 Helper.IsPortInUseOnLocalHost(port.Value) == false;
 
-            if (specifiedTfsUrl || hasPortAndServerFromRequest ||
-                TryGetSettings(ref tfsUrl, ref port, proxyInfo))
+            if (hasPortFromRequest || TryGetSettings(ref port, proxyInfo))
             {
-                Run(tfsUrl, port ?? 8081, proxyInfo);
+                Run(port ?? 8081, proxyInfo);
             }
         }
 
@@ -104,20 +83,17 @@ namespace SvnBridge
             return proxyInfo;
         }
 
-        private static bool TryGetSettings(ref string tfsUrl,
-                                           ref int? port,
+        private static bool TryGetSettings(ref int? port,
                                            ProxyInformation proxyInfo)
         {
             SettingsForm view = new SettingsForm();
             SettingsViewPresenter presenter = new SettingsViewPresenter(view, proxyInfo);
-            presenter.TfsUrl = tfsUrl ?? Settings.Default.TfsUrl;
             presenter.Port = port ?? Settings.Default.TfsPort;
             presenter.Show();
 
 
             if (!presenter.Cancelled)
             {
-                tfsUrl = Settings.Default.TfsUrl = presenter.TfsUrl;
                 port = Settings.Default.TfsPort = presenter.Port;
 
                 Settings.Default.UseProxy = proxyInfo.UseProxy;
@@ -125,8 +101,6 @@ namespace SvnBridge
                 Settings.Default.ProxyPort = proxyInfo.Port;
                 Settings.Default.ProxyUseDefaultCredentials = proxyInfo.UseDefaultCredentails;
                 Settings.Default.ProxyUsername = proxyInfo.Username;
-                // we need to use this so Settings will handle bool?
-                Settings.Default.ServerUrlFromRequest = presenter.GetServerUrlFromRequest.ToString();
 
                 byte[] password = null;
                 if (proxyInfo.Password != null)
@@ -144,7 +118,7 @@ namespace SvnBridge
             return !presenter.Cancelled;
         }
 
-        private static void Run(string tfsUrl, int port, ProxyInformation proxyInformation)
+        private static void Run(int port, ProxyInformation proxyInformation)
         {
             Proxy.Set(proxyInformation);
             IListener listener = IoC.Resolve<IListener>();
@@ -155,9 +129,7 @@ namespace SvnBridge
             ListenerViewPresenter presenter = new ListenerViewPresenter(
                 view,
                 new ErrorsView(),
-                listener,
-                tfsUrl,
-                ShouldGetServerFromRequest());
+                listener);
 
             try
             {
@@ -178,16 +150,6 @@ namespace SvnBridge
             {
                 presenter.StopListener();
             }
-        }
-
-        private static bool? ShouldGetServerFromRequest()
-        {
-            bool? getServerFromRequest = null;
-            bool tmp;
-            // we store this as string because we can't use bool? in the settings file
-            if (bool.TryParse(Settings.Default.ServerUrlFromRequest, out tmp))
-                getServerFromRequest = tmp;
-            return getServerFromRequest;
         }
     }
 }

@@ -9,19 +9,11 @@ namespace SvnBridge.Presenters
 		private readonly ProxyInformation proxyInformation;
 		private readonly ISettingsView view;
 		private int port;
-		private string tfsUrl;
 		private int ignoredUsedPort;
-		private bool? getServerUrlFromRequest;
 
 		public ProxyInformation ProxyInformation
 		{
 			get { return proxyInformation; }
-		}
-
-		public bool? GetServerUrlFromRequest
-		{
-			get { return getServerUrlFromRequest; }
-			set { getServerUrlFromRequest = value; }
 		}
 
 		public SettingsViewPresenter(ISettingsView view, ProxyInformation proxyInformation)
@@ -51,12 +43,6 @@ namespace SvnBridge.Presenters
 		{
 			get { return port; }
 			set { port = value; }
-		}
-
-		public string TfsUrl
-		{
-			get { return tfsUrl; }
-			set { tfsUrl = value; }
 		}
 
 		public int IgnoredUsedPort
