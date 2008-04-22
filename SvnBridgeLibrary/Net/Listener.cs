@@ -23,6 +23,8 @@ namespace SvnBridge.Net
 
         #region IListener Members
 
+        private static event EventHandler<ListenErrorEventArgs> ErrorOccured = delegate { };
+
         public event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
         public event EventHandler<FinishedHandlingEventArgs> FinishedHandling = delegate { };
 
@@ -46,7 +48,7 @@ namespace SvnBridge.Net
             {
                 throw new InvalidOperationException("A port must be specified before starting the listener.");
             }
-
+            ErrorOccured += OnErrorOccured;
 			dispatcher = new HttpContextDispatcher(parser);
 
             isListening = true;
@@ -56,10 +58,16 @@ namespace SvnBridge.Net
             listener.BeginAcceptTcpClient(Accept, null);
         }
 
+        private void OnErrorOccured(object sender, ListenErrorEventArgs e)
+        {
+            OnListenException(e.Exception);
+        }
+
         public void Stop()
         {
             listener.Stop();
-
+            ErrorOccured -= OnErrorOccured;
+			
             isListening = false;
         }
 
@@ -171,6 +179,11 @@ namespace SvnBridge.Net
         private void OnListenException(Exception ex)
         {
             ListenError(this, new ListenErrorEventArgs(ex));
+        }
+
+        public static void RaiseErrorOccured(Exception e)
+        {
+            
         }
     }
 }

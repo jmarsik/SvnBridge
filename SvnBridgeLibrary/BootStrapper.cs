@@ -38,7 +38,9 @@ namespace SvnBridge
         public BootStrapper()
         {
         	IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
-             
+            IoC.Container.Configuration["persistentCachePath"] =
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
+
 			List<Assembly> asms = new List<Assembly>();
             List<string> names = new List<string>();
             foreach (Type type in representiveComponents)

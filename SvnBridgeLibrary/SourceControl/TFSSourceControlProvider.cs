@@ -589,6 +589,7 @@ namespace SvnBridge.SourceControl
 					if (retry == 3)
 					{
 						Logger.Error("Failed to download " + item.Name + ", max retry count reached, aborting", e);
+					    Listener.RaiseErrorOccured(e);
 						waitHandle.Set();
 						throw;
 					}

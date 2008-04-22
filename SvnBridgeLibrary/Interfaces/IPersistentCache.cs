@@ -11,8 +11,6 @@ namespace SvnBridge.Interfaces
 
 		void Set(string key, object obj);
 
-		void Lock(string key, Action action);
-		
 		bool Contains(string key);
 
 		void Clear();
@@ -20,5 +18,7 @@ namespace SvnBridge.Interfaces
 		void Add(string key, string value);
 
 		List<T> GetList<T>(string key);
+
+	    void UnitOfWork(Action action);
 	}
 }

@@ -83,6 +83,7 @@ namespace SvnBridge.SourceControl
             request.ContentType = "text/xml; charset=utf-8";
             request.ContentLength = data.Length;
             request.Credentials = credentials;
+            request.Timeout = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
             request.UserAgent = "CodePlexClient";
             Stream stream = request.GetRequestStream();
             stream.Write(data, 0, data.Length);

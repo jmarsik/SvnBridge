@@ -34,17 +34,10 @@ namespace SvnBridge
 		}
 
 		[Fact]
-		public void AfterStartingBootStrapper_WillResolveSameInstanceForPersistentCache()
-		{
-			new BootStrapper().Start();
-			Assert.Same(IoC.Resolve<IPersistentCache>(), IoC.Resolve<IPersistentCache>());
-		}
-
-		[Fact]
 		public void AfterStartingBootStrapper_CanResolveItems()
 		{
 			new BootStrapper().Start();
-			var dependencies = new Hashtable();
+            Hashtable dependencies = new Hashtable();
 			dependencies["serverUrl"] = "http://codeplex-tfs3:8080/";
 			dependencies["projectName"] = "as";
 			dependencies["credentials"] = CredentialCache.DefaultCredentials;
