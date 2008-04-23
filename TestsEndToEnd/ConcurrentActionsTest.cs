@@ -100,11 +100,6 @@ namespace TestsEndToEnd
 			get { return testCommand.Name; }
 		}
 
-		public object[] Parameters
-		{
-			get { return testCommand.Parameters; }
-		}
-
 		#endregion
 	}
 }

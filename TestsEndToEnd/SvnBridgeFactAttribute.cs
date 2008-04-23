@@ -16,7 +16,7 @@ namespace TestsEndToEnd
 		protected override IEnumerable<ITestCommand> EnumerateTestCommands(MethodInfo method)
 		{
 			if (Skip != null)
-				yield return new SkipCommand(method);
+				yield return new SkipCommand(method, "");
 
 			foreach (ITestCommand command in GetTestCommandsFromBase(method))
 			{
@@ -75,11 +75,6 @@ namespace TestsEndToEnd
 			get { return command.Name; }
 		}
 
-		public object[] Parameters
-		{
-			get { return command.Parameters; }
-		}
-
 		#endregion
 	}
 
@@ -121,11 +116,6 @@ namespace TestsEndToEnd
 		public string Name
 		{
 			get { return command.Name; }
-		}
-
-		public object[] Parameters
-		{
-			get { return command.Parameters; }
 		}
 
 		#endregion
