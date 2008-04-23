@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -45,6 +46,23 @@ namespace SvnBridge.Handlers
 						UpdateReport(request, sourceControlProvider, data, output);
 					}
 				}
+                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "replay-report")
+                {
+                    ReplayReportData relayReport = Helper.DeserializeXml<ReplayReportData>(reader);
+                    UpdateReportData data = new UpdateReportData();
+                    data.SrcPath = request.Url.AbsoluteUri;
+                    data.TargetRevision = relayReport.Revision.ToString();
+                    data.Entries = new List<EntryData>();
+                    EntryData item = new EntryData();
+                    item.Rev = (relayReport.Revision - 1).ToString();
+                    data.Entries.Add(item);
+                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                    response.SendChunked = true;
+                    using (StreamWriter output = new StreamWriter(response.OutputStream))
+                    {
+                        UpdateReport(request, sourceControlProvider, data, output);
+                    }
+                }
 				else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "log-report")
 				{
 					LogReportData data = Helper.DeserializeXml<LogReportData>(reader);

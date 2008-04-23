@@ -153,6 +153,8 @@ namespace SvnBridge.Infrastructure
                 }
 
                 persistentCache.Set(cacheKey, true);
+
+                items.Dispose();
             });
 
         }
@@ -166,6 +168,7 @@ namespace SvnBridge.Infrastructure
                 //change it to the directory name, can't use the Path class
                 // because that will change the '/' to '\'
                 serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+                items.Dispose();
                 items = sourceControlService.QueryItemsReader(serverUrl,
                                                               credentials,
                                                               serverPath,
