@@ -7,8 +7,9 @@ namespace SvnBridge.Net
 	public static class PerRequest
 	{
 		[ThreadStatic] private static IDictionary currentItems;
+	    private static bool? runningOnWeb;
 
-		public static void Init()
+	    public static void Init()
 		{
 			currentItems = new Hashtable();
 		}
@@ -18,15 +19,25 @@ namespace SvnBridge.Net
 			get
 			{
 				EnsureInitialized();
-				if (HttpContext.Current != null)
+			    if (RunningOnWeb)
 					return HttpContext.Current.Items;
 				return currentItems;
 			}
 		}
 
-		public static void EnsureInitialized()
+	    private static bool RunningOnWeb
+	    {
+	        get
+	        {
+                if (runningOnWeb == null)
+                    runningOnWeb = HttpContext.Current != null;
+	            return runningOnWeb.Value;
+	        }
+	    }
+
+	    public static void EnsureInitialized()
 		{
-			if(HttpContext.Current==null && currentItems==null)
+            if (RunningOnWeb == false && currentItems == null)
 				throw new InvalidOperationException("Cannot use PerRequest Items if it wasn't initialized");
 		}
 	}

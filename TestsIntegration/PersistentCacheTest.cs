@@ -98,7 +98,7 @@ namespace IntegrationTests
             string name = Path.GetTempFileName();
             File.Delete(name);
             Directory.CreateDirectory(name);
-            cache = new FileBasedPersistentCache(name);
+            cache = new FileBasedPersistentCache(name, new WebCache());
 			cache.Clear();
 
 			PerRequest.Init();

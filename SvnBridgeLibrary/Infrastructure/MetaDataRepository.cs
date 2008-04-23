@@ -4,6 +4,7 @@ using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
+using SvnBridge.Net;
 using SvnBridge.Proxies;
 using SvnBridge.SourceControl;
 
@@ -76,8 +77,13 @@ namespace SvnBridge.Infrastructure
         {
             get
             {
+                string currentUserName = PerRequest.Items["CurrentUserName"] as string;
+                if(currentUserName!=null)
+                    return currentUserName;
                 NetworkCredential credential = credentials.GetCredential(new Uri(serverUrl), "Basic");
-                return credential.UserName + "@" + credential.Domain;
+                currentUserName = credential.UserName + "@" + credential.Domain;
+                PerRequest.Items["CurrentUserName"] = currentUserName;
+                return currentUserName;
             }
         }
 

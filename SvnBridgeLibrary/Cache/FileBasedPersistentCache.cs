@@ -13,14 +13,16 @@ namespace SvnBridge.Cache
     public class FileBasedPersistentCache : IPersistentCache, ICanValidateMyEnvironment
     {
         private readonly string rootPath;
+        private readonly ICache cache;
         private bool ensuredDirectoryExists;
 
-        public FileBasedPersistentCache(string persistentCachePath)
+        public FileBasedPersistentCache(string persistentCachePath, ICache cache)
         {
             rootPath = persistentCachePath;
+            this.cache = cache;
         }
 
-        private int UnitOfWorkNestingLevel
+        private static int UnitOfWorkNestingLevel
         {
             get
             {
@@ -258,12 +260,16 @@ namespace SvnBridge.Cache
             EnsureDirectoryExists(rootPath);
         }
 
-        private static void EnsureDirectoryExists(string directoryName)
+        private void EnsureDirectoryExists(string directoryName)
         {
+            string cacheKey = "EnsureDirectoryExists: " + directoryName;
+            if (cache.Get(cacheKey) != null)
+                return;
             if (Directory.Exists(directoryName) == false)
             {
                 Directory.CreateDirectory(directoryName);
             }
+            cache.Set(cacheKey, true);
         }
 
         #region Nested type: PersistentItem
