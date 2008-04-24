@@ -52,6 +52,24 @@ namespace TestsEndToEnd
             Svn("update -r " + revision);
         }
 
+        [SvnBridgeFact]
+        public void AddFiles_Remove_AndRenameParent_WhenRootFolderHasSeveralSubFolder()
+        {
+            CheckoutAndChangeDirectory();
+
+            CreateFolder(testPath + "/Foo", true);
+            CreateFolder(testPath + "/Foo/obj", true);
+            CreateFolder(testPath + "/Foo/U", true);
+            WriteFile(testPath + "/Foo/U/c.txt", "b", true);
+            CreateFolder(testPath + "/Foo/Y", true);
+            WriteFile(testPath + "/Foo/Y/D.txt", "b", true);
+            WriteFile(testPath + "/Foo/obj/b.txt", "b", true);
+            DeleteItem(testPath + "/Foo/obj", true);
+            int revision = _lastCommitRevision;
+            RenameItem(testPath + "/Foo", testPath + "/Bar", true);
+
+            Svn("update");
+        }
 
         [SvnBridgeFact]
         public void CanUpdateWorkingCopyToPreviousVersion()

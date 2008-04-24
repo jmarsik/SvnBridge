@@ -537,7 +537,7 @@ namespace SvnBridge.SourceControl
                             folder.Items.Remove(item);
                         }
                     }
-                    if (!lastNamePart)
+                    if (lastNamePart == false)
                     {
                         folder = (FolderMetaData)item;
                     }
