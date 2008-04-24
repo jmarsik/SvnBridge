@@ -7,7 +7,7 @@ namespace SvnBridge.Cache
 	[Serializable]
 	public class HashSet<T> : ISet<T>
 	{
-		private Dictionary<T, object> inner = new Dictionary<T, object>();
+		private readonly Dictionary<T, object> inner = new Dictionary<T, object>();
 
 		#region IEnumerable Members
 

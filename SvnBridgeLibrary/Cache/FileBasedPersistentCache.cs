@@ -125,7 +125,8 @@ namespace SvnBridge.Cache
                 ISet<string> set = new HashSet<string>();
                 if (result != null)
                     set = (ISet<string>)result.Value;
-                set.Add(value);
+                if (value!=null)
+                    set.Add(value);
                 Set(key, set);
             });
         }

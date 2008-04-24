@@ -38,17 +38,27 @@ namespace SvnBridge.Infrastructure
             List<SourceItem> list = null;
             persistentCache.UnitOfWork(delegate
             {
-               string serverPath = GetServerPath(path);
+                string serverPath = GetServerPath(path);
 
-               EnsureRevisionIsCached(revision, path);
+                if (serverPath == Constants.ServerRootPath && recursion == Recursion.None)
+                {
+                    SourceItem[] items = sourceControlService.QueryItems(serverUrl, credentials, serverPath, RecursionType.None,
+                                                                         VersionSpec.FromChangeset(revision), DeletedState.NonDeleted,
+                                                                         ItemType.Any);
 
-               string cacheKey = GetItemsListCacheKey(recursion, revision, serverPath);
+                    list = new List<SourceItem>(items);
+                    return;
+                }
 
-               list = persistentCache.GetList<SourceItem>(cacheKey);
-               list.Sort(delegate(SourceItem x, SourceItem y)
-               {
-                   return x.RemoteName.CompareTo(y.RemoteName);
-               });
+                EnsureRevisionIsCached(revision, path);
+
+                string cacheKey = GetItemsListCacheKey(recursion, revision, serverPath);
+
+                list = persistentCache.GetList<SourceItem>(cacheKey);
+                list.Sort(delegate(SourceItem x, SourceItem y)
+                {
+                    return x.RemoteName.CompareTo(y.RemoteName);
+                });
             });
             return list.ToArray();
         }
@@ -78,7 +88,7 @@ namespace SvnBridge.Infrastructure
             get
             {
                 string currentUserName = PerRequest.Items["CurrentUserName"] as string;
-                if(currentUserName!=null)
+                if (currentUserName != null)
                     return currentUserName;
                 NetworkCredential credential = credentials.GetCredential(new Uri(serverUrl), "Basic");
                 currentUserName = credential.UserName + "@" + credential.Domain;
@@ -111,6 +121,11 @@ namespace SvnBridge.Infrastructure
         public void EnsureRevisionIsCached(int revision, string path)
         {
             string serverPath = GetServerPath(path);
+            
+            // optimizing access to properties by always getting the entire 
+            // properties folder the when accessing the folder props
+            if (serverPath.EndsWith(Constants.FolderPropFilePath))
+                serverPath = GetParentName(serverPath);
 
             // already cached this version, skip inserting
             if (IsInCache(revision, serverPath))
@@ -130,8 +145,10 @@ namespace SvnBridge.Infrastructure
                                                                                       VersionSpec.FromChangeset(revision))
                                                                             .GetEnumerator();
                 bool firstRead = true;
+                bool hasItems = false;
                 while (items.MoveNext())
                 {
+                    hasItems = true;
                     if (firstRead)
                     {
                         items = QueryFolderIfCurrentlyReadingFile(revision, ref serverPath, items);
@@ -158,11 +175,35 @@ namespace SvnBridge.Infrastructure
 
                 }
 
+                if (hasItems == false)
+                    AddMissingItemToCache(revision, serverPath);
+
                 persistentCache.Set(cacheKey, true);
 
                 items.Dispose();
             });
 
+        }
+
+        private void AddMissingItemToCache(int revision, string serverPath)
+        {
+            string parentDirectory = GetParentName(serverPath);
+            
+            if (parentDirectory == "$") 
+                return;
+            
+            bool parentDirDoesNotExists =
+                QueryItems(revision, parentDirectory, Recursion.None).Length == 0;
+
+            if (!parentDirDoesNotExists) 
+                return;
+
+            persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), null);
+            // this lies to the cache system, making it think that the parent
+            // directory is cached, when in truth the parent directory doesn't even exists
+            // this saves going to the server again for files in the same directory
+            string parentCacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
+            persistentCache.Set(parentCacheKey, true);
         }
 
         private IEnumerator<SourceItem> QueryFolderIfCurrentlyReadingFile(int revision, ref string serverPath, IEnumerator<SourceItem> items)
@@ -204,7 +245,7 @@ namespace SvnBridge.Infrastructure
                    ", Path: " + path;
         }
 
-        private string GetParentName(string name)
+        private static string GetParentName(string name)
         {
             int lastIndexOfSlash = name.LastIndexOf('/');
             if (lastIndexOfSlash == -1)
