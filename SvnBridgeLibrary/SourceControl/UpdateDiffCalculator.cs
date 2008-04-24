@@ -16,6 +16,7 @@ namespace SvnBridge.SourceControl
 
         private Dictionary<string, int> clientExistingFiles;
         private Dictionary<string, string> clientDeletedFiles;
+        private readonly List<string> renamedItemsToBeCheckedForDeletedChildren = new List<string>();
 
         public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider)
         {
@@ -65,7 +66,16 @@ namespace SvnBridge.SourceControl
                 }
             }
             FlattenDeletedFolders(root);
+            RemoveMissingItemsWhichAreChildrenOfRenamedItem(root);
             VerifyNoMissingItemMetaDataRemained(root);
+        }
+
+        private void RemoveMissingItemsWhichAreChildrenOfRenamedItem(FolderMetaData root)
+        {
+            foreach (string item in renamedItemsToBeCheckedForDeletedChildren)
+            {
+                RemoveMissingItemsWhichAreChildrenOfRenamedItem(item, root);
+            }
         }
 
         private static void VerifyNoMissingItemMetaDataRemained(FolderMetaData root)
@@ -280,11 +290,14 @@ namespace SvnBridge.SourceControl
                                    targetVersion);
             }
             if (change.Item.ItemType == ItemType.Folder)
-                RemoveMissingItemsWhichAreChildrenOfRenamedItem(change.Item, root);
+            {
+                string itemName = updatingForwardInTime ? change.Item.RemoteName : oldItem.Name;
+                renamedItemsToBeCheckedForDeletedChildren.Add(itemName);
+            }
 
         }
 
-        private void RemoveMissingItemsWhichAreChildrenOfRenamedItem(SourceItem item, FolderMetaData root)
+        private static void RemoveMissingItemsWhichAreChildrenOfRenamedItem(string itemName, FolderMetaData root)
         {
             foreach (ItemMetaData data in new List<ItemMetaData>(root.Items))
             {
@@ -294,14 +307,14 @@ namespace SvnBridge.SourceControl
 
                 // a child of the currently renamed item
                 if (data is MissingFolderMetaData &&
-                    nameMatchingSourceItemConvention.StartsWith(item.RemoteName,StringComparison.InvariantCultureIgnoreCase))
+                    nameMatchingSourceItemConvention.StartsWith(itemName,StringComparison.InvariantCultureIgnoreCase))
                 {
                     root.Items.Remove(data);
                     continue;
                 }
                 if (data is FolderMetaData)
                 {
-                    RemoveMissingItemsWhichAreChildrenOfRenamedItem(item, (FolderMetaData)data);
+                    RemoveMissingItemsWhichAreChildrenOfRenamedItem(itemName, (FolderMetaData)data);
                 }
 
             }
