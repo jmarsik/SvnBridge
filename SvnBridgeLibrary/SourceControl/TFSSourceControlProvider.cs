@@ -822,8 +822,13 @@ namespace SvnBridge.SourceControl
 				}
 				else
 				{
-					string folderName = GetFolderName(propertyRevision.Key).ToLower();
-					foreach (ItemMetaData folderItem in folders[folderName].Items)
+					string folderName = GetFolderName(propertyRevision.Key).ToLowerInvariant();
+
+				    FolderMetaData folder;
+                    if (folders.TryGetValue(folderName, out folder) == false)
+                        continue;
+
+				    foreach (ItemMetaData folderItem in folder.Items)
 					{
 						if (folderItem.Name == propertyRevision.Key)
 						{
@@ -1411,19 +1416,27 @@ namespace SvnBridge.SourceControl
 		{
 			foreach (KeyValuePair<string, ItemProperties> itemProperties in properties)
 			{
-				ItemMetaData item;
+				ItemMetaData item = null;
 				if (folders.ContainsKey(itemProperties.Key.ToLowerInvariant()))
 				{
 					item = folders[itemProperties.Key.ToLowerInvariant()];
 				}
 				else
 				{
-					string folderName = GetFolderName(itemProperties.Key);
-					item = folders[folderName.ToLowerInvariant()].FindItem(itemProperties.Key);
+					string folderName = GetFolderName(itemProperties.Key)
+                        .ToLowerInvariant();
+                    if(folders.ContainsKey(folderName))
+                    {
+                        item = folders[folderName].FindItem(itemProperties.Key);
+                    }
 				}
 				if (item != null)
-					foreach (Property property in itemProperties.Value.Properties)
-						item.Properties[property.Name] = property.Value;
+				{
+                    foreach (Property property in itemProperties.Value.Properties)
+                    {
+                        	item.Properties[property.Name] = property.Value;
+                    }
+                }
 			}
 		}
 
