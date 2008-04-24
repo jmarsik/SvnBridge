@@ -25,10 +25,10 @@ namespace SvnBridge.Cache
             {
                 sb.Append(b.ToString("X2"));
             }
-            sb.Insert(2, Path.DirectorySeparatorChar);
-            sb.Insert(4, Path.DirectorySeparatorChar);
             sb.Insert(9, Path.DirectorySeparatorChar);
             sb.Insert(13, Path.DirectorySeparatorChar);
+            sb.Insert(16, Path.DirectorySeparatorChar);
+            sb.Insert(18, Path.DirectorySeparatorChar);
             return sb.ToString();
         }
 

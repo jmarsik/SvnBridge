@@ -68,7 +68,7 @@ namespace SvnBridge.SourceControl
             VerifyNoMissingItemMetaDataRemained(root);
         }
 
-        private void VerifyNoMissingItemMetaDataRemained(FolderMetaData root)
+        private static void VerifyNoMissingItemMetaDataRemained(FolderMetaData root)
         {
             foreach (ItemMetaData item in root.Items)
             {
@@ -166,7 +166,7 @@ namespace SvnBridge.SourceControl
                             // We may have edit & rename operations
                             if (IsRenameOperation(change))
                             {
-                                PerformRename(targetVersion, checkoutRootPath, history, change, root, updatingForwardInTime);
+                                PerformRename(targetVersion, checkoutRootPath, change, root, updatingForwardInTime);
                             }
                             if (updatingForwardInTime == false)
                             {
@@ -176,7 +176,7 @@ namespace SvnBridge.SourceControl
                         }
                         else if (IsRenameOperation(change))
                         {
-                            PerformRename(targetVersion, checkoutRootPath, history, change, root, updatingForwardInTime);
+                            PerformRename(targetVersion, checkoutRootPath, change, root, updatingForwardInTime);
                         }
                         else
                         {
@@ -246,12 +246,7 @@ namespace SvnBridge.SourceControl
                                targetVersion);
         }
 
-        private void PerformRename(int targetVersion,
-                                   string checkoutRootPath,
-                                   SourceItemHistory history,
-                                   SourceItemChange change,
-                                   FolderMetaData root,
-                                   bool updatingForwardInTime)
+        private void PerformRename(int targetVersion, string checkoutRootPath, SourceItemChange change, FolderMetaData root, bool updatingForwardInTime)
         {
             ItemMetaData oldItem = sourceControlProvider.GetPreviousVersionOfItems(new SourceItem[] { change.Item }, change.Item.RemoteChangesetId)[0];
 
@@ -283,6 +278,32 @@ namespace SvnBridge.SourceControl
                                    change,
                                    root,
                                    targetVersion);
+            }
+            if (change.Item.ItemType == ItemType.Folder)
+                RemoveMissingItemsWhichAreChildrenOfRenamedItem(change.Item, root);
+
+        }
+
+        private void RemoveMissingItemsWhichAreChildrenOfRenamedItem(SourceItem item, FolderMetaData root)
+        {
+            foreach (ItemMetaData data in new List<ItemMetaData>(root.Items))
+            {
+                string nameMatchingSourceItemConvention = data.Name;
+                if (data.Name.StartsWith("/"))
+                    nameMatchingSourceItemConvention = data.Name.Substring(1);
+
+                // a child of the currently renamed item
+                if (data is MissingFolderMetaData &&
+                    nameMatchingSourceItemConvention.StartsWith(item.RemoteName,StringComparison.InvariantCultureIgnoreCase))
+                {
+                    root.Items.Remove(data);
+                    continue;
+                }
+                if (data is FolderMetaData)
+                {
+                    RemoveMissingItemsWhichAreChildrenOfRenamedItem(item, (FolderMetaData)data);
+                }
+
             }
         }
 

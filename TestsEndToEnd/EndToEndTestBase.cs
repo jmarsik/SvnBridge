@@ -154,7 +154,7 @@ namespace TestsEndToEnd
 					string line;
 					while ((line = svn.StandardOutput.ReadLine()) != null)
 					{
-						Console.WriteLine(line);
+						Debug.WriteLine(line);
 						output.AppendLine(line);
 					}
 				});
@@ -181,7 +181,7 @@ namespace TestsEndToEnd
 					string line;
 					while ((line = svn.StandardOutput.ReadLine()) != null)
 					{
-						Console.WriteLine(line);
+                        Debug.WriteLine(line);
 						output.AppendLine(line);
 					}
 				});
@@ -203,7 +203,7 @@ namespace TestsEndToEnd
 
 		private static void ExecuteInternal(string command, Action<Process> process)
 		{
-			Console.WriteLine("svn " + command);
+            Debug.WriteLine("svn " + command);
 			ProcessStartInfo psi = new ProcessStartInfo("svn", command);
 			psi.RedirectStandardOutput = true;
 			psi.RedirectStandardError = true;
