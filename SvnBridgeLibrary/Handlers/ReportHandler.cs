@@ -137,7 +137,35 @@ namespace SvnBridge.Handlers
                     }
                 }
             }
-            throw new NotSupportedException("waiting for binary diff");
+            using (StreamWriter output = new StreamWriter(response.OutputStream))
+            {
+                response.StatusCode = (int) HttpStatusCode.OK;   
+                output.Write(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<S:file-revs-report xmlns:S=""svn:"" xmlns:D=""DAV:"">");
+
+                foreach (SourceItemHistory history in Helper.SortHistories(true, log.History))
+                {
+                    foreach (SourceItemChange change in history.Changes)
+                    {
+                        ItemMetaData items = sourceControlProvider.GetItems(change.Item.RemoteChangesetId, change.Item.RemoteName, Recursion.None);
+                        MemoryStream svnDiffStream = new MemoryStream();
+                        SvnDiff svnDiff = SvnDiffEngine.CreateReplaceDiff(
+                            sourceControlProvider.ReadFile(items)
+                            );
+                        SvnDiffParser.WriteSvnDiff(svnDiff, svnDiffStream);
+                        byte[] svnDiffData = svnDiffStream.ToArray();
+
+
+                        output.Write(@"<S:file-rev path="""+ change.Item.RemoteName + @""" rev="""+ change.Item.RemoteChangesetId +@""">
+<S:rev-prop name=""svn:log"">" + history.Comment +@"</S:rev-prop>
+<S:rev-prop name=""svn:author"">" + history.Username + @"</S:rev-prop>
+<S:rev-prop name=""svn:date"">" + Helper.FormatDate(change.Item.RemoteDate) + @"</S:rev-prop>
+<S:txdelta>" + Convert.ToBase64String(svnDiffData) + 
+@"</S:txdelta></S:file-rev>");
+                    }
+                }
+             output.Write("</S:file-revs-report>");
+  }
         }
 
         private static void SendErrorResponseCannotRunBlameOnFolder(IHttpResponse response, string serverPath)

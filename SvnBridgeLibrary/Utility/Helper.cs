@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -6,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Net;
 
 namespace SvnBridge.Utility
@@ -279,6 +281,25 @@ namespace SvnBridge.Utility
             }
             proxy.Credentials = credential;
             return proxy;
+        }
+
+        public static IList<SourceItemHistory> SortHistories(bool updatingForwardInTime,
+                                                         IEnumerable<SourceItemHistory> items)
+        {
+            List<SourceItemHistory> histories = new List<SourceItemHistory>(items);
+
+            histories.Sort(delegate(SourceItemHistory x, SourceItemHistory y)
+            {
+                if (updatingForwardInTime)
+                {
+                    return x.ChangeSetID.CompareTo(y.ChangeSetID);
+                }
+                else
+                {
+                    return y.ChangeSetID.CompareTo(x.ChangeSetID);
+                }
+            });
+            return histories;
         }
     }
 }

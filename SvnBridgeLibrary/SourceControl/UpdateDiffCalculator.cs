@@ -4,6 +4,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
+using SvnBridge.Utility;
 
 namespace SvnBridge.SourceControl
 {
@@ -148,7 +149,7 @@ namespace SvnBridge.SourceControl
                                                  Recursion.Full, 256);
 
                 foreach (SourceItemHistory history in
-                    SortHistories(updatingForwardInTime, logItem.History))
+                    Helper.SortHistories(updatingForwardInTime, logItem.History))
                 {
                     changed = true;
                     lastVersion = history.ChangeSetID;
@@ -370,25 +371,6 @@ namespace SvnBridge.SourceControl
         private static bool IsEditOperation(SourceItemChange change)
         {
             return (change.ChangeType & ChangeType.Edit) == ChangeType.Edit;
-        }
-
-        private static IList<SourceItemHistory> SortHistories(bool updatingForwardInTime,
-                                                              IEnumerable<SourceItemHistory> items)
-        {
-            List<SourceItemHistory> histories = new List<SourceItemHistory>(items);
-
-            histories.Sort(delegate(SourceItemHistory x, SourceItemHistory y)
-            {
-                if (updatingForwardInTime)
-                {
-                    return x.ChangeSetID.CompareTo(y.ChangeSetID);
-                }
-                else
-                {
-                    return y.ChangeSetID.CompareTo(x.ChangeSetID);
-                }
-            });
-            return histories;
         }
 
         private static Dictionary<string, string> GetClientDeletedFiles(string path,
