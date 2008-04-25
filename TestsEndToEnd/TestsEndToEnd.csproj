@@ -42,6 +42,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlameTest.cs" />
     <Compile Include="CommitTest.cs" />
     <Compile Include="ConcurrentActionsTest.cs" />
     <Compile Include="EndToEndTestBase.cs" />

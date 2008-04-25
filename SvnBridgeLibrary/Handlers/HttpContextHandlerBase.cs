@@ -5,6 +5,7 @@ using System.Text;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
@@ -126,5 +127,27 @@ namespace SvnBridge.Handlers
 		{
 			return PathParser.GetLocalPath(httpContext.Request, path);
 		}
+
+        protected void WriteFileNotFoundResponse(IHttpRequest request, IHttpResponse response)
+        {
+            response.StatusCode = (int)HttpStatusCode.NotFound;
+            response.ContentType = "text/html; charset=iso-8859-1";
+
+            string responseContent =
+                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
+                "<html><head>\n" +
+                "<title>404 Not Found</title>\n" +
+                "</head><body>\n" +
+                "<h1>Not Found</h1>\n" +
+                "<p>The requested URL " + Helper.Decode(GetPath(request)) +
+                " was not found on this server.</p>\n" +
+                "<hr>\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at " + request.Url.Host +
+                " Port " + request.Url.Port + "</address>\n" +
+                "</body></html>\n";
+
+            WriteToResponse(response, responseContent);
+        }
+
 	}
 }

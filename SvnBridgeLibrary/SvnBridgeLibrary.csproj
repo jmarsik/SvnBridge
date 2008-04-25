@@ -93,6 +93,7 @@
     <Compile Include="Interfaces\IPathParser.cs" />
     <Compile Include="Interfaces\ISourceControlServicesHub.cs" />
     <Compile Include="Protocol\DatedRevReportData.cs" />
+    <Compile Include="Protocol\FileRevsReportData.cs" />
     <Compile Include="Protocol\RelayReportData.cs" />
     <Compile Include="Proxies\ProxyFactory.cs" />
     <Compile Include="Proxies\RemotingInvocation.cs" />

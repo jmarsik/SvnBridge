@@ -40,9 +40,9 @@ namespace TestsEndToEnd
 			CreateTempFolder();
 
 			Environment.CurrentDirectory = Path.Combine(Path.GetTempPath(), checkoutFolder);
-			Console.WriteLine("cd " + checkoutFolder);
+			Debug.WriteLine("cd " + checkoutFolder);
 			listener = IoC.Resolve<IListener>();
-			listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
+			listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Debug.WriteLine(e.Exception); };
 			listener.Port = this.port;
 
 			listener.Start(parser);
@@ -53,7 +53,7 @@ namespace TestsEndToEnd
 			checkoutFolder = Path.GetTempFileName();
 			File.Delete(checkoutFolder);
 			Directory.CreateDirectory(checkoutFolder);
-			Console.WriteLine("md " + checkoutFolder);
+			Debug.WriteLine("md " + checkoutFolder);
 		}
 
 		public override void Dispose()
@@ -121,11 +121,11 @@ namespace TestsEndToEnd
 		{
 			CreateTempFolder();
 			Environment.CurrentDirectory = checkoutFolder;
-			Console.WriteLine("cd " + checkoutFolder);
+			Debug.WriteLine("cd " + checkoutFolder);
 			Svn("co " + testUrl);
 			Environment.CurrentDirectory =
 				Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
-			Console.WriteLine("cd " + Environment.CurrentDirectory);
+			Debug.WriteLine("cd " + Environment.CurrentDirectory);
 		}
 
 		protected static string SvnExpectError(string command)
@@ -135,7 +135,7 @@ namespace TestsEndToEnd
 			{
 				err = svn.StandardError.ReadToEnd();
 			});
-			Console.WriteLine(err);
+			Debug.WriteLine(err);
 			return err;
 		}
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using SvnBridge.Cache;
@@ -20,14 +21,9 @@ namespace TestsEndToEnd
 
 			foreach (ITestCommand command in GetTestCommandsFromBase(method))
 			{
-				using(new ConsoleColorer(ConsoleColor.Gray))
+			    using (new ConsoleColorer(ConsoleColor.Gray))
 				{
-					Console.WriteLine("Test (UsingStaticServerPathParser): {0}", method);
-				}
-				yield return new UsingStaticServerPathParser(command);
-				using (new ConsoleColorer(ConsoleColor.Gray))
-				{
-					Console.WriteLine("Test (UsingRequestBasePathParser): {0}", method);
+					Debug.WriteLine("Test (UsingRequestBasePathParser): " + method);
 				}
 				yield return new UsingRequestBasePathParser(command);
 			}
@@ -37,45 +33,6 @@ namespace TestsEndToEnd
 		{
 			return base.EnumerateTestCommands(method);
 		}
-	}
-
-	internal class UsingStaticServerPathParser : ITestCommand
-	{
-		private readonly ITestCommand command;
-
-		public UsingStaticServerPathParser(ITestCommand command)
-		{
-			this.command = command;
-		}
-
-		#region ITestCommand Members
-
-		public MethodResult Execute(object testClass)
-		{
-			var test = (EndToEndTestBase) testClass;
-			string testUrl = "http://" + IPAddress.Loopback + ":" + test.Port + 
-				"/SvnBridgeTesting" + test.TestPath;
-			test.Initialize(testUrl, new StaticServerPathParser(test.ServerUrl));
-			try
-			{
-				return command.Execute(testClass);
-			}
-			catch (Exception e)
-			{
-				using(new ConsoleColorer(ConsoleColor.Red))
-				{
-					Console.WriteLine("Failed: {0}", e.Message);
-				}
-				throw;
-			}
-		}
-
-		public string Name
-		{
-			get { return command.Name; }
-		}
-
-		#endregion
 	}
 
 	internal class UsingRequestBasePathParser : ITestCommand

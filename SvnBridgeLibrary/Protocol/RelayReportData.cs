@@ -13,6 +13,5 @@ namespace SvnBridge.Protocol
 
         [XmlElement("send-deltas", Namespace = WebDav.Namespaces.SVN)]
         public int SendDelta;
-
     }
 }
