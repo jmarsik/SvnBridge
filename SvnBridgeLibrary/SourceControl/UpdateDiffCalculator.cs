@@ -363,7 +363,8 @@ namespace SvnBridge.SourceControl
                 return IsDeleteOperation(change, true);
             }
             return ((change.ChangeType & ChangeType.Add) == ChangeType.Add) ||
-                   ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch);
+                   ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch) ||
+                   ((change.ChangeType & ChangeType.Undelete) == ChangeType.Undelete);
         }
 
         private static bool IsEditOperation(SourceItemChange change)
