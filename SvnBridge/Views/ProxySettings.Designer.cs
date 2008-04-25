@@ -80,9 +80,9 @@ namespace SvnBridge.Views
             this.useDefaultCredetialsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.useDefaultCredetialsCheckBox.Location = new System.Drawing.Point(16, 64);
             this.useDefaultCredetialsCheckBox.Name = "useDefaultCredetialsCheckBox";
-            this.useDefaultCredetialsCheckBox.Size = new System.Drawing.Size(134, 17);
+            this.useDefaultCredetialsCheckBox.Size = new System.Drawing.Size(137, 17);
             this.useDefaultCredetialsCheckBox.TabIndex = 4;
-            this.useDefaultCredetialsCheckBox.Text = "Use default crednetials";
+            this.useDefaultCredetialsCheckBox.Text = "Use Default Credentials";
             this.useDefaultCredetialsCheckBox.UseVisualStyleBackColor = true;
             // 
             // label3
