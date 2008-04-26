@@ -74,9 +74,7 @@ namespace SvnBridge.Infrastructure
             settings.Indent = true;
             settings.OmitXmlDeclaration = true;
 
-            string logPath = GetLogPath();
-
-            string logFile = Path.Combine(logPath, level + ".log");
+            string logFile = Path.Combine(LogPath, level + ".log");
 
             using (StreamWriter text = File.AppendText(logFile))
             using (XmlWriter writer = XmlWriter.Create(text, settings))
@@ -90,27 +88,30 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-        private string GetLogPath()
+        private string LogPath
         {
-            if (logPath != null)
-                return logPath;
-            logPath = ConfigurationManager.AppSettings["LogPath"];
-            if (logPath != null)
-                return logPath;
-            logPath = "";
-            try
+            get
             {
-                File.WriteAllText("tmp.log", "test");
-                File.Delete("tmp.log");
+                if (logPath != null)
+                    return logPath;
+                logPath = ConfigurationManager.AppSettings["LogPath"];
+                if (logPath != null)
+                    return logPath;
+                logPath = "";
+                try
+                {
+                    File.WriteAllText("tmp.log", "test");
+                    File.Delete("tmp.log");
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    logPath = Path.Combine(localAppData, "SvnBridge");
+                    if (Directory.Exists(logPath) == false)
+                        Directory.CreateDirectory(logPath);
+                }
+                return logPath;
             }
-            catch (UnauthorizedAccessException)
-            {
-                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                logPath = Path.Combine(localAppData, "SvnBridge");
-                if (Directory.Exists(logPath) == false)
-                    Directory.CreateDirectory(logPath);
-            }
-            return logPath;
         }
 
         private static void WriteCDataElement(XmlWriter writer, string name, string message)

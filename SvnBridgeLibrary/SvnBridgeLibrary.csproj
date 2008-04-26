@@ -53,6 +53,7 @@
     <Compile Include="Cache\FileNameHashing.cs" />
     <Compile Include="Cache\HashSet.cs" />
     <Compile Include="Cache\ISet.cs" />
+    <Compile Include="Cache\RegistryBasedPersistentCache.cs" />
     <Compile Include="Interfaces\IPersistentCache.cs" />
     <Compile Include="NullImpl\NullCache.cs" />
     <Compile Include="Constants.cs" />
