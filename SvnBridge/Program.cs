@@ -24,7 +24,7 @@ namespace SvnBridge
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            int? port = null;
+            int? port;
 
             if (args.Length > 0)
             {
