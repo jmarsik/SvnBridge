@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Net.Sockets;
 using CodePlex.TfsLibrary;
 using SvnBridge.Net;
@@ -292,13 +293,13 @@ namespace SvnBridge.SourceControl
 
 			foreach (SourceItemHistory history in logItem.History)
 			{
-                List<SourceItem> renamedItems = new List<SourceItem>();
+				List<SourceItem> renamedItems = new List<SourceItem>();
 				foreach (SourceItemChange change in history.Changes)
 				{
 					change.Item.RemoteName = change.Item.RemoteName.Substring(rootPath.Length);
 					if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
 					{
-                        renamedItems.Add(change.Item);
+						renamedItems.Add(change.Item);
 					}
 					else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
 					{
@@ -318,25 +319,25 @@ namespace SvnBridge.SourceControl
 						change.Item = new RenamedSourceItem(change.Item, oldName, oldRevision);
 					}
 				}
-                if (renamedItems.Count > 0)
-                {
-                    ItemMetaData[] oldItems = GetPreviousVersionOfItems(renamedItems.ToArray(), history.ChangeSetID);
-                    Dictionary<int, ItemMetaData> oldItemsByKey = new Dictionary<int, ItemMetaData>();
-                    foreach (ItemMetaData oldItem in oldItems)
-                    {
-                        oldItemsByKey[oldItem.Id] = oldItem;
-                    }
+				if (renamedItems.Count > 0)
+				{
+					ItemMetaData[] oldItems = GetPreviousVersionOfItems(renamedItems.ToArray(), history.ChangeSetID);
+					Dictionary<int, ItemMetaData> oldItemsByKey = new Dictionary<int, ItemMetaData>();
+					foreach (ItemMetaData oldItem in oldItems)
+					{
+						oldItemsByKey[oldItem.Id] = oldItem;
+					}
 
-                    foreach (SourceItemChange change in history.Changes)
-                    {
-                        ItemMetaData oldItem;
-                        if (oldItemsByKey.TryGetValue(change.Item.ItemId, out oldItem))
-                        {
-                            change.Item = new RenamedSourceItem(change.Item, oldItem.Name, oldItem.Revision);
-                        }
-                    }
-                }
-            }
+					foreach (SourceItemChange change in history.Changes)
+					{
+						ItemMetaData oldItem;
+						if (oldItemsByKey.TryGetValue(change.Item.ItemId, out oldItem))
+						{
+							change.Item = new RenamedSourceItem(change.Item, oldItem.Name, oldItem.Revision);
+						}
+					}
+				}
+			}
 
 			return logItem;
 		}
@@ -458,10 +459,10 @@ namespace SvnBridge.SourceControl
 					{
 						changesetId =
 							SourceControlService.Commit(serverUrl,
-							                            credentials,
-							                            activityId,
-							                            activity.Comment,
-							                            commitServerList);
+														credentials,
+														activityId,
+														activity.Comment,
+														commitServerList);
 					}
 					catch (TfsFailureException)
 					{
@@ -589,7 +590,7 @@ namespace SvnBridge.SourceControl
 					if (retry == 3)
 					{
 						Logger.Error("Failed to download " + item.Name + ", max retry count reached, aborting", e);
-					    Listener.RaiseErrorOccured(e);
+						Listener.RaiseErrorOccured(e);
 						waitHandle.Set();
 						throw;
 					}
@@ -824,11 +825,11 @@ namespace SvnBridge.SourceControl
 				{
 					string folderName = GetFolderName(propertyRevision.Key).ToLowerInvariant();
 
-				    FolderMetaData folder;
-                    if (folders.TryGetValue(folderName, out folder) == false)
-                        continue;
+					FolderMetaData folder;
+					if (folders.TryGetValue(folderName, out folder) == false)
+						continue;
 
-				    foreach (ItemMetaData folderItem in folder.Items)
+					foreach (ItemMetaData folderItem in folder.Items)
 					{
 						if (folderItem.Name == propertyRevision.Key)
 						{
@@ -1424,19 +1425,19 @@ namespace SvnBridge.SourceControl
 				else
 				{
 					string folderName = GetFolderName(itemProperties.Key)
-                        .ToLowerInvariant();
-                    if(folders.ContainsKey(folderName))
-                    {
-                        item = folders[folderName].FindItem(itemProperties.Key);
-                    }
+						.ToLowerInvariant();
+					if (folders.ContainsKey(folderName))
+					{
+						item = folders[folderName].FindItem(itemProperties.Key);
+					}
 				}
 				if (item != null)
 				{
-                    foreach (Property property in itemProperties.Value.Properties)
-                    {
-                        	item.Properties[property.Name] = property.Value;
-                    }
-                }
+					foreach (Property property in itemProperties.Value.Properties)
+					{
+						item.Properties[property.Name] = property.Value;
+					}
+				}
 			}
 		}
 
@@ -1447,19 +1448,19 @@ namespace SvnBridge.SourceControl
 
 		public ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset)
 		{
-            int previousRevision = (changeset - 1);
+			int previousRevision = (changeset - 1);
 
-            List<int> itemIds = new List<int>();
-            foreach (SourceItem item in items)
-                itemIds.Add(item.ItemId);
+			List<int> itemIds = new List<int>();
+			foreach (SourceItem item in items)
+				itemIds.Add(item.ItemId);
 
-            SourceItem[] sourceItems = SourceControlService.QueryItems(serverUrl, credentials, itemIds.ToArray(), previousRevision);
+			SourceItem[] sourceItems = SourceControlService.QueryItems(serverUrl, credentials, itemIds.ToArray(), previousRevision);
 
-            List<ItemMetaData> result = new List<ItemMetaData>();
-            foreach (SourceItem sourceItem in sourceItems)
-                result.Add(ItemMetaData.ConvertSourceItem(sourceItem, rootPath));
+			List<ItemMetaData> result = new List<ItemMetaData>();
+			foreach (SourceItem sourceItem in sourceItems)
+				result.Add(ItemMetaData.ConvertSourceItem(sourceItem, rootPath));
 
-            return result.ToArray();
+			return result.ToArray();
 		}
 	}
 }
