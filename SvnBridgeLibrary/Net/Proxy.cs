@@ -10,7 +10,10 @@ namespace SvnBridge.Net
         public static void Set(ProxyInformation proxyInformation)
         {
         	DefaultProxy = proxyInformation;
-            WebRequest.DefaultWebProxy = Helper.CreateProxy(proxyInformation);
+			if (proxyInformation.UseProxy)
+			{
+				WebRequest.DefaultWebProxy = Helper.CreateProxy(proxyInformation);
+			}
         }
     }
 }

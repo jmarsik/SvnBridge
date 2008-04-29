@@ -12,9 +12,9 @@ namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlProviderTest : IDisposable
     {
-        private MockRepository mocks;
-        private IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
-        private TFSSourceControlProvider provider;
+        private readonly MockRepository mocks;
+        private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
+        private readonly TFSSourceControlProvider provider;
 
         public TFSSourceControlProviderTest()
         {
@@ -23,6 +23,7 @@ namespace SvnBridge.SourceControl
             provider = new TFSSourceControlProvider(
                 "blah",
                 null,
+				null,
                 CreateSourceControlServicesHub());
         }
 

@@ -35,7 +35,15 @@ namespace SvnBridge.Net
 	        }
 	    }
 
-	    public static void EnsureInitialized()
+		public static bool IsInitialized
+		{
+			get
+			{
+				return RunningOnWeb || currentItems != null;
+			}
+		}
+
+		public static void EnsureInitialized()
 		{
             if (RunningOnWeb == false && currentItems == null)
 				throw new InvalidOperationException("Cannot use PerRequest Items if it wasn't initialized");

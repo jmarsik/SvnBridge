@@ -121,6 +121,7 @@ namespace SvnBridge
         private static void Run(int port, ProxyInformation proxyInformation)
         {
             Proxy.Set(proxyInformation);
+			
             IListener listener = IoC.Resolve<IListener>();
 
             listener.Port = port;

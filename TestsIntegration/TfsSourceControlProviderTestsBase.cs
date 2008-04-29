@@ -46,6 +46,7 @@ namespace IntegrationTests
 
 			_provider = new TFSSourceControlProvider(ServerUrl,
 													 PROJECT_NAME,
+													 null,
 													 CreateSourceControlServicesHub());
 
 			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Environment.MachineName;
@@ -60,6 +61,7 @@ namespace IntegrationTests
 			_activityIdRoot = Guid.NewGuid().ToString();
 			_providerRoot = new TFSSourceControlProvider(ServerUrl,
 														 PROJECT_NAME + testPath,
+														 null,
 														 CreateSourceControlServicesHub());
 			_providerRoot.MakeActivity(_activityIdRoot);
 		}

@@ -41,6 +41,7 @@ namespace IntegrationTests
 																						  new NullLogger());
             TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
                                                                              PROJECT_NAME,
+																			 null,
                                                                              CreateSourceControlServicesHub());
         }
 

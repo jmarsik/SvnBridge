@@ -10,4 +10,5 @@ Cache.sdf
 Error.log
 Info.log
 Bin
+SvnBridgeViaIis.csproj.user
 </Value></Property></Properties></ItemProperties>

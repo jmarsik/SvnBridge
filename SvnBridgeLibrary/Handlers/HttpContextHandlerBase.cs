@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
@@ -13,6 +15,7 @@ namespace SvnBridge.Handlers
 	{
 		private IPathParser pathParser;
 		private IHttpContext httpContext;
+
 		public IPathParser PathParser
 		{
 			get { return pathParser; }
@@ -26,15 +29,17 @@ namespace SvnBridge.Handlers
 			string tfsUrl = pathParser.GetServerUrl(request.Url);
 			string projectName = pathParser.GetProjectName(context.Request);
 
+			NetworkCredential credential = GetCredential(context);
+			PerRequest.Items["credentials"] = credential;
 			ISourceControlProvider sourceControlProvider =
-				SourceControlProviderFactory.Create(tfsUrl, projectName, GetCredential(context));
+				SourceControlProviderFactory.Create(tfsUrl, projectName, credential);
 			Handle(context, sourceControlProvider);
 		}
 
-		public void Initialize(IHttpContext context, IPathParser pathParser)
+		public void Initialize(IHttpContext context, IPathParser parser)
 		{
 			this.httpContext = context;
-			this.pathParser = pathParser;
+			this.pathParser = parser;
 		}
 
 		public virtual void Cancel()

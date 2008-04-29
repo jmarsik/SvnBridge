@@ -78,9 +78,11 @@ namespace SvnBridge.SourceControl
 		public TFSSourceControlProvider(
 			string serverUrl,
 			string projectName,
+			ICredentials credentials,
 			ISourceControlServicesHub sourceControlServicesHub)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
+			this.credentials = credentials;
 
 			if (projectName != null)
 			{
@@ -95,7 +97,7 @@ namespace SvnBridge.SourceControl
 				this.serverUrl = serverUrl.Split(',')[0];
 				rootPath = Constants.ServerRootPath;
 			}
-			credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
+			this.credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
 		}
 
 		#region ISourceControlProvider Members

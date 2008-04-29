@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using SvnBridge.Interfaces;
+using SvnBridge.Net;
 using SvnBridge.Proxies;
 
 namespace SvnBridge.Infrastructure
@@ -125,6 +126,10 @@ namespace SvnBridge.Infrastructure
             {
                 return value;
             }
+			if (PerRequest.IsInitialized && PerRequest.Items.Contains(name))
+			{
+				return PerRequest.Items[name];
+			}
             return null;
         }
 

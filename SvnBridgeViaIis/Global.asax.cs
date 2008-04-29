@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Web;
 
 namespace SvnBridge
@@ -7,7 +8,14 @@ namespace SvnBridge
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            new BootStrapper().Start();
+        	try
+        	{
+        		new BootStrapper().Start();
+        	}
+        	catch (WebException we)
+        	{
+				Console.WriteLine(we);
+        	}
         }
 
         protected void Application_End(object sender, EventArgs e)

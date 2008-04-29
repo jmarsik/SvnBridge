@@ -10,279 +10,267 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Infrastructure
 {
-    [Interceptor(typeof(TracingInterceptor))]
-    public class MetaDataRepository : IMetaDataRepository
-    {
-        private readonly ITFSSourceControlService sourceControlService;
-        private readonly string serverUrl;
-        private readonly string rootPath;
-        private readonly ICredentials credentials;
-        private readonly IPersistentCache persistentCache;
+	[Interceptor(typeof(TracingInterceptor))]
+	public class MetaDataRepository : IMetaDataRepository
+	{
+		private readonly ITFSSourceControlService sourceControlService;
+		private readonly string serverUrl;
+		private readonly string rootPath;
+		private readonly ICredentials credentials;
+		private readonly IPersistentCache persistentCache;
 
-        public MetaDataRepository(
-            ITFSSourceControlService sourceControlService,
-            ICredentials credentials,
-            IPersistentCache persistentCache,
-            string serverUrl,
-            string rootPath)
-        {
-            this.sourceControlService = sourceControlService;
-            this.serverUrl = serverUrl;
-            this.rootPath = rootPath;
-            this.credentials = credentials;
-            this.persistentCache = persistentCache;
-        }
+		public MetaDataRepository(
+			ITFSSourceControlService sourceControlService,
+			ICredentials credentials,
+			IPersistentCache persistentCache,
+			string serverUrl,
+			string rootPath)
+		{
+			this.sourceControlService = sourceControlService;
+			this.serverUrl = serverUrl;
+			this.rootPath = rootPath;
+			this.credentials = credentials;
+			this.persistentCache = persistentCache;
+		}
 
-        public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
-        {
-            List<SourceItem> list = null;
-            persistentCache.UnitOfWork(delegate
-            {
-                string serverPath = GetServerPath(path);
+		public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
+		{
+			List<SourceItem> list = null;
+			persistentCache.UnitOfWork(delegate
+			{
+				string serverPath = GetServerPath(path);
 
-                if (serverPath == Constants.ServerRootPath && recursion == Recursion.None)
-                {
-                    SourceItem[] items = sourceControlService.QueryItems(serverUrl, credentials, serverPath, RecursionType.None,
-                                                                         VersionSpec.FromChangeset(revision), DeletedState.NonDeleted,
-                                                                         ItemType.Any);
+				if (serverPath == Constants.ServerRootPath && recursion == Recursion.None)
+				{
+					SourceItem[] items = sourceControlService.QueryItems(serverUrl, credentials, serverPath, RecursionType.None,
+																		 VersionSpec.FromChangeset(revision), DeletedState.NonDeleted,
+																		 ItemType.Any);
 
-                    list = new List<SourceItem>(items);
-                    return;
-                }
+					list = new List<SourceItem>(items);
+					return;
+				}
 
-                EnsureRevisionIsCached(revision, path);
+				EnsureRevisionIsCached(revision, path);
 
-                string cacheKey = GetItemsListCacheKey(recursion, revision, serverPath);
+				string cacheKey = GetItemsListCacheKey(recursion, revision, serverPath);
 
-                list = persistentCache.GetList<SourceItem>(cacheKey);
-                list.Sort(delegate(SourceItem x, SourceItem y)
-                {
-                    return x.RemoteName.CompareTo(y.RemoteName);
-                });
-            });
-            return list.ToArray();
-        }
+				list = persistentCache.GetList<SourceItem>(cacheKey);
+				list.Sort(delegate(SourceItem x, SourceItem y)
+				{
+					return x.RemoteName.CompareTo(y.RemoteName);
+				});
+			});
+			return list.ToArray();
+		}
 
-        private string GetItemsListCacheKey(Recursion recursion, int revision, string path)
-        {
-            switch (recursion)
-            {
-                case Recursion.Full:
-                    return GetItemFullPathCacheKey(revision, path);
-                case Recursion.OneLevel:
-                    return GetItemOneLevelCacheKey(revision, path);
-                case Recursion.None:
-                    return GetItemNoRecursionCacheKey(revision, path);
-                default:
-                    throw new NotSupportedException();
-            }
-        }
+		private string GetItemsListCacheKey(Recursion recursion, int revision, string path)
+		{
+			switch (recursion)
+			{
+				case Recursion.Full:
+					return GetItemFullPathCacheKey(revision, path);
+				case Recursion.OneLevel:
+					return GetItemOneLevelCacheKey(revision, path);
+				case Recursion.None:
+					return GetItemNoRecursionCacheKey(revision, path);
+				default:
+					throw new NotSupportedException();
+			}
+		}
 
-        private string GetItemNoRecursionCacheKey(int revision, string path)
-        {
-            return "No recursion of: " + GetItemCacheKey(revision, path);
-        }
+		private string GetItemNoRecursionCacheKey(int revision, string path)
+		{
+			return "No recursion of: " + GetItemCacheKey(revision, path);
+		}
 
-        private string CurrentUserName
-        {
-            get
-            {
-                string currentUserName = PerRequest.Items["CurrentUserName"] as string;
-                if (currentUserName != null)
-                    return currentUserName;
-                NetworkCredential credential = credentials.GetCredential(new Uri(serverUrl), "Basic");
-                currentUserName = credential.UserName + "@" + credential.Domain;
-                PerRequest.Items["CurrentUserName"] = currentUserName;
-                return currentUserName;
-            }
-        }
+		private string CurrentUserName
+		{
+			get
+			{
+				string currentUserName = PerRequest.Items["CurrentUserName"] as string;
+				if (currentUserName != null)
+					return currentUserName;
+				NetworkCredential credential = credentials.GetCredential(new Uri(serverUrl), "Basic");
+				currentUserName = credential.UserName + "@" + credential.Domain;
+				PerRequest.Items["CurrentUserName"] = currentUserName;
+				return currentUserName;
+			}
+		}
 
-        private string GetServerPath(string path)
-        {
-            if (path.StartsWith("$/"))
-                return path;
+		private string GetServerPath(string path)
+		{
+			if (path.StartsWith("$/"))
+				return path;
 
-            string serverPath = rootPath;
+			string serverPath = rootPath;
 
-            if (serverPath.EndsWith("/"))
-                serverPath = serverPath.Substring(0, serverPath.Length - 1);
+			if (serverPath.EndsWith("/"))
+				serverPath = serverPath.Substring(0, serverPath.Length - 1);
 
-            if (path.StartsWith("/") == false)
-                serverPath = serverPath + '/' + path;
-            else
-                serverPath = serverPath + path;
+			if (path.StartsWith("/") == false)
+				serverPath = serverPath + '/' + path;
+			else
+				serverPath = serverPath + path;
 
-            if (serverPath.EndsWith("/") && serverPath != "$/")
-                serverPath = serverPath.Substring(0, serverPath.Length - 1);
+			if (serverPath.EndsWith("/") && serverPath != "$/")
+				serverPath = serverPath.Substring(0, serverPath.Length - 1);
 
-            return serverPath;
-        }
+			return serverPath;
+		}
 
-        public void EnsureRevisionIsCached(int revision, string path)
-        {
-            string serverPath = GetServerPath(path);
-            
-            // optimizing access to properties by always getting the entire 
-            // properties folder the when accessing the folder props
-            if (serverPath.EndsWith(Constants.FolderPropFilePath))
-                serverPath = GetParentName(serverPath);
+		public void EnsureRevisionIsCached(int revision, string path)
+		{
+			string serverPath = GetServerPath(path);
 
-            // already cached this version, skip inserting
-            if (IsInCache(revision, serverPath))
-                return;
-            string cacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
-            persistentCache.UnitOfWork(delegate
-            {
-                // we have to make a second test here, to ensure that another thread
-                // did not already read this version
-                if (IsInCache(revision, serverPath))
-                    return;
+			// optimizing access to properties by always getting the entire 
+			// properties folder the when accessing the folder props
+			if (serverPath.EndsWith(Constants.FolderPropFilePath))
+				serverPath = GetParentName(serverPath);
 
-                IEnumerator<SourceItem> items = sourceControlService.QueryItemsReader(serverUrl,
-                                                                                      credentials,
-                                                                                      serverPath,
-                                                                                      RecursionType.Full,
-                                                                                      VersionSpec.FromChangeset(revision))
-                                                                            .GetEnumerator();
-                bool firstRead = true;
-                bool hasItems = false;
-                while (items.MoveNext())
-                {
-                    hasItems = true;
-                    if (firstRead)
-                    {
-                        items = QueryFolderIfCurrentlyReadingFile(revision, ref serverPath, items);
-                        firstRead = false;
-                    }
+			// already cached this version, skip inserting
+			if (IsInCache(revision, serverPath))
+				return;
+			string cacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
+			persistentCache.UnitOfWork(delegate
+			{
+				// we have to make a second test here, to ensure that another thread
+				// did not already read this version
+				if (IsInCache(revision, serverPath))
+					return;
 
-                    string itemCacheKey = GetItemCacheKey(revision, items.Current.RemoteName);
+				SourceItem[] items = QueryItemsInternal(revision, ref serverPath);
+
+				foreach (SourceItem item in items)
+				{
+
+					string itemCacheKey = GetItemCacheKey(revision, item.RemoteName);
 
 
-                    persistentCache.Set(itemCacheKey, items.Current);
+					persistentCache.Set(itemCacheKey, item);
 
-                    persistentCache.Add(GetItemNoRecursionCacheKey(revision, items.Current.RemoteName), itemCacheKey);
-                    persistentCache.Add(GetItemOneLevelCacheKey(revision, items.Current.RemoteName), itemCacheKey);
-                    persistentCache.Add(GetItemFullPathCacheKey(revision, items.Current.RemoteName), itemCacheKey);
+					persistentCache.Add(GetItemNoRecursionCacheKey(revision, item.RemoteName), itemCacheKey);
+					persistentCache.Add(GetItemOneLevelCacheKey(revision, item.RemoteName), itemCacheKey);
+					persistentCache.Add(GetItemFullPathCacheKey(revision, item.RemoteName), itemCacheKey);
 
-                    string parentDirectory = GetParentName(items.Current.RemoteName);
-                    persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), itemCacheKey);
+					string parentDirectory = GetParentName(item.RemoteName);
+					persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), itemCacheKey);
 
-                    do
-                    {
-                        persistentCache.Add(GetItemFullPathCacheKey(revision, parentDirectory), itemCacheKey);
-                        parentDirectory = GetParentName(parentDirectory);
-                    } while (parentDirectory != "$" && string.IsNullOrEmpty(parentDirectory) == false);
+					do
+					{
+						persistentCache.Add(GetItemFullPathCacheKey(revision, parentDirectory), itemCacheKey);
+						parentDirectory = GetParentName(parentDirectory);
+					} while (parentDirectory != "$" && string.IsNullOrEmpty(parentDirectory) == false);
 
-                }
+				}
 
-                if (hasItems == false)
-                    AddMissingItemToCache(revision, serverPath);
+				if (items.Length > 0)
+					AddMissingItemToCache(revision, serverPath);
 
-                persistentCache.Set(cacheKey, true);
+				persistentCache.Set(cacheKey, true);
+			});
 
-                items.Dispose();
-            });
+		}
 
-        }
+		private SourceItem[] QueryItemsInternal(int revision, ref string serverPath)
+		{
+			SourceItem[] items = sourceControlService.QueryItems(serverUrl, credentials, serverPath, 
+			                                                     RecursionType.Full,
+			                                                     VersionSpec.FromChangeset(revision), 
+			                                                     DeletedState.NonDeleted, 
+			                                                     ItemType.Any);
 
-        private void AddMissingItemToCache(int revision, string serverPath)
-        {
-            string parentDirectory = GetParentName(serverPath);
-            
-            if (parentDirectory == "$") 
-                return;
-            
-            bool parentDirDoesNotExists =
-                QueryItems(revision, parentDirectory, Recursion.None).Length == 0;
+			if (items.Length == 1 && items[0].ItemType == ItemType.File)
+			{
+				//change it to the directory name, can't use the Path class
+				// because that will change the '/' to '\'
+				serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+				
+				items = sourceControlService.QueryItems(serverUrl, credentials, serverPath,
+				                                        RecursionType.Full,
+				                                        VersionSpec.FromChangeset(revision),
+				                                        DeletedState.NonDeleted,
+				                                        ItemType.Any);
+			}
+			return items;
+		}
 
-            if (!parentDirDoesNotExists) 
-                return;
+		private void AddMissingItemToCache(int revision, string serverPath)
+		{
+			string parentDirectory = GetParentName(serverPath);
 
-            persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), null);
-            // this lies to the cache system, making it think that the parent
-            // directory is cached, when in truth the parent directory doesn't even exists
-            // this saves going to the server again for files in the same directory
-            string parentCacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
-            persistentCache.Set(parentCacheKey, true);
-        }
+			if (parentDirectory == "$")
+				return;
 
-        private IEnumerator<SourceItem> QueryFolderIfCurrentlyReadingFile(int revision, ref string serverPath, IEnumerator<SourceItem> items)
-        {
-            // we optimize it here in case we tried to load a file, we load the entire
-            // directory. This tends to save a lot of round trips in many cases
-            if (items.Current.ItemType == ItemType.File)
-            {
-                //change it to the directory name, can't use the Path class
-                // because that will change the '/' to '\'
-                serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
-                items.Dispose();
-                items = sourceControlService.QueryItemsReader(serverUrl,
-                                                              credentials,
-                                                              serverPath,
-                                                              RecursionType.Full,
-                                                              VersionSpec.FromChangeset(revision))
-                                .GetEnumerator();
-                items.MoveNext();
-            }
-            return items;
-        }
+			bool parentDirDoesNotExists =
+				QueryItems(revision, parentDirectory, Recursion.None).Length == 0;
 
-        private string GetItemFullPathCacheKey(int revision, string parentDirectory)
-        {
-            return "Full path of " + GetItemCacheKey(revision, parentDirectory);
-        }
+			if (!parentDirDoesNotExists)
+				return;
 
-        private string GetItemOneLevelCacheKey(int revision, string parentDirectory)
-        {
-            return "One Level of " + GetItemCacheKey(revision, parentDirectory);
-        }
+			persistentCache.Add(GetItemOneLevelCacheKey(revision, parentDirectory), null);
+			// this lies to the cache system, making it think that the parent
+			// directory is cached, when in truth the parent directory doesn't even exists
+			// this saves going to the server again for files in the same directory
+			string parentCacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
+			persistentCache.Set(parentCacheKey, true);
+		}
 
-        private string GetItemCacheKey(int revision, string path)
-        {
-            return "ServerUrl: " + serverUrl +
-                   ", UserName: " + CurrentUserName +
-                   ", Revision: " + revision +
-                   ", Path: " + path;
-        }
+		private string GetItemFullPathCacheKey(int revision, string parentDirectory)
+		{
+			return "Full path of " + GetItemCacheKey(revision, parentDirectory);
+		}
 
-        private static string GetParentName(string name)
-        {
-            int lastIndexOfSlash = name.LastIndexOf('/');
-            if (lastIndexOfSlash == -1)
-                return name;
-            return name.Substring(0, lastIndexOfSlash);
-        }
+		private string GetItemOneLevelCacheKey(int revision, string parentDirectory)
+		{
+			return "One Level of " + GetItemCacheKey(revision, parentDirectory);
+		}
 
-        public bool IsInCache(int revision, string path)
-        {
-            CachedResult result;
-            string serverPath = path;
-            do
-            {
-                string cacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
-                result = persistentCache.Get(cacheKey);
+		private string GetItemCacheKey(int revision, string path)
+		{
+			return "ServerUrl: " + serverUrl +
+				   ", UserName: " + CurrentUserName +
+				   ", Revision: " + revision +
+				   ", Path: " + path;
+		}
 
-                if (serverPath.IndexOf('/') == -1)
-                    break;
+		private static string GetParentName(string name)
+		{
+			int lastIndexOfSlash = name.LastIndexOf('/');
+			if (lastIndexOfSlash == -1)
+				return name;
+			return name.Substring(0, lastIndexOfSlash);
+		}
 
-                serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
-            } while (result == null);
+		public bool IsInCache(int revision, string path)
+		{
+			CachedResult result;
+			string serverPath = path;
+			do
+			{
+				string cacheKey = CreateRevisionAndPathCacheKey(revision, serverPath);
+				result = persistentCache.Get(cacheKey);
+
+				if (serverPath.IndexOf('/') == -1)
+					break;
+
+				serverPath = serverPath.Substring(0, serverPath.LastIndexOf('/'));
+			} while (result == null);
 
 
-            return result != null;
-        }
+			return result != null;
+		}
 
-        private string CreateRevisionAndPathCacheKey(int revision, string serverPath)
-        {
-            return "Revision: " + revision +
-                   ", ServerUrl: " + serverUrl +
-                   ", UserName: " + CurrentUserName +
-                   ", RootPath: " + serverPath;
-        }
+		private string CreateRevisionAndPathCacheKey(int revision, string serverPath)
+		{
+			return "Revision: " + revision +
+				   ", ServerUrl: " + serverUrl +
+				   ", UserName: " + CurrentUserName +
+				   ", RootPath: " + serverPath;
+		}
 
-        public void ClearCache()
-        {
-            persistentCache.Clear();
-        }
-    }
+		public void ClearCache()
+		{
+			persistentCache.Clear();
+		}
+	}
 }

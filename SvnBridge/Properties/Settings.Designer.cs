@@ -49,7 +49,7 @@ namespace SvnBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("itgproxy.redmond.corp.microsoft.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ProxyUrl {
             get {
                 return ((string)(this["ProxyUrl"]));
@@ -73,7 +73,7 @@ namespace SvnBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool ProxyUseDefaultCredentials {
             get {
                 return ((bool)(this["ProxyUseDefaultCredentials"]));
@@ -85,7 +85,7 @@ namespace SvnBridge.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("my\\user")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ProxyUsername {
             get {
                 return ((string)(this["ProxyUsername"]));
@@ -108,19 +108,19 @@ namespace SvnBridge.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool TraceEnabled {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LogPath {
             get {
-                return ((bool)(this["TraceEnabled"]));
+                return ((string)(this["LogPath"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LogPath {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TraceEnabled {
             get {
-                return ((string)(this["LogPath"]));
+                return ((bool)(this["TraceEnabled"]));
             }
         }
     }

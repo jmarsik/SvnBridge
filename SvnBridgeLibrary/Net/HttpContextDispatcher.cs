@@ -1,9 +1,11 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using CodePlex.TfsLibrary;
 using SvnBridge.Handlers;
+using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.Net
@@ -70,7 +72,15 @@ namespace SvnBridge.Net
 
             try
             {
-               handler.Handle(connection, parser);
+            	try
+            	{
+            		handler.Handle(connection, parser);
+            	}
+            	catch (TargetInvocationException e)
+            	{
+            		ExceptionHelper.PreserveStackTrace(e.InnerException);
+            		throw e.InnerException;
+            	}
             }
             catch (WebException ex)
             {
