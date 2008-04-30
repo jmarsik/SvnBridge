@@ -31,7 +31,10 @@ namespace SvnBridge.PathParsing
 		{
 			Uri urlAsUri = new Uri(url);
 			string path = urlAsUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
-			return "/" + path;
+		    path = "/" + path;
+            if (path.StartsWith(request.ApplicationPath, StringComparison.InvariantCultureIgnoreCase))
+                return path.Substring(request.ApplicationPath.Length);
+		    return path;
 		}
 
 		public override string GetProjectName(IHttpRequest request)

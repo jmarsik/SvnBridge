@@ -37,11 +37,11 @@ namespace SvnBridge
 
         public BootStrapper()
         {
-        	IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
+            IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
             IoC.Container.Configuration["persistentCachePath"] =
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
 
-			List<Assembly> asms = new List<Assembly>();
+            List<Assembly> asms = new List<Assembly>();
             List<string> names = new List<string>();
             foreach (Type type in representiveComponents)
             {
@@ -86,7 +86,7 @@ namespace SvnBridge
                         else
                         {
                             List<Type> interceptors = new List<Type>();
-                            Array.ForEach(attributes, delegate (object attr)
+                            Array.ForEach(attributes, delegate(object attr)
                             {
                                 interceptors.Add(((InterceptorAttribute)attr).Interceptor);
                             });
@@ -95,8 +95,9 @@ namespace SvnBridge
                     }
                 }
             }
-            IoC.Container.OverrideRegisteration<IPersistentCache>(delegate(Container c, IDictionary dependencies)
+            IoC.Container.OverrideRegisteration<IPersistentCache>(delegate
             {
+                //return new MemoryBasedPersistentCache();
                 RegistryBasedPersistentCache cache = new RegistryBasedPersistentCache();
                 cache.ValidateEnvironment();
                 return cache;
@@ -112,8 +113,8 @@ namespace SvnBridge
 
         private bool ValidTypeForRegistration(Type type)
         {
-			if (type.Namespace == "SvnBridge.NullImpl")
-				return false;
+            if (type.Namespace == "SvnBridge.NullImpl")
+                return false;
 
             if (type.IsInterface || type.IsAbstract)
             {

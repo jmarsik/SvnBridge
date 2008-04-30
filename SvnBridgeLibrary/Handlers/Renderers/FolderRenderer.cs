@@ -8,7 +8,7 @@ namespace SvnBridge.Handlers.Renderers
     {
         private readonly string serverUrl;
         private readonly StreamWriter writer;
-        private string applicationPath;
+        private readonly string applicationPath;
 
         public FolderRenderer(string serverUrl, IHttpContext context)
         {
@@ -28,9 +28,7 @@ namespace SvnBridge.Handlers.Renderers
             writer.Write(GetFolderName(folder));
             writer.WriteLine("</h1>");
             writer.Write("<ul>");
-            writer.Write("<li><a href='");
-            writer.Write(applicationPath);
-            writer.Write("..'>..</a></li>");
+            writer.Write("<li><a href='..'>..</a></li>");
             foreach (ItemMetaData item in folder.Items)
             {
                 writer.Write("<li><a href='");

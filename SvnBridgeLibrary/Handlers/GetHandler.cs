@@ -34,11 +34,11 @@ namespace SvnBridge.Handlers
 
 			itemPath = itemPath ?? requestPath.Substring(1);//remove first '/'
 
-			ItemMetaData item = sourceControlProvider.GetItemsWithoutProperties(itemVersion, itemPath, Recursion.None);
+			ItemMetaData item = sourceControlProvider.GetItemsWithoutProperties(itemVersion, itemPath, Recursion.OneLevel);
 			FolderMetaData folder = item as FolderMetaData;
 			if (folder != null)
 			{
-				folder = (FolderMetaData)sourceControlProvider.GetItemsWithoutProperties(itemVersion, itemPath, Recursion.OneLevel);
+			    folder = (FolderMetaData) item;
 				new FolderRenderer(sourceControlProvider.ServerUrl, context).Render(folder);
 			}
 			else if (item == null)
