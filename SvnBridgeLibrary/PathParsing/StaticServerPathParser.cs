@@ -32,7 +32,7 @@ namespace SvnBridge.PathParsing
 			Uri urlAsUri = new Uri(url);
 			string path = urlAsUri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
 		    path = "/" + path;
-            if (path.StartsWith(request.ApplicationPath, StringComparison.InvariantCultureIgnoreCase))
+            if (path.StartsWith(request.ApplicationPath, StringComparison.InvariantCultureIgnoreCase) && request.ApplicationPath != "/")
                 return path.Substring(request.ApplicationPath.Length);
 		    return path;
 		}

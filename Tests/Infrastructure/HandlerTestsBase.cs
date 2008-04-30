@@ -4,6 +4,7 @@ using Xunit;
 using SvnBridge.SourceControl;
 using SvnBridge.Stubs;
 using Tests;
+using SvnBridge.Net;
 
 namespace SvnBridge.Infrastructure
 {
@@ -33,6 +34,7 @@ namespace SvnBridge.Infrastructure
             response.OutputStream = new MemoryStream(Constants.BufferSize);
             context.Response = response;
             tfsUrl = "http://tfsserver";
+            PerRequest.Init();
         }
     }
 }
