@@ -29,6 +29,7 @@ namespace Tests
             provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             HttpDispatcher = new HttpContextDispatcher(new StaticServerPathParser("http://foo"));
+            PerRequest.Init();
         }
 
         public void Dispose()
