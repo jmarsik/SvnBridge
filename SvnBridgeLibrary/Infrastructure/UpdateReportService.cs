@@ -179,7 +179,6 @@ namespace SvnBridge.Infrastructure
                     else
                     {
                         ProcessUpdateReportForFile(updateReportRequest, item, output);
-                        output.Flush();
                     }
                 }
                 output.Write("<S:prop></S:prop>\n");
