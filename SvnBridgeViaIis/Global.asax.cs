@@ -8,14 +8,7 @@ namespace SvnBridge
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-        	try
-        	{
-        		new BootStrapper().Start();
-        	}
-        	catch (WebException we)
-        	{
-				Console.WriteLine(we);
-        	}
+        	new BootStrapper().Start();
         }
 
         protected void Application_End(object sender, EventArgs e)

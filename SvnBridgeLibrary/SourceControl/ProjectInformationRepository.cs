@@ -9,15 +9,12 @@ namespace SvnBridge.SourceControl
     public class ProjectInformationRepository : IProjectInformationRepository
     {
 		private readonly IMetaDataRepositoryFactory metaDataRepositoryFactory;
-        private readonly ICache cache;
         private readonly string serverUrl;
 
         public ProjectInformationRepository(
-            ICache cache,
             IMetaDataRepositoryFactory metaDataRepositoryFactory,
             string serverUrl)
         {
-            this.cache = cache;
 			this.metaDataRepositoryFactory = metaDataRepositoryFactory;
             this.serverUrl = serverUrl;
         }
@@ -27,13 +24,6 @@ namespace SvnBridge.SourceControl
         public ProjectLocationInformation GetProjectLocation(ICredentials credentials,
                                                              string projectName)
         {
-            string cacheKey = "GetProjectLocation-" + projectName;
-            CachedResult cached = cache.Get(cacheKey);
-            if (cached != null)
-            {
-                return (ProjectLocationInformation) cached.Value;
-            }
-
             projectName = projectName.ToLower();
             string[] servers = serverUrl.Split(',');
             foreach (string server in servers)
@@ -47,9 +37,7 @@ namespace SvnBridge.SourceControl
                 if (items != null && items.Length > 0)
                 {
                     string remoteProjectName = items[0].RemoteName.Substring(Constants.ServerRootPath.Length);
-                    ProjectLocationInformation information = new ProjectLocationInformation(remoteProjectName, server);
-                    cache.Set(cacheKey, information);
-                    return information;
+                    return new ProjectLocationInformation(remoteProjectName, server);
                 }
                 ;
             }

@@ -82,7 +82,7 @@
           <AutoAssignPort>False</AutoAssignPort>
           <DevelopmentServerPort>3737</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/svnbridge</IISUrl>
+          <IISUrl>http://codeplex.redmond.corp.microsoft.com/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>

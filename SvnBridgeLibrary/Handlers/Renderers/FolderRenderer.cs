@@ -14,6 +14,8 @@ namespace SvnBridge.Handlers.Renderers
         {
             this.serverUrl = serverUrl;
             applicationPath = context.Request.ApplicationPath;
+            if (applicationPath == "/")
+                applicationPath = "";
             writer = new StreamWriter(context.Response.OutputStream);
         }
 

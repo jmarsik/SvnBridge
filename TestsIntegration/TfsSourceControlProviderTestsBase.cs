@@ -81,7 +81,7 @@ namespace IntegrationTests
 																						  system,
 																						  new NullLogger());
 			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<IPersistentCache>());
-			ProjectInformationRepository repository = new ProjectInformationRepository(new NullCache(),
+			ProjectInformationRepository repository = new ProjectInformationRepository(
 																					   metaDataRepositoryFactory,
 																					   ServerUrl);
 			return new SourceControlServicesHub(
