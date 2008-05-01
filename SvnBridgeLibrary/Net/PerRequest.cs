@@ -14,6 +14,11 @@ namespace SvnBridge.Net
 			currentItems = new Hashtable();
 		}
 
+        public static void Dispose()
+        {
+            currentItems = null;
+        }
+
 		public static IDictionary Items
 		{
 			get

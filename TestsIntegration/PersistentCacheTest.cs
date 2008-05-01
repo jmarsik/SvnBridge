@@ -91,17 +91,15 @@ namespace IntegrationTests
 		}
 	}
 
-	public class FileBasedPersistentCacheTest : PersistentCacheTestBase
+	public class MemoryBasedPersistentCacheTest : PersistentCacheTestBase
 	{
-        public FileBasedPersistentCacheTest()
+        public MemoryBasedPersistentCacheTest()
 		{
-            string name = Path.GetTempFileName();
-            File.Delete(name);
-            Directory.CreateDirectory(name);
-            cache = new FileBasedPersistentCache(name, new WebCache());
-			cache.Clear();
-
+            WebCache webCache = new WebCache();
+            webCache.Clear();
 			PerRequest.Init();
+            cache = new MemoryBasedPersistentCache(webCache);
+
 		}
 	}
 }

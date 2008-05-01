@@ -16,6 +16,11 @@ namespace SvnBridge.NullImpl
 		{
 		}
 
-		#endregion
+	    public void Clear()
+	    {
+	        
+	    }
+
+	    #endregion
 	}
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Caching;
 using SvnBridge.Interfaces;
@@ -23,6 +25,16 @@ namespace SvnBridge.Cache
                 TimeSpan.FromHours(2), 
                 CacheItemPriority.Default, 
                 null);
+        }
+
+        public void Clear()
+        {
+            List<string> keys = new List<string>();
+            foreach (DictionaryEntry de in cache)
+            {
+                keys.Add((string)de.Key);
+            }
+            keys.ForEach(s => cache.Remove(s));
         }
     }
 }

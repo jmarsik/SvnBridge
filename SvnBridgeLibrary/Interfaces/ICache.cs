@@ -10,5 +10,6 @@ namespace SvnBridge.Interfaces
         CachedResult Get(string key);
 
         void Set(string key, object obj);
+        void Clear();
     }
 }

@@ -2,9 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
-using SvnBridge.PathParsing;
 
 namespace SvnBridge.Net
 {
@@ -146,6 +144,7 @@ namespace SvnBridge.Net
                 }
                 finally
                 {
+                    PerRequest.Dispose();
                     FlushConnection(connection);
                     TimeSpan duration = DateTime.Now - start;
                     FinishedHandling(this, new FinishedHandlingEventArgs(duration,

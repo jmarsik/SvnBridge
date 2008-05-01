@@ -3,13 +3,34 @@ using System.Collections.Generic;
 using System.Threading;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
+using SvnBridge.Net;
 
 namespace SvnBridge.Cache
 {
+    /// <summary>
+    /// This class uses two levels of caching in order to ensure persistance.
+    /// The first is the per request items, and the second is the global cache.
+    /// The reason for that is that we _must_ ensure that the following code always works:
+    /// <example>
+    ///  cache.Set("foo", 1);
+    ///  Assert.Equals(cache.Get("foo"), 1);
+    /// </example>
+    /// This is not valid in most caching scenarios, becaus the cache is allowed to drop the values at any time.
+    /// Therefor, we use the two levls, the first level cache is per request, and is ensured to survive throughout
+    /// the current request.
+    /// 
+    /// Reads goes first to the per request cache, and then to system cache, if it is not there.
+    /// Writes goes to both of them.
+    /// </summary>
     public class MemoryBasedPersistentCache : IPersistentCache
     {
-        private static readonly IDictionary<string, object> cache = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         private static readonly ReaderWriterLock rwLock = new ReaderWriterLock();
+        private readonly ICache cache;
+
+        public MemoryBasedPersistentCache(ICache cache)
+        {
+            this.cache = cache;
+        }
 
         #region IPersistentCache Members
 
@@ -18,14 +39,15 @@ namespace SvnBridge.Cache
             CachedResult result = null;
             ReadLock(delegate
             {
-                object val;
-                if (cache.TryGetValue(key, out val))
-                    result = new CachedResult(val);
+                if (PerRequest.Items.Contains(key))
+                    result = new CachedResult(PerRequest.Items[key]);
+                else
+                    result = cache.Get(key);
             });
             return result;
         }
 
-        private void ReadLock(Action action)
+        private static void ReadLock(Action action)
         {
             if (rwLock.IsReaderLockHeld || rwLock.IsWriterLockHeld)
             {
@@ -45,7 +67,9 @@ namespace SvnBridge.Cache
 
         public void Set(string key, object obj)
         {
-            cache[key] = obj;
+            cache.Set(key, obj);
+            PerRequest.Items[key] = obj;
+
         }
 
         public void UnitOfWork(Action action)
@@ -72,7 +96,9 @@ namespace SvnBridge.Cache
             bool result = false;
             ReadLock(delegate
             {
-                result = cache.ContainsKey(key);
+                result = PerRequest.Items.Contains(key);
+                if (result == false)
+                    result = cache.Get(key) != null;
             });
             return result;
         }
@@ -82,6 +108,7 @@ namespace SvnBridge.Cache
             rwLock.AcquireWriterLock(Timeout.Infinite);
             try
             {
+                PerRequest.Items.Clear();
                 cache.Clear();
             }
             finally
@@ -93,11 +120,16 @@ namespace SvnBridge.Cache
         public void Add(string key, string value)
         {
             ISet<string> items;
-            object temp;
-            if (cache.TryGetValue(key, out temp))
-                items = (ISet<string>)temp;
+            CachedResult result = Get(key);
+            if (result != null)
+            {
+                items = (ISet<string>)result.Value;
+            }
             else
-                cache[key] = items = new HashSet<string>();
+            {
+                items = new HashSet<string>();
+                Set(key, items);
+            }
             items.Add(value);
         }
 

@@ -95,13 +95,6 @@ namespace SvnBridge
                     }
                 }
             }
-            IoC.Container.OverrideRegisteration<IPersistentCache>(delegate
-            {
-                //return new MemoryBasedPersistentCache();
-                RegistryBasedPersistentCache cache = new RegistryBasedPersistentCache();
-                cache.ValidateEnvironment();
-                return cache;
-            });
         }
 
         private bool IsValidInterface(Type interfaceType)
