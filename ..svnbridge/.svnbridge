@@ -22,4 +22,5 @@ test.write
 TestsIntegration.results.xml
 SvnBridge.resharper
 SvnBridge.resharper.user
+TestsEndToEnd.results.xml
 </Value></Property><Property><Name>bugtraq__COLON__url</Name><Value>http://www.codeplex.com/SvnBridge/WorkItem/View.aspx?WorkItemId=%BUGID%</Value></Property><Property><Name>bugtraq__COLON__message</Name><Value>Work Item: %BUGID%</Value></Property><Property><Name>bugtraq__COLON__number</Name><Value>true</Value></Property><Property><Name>bugtraq__COLON__warnifnoissue</Name><Value>true</Value></Property></Properties></ItemProperties>
