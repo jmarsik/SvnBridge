@@ -560,7 +560,10 @@ namespace SvnBridge.SourceControl
 			byte[] bytes = FileCache.Get(item.Name, item.Revision);
 			if (bytes != null)
 			{
-				item.Data = new FutureFile(delegate { return FileCache.Get(item.Name, item.Revision); });
+				item.Data = new FutureFile(delegate
+				                               {
+				                                    return FileCache.GetText(item.Name, item.Revision);
+				                               });
 				item.DataLoaded = true;
 				return;
 			}
@@ -602,11 +605,11 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		private byte[] GetFileData(WaitHandle resetEvent, ItemMetaData item)
+		private FileData GetFileData(WaitHandle resetEvent, ItemMetaData item)
 		{
 			resetEvent.WaitOne();
 			resetEvent.Close();
-			byte[] results = FileCache.Get(item.Name, item.Revision);
+			FileData results = FileCache.GetText(item.Name, item.Revision);
 			if (results == null)
 				throw new CacheMissException(item.Name);
 			return results;

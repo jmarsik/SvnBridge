@@ -11,9 +11,9 @@ namespace SvnBridge.Infrastructure
     /// </summary>
     public class BrokenXml
     {
-        static readonly Regex findDuplicateNamespacesInTagStart = new Regex(@"<([\w\d]+):([\w\d]+):([\w\d]+)>", RegexOptions.Compiled);
+        static readonly Regex findDuplicateNamespacesInTagStart = new Regex(@"<\s*([\w\d]+):([\w\d]+):([\w\d]+)\s*>", RegexOptions.Compiled);
 		static readonly Regex findDuplicateNamespacesInTag = new Regex(@"<\s*([\w\d]+):([\w\d]+):([\w\d]+)\s*/>", RegexOptions.Compiled);
-        static readonly Regex findDuplicateNamespacesInTagEnd = new Regex(@"</([\w\d]+):([\w\d]+):([\w\d]+)>", RegexOptions.Compiled);
+        static readonly Regex findDuplicateNamespacesInTagEnd = new Regex(@"</\s*([\w\d]+):([\w\d]+):([\w\d]+)\s*>", RegexOptions.Compiled);
 
         public static string Escape(string brokenXml)
         {

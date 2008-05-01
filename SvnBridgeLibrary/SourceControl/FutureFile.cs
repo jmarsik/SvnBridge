@@ -10,7 +10,7 @@ namespace SvnBridge.SourceControl
     {
         private readonly GetFileData getFileData;
 
-        public delegate byte[] GetFileData();
+        public delegate FileData GetFileData();
 
         public FutureFile(GetFileData getFileData)
         {
@@ -18,12 +18,18 @@ namespace SvnBridge.SourceControl
         }
 
 
-        public byte[] Value
+        public FileData Value
         {
             get
             {
                 return getFileData();
             }
         }
+    }
+
+    public class FileData
+    {
+        public string Base64DiffData;
+        public string Md5;
     }
 }

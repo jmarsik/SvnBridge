@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using Attach;
 using CodePlex.TfsLibrary;
+using SvnBridge.Utility;
 using Xunit;
 using SvnBridge.SourceControl;
 using Tests;
@@ -416,7 +417,8 @@ namespace ProtocolTests
             folder.Items.Add(item);
             stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("New file");
-            stub.Attach(provider.ReadFileAsync, fileData);
+            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            
             stub.Attach(provider.ItemExists, Return.MultipleValues(true, false));
 
             string request =

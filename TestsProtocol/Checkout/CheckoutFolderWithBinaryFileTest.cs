@@ -772,7 +772,8 @@ namespace ProtocolTests
             SvnDiffParser.WriteSvnDiff(svnDiff, svnDiffStream);
             byte[] svnDiffData = svnDiffStream.ToArray();
             string txdelta = Convert.ToBase64String(svnDiffData);
-            stub.Attach(provider.ReadFileAsync, fileData);
+            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

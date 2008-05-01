@@ -6,6 +6,17 @@ namespace SvnBridge.Utility
 {
     public class SvnDiffParser
     {
+        public static string GetSvnDiffData(byte[] data)
+        {
+            SvnDiff svnDiff = SvnDiffEngine.CreateReplaceDiff(data);
+            using (MemoryStream svnDiffStream = new MemoryStream())
+            {
+                WriteSvnDiff(svnDiff, svnDiffStream);
+                byte[] diff = svnDiffStream.ToArray();
+                return Convert.ToBase64String(diff);
+            }
+        }
+
         public static SvnDiff[] ParseSvnDiff(Stream inputStream)
         {
             BinaryReaderEOF reader = new BinaryReaderEOF(inputStream);

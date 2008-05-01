@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using CodePlex.TfsLibrary;
+using SvnBridge.Utility;
 using Xunit;
 using SvnBridge.SourceControl;
 using Tests;
@@ -763,7 +764,7 @@ namespace ProtocolTests
             metadata.Items.Add(item);
             stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("More fun\r\n\r\nTest2.txt\r\n\r\nAnother fun");
-            stub.Attach(provider.ReadFileAsync, fileData);
+            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

@@ -3,6 +3,8 @@ using System.IO;
 using SvnBridge.Exceptions;
 using SvnBridge.Interfaces;
 using System.Threading;
+using SvnBridge.SourceControl;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Cache
 {
@@ -20,27 +22,36 @@ namespace SvnBridge.Cache
 
 		public byte[] Get(string filename, int revision)
 		{
-			EnsureRootDirectoryExists();
-
-			string hashedFilename = FileNameHashing.HashIfNeeded(rootCachePath, filename);
-
-			string cachedFileName = Path.Combine(Path.Combine(rootCachePath, hashedFilename), revision.ToString());
-			FileInfo verification = new FileInfo(cachedFileName + verificationExtension);
-			FileInfo cached = new FileInfo(cachedFileName);
-
-			if (
-				// both verification and cached exists, and the verification
-				// file is newer than the cached file
-				cached.Exists && verification.Exists &&
-				cached.LastWriteTimeUtc <= verification.LastWriteTimeUtc
-				)
-			{
-				return File.ReadAllBytes(cachedFileName);
-			}
-			return null;
+            byte[] result = null;
+            GetInternal(filename, revision,delegate(string path)
+                                               {
+                                                   result = File.ReadAllBytes(path);
+                                               });
+		    return result;
 		}
 
-		public void Set(string filename, int revision, byte[] data)
+	    private void GetInternal(string filename, int revision, Action<string> action)
+	    {
+	        EnsureRootDirectoryExists();
+
+	        string hashedFilename = FileNameHashing.HashIfNeeded(rootCachePath, filename);
+
+	        string cachedFileName = Path.Combine(Path.Combine(rootCachePath, hashedFilename), revision.ToString());
+	        FileInfo verification = new FileInfo(cachedFileName + verificationExtension);
+	        FileInfo cached = new FileInfo(cachedFileName);
+
+	        if (
+	            // both verification and cached exists, and the verification
+	            // file is newer than the cached file
+	            cached.Exists && verification.Exists &&
+	            cached.LastWriteTimeUtc <= verification.LastWriteTimeUtc
+	            )
+	        {
+	            action(cachedFileName);
+	        }
+	    }
+
+	    public void Set(string filename, int revision, byte[] data)
 		{
 			EnsureRootDirectoryExists();
 
@@ -48,11 +59,31 @@ namespace SvnBridge.Cache
 			string directoryName = Path.Combine(rootCachePath, hashedFilename);
 			string cachedFileName = Path.Combine(directoryName, revision.ToString());
 			EnsureDirectoryExists(directoryName);
+
+	        string base64 = SvnDiffParser.GetSvnDiffData(data);
+	        string md5 = Helper.GetMd5Checksum(data);
 			File.WriteAllBytes(cachedFileName, data);
+            File.WriteAllText(cachedFileName + ".base64", base64);
+            File.WriteAllText(cachedFileName + ".md5", md5);
 			File.WriteAllBytes(cachedFileName + verificationExtension, new byte[] { 13, 37 });
 		}
 
-		private void EnsureRootDirectoryExists()
+
+	    public FileData GetText(string filename, int revision)
+	    {
+            FileData result = null;
+            GetInternal(filename, revision, delegate(string path)
+            {
+                result = new FileData
+                             {
+                                 Md5 = File.ReadAllText(path + ".md5"),
+                                 Base64DiffData = File.ReadAllText(path + ".base64")
+                             };
+            });
+            return result;
+	    }
+
+	    private void EnsureRootDirectoryExists()
 		{
 			if (ensuredDirectoryExists)
 				return;

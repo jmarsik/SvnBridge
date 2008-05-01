@@ -198,7 +198,7 @@ namespace Tests
 
 
         public Results Attach(ReadFileAsync method,
-                             byte[] returnValue)
+                             FileData returnValue)
         {
             return base.Attach((Delegate)method, Return.DelegateResult(delegate(object[] parameters)
             {
