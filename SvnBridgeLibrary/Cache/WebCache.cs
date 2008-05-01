@@ -13,12 +13,12 @@ namespace SvnBridge.Cache
 
         public CachedResult Get(string key)
         {
-            return (CachedResult)cache[key];
+            return (CachedResult)cache[key.ToLowerInvariant()];
         }
 
         public void Set(string key, object obj)
         {
-            cache.Add(key, 
+            cache.Add(key.ToLowerInvariant(), 
                 new CachedResult(obj), 
                 null, 
                 System.Web.Caching.Cache.NoAbsoluteExpiration,

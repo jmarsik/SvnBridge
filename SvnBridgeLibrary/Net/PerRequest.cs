@@ -11,7 +11,7 @@ namespace SvnBridge.Net
 
 	    public static void Init()
 		{
-			currentItems = new Hashtable();
+			currentItems = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 		}
 
         public static void Dispose()
