@@ -737,47 +737,32 @@ namespace SvnBridge.SourceControl
                 path = path.Substring(1);
             }
 
-            Dictionary<string, ItemProperties> properties = new Dictionary<string, ItemProperties>();
-
             if (version == -1)
             {
                 version = GetLatestVersion();
             }
 
-            SourceItem[] items =
-                MetaDataRepository.QueryItems(version, path, recursion);
+            SourceItem[] items = MetaDataRepository.QueryItems(version, path, recursion);
 
             Dictionary<string, FolderMetaData> folders = new Dictionary<string, FolderMetaData>();
+            Dictionary<string, ItemProperties> properties = new Dictionary<string, ItemProperties>();
             Dictionary<string, int> itemPropertyRevision = new Dictionary<string, int>();
             ItemMetaData firstItem = null;
             for (int i = 0; i < items.Length; i++)
             {
                 ItemMetaData item = ItemMetaData.ConvertSourceItem(items[i], rootPath);
-                if (!returnPropertyFiles)
+                if (!returnPropertyFiles && recursion != Recursion.Full && !IsPropertyFile(item.Name) && !IsPropertyFolder(item.Name))
                 {
-                    if (Path.GetFileName(item.Name) != Constants.PropFolder)
-                    {
-                        RetrievePropertiesForItem(item);
-                    }
+                    RetrievePropertiesForItem(item);
                 }
 
-                if (IsPropertyFile(item.Name) && !returnPropertyFiles)
+                if (!returnPropertyFiles && recursion == Recursion.Full && IsPropertyFile(item.Name))
                 {
-                    string itemPath = item.Name.Replace("/" + Constants.PropFolder + "/" + Constants.FolderPropFile, "");
-                    if (itemPath == Constants.PropFolder + "/" + Constants.FolderPropFile)
-                    {
-                        itemPath = "";
-                    }
-                    itemPath = itemPath.Replace("/" + Constants.PropFolder + "/", "/");
-                    if (itemPath.StartsWith(Constants.PropFolder + "/"))
-                    {
-                        itemPath = itemPath.Substring(Constants.PropFolder.Length + 1);
-                    }
-                    ItemProperties itemProperties = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
-                    properties[itemPath] = itemProperties;
+                    string itemPath = GetItemFileNameFromPropertiesFileName(item.Name);
                     itemPropertyRevision[itemPath] = item.Revision;
+                    properties[itemPath] = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
                 }
-                else if (!IsPropertyFolder(item.Name) || item.ItemType != ItemType.Folder || returnPropertyFiles)
+                else if (returnPropertyFiles || !IsPropertyFolder(item.Name) || item.ItemType != ItemType.Folder)
                 {
                     if (item.ItemType == ItemType.Folder)
                     {
@@ -1229,6 +1214,25 @@ namespace SvnBridge.SourceControl
             if (path.LastIndexOf('/') != -1)
                 return path.Substring(0, path.LastIndexOf('/')) + "/" + Constants.PropFolder;
             return Constants.PropFolder;
+        }
+
+        private static string GetItemFileNameFromPropertiesFileName(string path)
+        {
+            string itemPath = path;
+            if (itemPath == Constants.PropFolder + "/" + Constants.FolderPropFile)
+            {
+                itemPath = "";
+            }
+            else if (itemPath.StartsWith(Constants.PropFolder + "/"))
+            {
+                itemPath = path.Substring(Constants.PropFolder.Length + 1);
+            }
+            else
+            {
+                itemPath = itemPath.Replace("/" + Constants.PropFolder + "/" + Constants.FolderPropFile, "");
+                itemPath = itemPath.Replace("/" + Constants.PropFolder + "/", "/");
+            }
+            return itemPath;
         }
 
         private static string GetPropertiesFileName(string path,
