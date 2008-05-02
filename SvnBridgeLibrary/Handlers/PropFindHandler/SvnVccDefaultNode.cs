@@ -45,6 +45,8 @@ namespace SvnBridge.Nodes
                     return GetBaselineCollection(handler);
                 case "version-name":
                     return GetVersionName(property);
+                case "auto-version":
+                    return "";
                 default:
                     throw new Exception("Property not found: " + property.LocalName);
             }
