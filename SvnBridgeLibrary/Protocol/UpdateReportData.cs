@@ -23,12 +23,10 @@ namespace SvnBridge.Protocol
 		public string SrcPath = null;
 
 		[XmlElement("target-revision", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
-		public string
-			TargetRevision = null;
+		public string TargetRevision = null;
 
 		[XmlElement("update-target", Namespace = WebDav.Namespaces.SVN, DataType = "string")]
-		public string UpdateTarget
-			= null;
+		public string UpdateTarget = null;
 
 		public bool IsCheckOut
 		{

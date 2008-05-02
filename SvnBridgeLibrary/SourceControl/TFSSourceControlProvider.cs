@@ -201,6 +201,10 @@ namespace SvnBridge.SourceControl
                 root.Items.Add(deletedFile);
                 return root;
             }
+            if (root == null)
+            {
+                throw new FileNotFoundException(path);
+            }
 
             UpdateDiffCalculator udc = new UpdateDiffCalculator(this);
             udc.CalculateDiff(path, versionTo, versionFrom, root, reportData);
@@ -278,20 +282,8 @@ namespace SvnBridge.SourceControl
                     recursionType = RecursionType.Full;
                     break;
             }
-            ChangesetVersionSpec changesetFrom = new ChangesetVersionSpec();
-            changesetFrom.cs = versionFrom;
 
-            ChangesetVersionSpec changesetTo = new ChangesetVersionSpec();
-            changesetTo.cs = versionTo;
-
-            LogItem logItem =
-                SourceControlService.QueryLog(serverUrl,
-                                              credentials,
-                                              serverPath,
-                                              changesetFrom,
-                                              changesetTo,
-                                              recursionType,
-                                              maxCount);
+            LogItem logItem = GetLogItem(serverPath, versionFrom, versionTo, recursionType, maxCount);
 
             foreach (SourceItemHistory history in logItem.History)
             {
@@ -342,6 +334,41 @@ namespace SvnBridge.SourceControl
             }
 
             return logItem;
+        }
+
+        private LogItem GetLogItem(string serverPath, int versionFrom, int versionTo, RecursionType recursionType, int maxCount)
+        {
+            LogItem log = SourceControlService.QueryLog(serverUrl,
+                                                        credentials,
+                                                        serverPath,
+                                                        new ChangesetVersionSpec { cs = versionFrom },
+                                                        new ChangesetVersionSpec { cs = versionTo },
+                                                        recursionType,
+                                                        maxCount);
+            const int queryLimit = 256;
+            if (maxCount > queryLimit)
+            {
+                var histories = new List<SourceItemHistory>(log.History);
+                // we might have remaining items
+                int logItemsCount = log.History.Length;
+                while (logItemsCount == queryLimit)
+                {
+                    int earliestVersionFound = log.History[queryLimit - 1].ChangeSetID - 1;
+                    if (earliestVersionFound == versionFrom)
+                        break;
+                    LogItem temp = SourceControlService.QueryLog(serverUrl,
+                                                        credentials,
+                                                        serverPath,
+                                                        new ChangesetVersionSpec { cs = versionFrom },
+                                                        new ChangesetVersionSpec { cs = earliestVersionFound },
+                                                        recursionType,
+                                                        maxCount);
+                    histories.AddRange(temp.History);
+                    logItemsCount = temp.History.Length;
+                }
+                log.History = histories.ToArray();
+            }
+            return log;
         }
 
         public bool IsDirectory(int version,

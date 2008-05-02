@@ -50,19 +50,7 @@ namespace SvnBridge.Handlers
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "replay-report")
                 {
                     ReplayReportData relayReport = Helper.DeserializeXml<ReplayReportData>(reader);
-                    UpdateReportData data = new UpdateReportData();
-                    data.SrcPath = request.Url.AbsoluteUri;
-                    data.TargetRevision = relayReport.Revision.ToString();
-                    data.Entries = new List<EntryData>();
-                    EntryData item = new EntryData();
-                    item.Rev = (relayReport.Revision - 1).ToString();
-                    data.Entries.Add(item);
-                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-                    response.SendChunked = true;
-                    using (StreamWriter output = new StreamWriter(response.OutputStream))
-                    {
-                        UpdateReport(request, sourceControlProvider, data, output);
-                    }
+                    ReplayReport(request, response, sourceControlProvider, relayReport);
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "log-report")
                 {
@@ -112,6 +100,51 @@ namespace SvnBridge.Handlers
             }
         }
 
+        private void ReplayReport(IHttpRequest request, IHttpResponse response, ISourceControlProvider sourceControlProvider, ReplayReportData replayReport)
+        {
+            if (replayReport.Revision == 0)
+            {
+                response.StatusCode = (int)HttpStatusCode.OK;
+                using (StreamWriter output = new StreamWriter(response.OutputStream))
+                {
+                    output.Write(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<S:editor-report xmlns:S=""svn:"">
+<S:target-revision rev=""0""/>
+</S:editor-report>");
+                    return;
+                }
+            }
+
+            UpdateReportData data = new UpdateReportData();
+            data.SrcPath = request.Url.AbsoluteUri;
+            data.Entries = new List<EntryData>();
+            EntryData item = new EntryData();
+            LogItem log = sourceControlProvider.GetLog(PathParser.GetLocalPath(request), 0,
+                                                       sourceControlProvider.GetLatestVersion(),
+                                                       Recursion.None, 1);
+            if (log.History.Length == 0)
+            {
+                WriteFileNotFoundResponse(request, response);
+            }
+
+            item.Rev = (replayReport.Revision).ToString();
+            data.TargetRevision = (replayReport.Revision + 1).ToString();
+            data.Entries.Add(item);
+            SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+            response.SendChunked = true;
+            using (StreamWriter output = new StreamWriter(response.OutputStream))
+            {
+                try
+                {
+                    UpdateReport(request, sourceControlProvider, data, output);
+                }
+                catch (FileNotFoundException)
+                {
+                    WriteFileNotFoundResponse(request, response);
+                }
+            }
+        }
+
         private void SendBlameResponse(IHttpRequest request, IHttpResponse response, ISourceControlProvider sourceControlProvider, string serverPath, FileRevsReportData data)
         {
             LogItem log = sourceControlProvider.GetLog(
@@ -130,7 +163,7 @@ namespace SvnBridge.Handlers
             {
                 foreach (SourceItemChange change in history.Changes)
                 {
-                    if(change.Item.ItemType==ItemType.Folder)
+                    if (change.Item.ItemType == ItemType.Folder)
                     {
                         SendErrorResponseCannotRunBlameOnFolder(response, serverPath);
                         return;
@@ -139,7 +172,7 @@ namespace SvnBridge.Handlers
             }
             using (StreamWriter output = new StreamWriter(response.OutputStream))
             {
-                response.StatusCode = (int) HttpStatusCode.OK;   
+                response.StatusCode = (int)HttpStatusCode.OK;
                 output.Write(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <S:file-revs-report xmlns:S=""svn:"" xmlns:D=""DAV:"">");
 
@@ -156,16 +189,16 @@ namespace SvnBridge.Handlers
                         byte[] svnDiffData = svnDiffStream.ToArray();
 
 
-                        output.Write(@"<S:file-rev path="""+ change.Item.RemoteName + @""" rev="""+ change.Item.RemoteChangesetId +@""">
-<S:rev-prop name=""svn:log"">" + history.Comment +@"</S:rev-prop>
+                        output.Write(@"<S:file-rev path=""" + change.Item.RemoteName + @""" rev=""" + change.Item.RemoteChangesetId + @""">
+<S:rev-prop name=""svn:log"">" + history.Comment + @"</S:rev-prop>
 <S:rev-prop name=""svn:author"">" + history.Username + @"</S:rev-prop>
 <S:rev-prop name=""svn:date"">" + Helper.FormatDate(change.Item.RemoteDate) + @"</S:rev-prop>
-<S:txdelta>" + Convert.ToBase64String(svnDiffData) + 
+<S:txdelta>" + Convert.ToBase64String(svnDiffData) +
 @"</S:txdelta></S:file-rev>");
                     }
                 }
-             output.Write("</S:file-revs-report>");
-  }
+                output.Write("</S:file-revs-report>");
+            }
         }
 
         private static void SendErrorResponseCannotRunBlameOnFolder(IHttpResponse response, string serverPath)
@@ -286,10 +319,12 @@ namespace SvnBridge.Handlers
                 serverPath = path.Substring(path.IndexOf('/', 9));
             }
 
+            int end = int.Parse(logreport.EndRevision);
+            int start = int.Parse(logreport.StartRevision);
             LogItem logItem = sourceControlProvider.GetLog(
                 serverPath,
-                int.Parse(logreport.EndRevision),
-                int.Parse(logreport.StartRevision),
+                Math.Min(start, end),
+                Math.Max(start, end),
                 Recursion.Full,
                 int.Parse(logreport.Limit ?? "1000000"));
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
