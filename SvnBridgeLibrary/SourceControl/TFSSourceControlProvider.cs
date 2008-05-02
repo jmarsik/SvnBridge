@@ -748,38 +748,33 @@ namespace SvnBridge.SourceControl
             Dictionary<string, ItemProperties> properties = new Dictionary<string, ItemProperties>();
             Dictionary<string, int> itemPropertyRevision = new Dictionary<string, int>();
             ItemMetaData firstItem = null;
-            for (int i = 0; i < items.Length; i++)
+            foreach (SourceItem sourceItem in items)
             {
-                ItemMetaData item = ItemMetaData.ConvertSourceItem(items[i], rootPath);
-                if (!returnPropertyFiles && recursion != Recursion.Full && !IsPropertyFile(item.Name) && !IsPropertyFolder(item.Name))
-                {
-                    RetrievePropertiesForItem(item);
-                }
-
-                if (!returnPropertyFiles && recursion == Recursion.Full && IsPropertyFile(item.Name))
+                ItemMetaData item = ItemMetaData.ConvertSourceItem(sourceItem, rootPath);
+                if (recursion == Recursion.Full && IsPropertyFile(item.Name) && !returnPropertyFiles)
                 {
                     string itemPath = GetItemFileNameFromPropertiesFileName(item.Name);
                     itemPropertyRevision[itemPath] = item.Revision;
                     properties[itemPath] = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
                 }
-                else if (returnPropertyFiles || !IsPropertyFolder(item.Name) || item.ItemType != ItemType.Folder)
+                if ((!IsPropertyFile(item.Name) && !IsPropertyFolder(item.Name)) || returnPropertyFiles)
                 {
+                    if (recursion != Recursion.Full && !returnPropertyFiles)
+                    {
+                        RetrievePropertiesForItem(item);
+                    }
                     if (item.ItemType == ItemType.Folder)
                     {
                         folders[item.Name.ToLower()] = (FolderMetaData)item;
                     }
-                    if (i == 0)
+                    if (firstItem == null)
                     {
                         firstItem = item;
                     }
                     else
                     {
-                        string folderName = "";
-                        if (item.Name.IndexOf('/') != -1)
-                        {
-                            folderName = GetFolderName(item.Name).ToLower();
-                        }
-                        folders[folderName].Items.Add(item);
+                        string folderName = GetFolderName(item.Name);
+                        folders[folderName.ToLower()].Items.Add(item);
                     }
                 }
             }
