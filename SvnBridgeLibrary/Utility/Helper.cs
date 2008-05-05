@@ -301,5 +301,13 @@ namespace SvnBridge.Utility
             });
             return histories;
         }
+
+        public static string GetFolderName(string name)
+        {
+            int indexOfSlash = name.LastIndexOf("/");
+            if(indexOfSlash==-1)
+                return "";
+            return name.Substring(0, indexOfSlash);
+        }
     }
 }

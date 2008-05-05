@@ -192,11 +192,12 @@ namespace SvnBridge.SourceControl
                 root.Properties.Clear();
             }
 
-            // the item doesn't exist and the reques was for a specific version
+            // the item doesn't exist and the request was for a specific version
             if (root == null && reportData.UpdateTarget != null)
             {
                 root = new FolderMetaData();
                 DeleteMetaData deletedFile = new DeleteMetaData();
+                deletedFile.ItemRevision = versionTo;
                 deletedFile.Name = reportData.UpdateTarget;
                 root.Items.Add(deletedFile);
                 return root;
@@ -307,6 +308,11 @@ namespace SvnBridge.SourceControl
                                                                null,
                                                                new ItemSpec[] { spec },
                                                                branchChangeset);
+                        if(branches[0].Length == 0)
+                        {
+                            // it is a branch without a source ...
+                            continue;
+                        }
                         string oldName =
                             branches[0][branches[0].GetUpperBound(0)].BranchFromItem.item.Substring(rootPath.Length);
                         int oldRevision = change.Item.RemoteChangesetId - 1;
@@ -351,18 +357,19 @@ namespace SvnBridge.SourceControl
                 var histories = new List<SourceItemHistory>(log.History);
                 // we might have remaining items
                 int logItemsCount = log.History.Length;
+                LogItem temp = log;
                 while (logItemsCount == queryLimit)
                 {
-                    int earliestVersionFound = log.History[queryLimit - 1].ChangeSetID - 1;
+                    int earliestVersionFound = temp.History[queryLimit - 1].ChangeSetID - 1;
                     if (earliestVersionFound == versionFrom)
                         break;
-                    LogItem temp = SourceControlService.QueryLog(serverUrl,
-                                                        credentials,
-                                                        serverPath,
-                                                        new ChangesetVersionSpec { cs = versionFrom },
-                                                        new ChangesetVersionSpec { cs = earliestVersionFound },
-                                                        recursionType,
-                                                        maxCount);
+                    temp = SourceControlService.QueryLog(serverUrl,
+                                                         credentials,
+                                                         serverPath,
+                                                         new ChangesetVersionSpec { cs = versionFrom },
+                                                         new ChangesetVersionSpec { cs = earliestVersionFound },
+                                                         recursionType,
+                                                         maxCount);
                     histories.AddRange(temp.History);
                     logItemsCount = temp.History.Length;
                 }
@@ -616,9 +623,10 @@ namespace SvnBridge.SourceControl
                     Logger.Trace("Finished downloading {0}", item.Name);
                     waitHandle.Set();
                 }
-                catch (UnauthorizedAccessException)
+                catch (UnauthorizedAccessException e)
                 {
-                    throw;
+                    item.DataLoadedError = e;
+                    waitHandle.Set();
                 }
                 catch (Exception e)
                 {
@@ -627,8 +635,8 @@ namespace SvnBridge.SourceControl
                     {
                         Logger.Error("Failed to download " + item.Name + ", max retry count reached, aborting", e);
                         Listener.RaiseErrorOccured(e);
+                        item.DataLoadedError = e;
                         waitHandle.Set();
-                        throw;
                     }
                     Logger.Error("Failed to download " + item.Name + " retry #" + retry, e);
                     DownloadFileAsync(item, waitHandle, retry);
@@ -640,6 +648,8 @@ namespace SvnBridge.SourceControl
         {
             resetEvent.WaitOne();
             resetEvent.Close();
+            if(item.DataLoadedError!=null)
+                throw new InvalidOperationException("Failed to get item data", item.DataLoadedError);
             FileData results = FileCache.GetText(item.Name, item.Revision);
             if (results == null)
                 throw new CacheMissException(item.Name);

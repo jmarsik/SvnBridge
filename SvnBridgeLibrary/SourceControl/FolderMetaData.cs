@@ -52,6 +52,8 @@ namespace SvnBridge.SourceControl
 
         public ItemMetaData FindItem(string name)
         {
+            if (string.Equals(name, this.Name, StringComparison.InvariantCultureIgnoreCase))
+                return this;
             foreach (ItemMetaData item in Items)
             {
                 if (string.Equals(item.Name, name, StringComparison.InvariantCultureIgnoreCase))

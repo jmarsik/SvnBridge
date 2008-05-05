@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -119,7 +120,8 @@ namespace SvnBridge.Handlers
             data.SrcPath = request.Url.AbsoluteUri;
             data.Entries = new List<EntryData>();
             EntryData item = new EntryData();
-            LogItem log = sourceControlProvider.GetLog(PathParser.GetLocalPath(request), 0,
+            string localPath = PathParser.GetLocalPath(request);
+            LogItem log = sourceControlProvider.GetLog(localPath, 0,
                                                        sourceControlProvider.GetLatestVersion(),
                                                        Recursion.None, 1);
             if (log.History.Length == 0)
@@ -127,8 +129,8 @@ namespace SvnBridge.Handlers
                 WriteFileNotFoundResponse(request, response);
             }
 
-            item.Rev = (replayReport.Revision).ToString();
-            data.TargetRevision = (replayReport.Revision + 1).ToString();
+            item.Rev = (replayReport.Revision - 1).ToString();
+            data.TargetRevision = (replayReport.Revision).ToString();
             data.Entries.Add(item);
             SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
             response.SendChunked = true;
@@ -136,13 +138,91 @@ namespace SvnBridge.Handlers
             {
                 try
                 {
-                    UpdateReport(request, sourceControlProvider, data, output);
+                    output.Write(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<S:editor-report xmlns:S=""svn:"">");
+
+                    int targetRevision;
+                    FolderMetaData metadata = GetMetadataForUpdate(request, data, sourceControlProvider, out targetRevision);
+                    output.WriteLine("<S:target-revision rev=\"{0}\"/>", targetRevision);
+
+                    OutputEditorReport(sourceControlProvider, metadata, replayReport.Revision,
+                        localPath == "/",
+                        output);
+
+                   output.Write("</S:editor-report>");
                 }
                 catch (FileNotFoundException)
                 {
                     WriteFileNotFoundResponse(request, response);
                 }
             }
+        }
+
+        private void OutputEditorReport(
+            ISourceControlProvider sourceControlProvider,
+            FolderMetaData folder,
+            int revision,
+            bool isRoot,
+            TextWriter output)
+        {
+            if(isRoot)
+            {
+                output.WriteLine("<S:open-root rev=\"-1\"/>");
+            }
+            else if (sourceControlProvider.ItemExists(folder.Name, revision - 1))
+            {
+                output.Write("<S:open-directory name=\"{0}\" rev=\"-1\" />\n", Helper.EncodeB(folder.Name));
+            }
+            else
+            {
+                output.Write("<S:add-directory name=\"{0}\" />\n", Helper.EncodeB(folder.Name));
+            }
+
+            foreach (var property in folder.Properties)
+            {
+                output.Write("<S:change-dir-prop name=\"{0}\">{1}\n", property.Key.Replace("__COLON__", ":"), property.Value);
+                output.Write("</S:change-dir-prop>\n");
+            }
+
+            foreach (var item in folder.Items)
+            {
+                if (item.ItemRevision != revision)
+                    continue;
+                if (item is DeleteMetaData || item is DeleteFolderMetaData)
+                {
+                    output.Write("<S:delete-entry name=\"{0}\" rev=\"-1\"/>\n", Helper.EncodeB(item.Name));
+                    continue;
+                }
+
+                if (item.ItemType == ItemType.Folder)
+                {
+                    OutputEditorReport(sourceControlProvider, (FolderMetaData)item, revision, false, output);
+                }
+                else
+                {
+                    if (sourceControlProvider.ItemExists(item.Name, revision - 1))
+                    {
+                        output.Write("<S:open-file name=\"{0}\" rev=\"-1\"/>\n", item.Name);
+                    }
+                    else
+                    {
+                        output.Write("<S:add-file name=\"{0}\"/>\n", item.Name);
+
+                    }
+
+                    while (item.DataLoaded == false)
+                        Thread.Sleep(100);
+
+                    FileData value = item.Data.Value;
+                    output.Write("<S:apply-textdelta>");
+                    output.Write(value.Base64DiffData);
+                    output.Write("\n");
+                    output.Write("</S:apply-textdelta>\n");
+                    output.Write("<S:close-file checksum=\"{0}\"/>\n", value.Md5);
+                }
+
+            }
+            output.Write("<S:close-directory />\n");
         }
 
         private void SendBlameResponse(IHttpRequest request, IHttpResponse response, ISourceControlProvider sourceControlProvider, string serverPath, FileRevsReportData data)
@@ -267,9 +347,26 @@ namespace SvnBridge.Handlers
                                   UpdateReportData updatereport,
                                   StreamWriter output)
         {
+            output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+            output.Write(
+                "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
+
+            int targetRevision;
+
+            FolderMetaData metadata = GetMetadataForUpdate(request, updatereport, sourceControlProvider, out targetRevision);
+
+            IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
+
+            output.Write("<S:target-revision rev=\"" + targetRevision + "\"/>\n");
+            updateReportService.ProcessUpdateReportForDirectory(updatereport, metadata, output, true);
+
+            output.Write("</S:update-report>\n");
+        }
+
+        private FolderMetaData GetMetadataForUpdate(IHttpRequest request, UpdateReportData updatereport, ISourceControlProvider sourceControlProvider, out int targetRevision)
+        {
             string basePath = PathParser.GetLocalPath(request, updatereport.SrcPath);
             FolderMetaData metadata;
-            int targetRevision;
             if (updatereport.TargetRevision != null)
             {
                 targetRevision = int.Parse(updatereport.TargetRevision);
@@ -294,18 +391,10 @@ namespace SvnBridge.Handlers
                 throw new InvalidOperationException("Could not find " + basePath + " in revision " + targetRevision);
 
             ThreadPool.QueueUserWorkItem(delegate(object state)
-            {
-                new AsyncItemLoader(metadata, sourceControlProvider).Start();
-            });
-
-            IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
-
-            output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-            output.Write(
-                "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
-            output.Write("<S:target-revision rev=\"" + targetRevision + "\"/>\n");
-            updateReportService.ProcessUpdateReportForDirectory(updatereport, metadata, output, true);
-            output.Write("</S:update-report>\n");
+                                             {
+                                                 new AsyncItemLoader(metadata, sourceControlProvider).Start();
+                                             });
+            return metadata;
         }
 
         private static void LogReport(ISourceControlProvider sourceControlProvider,
@@ -327,6 +416,10 @@ namespace SvnBridge.Handlers
                 Math.Max(start, end),
                 Recursion.Full,
                 int.Parse(logreport.Limit ?? "1000000"));
+
+            if (start < end)
+                Array.Reverse(logItem.History);
+
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:log-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
 

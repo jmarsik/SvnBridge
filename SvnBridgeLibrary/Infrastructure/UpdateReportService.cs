@@ -180,9 +180,10 @@ namespace SvnBridge.Infrastructure
             }
         }
 
+
         private static string GetFileName(string path)
         {
-            int slashIndex = path.LastIndexOfAny(new char[] {'/', '\\'});
+            int slashIndex = path.LastIndexOfAny(new char[] { '/', '\\' });
             return path.Substring(slashIndex + 1);
         }
     }
