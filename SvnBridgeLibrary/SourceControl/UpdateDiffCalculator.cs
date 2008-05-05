@@ -308,7 +308,7 @@ namespace SvnBridge.SourceControl
 
                 // a child of the currently renamed item
                 if (data is MissingFolderMetaData &&
-                    nameMatchingSourceItemConvention.StartsWith(itemName,StringComparison.InvariantCultureIgnoreCase))
+                    nameMatchingSourceItemConvention.StartsWith(itemName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     root.Items.Remove(data);
                     continue;
@@ -365,6 +365,7 @@ namespace SvnBridge.SourceControl
             }
             return ((change.ChangeType & ChangeType.Add) == ChangeType.Add) ||
                    ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch) ||
+                   ((change.ChangeType &ChangeType.Merge) == ChangeType.Merge) || 
                    ((change.ChangeType & ChangeType.Undelete) == ChangeType.Undelete);
         }
 
@@ -494,8 +495,9 @@ namespace SvnBridge.SourceControl
                         {
                             StubFolderMetaData stubFolder = new StubFolderMetaData();
                             stubFolder.RealFolder = (FolderMetaData)item;
-                            stubFolder.Name = item.Name;
-                            stubFolder.ItemRevision = item.Revision;
+                            stubFolder.Name = "/" + item.Name;
+                            stubFolder.ItemRevision = item.ItemRevision;
+                            stubFolder.PropertyRevision = item.PropertyRevision;
                             stubFolder.LastModifiedDate = item.LastModifiedDate;
                             stubFolder.Author = item.Author;
                             item = stubFolder;
@@ -564,22 +566,27 @@ namespace SvnBridge.SourceControl
             string[] nameParts = remoteName.Substring(checkoutRootPath.Length)
                 .Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (nameParts.Length == 0)
+            if (nameParts.Length < 2)
             {
-                HandleDeleteItem(remoteName, change, folderName, ref root, true, targetVersion);
+                HandleDeleteItem(remoteName, change, remoteName, root, true, targetVersion);
                 return;
             }
 
             FolderMetaData folder = root;
-            for (int i = 0; i < nameParts.Length; i++)
+            string separator = folderName != "" ? "/" : "";
+            folderName += separator + nameParts[0];
+            HandleDeleteItem(remoteName, change, folderName, folder, false, targetVersion);
+            for (int i = 1; i < nameParts.Length; i++)
             {
                 bool isLastNamePart = i == nameParts.Length - 1;
+
                 folderName += "/" + nameParts[i];
-                HandleDeleteItem(remoteName, change, folderName, ref folder, isLastNamePart, targetVersion);
+
+                HandleDeleteItem(remoteName, change, folderName, folder, isLastNamePart, targetVersion);
             }
         }
 
-        private void HandleDeleteItem(string remoteName, SourceItemChange change, string folderName, ref FolderMetaData folder, bool isLastNamePart, int targetVersion)
+        private void HandleDeleteItem(string remoteName, SourceItemChange change, string folderName, FolderMetaData folder, bool isLastNamePart, int targetVersion)
         {
             ItemMetaData item = folder.FindItem(folderName);
             if (item is DeleteFolderMetaData)
@@ -599,6 +606,7 @@ namespace SvnBridge.SourceControl
                     }
 
                     item.Name = remoteName;
+                    item.ItemRevision = change.Item.RemoteChangesetId;
                 }
                 else
                 {
@@ -607,13 +615,12 @@ namespace SvnBridge.SourceControl
                     {
                         item = new DeleteFolderMetaData();
                         item.Name = folderName;
+                        item.ItemRevision = targetVersion;
                     }
                 }
-                folder.Items.Add(item);
-                if (isLastNamePart == false)
-                {
-                    folder = (FolderMetaData)item;
-                }
+                string parentName = Helper.GetFolderName(item.Name);
+                FolderMetaData parentFolder = (FolderMetaData)folder.FindItem(parentName);
+                parentFolder.Items.Add(item);
             }
             else if (isLastNamePart)// we need to revert the item addition
             {
@@ -621,6 +628,7 @@ namespace SvnBridge.SourceControl
                 {
                     DeleteFolderMetaData removeFolder = new DeleteFolderMetaData();
                     removeFolder.Name = item.Name;
+                    removeFolder.ItemRevision = targetVersion;
                     folder.Items.Remove(item);
                     folder.Items.Add(removeFolder);
                 }
@@ -628,6 +636,7 @@ namespace SvnBridge.SourceControl
                 {
                     ItemMetaData removeFolder = item is FolderMetaData ? (ItemMetaData)new DeleteFolderMetaData() : new DeleteMetaData();
                     removeFolder.Name = item.Name;
+                    removeFolder.ItemRevision = targetVersion;
                     folder.Items.Remove(item);
                     folder.Items.Add(removeFolder);
                 }
@@ -635,10 +644,6 @@ namespace SvnBridge.SourceControl
                 {
                     folder.Items.Remove(item);
                 }
-            }
-            if (isLastNamePart == false)
-            {
-                folder = (FolderMetaData)item;
             }
         }
 
