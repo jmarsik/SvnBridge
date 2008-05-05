@@ -40,9 +40,19 @@ namespace SvnBridge.Cache
             ReadLock(delegate
             {
                 if (PerRequest.Items.Contains(key))
+                {
                     result = new CachedResult(PerRequest.Items[key]);
+                }
                 else
+                {
                     result = cache.Get(key);
+                    if(result!=null)
+                    {
+                        // we have to store it back in the per request, to ensure that we
+                        // wouldn't lose it during this request
+                        PerRequest.Items[key] = result.Value;
+                    }
+                }
             });
             return result;
         }
