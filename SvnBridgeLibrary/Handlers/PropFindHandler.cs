@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Web;
 using System.Xml;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
@@ -176,7 +177,7 @@ namespace SvnBridge.Handlers
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
             writer.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n");
-            writer.Write("<D:href>" + requestPath + "</D:href>\n");
+            writer.Write("<D:href>" + HttpUtility.UrlEncode(requestPath) + "</D:href>\n");
             writer.Write("<D:propstat>\n");
             writer.Write("<D:prop>\n");
             writer.Write("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>\n");
@@ -214,7 +215,7 @@ namespace SvnBridge.Handlers
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
             writer.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n");
-            writer.Write("<D:href>" + requestPath + "</D:href>\n");
+            writer.Write("<D:href>" + HttpUtility.UrlEncode(requestPath) + "</D:href>\n");
             writer.Write("<D:propstat>\n");
             writer.Write("<D:prop>\n");
             writer.Write("<lp1:getcontenttype>text/plain</lp1:getcontenttype>\n");
