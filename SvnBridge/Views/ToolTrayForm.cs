@@ -18,6 +18,7 @@ namespace SvnBridge.Views
 				presenter.ViewClosed();
 			};
 			showErrorsToolStripMenuItem.Click += OnShowErrorsClick;
+            invokeDeubgger.Click+=((sender, e) => Debugger.Launch());
         }
 
     	private void BalloonTipClicked_OnClick(object sender, EventArgs e)
