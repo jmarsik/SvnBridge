@@ -129,6 +129,9 @@ namespace SvnBridge.Cache
 
         public void Add(string key, string value)
         {
+            if(value==null)
+                return;
+
             ISet<string> items;
             CachedResult result = Get(key);
             if (result != null)

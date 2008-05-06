@@ -486,6 +486,16 @@ namespace SvnBridge.SourceControl
                     {
                         commitServerList.Add(item.Path);
                     }
+                    if(item.Action==ActivityItemAction.Branch)
+                    {
+                        SourceItem[] items = MetaDataRepository.QueryItems(GetLatestVersion(), item.SourcePath, Recursion.Full);
+                        foreach (SourceItem sourceItem in items)
+                        {
+                            string branchedPath = item.Path + sourceItem.RemoteName.Substring(item.SourcePath.Length);
+                            if (commitServerList.Contains(branchedPath) == false)
+                                commitServerList.Add(branchedPath);
+                        }
+                    }
                 }
 
                 int changesetId;
@@ -1229,7 +1239,8 @@ namespace SvnBridge.SourceControl
                 else
                 {
                     activity.MergeList.Add(
-                        new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.Branch));
+                        new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.Branch,
+                            rootPath + copyAction.Path));
                 }
             });
         }

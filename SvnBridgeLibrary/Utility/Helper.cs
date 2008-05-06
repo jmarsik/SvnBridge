@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 using CodePlex.TfsLibrary.ObjectModel;
@@ -308,6 +309,23 @@ namespace SvnBridge.Utility
             if(indexOfSlash==-1)
                 return "";
             return name.Substring(0, indexOfSlash);
+        }
+
+        public static string UrlEncodeIfNeccesary(string href)
+        {
+            bool containsNonAsciiChar = false;
+            foreach (char c in href)
+            {
+                if (c > 256)
+                {
+                    containsNonAsciiChar = true;
+                    break;
+                }
+            }
+            string encode = Encode(href);
+            if (containsNonAsciiChar)
+                encode = HttpUtility.UrlEncode(href);
+            return encode;
         }
     }
 }

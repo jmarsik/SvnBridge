@@ -40,9 +40,9 @@ namespace TestsEndToEnd
 			CreateTempFolder();
 
 			Environment.CurrentDirectory = Path.Combine(Path.GetTempPath(), checkoutFolder);
-			Debug.WriteLine("cd " + checkoutFolder);
+			Console.WriteLine("cd " + checkoutFolder);
 			listener = IoC.Resolve<IListener>();
-			listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Debug.WriteLine(e.Exception); };
+			listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
 			listener.Port = this.port;
 
 			listener.Start(parser);
@@ -53,7 +53,7 @@ namespace TestsEndToEnd
 			checkoutFolder = Path.GetTempFileName();
 			File.Delete(checkoutFolder);
 			Directory.CreateDirectory(checkoutFolder);
-			Debug.WriteLine("md " + checkoutFolder);
+			Console.WriteLine("md " + checkoutFolder);
 		}
 
 		public override void Dispose()
@@ -121,11 +121,11 @@ namespace TestsEndToEnd
 		{
 			CreateTempFolder();
 			Environment.CurrentDirectory = checkoutFolder;
-			Debug.WriteLine("cd " + checkoutFolder);
+			Console.WriteLine("cd " + checkoutFolder);
 			Svn("co " + testUrl);
 			Environment.CurrentDirectory =
 				Path.Combine(Environment.CurrentDirectory, testPath.Substring(1) /* remove '/' */);
-			Debug.WriteLine("cd " + Environment.CurrentDirectory);
+			Console.WriteLine("cd " + Environment.CurrentDirectory);
 		}
 
 		protected static string SvnExpectError(string command)
@@ -135,7 +135,7 @@ namespace TestsEndToEnd
 			{
 				err = svn.StandardError.ReadToEnd();
 			});
-			Debug.WriteLine(err);
+			Console.WriteLine(err);
 			return err;
 		}
 
@@ -154,7 +154,7 @@ namespace TestsEndToEnd
 					string line;
 					while ((line = svn.StandardOutput.ReadLine()) != null)
 					{
-						Debug.WriteLine(line);
+						Console.WriteLine(line);
 						output.AppendLine(line);
 					}
 				});
@@ -181,7 +181,7 @@ namespace TestsEndToEnd
 					string line;
 					while ((line = svn.StandardOutput.ReadLine()) != null)
 					{
-                        Debug.WriteLine(line);
+                        Console.WriteLine(line);
 						output.AppendLine(line);
 					}
 				});
@@ -203,7 +203,7 @@ namespace TestsEndToEnd
 
 		private static void ExecuteInternal(string command, Action<Process> process)
 		{
-            Debug.WriteLine("svn " + command);
+            Console.WriteLine("svn " + command);
 			ProcessStartInfo psi = new ProcessStartInfo("svn", command);
 			psi.RedirectStandardOutput = true;
 			psi.RedirectStandardError = true;

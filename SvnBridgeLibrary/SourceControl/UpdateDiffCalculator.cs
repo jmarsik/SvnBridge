@@ -470,6 +470,8 @@ namespace SvnBridge.SourceControl
             {
                 FolderMetaData folder = root;
                 string itemName = checkoutRootPath;
+                if (itemName.StartsWith("/") == false)
+                    itemName = "/" + itemName;
                 string[] nameParts;
                 if (checkoutRootPath != "")
                     nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split('/');

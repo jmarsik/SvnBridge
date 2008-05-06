@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Web;
 using System.Xml;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
@@ -36,9 +37,10 @@ namespace SvnBridge.Nodes
             {
                 href += "/";
             }
-
-        	return handler.GetLocalPath(HttpUtility.UrlEncode(href));
+            return handler.GetLocalPath(Helper.UrlEncodeIfNeccesary(href));
         }
+
+        
 
         public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
         {

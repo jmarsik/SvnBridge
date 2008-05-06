@@ -99,6 +99,9 @@ namespace SvnBridge.Infrastructure
 
         private string GetServerPath(string path)
         {
+            if (path.StartsWith("$//"))
+                return Constants.ServerRootPath + path.Substring(3);
+
             if (path.StartsWith("$/"))
                 return path;
 
@@ -163,7 +166,7 @@ namespace SvnBridge.Infrastructure
 
                 }
 
-                if (items.Length > 0)
+                if (items.Length == 0)
                     AddMissingItemToCache(revision, serverPath);
 
                 persistentCache.Set(cacheKey, true);
