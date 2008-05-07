@@ -15,17 +15,17 @@ namespace SvnBridge.Utility
 {
     public static class Helper
     {
-        private static readonly string[] DECODED = new string[] {"%", "#", " ", "^", "{", "[", "}", "]", ";", "`", "&"};
-        private static readonly string[] DECODED_B = new string[] {"&", "<", ">"};
-        private static readonly string[] DECODED_C = new string[] {"%", "#", " ", "^", "{", "[", "}", "]", ";", "`"};
+        private static readonly string[] DECODED = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`", "&" };
+        private static readonly string[] DECODED_B = new string[] { "&", "<", ">" };
+        private static readonly string[] DECODED_C = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`" };
 
         private static readonly string[] ENCODED =
-            new string[] {"%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;"};
+            new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;" };
 
-        private static readonly string[] ENCODED_B = new string[] {"&amp;", "&lt;", "&gt;"};
+        private static readonly string[] ENCODED_B = new string[] { "&amp;", "&lt;", "&gt;" };
 
         private static readonly string[] ENCODED_C =
-            new string[] {"%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60"};
+            new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60" };
 
         public static XmlReaderSettings InitializeNewXmlReaderSettings()
         {
@@ -36,20 +36,20 @@ namespace SvnBridge.Utility
 
         public static T DeserializeXml<T>(XmlReader reader)
         {
-            XmlSerializer requestSerializer = new XmlSerializer(typeof (T));
-            return (T) requestSerializer.Deserialize(reader);
+            XmlSerializer requestSerializer = new XmlSerializer(typeof(T));
+            return (T)requestSerializer.Deserialize(reader);
         }
 
         public static T DeserializeXml<T>(string xml)
         {
             XmlReader reader = XmlReader.Create(new StringReader(xml), InitializeNewXmlReaderSettings());
-            return (T) DeserializeXml<T>(reader);
+            return (T)DeserializeXml<T>(reader);
         }
 
         public static T DeserializeXml<T>(byte[] xml)
         {
             XmlReader reader = XmlReader.Create(new MemoryStream(xml), InitializeNewXmlReaderSettings());
-            return (T) DeserializeXml<T>(reader);
+            return (T)DeserializeXml<T>(reader);
         }
 
         public static T DeserializeXml<T>(Stream requestStream)
@@ -146,7 +146,7 @@ namespace SvnBridge.Utility
             settings.Encoding = Encoding.UTF8;
             MemoryStream xml = new MemoryStream();
             XmlWriter writer = XmlWriter.Create(xml, settings);
-            XmlSerializer serializer = new XmlSerializer(typeof (T));
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
             serializer.Serialize(writer, request, ns);
             writer.Flush();
@@ -306,9 +306,10 @@ namespace SvnBridge.Utility
         public static string GetFolderName(string name)
         {
             int indexOfSlash = name.LastIndexOf("/");
-            if(indexOfSlash==-1)
-                return "";
-            return name.Substring(0, indexOfSlash);
+            string folderName = indexOfSlash == -1 ? "" : name.Substring(0, indexOfSlash);
+            if (folderName.StartsWith("/") == false)
+                folderName = "/" + folderName;
+            return folderName;
         }
 
         public static string UrlEncodeIfNeccesary(string href)

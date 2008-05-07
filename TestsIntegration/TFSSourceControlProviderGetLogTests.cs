@@ -31,7 +31,7 @@ namespace IntegrationTests
 
 			LogItem logItem = _provider.GetLog(testPath + "/FunRename.txt", versionFrom, versionTo, Recursion.None, 1);
 
-			Assert.Equal(testPath.Substring(1) + "/Fun.txt",
+			Assert.Equal(testPath + "/Fun.txt",
 			                ((RenamedSourceItem) logItem.History[0].Changes[0].Item).OriginalRemoteName);
 			Assert.Equal(versionFrom, ((RenamedSourceItem) logItem.History[0].Changes[0].Item).OriginalRevision);
 			Assert.Equal(testPath.Substring(1) + "/FunRename.txt", logItem.History[0].Changes[0].Item.RemoteName);

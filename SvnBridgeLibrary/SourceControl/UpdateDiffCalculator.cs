@@ -365,7 +365,7 @@ namespace SvnBridge.SourceControl
             }
             return ((change.ChangeType & ChangeType.Add) == ChangeType.Add) ||
                    ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch) ||
-                   ((change.ChangeType &ChangeType.Merge) == ChangeType.Merge) || 
+                   ((change.ChangeType & ChangeType.Merge) == ChangeType.Merge) ||
                    ((change.ChangeType & ChangeType.Undelete) == ChangeType.Undelete);
         }
 
@@ -497,7 +497,7 @@ namespace SvnBridge.SourceControl
                         {
                             StubFolderMetaData stubFolder = new StubFolderMetaData();
                             stubFolder.RealFolder = (FolderMetaData)item;
-                            stubFolder.Name = "/" + item.Name;
+                            stubFolder.Name = item.Name;
                             stubFolder.ItemRevision = item.ItemRevision;
                             stubFolder.PropertyRevision = item.PropertyRevision;
                             stubFolder.LastModifiedDate = item.LastModifiedDate;
@@ -564,6 +564,8 @@ namespace SvnBridge.SourceControl
                 return;
             }
 
+            if (checkoutRootPath.StartsWith("/") == false)
+                checkoutRootPath = "/" + checkoutRootPath;
             string folderName = checkoutRootPath;
             string[] nameParts = remoteName.Substring(checkoutRootPath.Length)
                 .Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -590,6 +592,8 @@ namespace SvnBridge.SourceControl
 
         private void HandleDeleteItem(string remoteName, SourceItemChange change, string folderName, FolderMetaData folder, bool isLastNamePart, int targetVersion)
         {
+            if (folderName.StartsWith("/") == false)
+                folderName = "/" + folderName;
             ItemMetaData item = folder.FindItem(folderName);
             if (item is DeleteFolderMetaData)
                 return;
@@ -655,7 +659,9 @@ namespace SvnBridge.SourceControl
                                                                 IDictionary<string, int> clientExistingFiles,
                                                                 IDictionary<string, string> clientDeletedFiles)
         {
-            string changePath = "/" + itemPath;
+            string changePath = itemPath;
+            if (changePath.StartsWith("/") == false)
+                changePath = "/" + changePath;
             if (((changeType & ChangeType.Add) == ChangeType.Add) ||
                 ((changeType & ChangeType.Edit) == ChangeType.Edit))
             {

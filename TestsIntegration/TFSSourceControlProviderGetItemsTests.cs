@@ -16,13 +16,13 @@ namespace IntegrationTests
 
             ItemMetaData item = _provider.GetItemInActivity(_activityId, testPath + "/B/Test.txt");
 
-            Assert.Equal(testPath.Substring(1) + "/A/Test.txt", item.Name);
+            Assert.Equal(testPath + "/A/Test.txt", item.Name);
         }
 
         [Fact]
         public void TestGetItemsForRootSucceeds()
         {
-            FolderMetaData item = (FolderMetaData) _provider.GetItems(-1, "", Recursion.OneLevel);
+            _provider.GetItems(-1, "", Recursion.OneLevel);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace IntegrationTests
             ItemMetaData item = _provider.GetItems(-1, testPath + "/File1.txt", Recursion.None);
 
             Assert.NotNull(item);
-            Assert.Equal(testPath.Substring(1) + "/File1.txt", item.Name);
+            Assert.Equal(testPath  + "/File1.txt", item.Name);
         }
 
         [Fact]

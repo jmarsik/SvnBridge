@@ -1369,30 +1369,22 @@ namespace SvnBridge.SourceControl
                 ItemMetaData item;
                 ItemType itemType;
 
+                Dictionary<string, Property> propertiesToAdd = new Dictionary<string, Property> ();
                 foreach (string path in activity.Properties.Keys)
                 {
                     ItemProperties properties = GetItemProperties(activity, path, out item, out itemType);
-
+                    foreach (Property property in properties.Properties)
+                    {
+                        propertiesToAdd[property.Name] = property;
+                    }
                     foreach (KeyValuePair<string, string> property in activity.Properties[path].Added)
                     {
-                        bool found = false;
-                        foreach (Property currentProperty in properties.Properties)
-                        {
-                            if (currentProperty.Name == property.Key)
-                            {
-                                currentProperty.Value = property.Value;
-                                found = true;
-                            }
-                        }
-                        if (!found)
-                        {
-                            properties.Properties.Add(new Property(property.Key, property.Value));
-                        }
+                        propertiesToAdd[property.Key] = new Property(property.Key, property.Value);
                     }
-
-                    properties.Properties.RemoveAll(
-                        delegate(Property obj) { return activity.Properties[path].Removed.Contains(obj.Name); });
-
+                    foreach (string removedProperty in activity.Properties[path].Removed)
+                    {
+                        propertiesToAdd.Remove(removedProperty);
+                    }
                     string propertiesPath = GetPropertiesFileName(path, itemType);
                     string propertiesFolder = GetPropertiesFolderName(path, itemType);
                     ItemMetaData propertiesFolderItem = GetItems(-1, propertiesFolder, Recursion.None, true);
@@ -1400,6 +1392,8 @@ namespace SvnBridge.SourceControl
                     {
                         MakeCollection(activityId, propertiesFolder);
                     }
+
+                    properties.Properties.AddRange(propertiesToAdd.Values);
 
                     if (item != null)
                     {
@@ -1436,10 +1430,18 @@ namespace SvnBridge.SourceControl
 
         private static string GetFolderName(string path)
         {
+            string folderName;
             if (path.Contains("/"))
-                return path.Substring(0, path.LastIndexOf('/'));
+            {
+                folderName = path.Substring(0, path.LastIndexOf('/'));
+            }
             else
-                return "";
+            {
+                folderName = "/";
+            }
+            if (folderName.StartsWith("/") == false && folderName.StartsWith("$/") == false)
+                folderName = "/" + folderName;
+            return folderName;
         }
 
         private ItemMetaData GetPendingItem(string activityId,
@@ -1474,9 +1476,12 @@ namespace SvnBridge.SourceControl
             foreach (KeyValuePair<string, ItemProperties> itemProperties in properties)
             {
                 ItemMetaData item = null;
-                if (folders.ContainsKey(itemProperties.Key.ToLowerInvariant()))
+                string key = itemProperties.Key.ToLowerInvariant();
+                if(key.StartsWith("/")==false)
+                    key = "/"+ key;
+                if (folders.ContainsKey(key))
                 {
-                    item = folders[itemProperties.Key.ToLowerInvariant()];
+                    item = folders[key];
                 }
                 else
                 {

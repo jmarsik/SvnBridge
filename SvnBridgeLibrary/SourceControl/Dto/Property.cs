@@ -1,4 +1,4 @@
-namespace SvnBridge.SourceControl.Dto
+                namespace SvnBridge.SourceControl.Dto
 {
     public class Property
     {

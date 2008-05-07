@@ -75,6 +75,8 @@ namespace SvnBridge.SourceControl
 			{
 				item.Name = "";
 			}
+            if (item.Name.StartsWith("/") == false)
+                item.Name = "/" + item.Name;
 
 			item.Author = "unknown";
 			item.LastModifiedDate = sourceItem.RemoteDate;
