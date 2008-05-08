@@ -97,6 +97,8 @@ namespace SvnBridge.SourceControl
             FolderMetaData folder = root;
             string[] parts = path.Split('/');
             string itemName = pathRoot;
+            if (itemName.StartsWith("/") == false)
+                itemName = "/" + itemName;
             ItemMetaData item = null;
             for (int i = 0; i < parts.Length; i++)
             {

@@ -17,7 +17,7 @@ namespace SvnBridge.Handlers
 			IHttpResponse response = context.Response;
 
 			string path = GetPath(request);
-			CheckoutData data = Helper.DeserializeXml<CheckoutData>(request.InputStream);
+        	CheckoutData data = Helper.DeserializeXml<CheckoutData>(request.InputStream);
 
 			try
 			{
@@ -61,15 +61,17 @@ namespace SvnBridge.Handlers
 			string activityId = PathParser.GetActivityId(request.ActivitySet.href);
 
 			if (path.Contains("/bln"))
-				return GetLocalPath("//!svn/wbl/" + activityId + path.Substring(9));
+				return GetLocalPath("/!svn/wbl/" + activityId + path.Substring(9));
 
 			int revisionStart = path.IndexOf("/ver/") + 5;
 			int revisionEnd = path.IndexOf('/', revisionStart + 1);
 			string itemPath = path.Substring(revisionEnd);
-
+       
 			int version = int.Parse(path.Substring(revisionStart, revisionEnd - revisionStart));
-			string location = GetLocalPath("//!svn/wrk/" + activityId + itemPath);
-			ItemMetaData item = sourceControlProvider.GetItemsWithoutProperties(-1, Helper.Decode(itemPath), Recursion.None);
+		    itemPath = itemPath.Replace("//", "/");
+			string location = GetLocalPath("/!svn/wrk/" + activityId + itemPath);
+		
+            ItemMetaData item = sourceControlProvider.GetItemsWithoutProperties(-1, Helper.Decode(itemPath), Recursion.None);
 			if (item.Revision > version)
 			{
 				throw new ConflictException();

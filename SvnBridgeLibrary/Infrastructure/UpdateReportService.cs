@@ -93,9 +93,7 @@ namespace SvnBridge.Infrastructure
 
     	private string GetSrcPath(UpdateReportData updateReportRequest)
     	{
-    		string srcPath = handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
-    		srcPath = srcPath.Substring(1);// remove '/' from start of path
-    		return srcPath;
+    	    return handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
     	}
 
     	public void ProcessUpdateReportForDirectory(UpdateReportData updateReportRequest,

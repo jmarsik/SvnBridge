@@ -33,9 +33,9 @@ namespace SvnBridge.Nodes
                 href = "/" + href;
             }
 
-            if (item.ItemType == ItemType.Folder && !href.EndsWith("/"))
+            if (href.EndsWith("/"))
             {
-                href += "/";
+                href = href.Substring(0, href.Length - 1);
             }
             return handler.GetLocalPath(Helper.UrlEncodeIfNeccesary(href));
         }

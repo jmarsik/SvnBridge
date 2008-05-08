@@ -121,11 +121,16 @@ namespace SvnBridge.Handlers
 
 		public string GetLocalPath(string href)
 		{
+		    string result;
 			if (href.StartsWith("/") == false && ApplicationPath.EndsWith("/") == false)
-				return ApplicationPath + "/" + href;
+			    result =  ApplicationPath + "/" + href;
 			if (href.StartsWith("/") && ApplicationPath.EndsWith("/"))
-				return ApplicationPath + href.Substring(1);
-			return ApplicationPath + href;
+			    result = ApplicationPath + href.Substring(1);
+		    else
+                result = ApplicationPath + href;
+            if (result.EndsWith("/"))
+                return result.Substring(0, result.Length - 1);
+		    return result;
 		}
 
 		public string GetLocalPathFromUrl(string path)
