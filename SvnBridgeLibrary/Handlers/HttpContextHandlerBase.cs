@@ -128,8 +128,6 @@ namespace SvnBridge.Handlers
 			    result = ApplicationPath + href.Substring(1);
 		    else
                 result = ApplicationPath + href;
-            if (result.EndsWith("/"))
-                return result.Substring(0, result.Length - 1);
 		    return result;
 		}
 

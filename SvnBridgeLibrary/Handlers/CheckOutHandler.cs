@@ -61,7 +61,7 @@ namespace SvnBridge.Handlers
 			string activityId = PathParser.GetActivityId(request.ActivitySet.href);
 
 			if (path.Contains("/bln"))
-				return GetLocalPath("/!svn/wbl/" + activityId + path.Substring(9));
+				return GetLocalPath("//!svn/wbl/" + activityId + path.Substring(9));
 
 			int revisionStart = path.IndexOf("/ver/") + 5;
 			int revisionEnd = path.IndexOf('/', revisionStart + 1);
@@ -69,7 +69,7 @@ namespace SvnBridge.Handlers
        
 			int version = int.Parse(path.Substring(revisionStart, revisionEnd - revisionStart));
 		    itemPath = itemPath.Replace("//", "/");
-			string location = GetLocalPath("/!svn/wrk/" + activityId + itemPath);
+			string location = GetLocalPath("//!svn/wrk/" + activityId + itemPath);
 		
             ItemMetaData item = sourceControlProvider.GetItemsWithoutProperties(-1, Helper.Decode(itemPath), Recursion.None);
 			if (item.Revision > version)

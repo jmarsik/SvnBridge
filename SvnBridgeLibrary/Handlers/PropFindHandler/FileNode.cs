@@ -33,14 +33,13 @@ namespace SvnBridge.Nodes
                 href = "/" + href;
             }
 
-            if (href.EndsWith("/"))
+            if (item.ItemType == ItemType.Folder && !href.EndsWith("/"))
             {
-                href = href.Substring(0, href.Length - 1);
+                href += "/";
             }
-            return handler.GetLocalPath(Helper.UrlEncodeIfNeccesary(href));
-        }
 
-        
+            return handler.GetLocalPath(Helper.Encode(href));
+        }
 
         public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
         {
@@ -126,13 +125,13 @@ namespace SvnBridge.Nodes
 
         private string GetRepositoryUUID()
         {
-			return "<lp2:repository-uuid>" + sourceControlProvider.GetRepositoryUuid() + "</lp2:repository-uuid>";
+            return "<lp2:repository-uuid>" + sourceControlProvider.GetRepositoryUuid() + "</lp2:repository-uuid>";
         }
 
         private string GetCheckedIn(HttpContextHandlerBase handler)
         {
             return
-                "<lp1:checked-in><D:href>" + handler.GetLocalPath( "/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true)) +
+                "<lp1:checked-in><D:href>" + handler.GetLocalPath("/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name, true)) +
                 "</D:href></lp1:checked-in>";
         }
 

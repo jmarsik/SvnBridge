@@ -310,6 +310,9 @@ namespace SvnBridge.SourceControl
 
         private static void RemoveMissingItemsWhichAreChildrenOfRenamedItem(string itemName, FolderMetaData root)
         {
+            if (itemName.StartsWith("/"))
+                itemName = itemName.Substring(1);
+
             foreach (ItemMetaData data in new List<ItemMetaData>(root.Items))
             {
                 string nameMatchingSourceItemConvention = data.Name;
@@ -482,7 +485,7 @@ namespace SvnBridge.SourceControl
                     itemName = "/" + itemName;
                 string[] nameParts;
                 if (checkoutRootPath != "")
-                    nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split('/');
+                    nameParts = remoteName.Substring(checkoutRootPath.Length + 1).Split(new char[]{'/'},StringSplitOptions.RemoveEmptyEntries);
                 else
                     nameParts = remoteName.Split('/');
 
@@ -582,13 +585,17 @@ namespace SvnBridge.SourceControl
 
             FolderMetaData folder = root;
             string separator = folderName != "" ? "/" : "";
-            for (int i = 1; i < nameParts.Length; i++)
+            for (int i = 0; i < nameParts.Length; i++)
             {
                 bool isLastNamePart = i == nameParts.Length - 1;
 
-                folderName += separator + nameParts[0];
+                folderName += separator + nameParts[i];
                 separator = "/";
                 HandleDeleteItem(remoteName, change, folderName, ref folder, isLastNamePart, targetVersion);
+            }
+            if(nameParts.Length==0)//we have to delete the checkout root itself
+            {
+                HandleDeleteItem(remoteName, change, folderName, ref folder, true, targetVersion);
             }
         }
 
