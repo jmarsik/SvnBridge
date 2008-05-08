@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
@@ -28,7 +31,7 @@ namespace IntegrationTests
 												IoC.Resolve<IPersistentCache>(), ServerUrl, Constants.ServerRootPath + PROJECT_NAME);
 		}
 
-		[Fact]
+	    [Fact]
 		public void WhenAskToGetItemOnServer_WillCacheEntireRevision()
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);

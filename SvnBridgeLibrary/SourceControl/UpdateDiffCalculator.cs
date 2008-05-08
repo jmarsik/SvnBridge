@@ -35,9 +35,9 @@ namespace SvnBridge.SourceControl
             if (versionFrom != versionTo)
             {
                 CalculateChangeBetweenVersions(checkoutRootPath,
-                                           root,
-                                           versionFrom,
-                                           versionTo);
+                                               root,
+                                               versionFrom,
+                                               versionTo);
             }
 
             if (updateReportData.Entries != null)
@@ -50,10 +50,11 @@ namespace SvnBridge.SourceControl
                         continue;
                     if (itemVersionFrom != versionTo)
                     {
-                        FindOrCreateResults results = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo, Recursion.None);
+                        FindOrCreateResults results = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo,
+                                                                           Recursion.None);
 
                         bool changed = CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, root,
-                                                       itemVersionFrom, versionTo);
+                                                                      itemVersionFrom, versionTo);
                         if (changed == false)
                             results.RevertAddition();
                     }
@@ -84,14 +85,16 @@ namespace SvnBridge.SourceControl
             foreach (ItemMetaData item in root.Items)
             {
                 if (item is MissingFolderMetaData)
-                    throw new InvalidOperationException("Found missing item:" + item + " but those should not be returned from UpdateDiffCalculator");
+                    throw new InvalidOperationException("Found missing item:" + item +
+                                                        " but those should not be returned from UpdateDiffCalculator");
                 if (item is FolderMetaData)
                     VerifyNoMissingItemMetaDataRemained((FolderMetaData)item);
             }
         }
 
         private FindOrCreateResults FindItemOrCreateItem(FolderMetaData root,
-            string pathRoot, string path, int targetVersion, Recursion recursion)
+                                                         string pathRoot, string path, int targetVersion,
+                                                         Recursion recursion)
         {
             FindOrCreateResults results = new FindOrCreateResults();
             FolderMetaData folder = root;
@@ -113,7 +116,8 @@ namespace SvnBridge.SourceControl
                     }
                     else
                     {
-                        FolderMetaData subFolder = (FolderMetaData)sourceControlProvider.GetItems(targetVersion, itemName, recursion);
+                        FolderMetaData subFolder =
+                            (FolderMetaData)sourceControlProvider.GetItems(targetVersion, itemName, recursion);
                         item = subFolder;
                     }
                     item = item ?? new MissingFolderMetaData(itemName, targetVersion);
@@ -183,7 +187,7 @@ namespace SvnBridge.SourceControl
                             }
                             if (updatingForwardInTime == false)
                             {
-                                change.Item.RemoteChangesetId -= 1;// we turn the edit around, basically
+                                change.Item.RemoteChangesetId -= 1; // we turn the edit around, basically
                             }
                             PerformAdd(targetVersion, checkoutRootPath, change, root);
                         }
@@ -209,15 +213,17 @@ namespace SvnBridge.SourceControl
         private void PrePopulateCacheWithChanges(SourceItemHistory history, int revision)
         {
             List<SourceItemChange> list = new List<SourceItemChange>(history.Changes);
-            list.Sort(delegate(SourceItemChange x, SourceItemChange y)
-            {
-                return x.Item.RemoteName.Length.CompareTo(y.Item.RemoteName.Length);
-            });
+            list.Sort(
+                delegate(SourceItemChange x, SourceItemChange y)
+                {
+                    return x.Item.RemoteName.Length.CompareTo(y.Item.RemoteName.Length);
+                });
 
-            list.ForEach(delegate(SourceItemChange obj)
-            {
-                sourceControlProvider.GetItems(revision, obj.Item.RemoteName, Recursion.None);
-            });
+            list.ForEach(
+                delegate(SourceItemChange obj)
+                {
+                    sourceControlProvider.GetItems(revision, obj.Item.RemoteName, Recursion.None);
+                });
         }
 
         private void PerformAdd(int targetVersion,
@@ -259,9 +265,12 @@ namespace SvnBridge.SourceControl
                                targetVersion);
         }
 
-        private void PerformRename(int targetVersion, string checkoutRootPath, SourceItemChange change, FolderMetaData root, bool updatingForwardInTime)
+        private void PerformRename(int targetVersion, string checkoutRootPath, SourceItemChange change,
+                                   FolderMetaData root, bool updatingForwardInTime)
         {
-            ItemMetaData oldItem = sourceControlProvider.GetPreviousVersionOfItems(new SourceItem[] { change.Item }, change.Item.RemoteChangesetId)[0];
+            ItemMetaData oldItem =
+                sourceControlProvider.GetPreviousVersionOfItems(new SourceItem[] { change.Item },
+                                                                change.Item.RemoteChangesetId)[0];
 
             if (updatingForwardInTime)
             {
@@ -297,7 +306,6 @@ namespace SvnBridge.SourceControl
                 string itemName = updatingForwardInTime ? change.Item.RemoteName : oldItem.Name;
                 renamedItemsToBeCheckedForDeletedChildren.Add(itemName);
             }
-
         }
 
         private static void RemoveMissingItemsWhichAreChildrenOfRenamedItem(string itemName, FolderMetaData root)
@@ -319,7 +327,6 @@ namespace SvnBridge.SourceControl
                 {
                     RemoveMissingItemsWhichAreChildrenOfRenamedItem(itemName, (FolderMetaData)data);
                 }
-
             }
         }
 
@@ -442,7 +449,6 @@ namespace SvnBridge.SourceControl
                 {
                     FlattenDeletedFolders(folder);
                 }
-
             }
         }
 
@@ -566,33 +572,28 @@ namespace SvnBridge.SourceControl
                 return;
             }
 
-            if (checkoutRootPath.StartsWith("/") == false)
-                checkoutRootPath = "/" + checkoutRootPath;
             string folderName = checkoutRootPath;
-            string[] nameParts = remoteName.Substring(checkoutRootPath.Length)
-                .Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (folderName.StartsWith("/") == false)
+                folderName = "/" + folderName;
+            string remoteNameStart = remoteName.StartsWith(checkoutRootPath) ? checkoutRootPath : folderName;
 
-            if (nameParts.Length < 2)
-            {
-                HandleDeleteItem(remoteName, change, remoteName, root, true, targetVersion);
-                return;
-            }
+            string[] nameParts = remoteName.Substring(remoteNameStart.Length)
+                .Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
             FolderMetaData folder = root;
             string separator = folderName != "" ? "/" : "";
-            folderName += separator + nameParts[0];
-            HandleDeleteItem(remoteName, change, folderName, folder, false, targetVersion);
             for (int i = 1; i < nameParts.Length; i++)
             {
                 bool isLastNamePart = i == nameParts.Length - 1;
 
-                folderName += "/" + nameParts[i];
-
-                HandleDeleteItem(remoteName, change, folderName, folder, isLastNamePart, targetVersion);
+                folderName += separator + nameParts[0];
+                separator = "/";
+                HandleDeleteItem(remoteName, change, folderName, ref folder, isLastNamePart, targetVersion);
             }
         }
 
-        private void HandleDeleteItem(string remoteName, SourceItemChange change, string folderName, FolderMetaData folder, bool isLastNamePart, int targetVersion)
+        private void HandleDeleteItem(string remoteName, SourceItemChange change, string folderName,
+                                      ref FolderMetaData folder, bool isLastNamePart, int targetVersion)
         {
             if (folderName.StartsWith("/") == false)
                 folderName = "/" + folderName;
@@ -626,11 +627,9 @@ namespace SvnBridge.SourceControl
                         item.ItemRevision = targetVersion;
                     }
                 }
-                string parentName = Helper.GetFolderName(item.Name);
-                FolderMetaData parentFolder = (FolderMetaData)folder.FindItem(parentName);
-                parentFolder.Items.Add(item);
+                folder.Items.Add(item);
             }
-            else if (isLastNamePart)// we need to revert the item addition
+            else if (isLastNamePart) // we need to revert the item addition
             {
                 if (item is StubFolderMetaData)
                 {
@@ -642,7 +641,9 @@ namespace SvnBridge.SourceControl
                 }
                 else if (additionForPropertyChangeOnly.ContainsKey(item) && additionForPropertyChangeOnly[item])
                 {
-                    ItemMetaData removeFolder = item is FolderMetaData ? (ItemMetaData)new DeleteFolderMetaData() : new DeleteMetaData();
+                    ItemMetaData removeFolder = item is FolderMetaData
+                                                    ? (ItemMetaData)new DeleteFolderMetaData()
+                                                    : new DeleteMetaData();
                     removeFolder.Name = item.Name;
                     removeFolder.ItemRevision = targetVersion;
                     folder.Items.Remove(item);
@@ -653,6 +654,7 @@ namespace SvnBridge.SourceControl
                     folder.Items.Remove(item);
                 }
             }
+            folder = (item as FolderMetaData) ?? folder;
         }
 
         private static bool IsChangeAlreadyCurrentInClientState(ChangeType changeType,

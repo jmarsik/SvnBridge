@@ -35,7 +35,8 @@ namespace SvnBridge
                 }
                 else
                 {
-                    MessageBox.Show("Could not parse port: " + args[0] + ". If the port is explicitly specified it must be numeric 0 - 65536");
+                    MessageBox.Show("Could not parse port: " + args[0] +
+                                    ". If the port is explicitly specified it must be numeric 0 - 65536");
                     return;
                 }
             }
@@ -64,7 +65,7 @@ namespace SvnBridge
 
         private static ProxyInformation GetProxyInfo()
         {
-            ProxyInformation proxyInfo = new ProxyInformation();
+            var proxyInfo = new ProxyInformation();
             proxyInfo.UseProxy = Settings.Default.UseProxy;
             proxyInfo.Url = Settings.Default.ProxyUrl;
             proxyInfo.Port = Settings.Default.ProxyPort;
@@ -86,8 +87,8 @@ namespace SvnBridge
         private static bool TryGetSettings(ref int? port,
                                            ProxyInformation proxyInfo)
         {
-            SettingsForm view = new SettingsForm();
-            SettingsViewPresenter presenter = new SettingsViewPresenter(view, proxyInfo);
+            var view = new SettingsForm();
+            var presenter = new SettingsViewPresenter(view, proxyInfo);
             presenter.Port = port ?? Settings.Default.TfsPort;
             presenter.Show();
 
@@ -121,13 +122,13 @@ namespace SvnBridge
         private static void Run(int port, ProxyInformation proxyInformation)
         {
             Proxy.Set(proxyInformation);
-			
-            IListener listener = IoC.Resolve<IListener>();
+
+            var listener = IoC.Resolve<IListener>();
 
             listener.Port = port;
 
-            ToolTrayForm view = new ToolTrayForm();
-            ListenerViewPresenter presenter = new ListenerViewPresenter(
+            var view = new ToolTrayForm();
+            var presenter = new ListenerViewPresenter(
                 view,
                 new ErrorsView(),
                 listener);
@@ -141,7 +142,8 @@ namespace SvnBridge
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(string.Format("Could not start listening: {0}{1}{2}", e.Message, Environment.NewLine, e));
+                    MessageBox.Show(string.Format("Could not start listening: {0}{1}{2}", e.Message, Environment.NewLine,
+                                                  e));
                     return;
                 }
 
