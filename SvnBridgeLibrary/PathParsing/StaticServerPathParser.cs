@@ -10,14 +10,18 @@ namespace SvnBridge.PathParsing
 
 		public StaticServerPathParser(string server)
 		{
-			Uri ignored;
-			if (Uri.TryCreate(server, UriKind.Absolute, out ignored) == false)
-				throw new InvalidOperationException("The url '" + server + "' is not a valid url");
+            foreach (string singleServerUrl in server.Split(','))
+            {
+                Uri ignored;
+                if (Uri.TryCreate(singleServerUrl, UriKind.Absolute, out ignored) == false)
+                    throw new InvalidOperationException("The url '" + server + "' is not a valid url");
 
-			this.server = server;
+            }
+
+		    this.server = server;
 		}
 
-		public override string GetServerUrl(Uri requestUrl)
+	    public override string GetServerUrl(Uri requestUrl)
 		{
 			return server;
 		}

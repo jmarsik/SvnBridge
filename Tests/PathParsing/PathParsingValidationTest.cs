@@ -18,7 +18,32 @@ namespace SvnBridge.PathParsing
 			ValidateParserWillNotAcceptInvalidTfsUrl<StaticServerPathParser>();
 		}
 
-		private void ValidateParserWillNotAcceptInvalidTfsUrl<T>()
+        [Fact]
+        public void StaticServerPathParser_AcceptValidUrl()
+        {
+            ValidateParserWillAcceptValidTfsUrl<StaticServerPathParser>("https://codeplex.com");
+        }
+
+        [Fact]
+        public void StaticServerWithProjectNameInHostNamePathParser_AcceptValidUrl()
+        {
+            ValidateParserWillAcceptValidTfsUrl<StaticServerWithProjectNameInHostNamePathParser>("https://codeplex.com");
+        }
+
+        [Fact]
+        public void StaticServerPathParser_AcceptValidUrl_Muliple()
+        {
+            ValidateParserWillAcceptValidTfsUrl<StaticServerPathParser>("https://codeplex.com,https://www.codeplex.com");
+        }
+
+        [Fact]
+        public void StaticServerWithProjectNameInHostNamePathParser_AcceptValidUrl_Muliple()
+        {
+            ValidateParserWillAcceptValidTfsUrl<StaticServerWithProjectNameInHostNamePathParser>("https://codeplex.com,https://www.codeplex.com");
+        }
+
+
+		private static void ValidateParserWillNotAcceptInvalidTfsUrl<T>()
 		{
 			Assert.Throws<InvalidOperationException>(delegate
 			{
@@ -32,5 +57,10 @@ namespace SvnBridge.PathParsing
 				}
 			});
 		}
+
+        private static void ValidateParserWillAcceptValidTfsUrl<T>(string url)
+        {
+            Activator.CreateInstance(typeof(T), url);
+        }
 	}
 }

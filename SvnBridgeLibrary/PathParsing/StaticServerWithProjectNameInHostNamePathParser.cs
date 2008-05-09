@@ -1,5 +1,3 @@
-using System;
-using SvnBridge.Interfaces;
 using SvnBridge.Net;
 
 namespace SvnBridge.PathParsing
@@ -9,6 +7,7 @@ namespace SvnBridge.PathParsing
 		public StaticServerWithProjectNameInHostNamePathParser(string server) : base(server)
 		{
 		}
+
 
 		public override string GetProjectName(IHttpRequest request)
 		{

@@ -15,6 +15,7 @@ namespace SvnBridge.Handlers
 	{
 		private IPathParser pathParser;
 		private IHttpContext httpContext;
+        ISourceControlProvider sourceControlProvider;
 
 		public IPathParser PathParser
 		{
@@ -31,9 +32,8 @@ namespace SvnBridge.Handlers
 
 			NetworkCredential credential = GetCredential(context);
 			PerRequest.Items["credentials"] = credential;
-			ISourceControlProvider sourceControlProvider =
-				SourceControlProviderFactory.Create(tfsUrl, projectName, credential);
-			Handle(context, sourceControlProvider);
+		    sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, projectName, credential);
+		    Handle(context, sourceControlProvider);
 		}
 
 		public void Initialize(IHttpContext context, IPathParser parser)
@@ -157,5 +157,9 @@ namespace SvnBridge.Handlers
             WriteToResponse(response, responseContent);
         }
 
+	    public int GetLatestVersion()
+	    {
+	        return sourceControlProvider.GetLatestVersion();
+	    }
 	}
 }
