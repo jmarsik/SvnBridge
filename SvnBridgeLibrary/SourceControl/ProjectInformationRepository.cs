@@ -28,10 +28,10 @@ namespace SvnBridge.SourceControl
             string[] servers = serverUrl.Split(',');
             foreach (string server in servers)
             {
-				ICredentials credentialsForServer = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
-				int revision = metaDataRepositoryFactory.GetLatestRevision(serverUrl, credentialsForServer);
+                ICredentials credentialsForServer = CredentialsHelper.GetCredentialsForServer(server, credentials);
+                int revision = metaDataRepositoryFactory.GetLatestRevision(server, credentialsForServer);
             	SourceItem[] items = metaDataRepositoryFactory
-						.Create(credentialsForServer, serverUrl, Constants.ServerRootPath + projectName)
+                        .Create(credentialsForServer, server, Constants.ServerRootPath + projectName)
 							.QueryItems(revision, "", Recursion.None);
 
                 if (items != null && items.Length > 0)

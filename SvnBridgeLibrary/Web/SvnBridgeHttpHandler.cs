@@ -15,6 +15,7 @@ namespace SvnBridge.Web
 		public SvnBridgeHttpHandler()
 		{
 			string tfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
+		    PerRequest.Items["serverUrl"] = tfsUrl;
 		    IProjectInformationRepository projectInformationRepository = IoC.Resolve<IProjectInformationRepository>();
 		    if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
 			{
