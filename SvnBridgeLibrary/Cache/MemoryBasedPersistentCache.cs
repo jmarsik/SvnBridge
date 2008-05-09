@@ -118,7 +118,8 @@ namespace SvnBridge.Cache
             rwLock.AcquireWriterLock(Timeout.Infinite);
             try
             {
-                PerRequest.Items.Clear();
+                if(PerRequest.IsInitialized)
+                    PerRequest.Items.Clear();
                 cache.Clear();
             }
             finally
