@@ -1,11 +1,12 @@
 using System;
+using System.Net;
 using SvnBridge.Net;
 
 namespace SvnBridge.Interfaces
 {
 	public interface IPathParser
 	{
-		string GetServerUrl(Uri requestUrl);
+        string GetServerUrl(IHttpRequest request, ICredentials credentials);
 		string GetLocalPath(IHttpRequest request);
 		string GetLocalPath(IHttpRequest request, string url);
 		string GetProjectName(IHttpRequest request);

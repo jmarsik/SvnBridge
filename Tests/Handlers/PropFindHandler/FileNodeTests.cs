@@ -1,4 +1,6 @@
 using System.Xml;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using SvnBridge.PathParsing;
 using Xunit;
 using SvnBridge.Infrastructure;
@@ -26,14 +28,20 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyCheckedInPropertyGetsEncoded()
         {
+            MockRepository mocks = new MockRepository();
+            ISourceControlProvider sourceControlProvider = mocks.Stub<ISourceControlProvider>();
+            SetupResult.For(sourceControlProvider.GetLatestVersion()).Return(5718);
+            mocks.ReplayAll();
+
             XmlDocument xml = new XmlDocument();
             ItemMetaData item = new ItemMetaData();
-            item.ItemRevision = 5718;
+            item.ItemRevision = 5700;
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
             FileNode node = new FileNode(item, null);
 
         	GetHandler handler = new GetHandler();
-			handler.Initialize(context, new StaticServerPathParser(tfsUrl));
+			handler.Initialize(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()));
+            handler.SetSourceControlProvider(sourceControlProvider);
         	string result = node.GetProperty(handler, xml.CreateElement("checked-in"));
 
             Assert.Equal(

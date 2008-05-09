@@ -424,6 +424,7 @@ namespace ProtocolTests
         {
             stub.Attach(provider.ItemExists, true);
             stub.Attach(provider.IsDirectory, true);
+            stub.Attach(provider.GetLatestVersion, 5707);
             FolderMetaData item = new FolderMetaData();
             item.Name = "";
             item.ItemRevision = 5707;

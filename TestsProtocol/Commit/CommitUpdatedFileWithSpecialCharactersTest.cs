@@ -111,6 +111,7 @@ namespace ProtocolTests
         public void Test11()
         {
             stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.GetLatestVersion, 5718);
             ItemMetaData item = new ItemMetaData();
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
             item.ItemRevision = 5718;
@@ -589,6 +590,7 @@ namespace ProtocolTests
         public void Test8()
         {
             stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.GetLatestVersion, 5718);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.ItemRevision = 5718;

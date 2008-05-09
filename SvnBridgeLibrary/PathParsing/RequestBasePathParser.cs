@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 
@@ -14,9 +15,9 @@ namespace SvnBridge.PathParsing
 			this.urlValidator = urlValidator;
 		}
 
-		public override string GetServerUrl(Uri requestUrl)
+		public override string GetServerUrl(IHttpRequest request, ICredentials credentials)
 		{
-			string url = GetUrlFromRequest(requestUrl);
+			string url = GetUrlFromRequest(request.Url);
 
 			if (urlValidator.IsValidTfsServerUrl("https://" + url))
 				return "https://" + url;

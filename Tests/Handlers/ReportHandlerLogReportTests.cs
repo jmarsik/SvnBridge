@@ -5,6 +5,8 @@ using System.Text;
 using Attach;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.PathParsing;
@@ -43,7 +45,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5532</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
 
-			handler.Handle(context, new StaticServerPathParser("http://tfsserver"));
+			handler.Handle(context, new StaticServerPathParser("http://tfsserver", MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -78,7 +80,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5696</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:strict-node-history/><S:path></S:path></S:log-report>";
 
-			handler.Handle(context, new StaticServerPathParser("http://tfsserver"));
+			handler.Handle(context, new StaticServerPathParser("http://tfsserver", MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -107,7 +109,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><S:get-locations xmlns:S=\"svn:\" xmlns:D=\"DAV:\"><S:path></S:path><S:peg-revision>5696</S:peg-revision><S:location-revision>5597</S:location-revision></S:get-locations>";
 
-			handler.Handle(context, new StaticServerPathParser("http://tfsserver"));
+			handler.Handle(context, new StaticServerPathParser("http://tfsserver", MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -129,7 +131,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><S:get-locations xmlns:S=\"svn:\" xmlns:D=\"DAV:\"><S:path></S:path><S:peg-revision>5696</S:peg-revision><S:location-revision>5573</S:location-revision></S:get-locations>";
 
-			handler.Handle(context, new StaticServerPathParser("http://tfsserver"));
+			handler.Handle(context, new StaticServerPathParser("http://tfsserver", MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -152,7 +154,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5679</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:strict-node-history/><S:path></S:path></S:log-report>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -187,7 +189,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:log-report xmlns:S=\"svn:\"><S:start-revision>5531</S:start-revision><S:end-revision>1</S:end-revision><S:limit>100</S:limit><S:discover-changed-paths/><S:path></S:path></S:log-report>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +

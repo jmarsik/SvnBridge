@@ -15,7 +15,13 @@ namespace SvnBridge.Handlers
 	{
 		private IPathParser pathParser;
 		private IHttpContext httpContext;
-        ISourceControlProvider sourceControlProvider;
+
+	    public void SetSourceControlProvider(ISourceControlProvider value)
+	    {
+	        sourceControlProvider = value;
+	    }
+
+	    ISourceControlProvider sourceControlProvider;
 
 		public IPathParser PathParser
 		{
@@ -23,16 +29,16 @@ namespace SvnBridge.Handlers
 		}
 
 
-		public void Handle(IHttpContext context, IPathParser pathParser)
+		public void Handle(IHttpContext context, IPathParser pathParser, NetworkCredential credentials)
 		{
-			Initialize(context, pathParser);
+            PerRequest.Items["credentials"] = credentials;
+            
+            Initialize(context, pathParser);
 			IHttpRequest request = context.Request;
-			string tfsUrl = pathParser.GetServerUrl(request.Url);
-			string projectName = pathParser.GetProjectName(context.Request);
+			string tfsUrl = pathParser.GetServerUrl(request, credentials);
+            string projectName = pathParser.GetProjectName(context.Request);
 
-			NetworkCredential credential = GetCredential(context);
-			PerRequest.Items["credentials"] = credential;
-		    sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, projectName, credential);
+			sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, projectName, credentials);
 		    Handle(context, sourceControlProvider);
 		}
 
@@ -49,38 +55,6 @@ namespace SvnBridge.Handlers
 		protected abstract void Handle(IHttpContext context,
 									   ISourceControlProvider sourceControlProvider);
 
-		private static NetworkCredential GetCredential(IHttpContext context)
-		{
-			string authorizationHeader = context.Request.Headers["Authorization"];
-			if (!string.IsNullOrEmpty(authorizationHeader))
-			{
-				if (authorizationHeader.StartsWith("Negotiate"))
-				{
-					return (NetworkCredential)CredentialCache.DefaultCredentials;
-				}
-				string encodedCredential = authorizationHeader.Substring(authorizationHeader.IndexOf(' ') + 1);
-				string credential = UTF8Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredential));
-				string[] credentialParts = credential.Split(':');
-
-				string username = credentialParts[0];
-				string password = credentialParts[1];
-
-				if (username.IndexOf('\\') >= 0)
-				{
-					string domain = username.Substring(0, username.IndexOf('\\'));
-					username = username.Substring(username.IndexOf('\\') + 1);
-					return new NetworkCredential(username, password, domain);
-				}
-				else
-				{
-					return new NetworkCredential(username, password);
-				}
-			}
-			else
-			{
-				return CredentialsHelper.NullCredentials;
-			}
-		}
 
 		protected static void SetResponseSettings(IHttpResponse response,
 												  string contentType,

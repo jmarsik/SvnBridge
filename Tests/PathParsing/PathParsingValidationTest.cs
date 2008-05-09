@@ -1,5 +1,7 @@
 using System;
 using System.Reflection;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using Xunit;
 
 namespace SvnBridge.PathParsing
@@ -49,7 +51,7 @@ namespace SvnBridge.PathParsing
 			{
 				try
 				{
-					Activator.CreateInstance(typeof (T), "blah");
+					Activator.CreateInstance(typeof (T), "blah", MockRepository.GenerateStub<IProjectInformationRepository>());
 				}
 				catch (TargetInvocationException e)
 				{
@@ -60,7 +62,7 @@ namespace SvnBridge.PathParsing
 
         private static void ValidateParserWillAcceptValidTfsUrl<T>(string url)
         {
-            Activator.CreateInstance(typeof(T), url);
+            Activator.CreateInstance(typeof(T), url, MockRepository.GenerateStub<IProjectInformationRepository>());
         }
 	}
 }

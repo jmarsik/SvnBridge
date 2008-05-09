@@ -1,15 +1,18 @@
 using System;
+using System.Net;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.PathParsing
 {
 	public class StaticServerPathParser : BasePathParser
 	{
 		private readonly string server;
+	    private readonly IProjectInformationRepository projectInformationRepository;
 
-		public StaticServerPathParser(string server)
-		{
+        public StaticServerPathParser(string server, IProjectInformationRepository projectInformationRepository)
+        {
             foreach (string singleServerUrl in server.Split(','))
             {
                 Uri ignored;
@@ -18,12 +21,18 @@ namespace SvnBridge.PathParsing
 
             }
 
-		    this.server = server;
-		}
+            this.server = server;
+            this.projectInformationRepository = projectInformationRepository;
+        }
 
-	    public override string GetServerUrl(Uri requestUrl)
+
+	    public override string GetServerUrl(IHttpRequest request, ICredentials credentials)
 		{
-			return server;
+	        string projectName = GetProjectName(request);
+            if (projectName == null)
+                return server.Split(',')[0];
+
+            return projectInformationRepository.GetProjectLocation(credentials, projectName).ServerUrl;
 		}
 
 		public override string GetLocalPath(IHttpRequest request)

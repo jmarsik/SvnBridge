@@ -566,6 +566,7 @@ namespace ProtocolTests
         public void Test8()
         {
             stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.GetLatestVersion, 5476);
             ItemMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk/New Folder 10";
             item.ItemRevision = 5476;

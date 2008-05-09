@@ -496,6 +496,7 @@ namespace ProtocolTests
         public void Test8()
         {
             stub.Attach(provider.ItemExists, true);
+            stub.Attach(provider.GetLatestVersion, 5721);
             FolderMetaData item = new FolderMetaData();
             item.Name = "A !@#$%^&()_-+={[}];',.~`/B !@#$%^&()_-+={[}];',.~`";
             item.ItemRevision = 5721;

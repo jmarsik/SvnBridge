@@ -7,6 +7,7 @@ using CodePlex.TfsLibrary;
 using SvnBridge.Handlers;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Net
 {
@@ -55,7 +56,8 @@ namespace SvnBridge.Net
         public void Dispatch(IHttpContext connection)
         {
         	IHttpRequest request = connection.Request;
-        	string tfsUrl = parser.GetServerUrl(request.Url);
+            NetworkCredential credential = GetCredential(connection);
+            string tfsUrl = parser.GetServerUrl(request, credential);
         	if (string.IsNullOrEmpty(tfsUrl))
             {
                 throw new InvalidOperationException(
@@ -74,7 +76,7 @@ namespace SvnBridge.Net
             {
             	try
             	{
-            		handler.Handle(connection, parser);
+            		handler.Handle(connection, parser, credential);
             	}
             	catch (TargetInvocationException e)
             	{
@@ -106,6 +108,40 @@ namespace SvnBridge.Net
             }
 
         }
+
+        private static NetworkCredential GetCredential(IHttpContext context)
+        {
+            string authorizationHeader = context.Request.Headers["Authorization"];
+            if (!string.IsNullOrEmpty(authorizationHeader))
+            {
+                if (authorizationHeader.StartsWith("Negotiate"))
+                {
+                    return (NetworkCredential)CredentialCache.DefaultCredentials;
+                }
+                string encodedCredential = authorizationHeader.Substring(authorizationHeader.IndexOf(' ') + 1);
+                string credential = UTF8Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredential));
+                string[] credentialParts = credential.Split(':');
+
+                string username = credentialParts[0];
+                string password = credentialParts[1];
+
+                if (username.IndexOf('\\') >= 0)
+                {
+                    string domain = username.Substring(0, username.IndexOf('\\'));
+                    username = username.Substring(username.IndexOf('\\') + 1);
+                    return new NetworkCredential(username, password, domain);
+                }
+                else
+                {
+                    return new NetworkCredential(username, password);
+                }
+            }
+            else
+            {
+                return CredentialsHelper.NullCredentials;
+            }
+        }
+
 
         private static void SendUnauthorizedResponse(IHttpContext connection)
         {

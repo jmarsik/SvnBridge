@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.NullImpl;
@@ -28,7 +29,7 @@ namespace Tests
         {
             provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            HttpDispatcher = new HttpContextDispatcher(new StaticServerPathParser("http://foo"));
+            HttpDispatcher = new HttpContextDispatcher(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>()));
             PerRequest.Init();
         }
 

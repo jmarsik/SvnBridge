@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SvnBridge.Interfaces;
 using Xunit;
 using Rhino.Mocks;
 using SvnBridge.Net;
@@ -12,8 +13,8 @@ namespace SvnBridge.PathParsing
         [Fact]
         public void VerifyGetLocalPathWhenPathIsRootReturnsRootPath()
         {
-            StaticServerPathParser parser = new StaticServerPathParser("http://www.codeplex.com");
             MockRepository mocks = new MockRepository();
+            StaticServerPathParser parser = new StaticServerPathParser("http://www.codeplex.com", mocks.Stub<IProjectInformationRepository>());
             IHttpRequest request = mocks.Stub<IHttpRequest>();
             SetupResult.For(request.ApplicationPath ).Return("/");
             mocks.ReplayAll();

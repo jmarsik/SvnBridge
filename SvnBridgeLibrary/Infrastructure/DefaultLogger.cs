@@ -96,19 +96,27 @@ namespace SvnBridge.Infrastructure
                     return logPath;
                 logPath = ConfigurationManager.AppSettings["LogPath"];
                 if (logPath != null)
-                    return logPath;
+                    return logPath.Replace("~", AppDomain.CurrentDomain.BaseDirectory);
                 logPath = "";
                 try
                 {
-                    File.WriteAllText("tmp.log", "test");
-                    File.Delete("tmp.log");
+                    try
+                    {
+                        File.WriteAllText("tmp.log", "test");
+                        File.Delete("tmp.log");
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                        logPath = Path.Combine(localAppData, "SvnBridge");
+                        if (Directory.Exists(logPath) == false)
+                            Directory.CreateDirectory(logPath);
+                    }
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                    logPath = Path.Combine(localAppData, "SvnBridge");
-                    if (Directory.Exists(logPath) == false)
-                        Directory.CreateDirectory(logPath);
+                    throw new UnauthorizedAccessException(string.Format("Tried to write to a log file in: {0} and in {1}, but did not have the required permissions to do so."+Environment.NewLine +
+                        "Please set the permissions for either of those locations, or set the 'LogPath' property in the application configuration file.", Environment.CurrentDirectory, Path.GetFullPath(logPath)));
                 }
                 return logPath;
             }

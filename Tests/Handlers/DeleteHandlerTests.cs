@@ -1,6 +1,8 @@
 using System.IO;
 using System.Text;
 using Attach;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.PathParsing;
@@ -17,7 +19,7 @@ namespace SvnBridge.Handlers
             Results r = stub.Attach(provider.DeleteActivity);
             request.Path = "http://localhost:8082/!svn/act/5b34ae67-87de-3741-a590-8bda26893532";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             Assert.Equal(1, r.CallCount);
             Assert.Equal("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
@@ -30,7 +32,7 @@ namespace SvnBridge.Handlers
             request.Path =
                 "http://localhost:8082//!svn/wrk/c512ecbe-7577-ce46-939c-a9e81eb4d98e/Spikes/SvnFacade/trunk/Test4.txt";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             Assert.Equal(1, r.CallCount);
             Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
@@ -44,7 +46,7 @@ namespace SvnBridge.Handlers
             request.Path =
                 "http://localhost:8082//!svn/wrk/125c1a75-a7a6-104d-a661-54689d30dc99/Spikes/SvnFacade/trunk/New%20Folder%206";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             Assert.Equal("/Spikes/SvnFacade/trunk/New Folder 6", r.Parameters[1]);
         }
@@ -56,7 +58,7 @@ namespace SvnBridge.Handlers
             request.Path =
                 "http://localhost:8082//!svn/wrk/70df3104-9f67-8d4e-add7-6012fe86c03a/Spikes/SvnFacade/trunk/New%20Folder/Test2.txt";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +

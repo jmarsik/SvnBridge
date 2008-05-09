@@ -83,21 +83,14 @@ namespace SvnBridge.SourceControl
         {
             this.sourceControlServicesHub = sourceControlServicesHub;
             this.credentials = credentials;
-
-            if (projectName != null)
-            {
-                ProjectLocationInformation location =
-                    sourceControlServicesHub.ProjectInformationRepository.GetProjectLocation(credentials, projectName);
-                this.projectName = location.RemoteProjectName;
-                this.serverUrl = location.ServerUrl;
-                rootPath = Constants.ServerRootPath + this.projectName + "/";
-            }
-            else
-            {
-                this.serverUrl = serverUrl.Split(',')[0];
-                rootPath = Constants.ServerRootPath;
-            }
+            this.serverUrl = serverUrl;
+            this.projectName = projectName;
             this.credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
+         
+            if (string.IsNullOrEmpty(projectName))
+                rootPath = Constants.ServerRootPath;
+            else
+                rootPath = Constants.ServerRootPath + this.projectName + "/";
         }
 
         #region ISourceControlProvider Members

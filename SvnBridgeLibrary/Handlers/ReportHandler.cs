@@ -11,6 +11,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
+using SvnBridge.PathParsing;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;

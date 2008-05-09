@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using Attach;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.Exceptions;
 using SvnBridge.Infrastructure;
@@ -28,7 +30,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -47,7 +49,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(output.Contains("<D:href>/A%20!@%23$%25%5E&amp;()_-+=%7B%5B%7D%5D%3B',~%60..txt</D:href>"));
@@ -61,7 +63,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/61652fe8-44cd-8d43-810f-c95deccc6db3</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +

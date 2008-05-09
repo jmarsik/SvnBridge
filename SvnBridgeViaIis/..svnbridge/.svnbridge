@@ -11,4 +11,16 @@ Error.log
 Info.log
 Bin
 SvnBridgeViaIis.csproj.user
+</Value></Property><Property><Name>ignore</Name><Value>bin
+obj
+</Value></Property><Property><Name>svn:ignore</Name><Value>bin
+obj
+FileCache
+SvnBridgeViaIis-vs2008.csproj.user
+Cache.sdf
+Error.log
+Info.log
+Bin
+SvnBridgeViaIis.csproj.user
+Logs
 </Value></Property></Properties></ItemProperties>

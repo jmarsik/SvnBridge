@@ -2,6 +2,7 @@ using System.Configuration;
 using System.Reflection;
 using System.Web;
 using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.PathParsing;
 
@@ -14,13 +15,14 @@ namespace SvnBridge.Web
 		public SvnBridgeHttpHandler()
 		{
 			string tfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
-			if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
+		    IProjectInformationRepository projectInformationRepository = IoC.Resolve<IProjectInformationRepository>();
+		    if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
 			{
-				dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl));
+				dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl, projectInformationRepository));
 			}
 			else
 			{
-				dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl));
+                dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl, projectInformationRepository));
 			}
 		}
 

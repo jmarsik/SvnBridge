@@ -1,4 +1,6 @@
 using System;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using SvnBridge.NullImpl;
 using SvnBridge.PathParsing;
 using Xunit;
@@ -13,7 +15,7 @@ namespace SvnBridge.Net
         {
             Listener listener = new Listener(new NullLogger());
             listener.Port = 10011;
-            listener.Start(new StaticServerPathParser("http://foo"));
+            listener.Start(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>()));
 
             Assert.Throws<InvalidOperationException>(
                 delegate { listener.Port = 8082; });
@@ -27,7 +29,7 @@ namespace SvnBridge.Net
 			Listener listener = new Listener(new NullLogger());
             
             Assert.Throws<InvalidOperationException>(
-				delegate { listener.Start(new StaticServerPathParser("http://foo")); });
+				delegate { listener.Start(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>())); });
         }
     }
 }

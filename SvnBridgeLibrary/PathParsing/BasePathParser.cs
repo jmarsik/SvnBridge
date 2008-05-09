@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 
@@ -6,7 +7,7 @@ namespace SvnBridge.PathParsing
 {
 	public abstract class BasePathParser : IPathParser
 	{
-		public abstract string GetServerUrl(Uri requestUrl);
+        public abstract string GetServerUrl(IHttpRequest request, ICredentials credentials);
 		public abstract string GetLocalPath(IHttpRequest request);
 		public abstract string GetLocalPath(IHttpRequest request, string url);
 		public abstract string GetProjectName(IHttpRequest request);

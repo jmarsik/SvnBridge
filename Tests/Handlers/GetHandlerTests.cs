@@ -1,6 +1,8 @@
 using System.IO;
 using System.Text;
 using Attach;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.PathParsing;
@@ -21,7 +23,7 @@ namespace SvnBridge.Handlers
             Results readFileResult = stub.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("asdf"));
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo/Bar.txt";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl));
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected = "asdf";
             Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));

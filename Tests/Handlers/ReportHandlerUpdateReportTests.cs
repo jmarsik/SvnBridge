@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Text;
 using Attach;
+using Rhino.Mocks;
+using SvnBridge.Interfaces;
 using SvnBridge.Utility;
 using Xunit;
 using SvnBridge.Infrastructure;
@@ -30,7 +32,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:delete-entry name=\"F !@#$%^&amp;()_-+={[}];',.~`.txt\"/>"));
@@ -52,7 +54,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:delete-entry name=\"B !@#$%^&amp;()_-+={[}];',.~`\"/>"));
@@ -75,12 +77,16 @@ namespace SvnBridge.Handlers
             stub.Attach(provider.GetChangedItems, metadata);
             stub.Attach(provider.ItemExists, true);
             byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stub.Attach(provider.ReadFileAsync, new FileData
+            {
+                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
+                Md5 = Helper.GetMd5Checksum(fileData)
+            });
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:open-file name=\"G !@#$%^&amp;()_-+={[}];',.~`.txt\" rev=\"5733\">"));
@@ -102,12 +108,16 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(folder);
             stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stub.Attach(provider.ReadFileAsync, new FileData
+            {
+                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
+                Md5 = Helper.GetMd5Checksum(fileData)
+            });
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(
@@ -131,13 +141,17 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(folder);
             stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stub.Attach(provider.ReadFileAsync, new FileData
+            {
+                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
+                Md5 = Helper.GetMd5Checksum(fileData)
+            });
             ;
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(
@@ -161,13 +175,17 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(item);
             stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stub.Attach(provider.ReadFileAsync, new FileData
+            {
+                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
+                Md5 = Helper.GetMd5Checksum(fileData)
+            });
             ;
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(
@@ -191,13 +209,17 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(item);
             stub.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stub.Attach(provider.ReadFileAsync, new FileData
+            {
+                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
+                Md5 = Helper.GetMd5Checksum(fileData)
+            });
             ;
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:add-file name=\"C !@#$%^&amp;()_-+={[}];',.~`..txt\">"));
@@ -219,13 +241,17 @@ namespace SvnBridge.Handlers
             Results r = stub.Attach(provider.GetChangedItems, folder);
             stub.Attach(provider.ItemExists, false);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stub.Attach(provider.ReadFileAsync, new FileData
+            {
+                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
+                Md5 = Helper.GetMd5Checksum(fileData)
+            });
             ;
             request.Path = "http://localhost:8082/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5700</S:target-revision><S:entry rev=\"5699\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -281,7 +307,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5698</S:target-revision><S:entry rev=\"5697\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -329,7 +355,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8085</S:src-path><S:entry rev=\"5713\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new StaticServerPathParser(tfsUrl));
+            handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
