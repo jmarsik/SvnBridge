@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+using SvnBridge.Infrastructure;
+using SvnBridge.Interfaces;
 using SvnBridge.Presenters;
 
 namespace SvnBridge.Views
@@ -13,12 +15,13 @@ namespace SvnBridge.Views
         {
             InitializeComponent();
 			notifyIcon.BalloonTipClicked+=BalloonTipClicked_OnClick;
-			Closed+=delegate(object sender, EventArgs e)
-			{
-				presenter.ViewClosed();
-			};
+			Closed+=((sender, e) => presenter.ViewClosed());
 			showErrorsToolStripMenuItem.Click += OnShowErrorsClick;
             invokeDeubgger.Click+=((sender, e) => Debugger.Launch());
+            cacheClear.Click += (sender, e) => {
+                IoC.Resolve<IPersistentCache>().Clear();
+                GC.Collect(2);
+            };
         }
 
     	private void BalloonTipClicked_OnClick(object sender, EventArgs e)

@@ -37,11 +37,12 @@ namespace SvnBridge.Views
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.invokeDeubgger = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.showErrorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.invokeDeubgger = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.cacheClear = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,23 +61,24 @@ namespace SvnBridge.Views
             this.stopToolStripMenuItem,
             this.toolStripSeparator1,
             this.invokeDeubgger,
+            this.cacheClear,
             this.toolStripSeparator2,
             this.showErrorsToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(151, 148);
+            this.contextMenuStrip.Size = new System.Drawing.Size(183, 170);
             // 
             // showToolStripMenuItem
             // 
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.showToolStripMenuItem.Text = "Settings...";
             this.showToolStripMenuItem.Click += new System.EventHandler(this.OnSettingsClicked);
             // 
             // startToolStripMenuItem
             // 
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.startToolStripMenuItem.Text = "Start";
             this.startToolStripMenuItem.Click += new System.EventHandler(this.OnStartClicked);
             // 
@@ -84,38 +86,44 @@ namespace SvnBridge.Views
             // 
             this.stopToolStripMenuItem.Enabled = false;
             this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.stopToolStripMenuItem.Text = "Stop";
             this.stopToolStripMenuItem.Click += new System.EventHandler(this.OnStopClicked);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(179, 6);
+            // 
+            // invokeDeubgger
+            // 
+            this.invokeDeubgger.Name = "invokeDeubgger";
+            this.invokeDeubgger.Size = new System.Drawing.Size(182, 22);
+            this.invokeDeubgger.Text = "Open Debugger";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(179, 6);
             // 
             // showErrorsToolStripMenuItem
             // 
             this.showErrorsToolStripMenuItem.Name = "showErrorsToolStripMenuItem";
-            this.showErrorsToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.showErrorsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.showErrorsToolStripMenuItem.Text = "Show &Errors";
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.OnExitClicked);
             // 
-            // invokeDeubgger
+            // cacheClear
             // 
-            this.invokeDeubgger.Name = "invokeDeubgger";
-            this.invokeDeubgger.Size = new System.Drawing.Size(150, 22);
-            this.invokeDeubgger.Text = "Open Debugger";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(147, 6);
+            this.cacheClear.Name = "cacheClear";
+            this.cacheClear.Size = new System.Drawing.Size(182, 22);
+            this.cacheClear.Text = "Clear MetaData Cache";
             // 
             // ToolTrayForm
             // 
@@ -144,6 +152,7 @@ namespace SvnBridge.Views
         private System.Windows.Forms.ToolStripMenuItem invokeDeubgger;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem cacheClear;
     }
 }
 

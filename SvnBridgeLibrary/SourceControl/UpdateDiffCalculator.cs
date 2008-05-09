@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
@@ -164,7 +165,7 @@ namespace SvnBridge.SourceControl
                         lastVersion -= 1;
                     }
 
-                    PrePopulateCacheWithChanges(history, lastVersion);
+                    new CachePrePopulator(sourceControlProvider).PrePopulateCacheWithChanges(history, lastVersion);
                     // we need to go over the changeset in reverse order so we will process
                     // all the files first, and build the folder hierarchy that way
                     for (int i = history.Changes.Count - 1; i >= 0; i--)
@@ -208,22 +209,6 @@ namespace SvnBridge.SourceControl
                 }
             }
             return changed;
-        }
-
-        private void PrePopulateCacheWithChanges(SourceItemHistory history, int revision)
-        {
-            List<SourceItemChange> list = new List<SourceItemChange>(history.Changes);
-            list.Sort(
-                delegate(SourceItemChange x, SourceItemChange y)
-                {
-                    return x.Item.RemoteName.Length.CompareTo(y.Item.RemoteName.Length);
-                });
-
-            list.ForEach(
-                delegate(SourceItemChange obj)
-                {
-                    sourceControlProvider.GetItems(revision, obj.Item.RemoteName, Recursion.None);
-                });
         }
 
         private void PerformAdd(int targetVersion,

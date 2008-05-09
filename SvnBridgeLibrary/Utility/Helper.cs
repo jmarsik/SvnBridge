@@ -303,12 +303,12 @@ namespace SvnBridge.Utility
             return histories;
         }
 
-        public static string GetFolderName(string name)
+        public static string GetFolderNameUsingServerRootPath(string name)
         {
             int indexOfSlash = name.LastIndexOf("/");
-            string folderName = indexOfSlash == -1 ? "" : name.Substring(0, indexOfSlash);
-            if (folderName.StartsWith("/") == false)
-                folderName = "/" + folderName;
+            string folderName = indexOfSlash == -1 ? Constants.ServerRootPath : name.Substring(0, indexOfSlash);
+            if (folderName == "$")
+                return Constants.ServerRootPath;
             return folderName;
         }
 

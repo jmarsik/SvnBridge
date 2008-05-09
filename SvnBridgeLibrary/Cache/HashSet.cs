@@ -9,7 +9,15 @@ namespace SvnBridge.Cache
 	{
 		private readonly Dictionary<T, object> inner = new Dictionary<T, object>();
 
-		#region IEnumerable Members
+	    public int Count
+	    {
+            get
+            {
+                return inner.Count;
+            }
+	    }
+
+	    #region IEnumerable Members
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
