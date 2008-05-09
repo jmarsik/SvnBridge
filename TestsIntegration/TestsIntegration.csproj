@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionTrackingViaPerfCounterTests.cs" />
     <Compile Include="AuthenticateAsLowPrivilegeUser.cs" />
     <Compile Include="PersistentCacheTest.cs" />
     <Compile Include="FileCacheTest.cs" />

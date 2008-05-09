@@ -5,7 +5,9 @@ using System.Reflection;
 using System.Text;
 using CodePlex.TfsLibrary;
 using SvnBridge.Handlers;
+using SvnBridge.Handlers.Renderers;
 using SvnBridge.Infrastructure;
+using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 
@@ -14,13 +16,15 @@ namespace SvnBridge.Net
     public class HttpContextDispatcher
     {
 		private readonly IPathParser parser;
+        private readonly IActionTracking actionTracking;
 
-    	public HttpContextDispatcher(IPathParser parser)
+        public HttpContextDispatcher(IPathParser parser, IActionTracking actionTracking)
     	{
-    		this.parser = parser;
+    	    this.parser = parser;
+    	    this.actionTracking = actionTracking;
     	}
 
-    	public HttpContextHandlerBase GetHandler(string httpMethod)
+        public HttpContextHandlerBase GetHandler(string httpMethod)
         {
             switch (httpMethod.ToLowerInvariant())
             {
@@ -56,6 +60,12 @@ namespace SvnBridge.Net
         public void Dispatch(IHttpContext connection)
         {
         	IHttpRequest request = connection.Request;
+            if ("/!stats/request".Equals(request.LocalPath, StringComparison.InvariantCultureIgnoreCase))
+            {
+                new StatsRenderer(IoC.Resolve<IActionTracking>()).Render(connection);
+                return;
+            }
+
             NetworkCredential credential = GetCredential(connection);
             string tfsUrl = parser.GetServerUrl(request, credential);
         	if (string.IsNullOrEmpty(tfsUrl))
@@ -68,6 +78,7 @@ namespace SvnBridge.Net
 
             if (handler == null)
             {
+                actionTracking.Error();
                 SendUnsupportedMethodResponse(connection);
                 return;
             }
@@ -76,6 +87,7 @@ namespace SvnBridge.Net
             {
             	try
             	{
+                    actionTracking.Request(handler);
             		handler.Handle(connection, parser, credential);
             	}
             	catch (TargetInvocationException e)
@@ -86,6 +98,8 @@ namespace SvnBridge.Net
             }
             catch (WebException ex)
             {
+                actionTracking.Error();
+                
                 HttpWebResponse response = ex.Response as HttpWebResponse;
 
                 if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)

@@ -9,6 +9,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
 using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
+using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
@@ -32,7 +33,8 @@ namespace SvnBridge
                 typeof (IWebTransferService),
                 typeof (ITFSSourceControlService),
                 typeof (IAssociateWorkItemWithChangeSet),
-                typeof (IListener)
+                typeof (IListener),
+                typeof (IActionTracking)
             };
 
         public BootStrapper()

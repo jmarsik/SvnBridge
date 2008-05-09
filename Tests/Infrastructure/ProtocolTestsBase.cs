@@ -8,6 +8,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using Rhino.Mocks;
 using SvnBridge.Infrastructure;
+using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.NullImpl;
 using Xunit;
@@ -25,11 +26,12 @@ namespace Tests
         protected StubSourceControlProvider provider;
         protected MyMocks stub = new MyMocks();
 
-        public ProtocolTestsBase()
+        protected ProtocolTestsBase()
         {
             provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            HttpDispatcher = new HttpContextDispatcher(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>()));
+            StaticServerPathParser pathParser = new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>());
+            HttpDispatcher = new HttpContextDispatcher(pathParser, MockRepository.GenerateStub<IActionTracking>());
             PerRequest.Init();
         }
 

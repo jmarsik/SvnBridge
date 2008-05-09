@@ -1,5 +1,6 @@
 using System;
 using Rhino.Mocks;
+using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.NullImpl;
 using SvnBridge.PathParsing;
@@ -13,7 +14,7 @@ namespace SvnBridge.Net
         [Fact]
         public void SetPortAfterStartThrows()
         {
-            Listener listener = new Listener(new NullLogger());
+            Listener listener = new Listener(new NullLogger(), MockRepository.GenerateStub<IActionTracking>());
             listener.Port = 10011;
             listener.Start(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>()));
 
@@ -26,7 +27,7 @@ namespace SvnBridge.Net
         [Fact]
         public void StartWithoutSettingPortThrows()
         {
-			Listener listener = new Listener(new NullLogger());
+            Listener listener = new Listener(new NullLogger(), MockRepository.GenerateStub<IActionTracking>());
             
             Assert.Throws<InvalidOperationException>(
 				delegate { listener.Start(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>())); });

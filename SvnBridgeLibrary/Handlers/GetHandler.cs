@@ -1,7 +1,10 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Web.UI;
 using SvnBridge.Handlers.Renderers;
+using SvnBridge.Infrastructure;
+using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
@@ -20,6 +23,7 @@ namespace SvnBridge.Handlers
 			string requestPath = GetPath(request);
 			int itemVersion = 0;
 			string itemPath = null;
+            
 			if (requestPath.StartsWith("/!svn/bc/"))
 			{
 				string[] parts = requestPath.Split('/');

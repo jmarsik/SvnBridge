@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using SvnBridge.Infrastructure;
+using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.Net
@@ -13,10 +15,12 @@ namespace SvnBridge.Net
         private readonly ILogger logger;
         private TcpListener listener;
         private int? port;
+        private IActionTracking actionTracking;
 
-    	public Listener(ILogger logger)
+        public Listener(ILogger logger, IActionTracking actionTracking)
         {
             this.logger = logger;
+            this.actionTracking = actionTracking;
         }
 
         #region IListener Members
@@ -47,7 +51,7 @@ namespace SvnBridge.Net
                 throw new InvalidOperationException("A port must be specified before starting the listener.");
             }
             ErrorOccured += OnErrorOccured;
-			dispatcher = new HttpContextDispatcher(parser);
+            dispatcher = new HttpContextDispatcher(parser, actionTracking);
 
             isListening = true;
             listener = new TcpListener(IPAddress.Loopback, Port);

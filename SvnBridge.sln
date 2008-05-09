@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsEndToEnd", "TestsEndTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsRequiringTfsClient", "TestsRequiringTfsClient\TestsRequiringTfsClient.csproj", "{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridge.PerfCounter.Installer", "SvnBridge.PerfCounter.Installer\SvnBridge.PerfCounter.Installer.csproj", "{13020B7B-21DD-48F4-8F30-DC18AEABAC02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D150CF0-B15E-4933-BB9E-DE9C2C73D059}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13020B7B-21DD-48F4-8F30-DC18AEABAC02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13020B7B-21DD-48F4-8F30-DC18AEABAC02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13020B7B-21DD-48F4-8F30-DC18AEABAC02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13020B7B-21DD-48F4-8F30-DC18AEABAC02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

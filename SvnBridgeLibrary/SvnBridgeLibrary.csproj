@@ -53,6 +53,9 @@
     <Compile Include="Cache\HashSet.cs" />
     <Compile Include="Cache\ISet.cs" />
     <Compile Include="Cache\MemoryBasedPersistentCache.cs" />
+    <Compile Include="Handlers\Renderers\StatsRenderer.cs" />
+    <Compile Include="Infrastructure\Statistics\ActionTrackingViaPerfCounter.cs" />
+    <Compile Include="Infrastructure\Statistics\IActionTracking.cs" />
     <Compile Include="Interfaces\IPersistentCache.cs" />
     <Compile Include="NullImpl\NullCache.cs" />
     <Compile Include="Constants.cs" />
