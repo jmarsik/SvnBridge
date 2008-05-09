@@ -39,7 +39,7 @@ namespace SvnBridge.Handlers
 			if (folder != null)
 			{
 			    folder = (FolderMetaData) item;
-				new FolderRenderer(sourceControlProvider.ServerUrl, context).Render(folder);
+				new FolderRenderer(context, PathParser,Credentials).Render(folder);
 			}
 			else if (item == null)
 			{

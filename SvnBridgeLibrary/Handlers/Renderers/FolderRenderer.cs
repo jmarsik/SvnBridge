@@ -1,4 +1,6 @@
 using System.IO;
+using System.Net;
+using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
 
@@ -6,13 +8,17 @@ namespace SvnBridge.Handlers.Renderers
 {
     internal class FolderRenderer
     {
-        private readonly string serverUrl;
+        private readonly IHttpContext context;
+        private readonly IPathParser pathParser;
+        private readonly ICredentials credentials;
         private readonly StreamWriter writer;
         private readonly string applicationPath;
 
-        public FolderRenderer(string serverUrl, IHttpContext context)
+        public FolderRenderer(IHttpContext context, IPathParser PathParser, ICredentials credentials)
         {
-            this.serverUrl = serverUrl;
+            this.context = context;
+            pathParser = PathParser;
+            this.credentials = credentials;
             applicationPath = context.Request.ApplicationPath;
             if (applicationPath == "/")
                 applicationPath = "";
@@ -50,7 +56,10 @@ namespace SvnBridge.Handlers.Renderers
 
         private string GetFolderName(ItemMetaData folder)
         {
-           return serverUrl + "/" + folder.Name;
+            string projectName = pathParser.GetProjectName(context.Request);
+            if (projectName != null)
+                return "Project " + projectName + " " + folder.Name;
+            return folder.Name + " @ " + pathParser.GetServerUrl(context.Request, credentials);
         }
     }
 }

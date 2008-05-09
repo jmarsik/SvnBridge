@@ -15,6 +15,7 @@ namespace SvnBridge.Handlers
 	{
 		private IPathParser pathParser;
 		private IHttpContext httpContext;
+	    private ICredentials credentials;
 
 	    public void SetSourceControlProvider(ISourceControlProvider value)
 	    {
@@ -28,11 +29,15 @@ namespace SvnBridge.Handlers
 			get { return pathParser; }
 		}
 
+	    public ICredentials Credentials
+	    {
+	        get { return credentials; }
+	    }
 
-		public void Handle(IHttpContext context, IPathParser pathParser, NetworkCredential credentials)
+	    public void Handle(IHttpContext context, IPathParser pathParser, NetworkCredential credentials)
 		{
             PerRequest.Items["credentials"] = credentials;
-            
+            this.credentials = credentials;
             Initialize(context, pathParser);
 			IHttpRequest request = context.Request;
 			string tfsUrl = pathParser.GetServerUrl(request, credentials);
