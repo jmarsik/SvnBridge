@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -11,7 +10,6 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
-using SvnBridge.PathParsing;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
@@ -34,59 +32,61 @@ namespace SvnBridge.Handlers
                 {
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
                     response.SendChunked = true;
-                    using (StreamWriter writer = new StreamWriter(response.OutputStream))
+                    using (var writer = new StreamWriter(response.OutputStream))
                     {
                         GetLocksReport(writer);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "update-report")
                 {
-                    UpdateReportData data = Helper.DeserializeXml<UpdateReportData>(reader);
+                    var data = Helper.DeserializeXml<UpdateReportData>(reader);
+                    int targetRevision;
+                    FolderMetaData update = GetMetadataForUpdate(request, data, sourceControlProvider, out targetRevision);
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
                     response.SendChunked = true;
-                    using (StreamWriter output = new StreamWriter(response.OutputStream))
+                    using (var output = new StreamWriter(response.OutputStream))
                     {
-                        UpdateReport(request, sourceControlProvider, data, output);
+                       UpdateReport(sourceControlProvider, data, output, update, targetRevision);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "replay-report")
                 {
-                    ReplayReportData relayReport = Helper.DeserializeXml<ReplayReportData>(reader);
+                    var relayReport = Helper.DeserializeXml<ReplayReportData>(reader);
                     ReplayReport(request, response, sourceControlProvider, relayReport);
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "log-report")
                 {
-                    LogReportData data = Helper.DeserializeXml<LogReportData>(reader);
+                    var data = Helper.DeserializeXml<LogReportData>(reader);
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
                     response.SendChunked = true;
                     response.BufferOutput = false;
-                    using (StreamWriter output = new StreamWriter(response.OutputStream))
+                    using (var output = new StreamWriter(response.OutputStream))
                     {
                         LogReport(sourceControlProvider, data, path, output);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locations")
                 {
-                    GetLocationsReportData data = Helper.DeserializeXml<GetLocationsReportData>(reader);
+                    var data = Helper.DeserializeXml<GetLocationsReportData>(reader);
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
                     response.SendChunked = true;
-                    using (StreamWriter output = new StreamWriter(response.OutputStream))
+                    using (var output = new StreamWriter(response.OutputStream))
                     {
                         GetLocationsReport(sourceControlProvider, data, path, output);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "dated-rev-report")
                 {
-                    DatedRevReportData data = Helper.DeserializeXml<DatedRevReportData>(reader);
+                    var data = Helper.DeserializeXml<DatedRevReportData>(reader);
                     SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-                    using (StreamWriter output = new StreamWriter(response.OutputStream))
+                    using (var output = new StreamWriter(response.OutputStream))
                     {
                         GetDatedRevReport(sourceControlProvider, data, output);
                     }
                 }
                 else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "file-revs-report")
                 {
-                    FileRevsReportData data = Helper.DeserializeXml<FileRevsReportData>(reader);
+                    var data = Helper.DeserializeXml<FileRevsReportData>(reader);
                     string serverPath = "/";
                     if (path.IndexOf('/', 9) > -1)
                     {
@@ -102,14 +102,16 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void ReplayReport(IHttpRequest request, IHttpResponse response, ISourceControlProvider sourceControlProvider, ReplayReportData replayReport)
+        private void ReplayReport(IHttpRequest request, IHttpResponse response,
+                                  ISourceControlProvider sourceControlProvider, ReplayReportData replayReport)
         {
             if (replayReport.Revision == 0)
             {
-                response.StatusCode = (int)HttpStatusCode.OK;
-                using (StreamWriter output = new StreamWriter(response.OutputStream))
+                response.StatusCode = (int) HttpStatusCode.OK;
+                using (var output = new StreamWriter(response.OutputStream))
                 {
-                    output.Write(@"<?xml version=""1.0"" encoding=""utf-8""?>
+                    output.Write(
+                        @"<?xml version=""1.0"" encoding=""utf-8""?>
 <S:editor-report xmlns:S=""svn:"">
 <S:target-revision rev=""0""/>
 </S:editor-report>");
@@ -117,10 +119,10 @@ namespace SvnBridge.Handlers
                 }
             }
 
-            UpdateReportData data = new UpdateReportData();
+            var data = new UpdateReportData();
             data.SrcPath = request.Url.AbsoluteUri;
             data.Entries = new List<EntryData>();
-            EntryData item = new EntryData();
+            var item = new EntryData();
             string localPath = PathParser.GetLocalPath(request);
             LogItem log = sourceControlProvider.GetLog(localPath, 0,
                                                        sourceControlProvider.GetLatestVersion(),
@@ -135,7 +137,7 @@ namespace SvnBridge.Handlers
             data.Entries.Add(item);
             SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
             response.SendChunked = true;
-            using (StreamWriter output = new StreamWriter(response.OutputStream))
+            using (var output = new StreamWriter(response.OutputStream))
             {
                 try
                 {
@@ -143,14 +145,15 @@ namespace SvnBridge.Handlers
 <S:editor-report xmlns:S=""svn:"">");
 
                     int targetRevision;
-                    FolderMetaData metadata = GetMetadataForUpdate(request, data, sourceControlProvider, out targetRevision);
+                    FolderMetaData metadata = GetMetadataForUpdate(request, data, sourceControlProvider,
+                                                                   out targetRevision);
                     output.WriteLine("<S:target-revision rev=\"{0}\"/>", targetRevision);
 
                     OutputEditorReport(sourceControlProvider, metadata, replayReport.Revision,
-                        localPath == "/",
-                        output);
+                                       localPath == "/",
+                                       output);
 
-                   output.Write("</S:editor-report>");
+                    output.Write("</S:editor-report>");
                 }
                 catch (FileNotFoundException)
                 {
@@ -166,7 +169,7 @@ namespace SvnBridge.Handlers
             bool isRoot,
             TextWriter output)
         {
-            if(isRoot)
+            if (isRoot)
             {
                 output.WriteLine("<S:open-root rev=\"-1\"/>");
             }
@@ -181,11 +184,12 @@ namespace SvnBridge.Handlers
 
             foreach (var property in folder.Properties)
             {
-                output.Write("<S:change-dir-prop name=\"{0}\">{1}\n", property.Key.Replace("__COLON__", ":"), property.Value);
+                output.Write("<S:change-dir-prop name=\"{0}\">{1}\n", property.Key.Replace("__COLON__", ":"),
+                             property.Value);
                 output.Write("</S:change-dir-prop>\n");
             }
 
-            foreach (var item in folder.Items)
+            foreach (ItemMetaData item in folder.Items)
             {
                 if (item.ItemRevision != revision)
                     continue;
@@ -197,7 +201,7 @@ namespace SvnBridge.Handlers
 
                 if (item.ItemType == ItemType.Folder)
                 {
-                    OutputEditorReport(sourceControlProvider, (FolderMetaData)item, revision, false, output);
+                    OutputEditorReport(sourceControlProvider, (FolderMetaData) item, revision, false, output);
                 }
                 else
                 {
@@ -208,7 +212,6 @@ namespace SvnBridge.Handlers
                     else
                     {
                         output.Write("<S:add-file name=\"{0}\"/>\n", item.Name);
-
                     }
 
                     while (item.DataLoaded == false)
@@ -221,12 +224,13 @@ namespace SvnBridge.Handlers
                     output.Write("</S:apply-textdelta>\n");
                     output.Write("<S:close-file checksum=\"{0}\"/>\n", value.Md5);
                 }
-
             }
             output.Write("<S:close-directory />\n");
         }
 
-        private void SendBlameResponse(IHttpRequest request, IHttpResponse response, ISourceControlProvider sourceControlProvider, string serverPath, FileRevsReportData data)
+        private void SendBlameResponse(IHttpRequest request, IHttpResponse response,
+                                       ISourceControlProvider sourceControlProvider, string serverPath,
+                                       FileRevsReportData data)
         {
             LogItem log = sourceControlProvider.GetLog(
                 serverPath,
@@ -251,18 +255,20 @@ namespace SvnBridge.Handlers
                     }
                 }
             }
-            using (StreamWriter output = new StreamWriter(response.OutputStream))
+            using (var output = new StreamWriter(response.OutputStream))
             {
-                response.StatusCode = (int)HttpStatusCode.OK;
-                output.Write(@"<?xml version=""1.0"" encoding=""utf-8""?>
+                response.StatusCode = (int) HttpStatusCode.OK;
+                output.Write(
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
 <S:file-revs-report xmlns:S=""svn:"" xmlns:D=""DAV:"">");
 
                 foreach (SourceItemHistory history in Helper.SortHistories(true, log.History))
                 {
                     foreach (SourceItemChange change in history.Changes)
                     {
-                        ItemMetaData items = sourceControlProvider.GetItems(change.Item.RemoteChangesetId, change.Item.RemoteName, Recursion.None);
-                        MemoryStream svnDiffStream = new MemoryStream();
+                        ItemMetaData items = sourceControlProvider.GetItems(change.Item.RemoteChangesetId,
+                                                                            change.Item.RemoteName, Recursion.None);
+                        var svnDiffStream = new MemoryStream();
                         SvnDiff svnDiff = SvnDiffEngine.CreateReplaceDiff(
                             sourceControlProvider.ReadFile(items)
                             );
@@ -270,12 +276,17 @@ namespace SvnBridge.Handlers
                         byte[] svnDiffData = svnDiffStream.ToArray();
 
 
-                        output.Write(@"<S:file-rev path=""" + change.Item.RemoteName + @""" rev=""" + change.Item.RemoteChangesetId + @""">
-<S:rev-prop name=""svn:log"">" + history.Comment + @"</S:rev-prop>
-<S:rev-prop name=""svn:author"">" + history.Username + @"</S:rev-prop>
-<S:rev-prop name=""svn:date"">" + Helper.FormatDate(change.Item.RemoteDate) + @"</S:rev-prop>
-<S:txdelta>" + Convert.ToBase64String(svnDiffData) +
-@"</S:txdelta></S:file-rev>");
+                        output.Write(@"<S:file-rev path=""" + change.Item.RemoteName + @""" rev=""" +
+                                     change.Item.RemoteChangesetId + @""">
+<S:rev-prop name=""svn:log"">" +
+                                     history.Comment + @"</S:rev-prop>
+<S:rev-prop name=""svn:author"">" +
+                                     history.Username + @"</S:rev-prop>
+<S:rev-prop name=""svn:date"">" +
+                                     Helper.FormatDate(change.Item.RemoteDate) + @"</S:rev-prop>
+<S:txdelta>" +
+                                     Convert.ToBase64String(svnDiffData) +
+                                     @"</S:txdelta></S:file-rev>");
                     }
                 }
                 output.Write("</S:file-revs-report>");
@@ -284,18 +295,21 @@ namespace SvnBridge.Handlers
 
         private static void SendErrorResponseCannotRunBlameOnFolder(IHttpResponse response, string serverPath)
         {
-            response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            response.StatusCode = (int) HttpStatusCode.InternalServerError;
             response.ContentType = "text/xml; charset=\"utf-8\"";
-            WriteToResponse(response, @"<?xml version=""1.0"" encoding=""utf-8""?>
+            WriteToResponse(response,
+                            @"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:error xmlns:D=""DAV:"" xmlns:m=""http://apache.org/dav/xmlns"" xmlns:C=""svn:"">
 <C:error/>
 <m:human-readable errcode=""160017"">
-'" + serverPath + @"' is not a file
+'" +
+                            serverPath + @"' is not a file
 </m:human-readable>
 </D:error>");
         }
 
-        private void GetDatedRevReport(ISourceControlProvider sourceControlProvider, DatedRevReportData data, TextWriter output)
+        private void GetDatedRevReport(ISourceControlProvider sourceControlProvider, DatedRevReportData data,
+                                       TextWriter output)
         {
             int targetRevision = sourceControlProvider.GetVersionForDate(data.CreationDate);
 
@@ -337,24 +351,17 @@ namespace SvnBridge.Handlers
             if (item != null)
             {
                 output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" +
-                    path +
-                    "\"/>\n");
+                             path +
+                             "\"/>\n");
             }
             output.Write("</S:get-locations-report>\n");
         }
 
-        private void UpdateReport(IHttpRequest request,
-                                  ISourceControlProvider sourceControlProvider,
-                                  UpdateReportData updatereport,
-                                  StreamWriter output)
+        private void UpdateReport(ISourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output, FolderMetaData metadata, int targetRevision)
         {
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write(
                 "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
-
-            int targetRevision;
-
-            FolderMetaData metadata = GetMetadataForUpdate(request, updatereport, sourceControlProvider, out targetRevision);
 
             IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
 
@@ -364,7 +371,8 @@ namespace SvnBridge.Handlers
             output.Write("</S:update-report>\n");
         }
 
-        private FolderMetaData GetMetadataForUpdate(IHttpRequest request, UpdateReportData updatereport, ISourceControlProvider sourceControlProvider, out int targetRevision)
+        private FolderMetaData GetMetadataForUpdate(IHttpRequest request, UpdateReportData updatereport,
+                                                    ISourceControlProvider sourceControlProvider, out int targetRevision)
         {
             string basePath = PathParser.GetLocalPath(request, updatereport.SrcPath);
             FolderMetaData metadata;
@@ -378,7 +386,9 @@ namespace SvnBridge.Handlers
             }
             if (updatereport.IsCheckOut)
             {
-                metadata = (FolderMetaData)sourceControlProvider.GetItemsWithoutProperties(targetRevision, basePath, Recursion.Full);
+                metadata =
+                    (FolderMetaData)
+                    sourceControlProvider.GetItemsWithoutProperties(targetRevision, basePath, Recursion.Full);
             }
             else
             {
@@ -391,17 +401,15 @@ namespace SvnBridge.Handlers
             if (metadata == null)
                 throw new InvalidOperationException("Could not find " + basePath + " in revision " + targetRevision);
 
-            ThreadPool.QueueUserWorkItem(delegate(object state)
-                                             {
-                                                 new AsyncItemLoader(metadata, sourceControlProvider).Start();
-                                             });
+            var loader = new AsyncItemLoader(metadata, sourceControlProvider);
+            ThreadPool.QueueUserWorkItem(state => loader.Start());
             return metadata;
         }
 
         private static void LogReport(ISourceControlProvider sourceControlProvider,
-                               LogReportData logreport,
-                               string path,
-                               TextWriter output)
+                                      LogReportData logreport,
+                                      string path,
+                                      TextWriter output)
         {
             string serverPath = "/";
             if (path.IndexOf('/', 9) > -1)
@@ -450,7 +458,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
+                        var renamedItem = (RenamedSourceItem) change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");
@@ -459,7 +467,7 @@ namespace SvnBridge.Handlers
                     }
                     else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
                     {
-                        RenamedSourceItem renamedItem = (RenamedSourceItem)change.Item;
+                        var renamedItem = (RenamedSourceItem) change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "\" copyfrom-rev=\"" + renamedItem.OriginalRevision + "\">/" +
                                      Helper.EncodeB(change.Item.RemoteName) + "</S:added-path>\n");

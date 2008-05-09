@@ -56,7 +56,7 @@ namespace SvnBridge.Handlers
 			else
 			{
 				SetResponseSettings(response, "text/plain", Encoding.Default, 200);
-				string itemData = Encoding.Default.GetString(sourceControlProvider.ReadFile(item));
+				string itemData = Encoding.UTF8.GetString(sourceControlProvider.ReadFile(item));
 
 				using (StreamWriter writer = new StreamWriter(response.OutputStream))
 				{

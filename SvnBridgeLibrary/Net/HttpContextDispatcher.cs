@@ -15,14 +15,14 @@ namespace SvnBridge.Net
 {
     public class HttpContextDispatcher
     {
-		private readonly IPathParser parser;
+        private readonly IPathParser parser;
         private readonly IActionTracking actionTracking;
 
         public HttpContextDispatcher(IPathParser parser, IActionTracking actionTracking)
-    	{
-    	    this.parser = parser;
-    	    this.actionTracking = actionTracking;
-    	}
+        {
+            this.parser = parser;
+            this.actionTracking = actionTracking;
+        }
 
         public HttpContextHandlerBase GetHandler(string httpMethod)
         {
@@ -59,47 +59,49 @@ namespace SvnBridge.Net
 
         public void Dispatch(IHttpContext connection)
         {
-        	IHttpRequest request = connection.Request;
-            if ("/!stats/request".Equals(request.LocalPath, StringComparison.InvariantCultureIgnoreCase))
-            {
-                new StatsRenderer(IoC.Resolve<IActionTracking>()).Render(connection);
-                return;
-            }
-
-            NetworkCredential credential = GetCredential(connection);
-            string tfsUrl = parser.GetServerUrl(request, credential);
-        	if (string.IsNullOrEmpty(tfsUrl))
-            {
-                throw new InvalidOperationException(
-                    "A TFS server URL must be specified before connections can be dispatched.");
-            }
-
-            HttpContextHandlerBase handler = GetHandler(connection.Request.HttpMethod);
-
-            if (handler == null)
-            {
-                actionTracking.Error();
-                SendUnsupportedMethodResponse(connection);
-                return;
-            }
-
+            HttpContextHandlerBase handler = null;
             try
             {
-            	try
-            	{
+                IHttpRequest request = connection.Request;
+                if ("/!stats/request".Equals(request.LocalPath, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    new StatsRenderer(IoC.Resolve<IActionTracking>()).Render(connection);
+                    return;
+                }
+
+                NetworkCredential credential = GetCredential(connection);
+                string tfsUrl = parser.GetServerUrl(request, credential);
+                if (string.IsNullOrEmpty(tfsUrl))
+                {
+                    throw new InvalidOperationException(
+                        "A TFS server URL must be specified before connections can be dispatched.");
+                }
+
+                handler = GetHandler(connection.Request.HttpMethod);
+
+                if (handler == null)
+                {
+                    actionTracking.Error();
+                    SendUnsupportedMethodResponse(connection);
+                    return;
+                }
+
+
+                try
+                {
                     actionTracking.Request(handler);
-            		handler.Handle(connection, parser, credential);
-            	}
-            	catch (TargetInvocationException e)
-            	{
-            		ExceptionHelper.PreserveStackTrace(e.InnerException);
-            		throw e.InnerException;
-            	}
+                    handler.Handle(connection, parser, credential);
+                }
+                catch (TargetInvocationException e)
+                {
+                    ExceptionHelper.PreserveStackTrace(e.InnerException);
+                    throw e.InnerException;
+                }
             }
             catch (WebException ex)
             {
                 actionTracking.Error();
-                
+
                 HttpWebResponse response = ex.Response as HttpWebResponse;
 
                 if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
@@ -118,7 +120,8 @@ namespace SvnBridge.Net
             catch (IOException)
             {
                 // Error caused by client cancelling operation
-                handler.Cancel();
+                if (handler != null)
+                    handler.Cancel();
             }
 
         }

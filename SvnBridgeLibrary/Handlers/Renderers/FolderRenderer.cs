@@ -14,14 +14,16 @@ namespace SvnBridge.Handlers.Renderers
         private readonly StreamWriter writer;
         private readonly string applicationPath;
 
-        public FolderRenderer(IHttpContext context, IPathParser PathParser, ICredentials credentials)
+        public FolderRenderer(IHttpContext context, IPathParser pathParser, ICredentials credentials)
         {
             this.context = context;
-            pathParser = PathParser;
+            this.pathParser = pathParser;
             this.credentials = credentials;
-            applicationPath = context.Request.ApplicationPath;
-            if (applicationPath == "/")
-                applicationPath = "";
+            applicationPath = pathParser.GetApplicationPath(context.Request);
+            if (applicationPath.EndsWith("/"))
+                applicationPath = applicationPath.Substring(0, applicationPath.Length - 1);
+            if (applicationPath.StartsWith("/") == false)
+                applicationPath = "/" + applicationPath;
             writer = new StreamWriter(context.Response.OutputStream);
         }
 
@@ -41,7 +43,6 @@ namespace SvnBridge.Handlers.Renderers
             {
                 writer.Write("<li><a href='");
                 writer.Write(applicationPath);
-                writer.Write("/");
                 writer.Write(item.Name);
                 writer.WriteLine("'>");
                 writer.Write(item.Name);

@@ -583,12 +583,20 @@ namespace SvnBridge.SourceControl
             byte[] bytes = FileCache.Get(item.Name, item.Revision);
             if (bytes != null)
             {
+                SetItemDataIsAtCache(item);
                 return bytes;
             }
 
             byte[] downloadBytes = WebTransferService.DownloadBytes(item.DownloadUrl, credentials);
             FileCache.Set(item.Name, item.Revision, downloadBytes);
+            SetItemDataIsAtCache(item);
             return downloadBytes;
+        }
+
+        private void SetItemDataIsAtCache(ItemMetaData item)
+        {
+            item.Data = new FutureFile(() => FileCache.GetText(item.Name, item.Revision));
+            item.DataLoaded = true;
         }
 
 
@@ -597,11 +605,7 @@ namespace SvnBridge.SourceControl
             byte[] bytes = FileCache.Get(item.Name, item.Revision);
             if (bytes != null)
             {
-                item.Data = new FutureFile(delegate
-                                               {
-                                                   return FileCache.GetText(item.Name, item.Revision);
-                                               });
-                item.DataLoaded = true;
+                SetItemDataIsAtCache(item);
                 return;
             }
             ManualResetEvent resetEvent = new ManualResetEvent(false);
@@ -652,7 +656,11 @@ namespace SvnBridge.SourceControl
             resetEvent.WaitOne();
             resetEvent.Close();
             if(item.DataLoadedError!=null)
+            {
+                if (item.DataLoadedError is UnauthorizedAccessException)
+                    throw item.DataLoadedError;
                 throw new InvalidOperationException("Failed to get item data", item.DataLoadedError);
+            }
             FileData results = FileCache.GetText(item.Name, item.Revision);
             if (results == null)
                 throw new CacheMissException(item.Name);
