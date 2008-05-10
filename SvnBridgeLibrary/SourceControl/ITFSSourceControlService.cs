@@ -7,7 +7,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 
 namespace SvnBridge.SourceControl
 {
-	public interface ITFSSourceControlService : ISourceControlService
+    public interface ITFSSourceControlService : ISourceControlService
     {
         ExtendedItem[][] QueryItemsExtended(string tfsUrl,
                                             ICredentials credentials,
@@ -22,8 +22,5 @@ namespace SvnBridge.SourceControl
                                          ItemSpec[] items,
                                          VersionSpec version);
 
-
-    	IEnumerable<SourceItem> QueryItemsReader(string tfsUrl, ICredentials credentials, string serverPath,
-    	                                  RecursionType recursion, VersionSpec version);
     }
 }

@@ -81,34 +81,6 @@ namespace IntegrationTests
 		}
 
 		[Fact]
-		public void QueryItemsAndQueryItemsReaderReturnSameResults()
-		{
-			WriteFile(testPath + "/Test.txt", "blah", true);
-			List<SourceItem> fromReader = new List<SourceItem>();
-			IEnumerator<SourceItem> reader = sourceControlService.QueryItemsReader(
-				ServerUrl,
-				credentials,
-				Constants.ServerRootPath + PROJECT_NAME,
-				RecursionType.OneLevel,
-				VersionSpec.FromChangeset(_lastCommitRevision))
-                .GetEnumerator();
-
-			while (reader.MoveNext())
-				fromReader.Add(reader.Current);
-
-			SourceItem[] sourceItems = sourceControlService.QueryItems(
-				ServerUrl,
-				credentials,
-				Constants.ServerRootPath + PROJECT_NAME,
-				RecursionType.OneLevel,
-				VersionSpec.FromChangeset(_lastCommitRevision),
-				DeletedState.NonDeleted,
-				ItemType.Any);
-
-			AssertEquals(sourceItems, fromReader.ToArray());
-		}
-
-		[Fact]
 		public void CanGetValidResultFromQueryItems_RecursionFull()
 		{
 			WriteFile(testPath + "/Test.txt", "blah", true);
