@@ -18,9 +18,16 @@ namespace SvnBridge.SourceControl
 
             Uri uri = new Uri(tfsUrl);
 
-            CredentialCache cache = new CredentialCache();
-            cache.Add(uri, "Basic", new NetworkCredential("anonymous", null));
-            return cache;
+            if (uri.Host.ToLowerInvariant().EndsWith("codeplex.com"))
+            {
+                CredentialCache cache = new CredentialCache();
+                cache.Add(uri, "Basic", new NetworkCredential("anonymous", null));
+                return cache;
+            }
+            else
+            {
+                return DefaultCredentials;
+            }
         }
     }
 }
