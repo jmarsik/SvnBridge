@@ -33,6 +33,16 @@ namespace SvnBridge.Infrastructure
             this.persistentCache = persistentCache;
         }
 
+        public SourceItem[] QueryItems(int revision, string[] paths, Recursion recursion)
+        {
+            List<SourceItem> items = new List<SourceItem>();
+            foreach (string path in paths)
+                foreach (SourceItem item in QueryItems(revision, path, recursion))
+                    items.Add(item);
+
+            return items.ToArray();
+        }
+
         public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
         {
             List<SourceItem> list = null;

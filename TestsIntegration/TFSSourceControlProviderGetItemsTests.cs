@@ -20,9 +20,11 @@ namespace IntegrationTests
         }
 
         [Fact]
-        public void TestGetItemsForRootSucceeds()
+        public void TestGetItemsForRootSucceedsWithAllRecursionLevels()
         {
+            _provider.GetItems(-1, "", Recursion.None);
             _provider.GetItems(-1, "", Recursion.OneLevel);
+            _provider.GetItems(-1, "", Recursion.Full);
         }
 
         [Fact]
@@ -163,6 +165,22 @@ namespace IntegrationTests
             Assert.Equal(ignore, item1.Properties["ignore"]);
             Assert.Equal(ignore, item2.Properties["ignore"]);
             Assert.Equal(ignore, item3.Properties["ignore"]);
+        }
+
+        [Fact]
+        public void TestGetItemsWithOneLevelRecursionReturnsPropertiesForSubFolders()
+        {
+            CreateFolder(testPath + "/Folder1", false);
+            CreateFolder(testPath + "/Folder1/SubFolder", false);
+            string ignore1 = "*.bad1\n";
+            string ignore2 = "*.bad2\n";
+            SetProperty(testPath + "/Folder1", "ignore", ignore1, false);
+            SetProperty(testPath + "/Folder1/SubFolder", "ignore", ignore2, true);
+
+            FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath + "/Folder1", Recursion.OneLevel);
+
+            Assert.Equal(ignore1, item.Properties["ignore"]);
+            Assert.Equal(ignore2, item.Items[0].Properties["ignore"]);
         }
 
         [Fact]

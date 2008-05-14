@@ -790,7 +790,41 @@ namespace SvnBridge.SourceControl
                 version = GetLatestVersion();
             }
 
-            SourceItem[] items = MetaDataRepository.QueryItems(version, path, recursion);
+            SourceItem[] items = null;
+            if (returnPropertyFiles || recursion == Recursion.Full)
+            {
+                items = MetaDataRepository.QueryItems(version, path, recursion);
+            }
+            else if (recursion == Recursion.None)
+            {
+                string propertiesForFile = GetPropertiesFileName(path, ItemType.File);
+                string propertiesForFolder = GetPropertiesFileName(path, ItemType.Folder);
+                items = MetaDataRepository.QueryItems(version, new string[] { path, propertiesForFile, propertiesForFolder }, recursion);
+            }
+            else if (recursion == Recursion.OneLevel)
+            {
+                string propertiesForFile = GetPropertiesFileName(path, ItemType.File);
+                string propertiesForFolder = GetPropertiesFileName(path, ItemType.Folder);
+                string propertiesForFolderItems = path + "/" + Constants.PropFolder;
+                items = MetaDataRepository.QueryItems(version, new string[] { path, propertiesForFile, propertiesForFolder, propertiesForFolderItems }, recursion);
+                if (items[0].ItemType == ItemType.Folder)
+                {
+                    List<string> propertiesForSubFolders = new List<string>();
+                    foreach (SourceItem item in items)
+                    {
+                        if (item.ItemType == ItemType.Folder && !IsPropertyFolder(item.RemoteName))
+                        {
+                            propertiesForSubFolders.Add(GetPropertiesFileName(item.RemoteName, ItemType.Folder));
+                        }
+                    }
+                    SourceItem[] subFolderProperties = MetaDataRepository.QueryItems(version, propertiesForSubFolders.ToArray(), Recursion.None);
+                    List<SourceItem> mergedItems = new List<SourceItem>(items);
+                    foreach (SourceItem item in subFolderProperties)
+                        mergedItems.Add(item);
+
+                    items = mergedItems.ToArray();
+                }
+            }
 
             Dictionary<string, FolderMetaData> folders = new Dictionary<string, FolderMetaData>();
             Dictionary<string, ItemProperties> properties = new Dictionary<string, ItemProperties>();
@@ -799,18 +833,14 @@ namespace SvnBridge.SourceControl
             foreach (SourceItem sourceItem in items)
             {
                 ItemMetaData item = ItemMetaData.ConvertSourceItem(sourceItem, rootPath);
-                if (recursion == Recursion.Full && IsPropertyFile(item.Name) && !returnPropertyFiles)
+                if (IsPropertyFile(item.Name) && !returnPropertyFiles) 
                 {
                     string itemPath = GetItemFileNameFromPropertiesFileName(item.Name);
                     itemPropertyRevision[itemPath] = item.Revision;
                     properties[itemPath] = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
                 }
-                if ((!IsPropertyFile(item.Name) && !IsPropertyFolder(item.Name)) || returnPropertyFiles)
+                else if ((!IsPropertyFile(item.Name) && !IsPropertyFolder(item.Name)) || returnPropertyFiles)
                 {
-                    if (recursion != Recursion.Full && !returnPropertyFiles)
-                    {
-                        RetrievePropertiesForItem(item);
-                    }
                     if (item.ItemType == ItemType.Folder)
                     {
                         folders[item.Name.ToLower()] = (FolderMetaData)item;
@@ -818,6 +848,12 @@ namespace SvnBridge.SourceControl
                     if (firstItem == null)
                     {
                         firstItem = item;
+                        if (item.ItemType == ItemType.File)
+                        {
+                            string folderName = GetFolderName(item.Name);
+                            folders[folderName.ToLower()] = new FolderMetaData();
+                            folders[folderName.ToLower()].Items.Add(item);
+                        }
                     }
                     else
                     {
@@ -904,19 +940,19 @@ namespace SvnBridge.SourceControl
             return reverted;
         }
 
-        private void RetrievePropertiesForItem(ItemMetaData item)
-        {
-            int revision;
-            ItemProperties properties = ReadPropertiesForItem(item.Name, item.ItemType, out revision);
-            if (properties != null)
-            {
-                item.PropertyRevision = revision;
-                foreach (Property property in properties.Properties)
-                {
-                    item.Properties[property.Name] = property.Value;
-                }
-            }
-        }
+        //private void RetrievePropertiesForItem(ItemMetaData item)
+        //{
+        //    int revision;
+        //    ItemProperties properties = ReadPropertiesForItem(item.Name, item.ItemType, out revision);
+        //    if (properties != null)
+        //    {
+        //        item.PropertyRevision = revision;
+        //        foreach (Property property in properties.Properties)
+        //        {
+        //            item.Properties[property.Name] = property.Value;
+        //        }
+        //    }
+        //}
 
         private MergeActivityResponse GenerateMergeResponse(string activityId,
                                                             int changesetId)
@@ -1330,15 +1366,6 @@ namespace SvnBridge.SourceControl
         private ItemProperties ReadPropertiesForItem(string path,
                                                      ItemType itemType)
         {
-            int revision;
-            return ReadPropertiesForItem(path, itemType, out revision);
-        }
-
-        private ItemProperties ReadPropertiesForItem(string path,
-                                                     ItemType itemType,
-                                                     out int revision)
-        {
-            revision = -1;
             ItemProperties properties = null;
             string propertiesPath = GetPropertiesFileName(path, itemType);
             string cacheKey = "ReadPropertiesForItem_" + propertiesPath;
@@ -1358,7 +1385,6 @@ namespace SvnBridge.SourceControl
             if (item != null)
             {
                 properties = Helper.DeserializeXml<ItemProperties>(ReadFile(item));
-                revision = item.Revision;
             }
             return properties;
         }
