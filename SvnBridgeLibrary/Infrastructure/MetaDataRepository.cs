@@ -131,7 +131,7 @@ namespace SvnBridge.Infrastructure
             return serverPath;
         }
 
-        public void EnsureRevisionIsCached(int revision, string path)
+        private void EnsureRevisionIsCached(int revision, string path)
         {
             string serverPath = GetServerPath(path);
 

@@ -265,7 +265,7 @@ namespace SvnBridge.SourceControl
                 path = path.Substring(1);
             }
 
-            string serverPath = rootPath + path;
+            string serverPath = CombinePath(rootPath,path);
             RecursionType recursionType = RecursionType.None;
             switch (recursion)
             {
@@ -294,7 +294,7 @@ namespace SvnBridge.SourceControl
                         ChangesetVersionSpec branchChangeset = new ChangesetVersionSpec();
                         branchChangeset.cs = history.ChangeSetID;
                         ItemSpec spec = new ItemSpec();
-                        spec.item = rootPath + change.Item.RemoteName;
+                        spec.item = CombinePath(rootPath,change.Item.RemoteName);
                         BranchRelative[][] branches =
                             SourceControlService.QueryBranches(serverUrl,
                                                                credentials,
@@ -460,7 +460,7 @@ namespace SvnBridge.SourceControl
             ActivityRepository.Use(activityId, delegate(Activity activity)
             {
                 activity.MergeList.Add(
-                    new ActivityItem(rootPath + path, ItemType.Folder, ActivityItemAction.New));
+                    new ActivityItem(CombinePath(rootPath,path), ItemType.Folder, ActivityItemAction.New));
                 activity.Collections.Add(path);
             });
 
@@ -525,7 +525,7 @@ namespace SvnBridge.SourceControl
                     foreach (string path in activity.PostCommitDeletedItems)
                     {
                         ProcessDeleteItem(activityId, path);
-                        commitServerList.Add(rootPath + path);
+                        commitServerList.Add(CombinePath(rootPath,path));
                     }
                     changesetId =
                         SourceControlService.Commit(serverUrl,
@@ -924,11 +924,11 @@ namespace SvnBridge.SourceControl
                     SourceControlService.UndoPendingChanges(serverUrl,
                                                             credentials,
                                                             activityId,
-                                                            new string[] { rootPath + path });
+                                                            new string[] { CombinePath(rootPath,path) });
                     activity.DeletedItems.Remove(path);
                     for (int j = activity.MergeList.Count - 1; j >= 0; j--)
                     {
-                        if (activity.MergeList[j].Path == rootPath + path)
+                        if (activity.MergeList[j].Path == CombinePath(rootPath,path))
                         {
                             activity.MergeList.RemoveAt(j);
                         }
@@ -939,20 +939,6 @@ namespace SvnBridge.SourceControl
             });
             return reverted;
         }
-
-        //private void RetrievePropertiesForItem(ItemMetaData item)
-        //{
-        //    int revision;
-        //    ItemProperties properties = ReadPropertiesForItem(item.Name, item.ItemType, out revision);
-        //    if (properties != null)
-        //    {
-        //        item.PropertyRevision = revision;
-        //        foreach (Property property in properties.Properties)
-        //        {
-        //            item.Properties[property.Name] = property.Value;
-        //        }
-        //    }
-        //}
 
         private MergeActivityResponse GenerateMergeResponse(string activityId,
                                                             int changesetId)
@@ -983,7 +969,7 @@ namespace SvnBridge.SourceControl
                         {
                             sortedMergeResponse.Add(newItem.Path);
 
-                            string path = newItem.Path.Substring(rootPath.Length);
+                            string path = newItem.Path.Substring(rootPath.Length - 1);
                             if (path == "")
                                 path = "/";
 
@@ -1106,17 +1092,17 @@ namespace SvnBridge.SourceControl
                 }
 
                 SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
-                SourceControlService.UploadFileFromBytes(serverUrl, credentials, activityId, fileData, rootPath + path);
+                SourceControlService.UploadFileFromBytes(serverUrl, credentials, activityId, fileData, CombinePath(rootPath,path));
 
                 if (addToMergeList)
                 {
                     if (!replaced && (!newFile || reportUpdatedFile))
                     {
-                        activity.MergeList.Add(new ActivityItem(rootPath + path, ItemType.File, ActivityItemAction.Updated));
+                        activity.MergeList.Add(new ActivityItem(CombinePath(rootPath,path), ItemType.File, ActivityItemAction.Updated));
                     }
                     else
                     {
-                        activity.MergeList.Add(new ActivityItem(rootPath + path, ItemType.File, ActivityItemAction.New));
+                        activity.MergeList.Add(new ActivityItem(CombinePath(rootPath,path), ItemType.File, ActivityItemAction.New));
                     }
                 }
             });
@@ -1133,10 +1119,10 @@ namespace SvnBridge.SourceControl
                 SourceControlService.UndoPendingChanges(serverUrl,
                                                     credentials,
                                                     activityId,
-                                                    new string[] { rootPath + copy.TargetPath });
+                                                    new string[] { CombinePath(rootPath,copy.TargetPath) });
                 for (int i = activity.MergeList.Count - 1; i >= 0; i--)
                 {
-                    if (activity.MergeList[i].Path == rootPath + copy.TargetPath)
+                    if (activity.MergeList[i].Path == CombinePath(rootPath,copy.TargetPath))
                     {
                         activity.MergeList.RemoveAt(i);
                     }
@@ -1185,7 +1171,7 @@ namespace SvnBridge.SourceControl
                 if (copyIsRename)
                 {
                     activity.MergeList.Add(
-                        new ActivityItem(rootPath + copyAction.Path, item.ItemType, ActivityItemAction.RenameDelete));
+                        new ActivityItem(CombinePath(rootPath,copyAction.Path), item.ItemType, ActivityItemAction.RenameDelete));
                 }
 
                 if (!copyIsRename)
@@ -1203,10 +1189,10 @@ namespace SvnBridge.SourceControl
                                     SourceControlService.UndoPendingChanges(serverUrl,
                                                                             credentials,
                                                                             activityId,
-                                                                            new string[] { rootPath + activity.DeletedItems[i] });
+                                                                            new string[] { CombinePath(rootPath,activity.DeletedItems[i]) });
                                     for (int j = activity.MergeList.Count - 1; j >= 0; j--)
                                     {
-                                        if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
+                                        if (activity.MergeList[j].Path == CombinePath(rootPath,activity.DeletedItems[i]))
                                         {
                                             activity.MergeList.RemoveAt(j);
                                         }
@@ -1232,10 +1218,10 @@ namespace SvnBridge.SourceControl
                             SourceControlService.UndoPendingChanges(serverUrl,
                                                                     credentials,
                                                                     activityId,
-                                                                    new string[] { rootPath + activity.DeletedItems[i] });
+                                                                    new string[] { CombinePath(rootPath,activity.DeletedItems[i]) });
                             for (int j = activity.MergeList.Count - 1; j >= 0; j--)
                             {
-                                if (activity.MergeList[j].Path == rootPath + activity.DeletedItems[i])
+                                if (activity.MergeList[j].Path == CombinePath(rootPath,activity.DeletedItems[i]))
                                 {
                                     activity.MergeList.RemoveAt(j);
                                 }
@@ -1271,13 +1257,13 @@ namespace SvnBridge.SourceControl
                 if (copyAction.Rename)
                 {
                     activity.MergeList.Add(
-                        new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.New));
+                        new ActivityItem(CombinePath(rootPath,copyAction.TargetPath), item.ItemType, ActivityItemAction.New));
                 }
                 else
                 {
                     activity.MergeList.Add(
-                        new ActivityItem(rootPath + copyAction.TargetPath, item.ItemType, ActivityItemAction.Branch,
-                            rootPath + copyAction.Path));
+                        new ActivityItem(CombinePath(rootPath,copyAction.TargetPath), item.ItemType, ActivityItemAction.Branch,
+                            CombinePath(rootPath,copyAction.Path)));
                 }
             });
         }
@@ -1358,7 +1344,7 @@ namespace SvnBridge.SourceControl
                 pendRequests.Add(PendRequest.Delete(localPath));
                 SourceControlService.PendChanges(serverUrl, credentials, activityId, pendRequests);
 
-                activity.MergeList.Add(new ActivityItem(rootPath + path, item.ItemType, ActivityItemAction.Deleted));
+                activity.MergeList.Add(new ActivityItem(CombinePath(rootPath,path), item.ItemType, ActivityItemAction.Deleted));
 
             });
         }
@@ -1471,11 +1457,19 @@ namespace SvnBridge.SourceControl
             return folderName;
         }
 
+        private string CombinePath(string path1, string path2)
+        {
+            if (path1.EndsWith("/") && path2.StartsWith("/"))
+                return path1 + path2.Substring(1);
+            else
+                return path1 + path2;
+        }
+
         private ItemMetaData GetPendingItem(string activityId,
                                             string path)
         {
             ItemSpec spec = new ItemSpec();
-            spec.item = rootPath + path;
+            spec.item = CombinePath(rootPath,path);
             ExtendedItem[][] items =
                 SourceControlService.QueryItemsExtended(serverUrl,
                                                         credentials,

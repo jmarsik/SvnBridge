@@ -61,6 +61,19 @@ namespace IntegrationTests
 			Assert.Equal(0, response.Items.Count);
 		}
 
+        [Fact]
+        public void TestCommitBranchFolderAlsoBranchesSubFiles()
+        {
+            CreateFolder(testPath + "/Folder1", false);
+            WriteFile(testPath + "/Folder1/Fun.txt", "Fun text", true);
+
+            _provider.CopyItem(_activityId, testPath + "/Folder1", testPath + "/Folder2");
+            MergeActivityResponse response = Commit();
+
+            FolderMetaData folder = (FolderMetaData)_provider.GetItems(-1, testPath + "/Folder2", Recursion.Full);
+            Assert.Equal(1, folder.Items.Count);
+        }
+
 		[Fact]
 		public void TestCommitDeleteFile()
 		{
