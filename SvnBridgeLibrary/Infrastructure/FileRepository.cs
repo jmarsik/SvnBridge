@@ -18,9 +18,9 @@ namespace SvnBridge.Infrastructure
         private readonly IWebTransferService webTransferService;
         private readonly ILogger logger;
 
-        public FileRepository(ICredentials credentials, IFileCache fileCache, IWebTransferService webTransferService, ILogger logger)
+        public FileRepository(string serverUrl, ICredentials credentials, IFileCache fileCache, IWebTransferService webTransferService, ILogger logger)
         {
-            this.credentials = credentials;
+            this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
             this.fileCache = fileCache;
             this.webTransferService = webTransferService;
             this.logger = logger;
