@@ -58,5 +58,14 @@ namespace IntegrationTests.Properties {
                 return ((string)(this["ServerUrl"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CacheEnabled {
+            get {
+                return ((bool)(this["CacheEnabled"]));
+            }
+        }
     }
 }

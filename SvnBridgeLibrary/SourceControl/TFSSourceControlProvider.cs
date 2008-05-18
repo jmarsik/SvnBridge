@@ -46,9 +46,9 @@ namespace SvnBridge.SourceControl
             get { return sourceControlServicesHub.Cache; }
         }
 
-        private IFileCache FileCache
+        private IFileRepository FileRepository
         {
-            get { return sourceControlServicesHub.FileCache; }
+            get { return sourceControlServicesHub.FileRepository; }
         }
 
         private ITFSSourceControlService SourceControlService
@@ -567,104 +567,20 @@ namespace SvnBridge.SourceControl
                         // were already committed to the source control provider.
                         // since we consider associating with work items nice but not essential,
                         // we will log the error and ignore it.
-                        LogError("Failed to associate work item with changeset", e);
+                        Logger.Error("Failed to associate work item with changeset", e);
                     }
                 }
             }
-        }
-
-        private void LogError(string message, Exception exception)
-        {
-            Logger.Error(message, exception);
         }
 
         public byte[] ReadFile(ItemMetaData item)
         {
-            byte[] bytes = FileCache.Get(item.Name, item.Revision);
-            if (bytes != null)
-            {
-                SetItemDataIsAtCache(item);
-                return bytes;
-            }
-
-            byte[] downloadBytes = WebTransferService.DownloadBytes(item.DownloadUrl, credentials);
-            FileCache.Set(item.Name, item.Revision, downloadBytes);
-            SetItemDataIsAtCache(item);
-            return downloadBytes;
+            return FileRepository.GetFile(item);
         }
-
-        private void SetItemDataIsAtCache(ItemMetaData item)
-        {
-            item.Data = new FutureFile(() => FileCache.GetText(item.Name, item.Revision));
-            item.DataLoaded = true;
-        }
-
 
         public void ReadFileAsync(ItemMetaData item)
         {
-            byte[] bytes = FileCache.Get(item.Name, item.Revision);
-            if (bytes != null)
-            {
-                SetItemDataIsAtCache(item);
-                return;
-            }
-            ManualResetEvent resetEvent = new ManualResetEvent(false);
-            DownloadFileAsync(item, resetEvent, 0);
-            item.Data = new FutureFile(delegate
-            {
-                return GetFileData(resetEvent, item);
-            });
-
-            item.DataLoaded = true;
-        }
-
-        private void DownloadFileAsync(ItemMetaData item, EventWaitHandle waitHandle, int retry)
-        {
-            Logger.Trace("Starting to download {0}", item.Name);
-            WebTransferService.BeginDownloadBytes(item.DownloadUrl, credentials, delegate(IAsyncResult ar)
-            {
-                try
-                {
-                    byte[] data = WebTransferService.EndDownloadBytes(ar);
-                    FileCache.Set(item.Name, item.Revision, data);
-                    Logger.Trace("Finished downloading {0}", item.Name);
-                    waitHandle.Set();
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    item.DataLoadedError = e;
-                    waitHandle.Set();
-                }
-                catch (Exception e)
-                {
-                    retry = retry + 1;
-                    if (retry == 3)
-                    {
-                        Logger.Error("Failed to download " + item.Name + ", max retry count reached, aborting", e);
-                        Listener.RaiseErrorOccured(e);
-                        item.DataLoadedError = e;
-                        waitHandle.Set();
-                    }
-                    Logger.Error("Failed to download " + item.Name + " retry #" + retry, e);
-                    DownloadFileAsync(item, waitHandle, retry);
-                }
-            });
-        }
-
-        private FileData GetFileData(WaitHandle resetEvent, ItemMetaData item)
-        {
-            resetEvent.WaitOne();
-            resetEvent.Close();
-            if(item.DataLoadedError!=null)
-            {
-                if (item.DataLoadedError is UnauthorizedAccessException)
-                    throw item.DataLoadedError;
-                throw new InvalidOperationException("Failed to get item data", item.DataLoadedError);
-            }
-            FileData results = FileCache.GetText(item.Name, item.Revision);
-            if (results == null)
-                throw new CacheMissException(item.Name);
-            return results;
+            FileRepository.ReadFileAsync(item);
         }
 
         public Guid GetRepositoryUuid()

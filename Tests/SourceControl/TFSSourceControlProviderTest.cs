@@ -38,7 +38,8 @@ namespace SvnBridge.SourceControl
                 new NullLogger(),
                 new NullCache(),
                 MockRepository.GenerateStub<IFileCache>(),
-				MockRepository.GenerateStub<IMetaDataRepositoryFactory>());
+				MockRepository.GenerateStub<IMetaDataRepositoryFactory>(),
+                MockRepository.GenerateStub<IFileRepository>());
         }
 
         public void Dispose()

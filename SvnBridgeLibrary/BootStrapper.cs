@@ -13,6 +13,7 @@ using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
+using SvnBridge.Properties;
 
 namespace SvnBridge
 {
@@ -37,9 +38,12 @@ namespace SvnBridge
                 typeof (IActionTracking)
             };
 
-        public BootStrapper()
+        public BootStrapper() : this(true) {}
+
+        public BootStrapper(bool useCaching)
         {
             IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
+            IoC.Container.Configuration["useCaching"] = useCaching;
             IoC.Container.Configuration["persistentCachePath"] =
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
 

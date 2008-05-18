@@ -16,5 +16,6 @@ namespace SvnBridge.Interfaces
         ICache Cache { get; }
         IFileCache FileCache { get; }
 		IMetaDataRepositoryFactory MetaDataRepositoryFactory { get; }
+        IFileRepository FileRepository { get; }
     }
 }

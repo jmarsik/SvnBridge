@@ -80,20 +80,25 @@ namespace IntegrationTests
 																						  webTransferService,
 																						  system,
 																						  new NullLogger());
-			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<IPersistentCache>());
+			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<IPersistentCache>(),Settings.Default.CacheEnabled);
 			ProjectInformationRepository repository = new ProjectInformationRepository(
 																					   metaDataRepositoryFactory,
 																					   ServerUrl);
+            ICredentials credentials = GetCredentials();
+            IFileCache fileCache = MockRepository.GenerateStub<IFileCache>();
+            ILogger logger = new NullLogger();
+            FileRepository fileRepository = new FileRepository(credentials, fileCache, webTransferService, logger);
 			return new SourceControlServicesHub(
-				GetCredentials(),
+				credentials,
 				webTransferService,
 				tfsSourceControlService,
 				repository,
 				associateWorkItemWithChangeSet,
-				new NullLogger(),
+				logger,
 				new NullCache(),
-				MockRepository.GenerateStub<IFileCache>(),
-				metaDataRepositoryFactory);
+				fileCache,
+				metaDataRepositoryFactory,
+                fileRepository);
 		}
 
 		protected static ICredentials GetCredentials()
