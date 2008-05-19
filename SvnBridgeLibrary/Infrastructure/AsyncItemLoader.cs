@@ -23,20 +23,6 @@ namespace SvnBridge.Infrastructure
             this.sourceControlProvider = sourceControlProvider;
         }
 
-        ///// <summary>
-        ///// This is required so if we are using a secured TFS server,
-        ///// we will get a 401 before sending any response to the user
-        ///// </summary>
-        ///// <param name="folder"></param>
-        //public void DownloadFirstFile(FolderMetaData folder)
-        //{
-        //    foreach (var file in IterateFiles(folder))
-        //    {
-        //        sourceControlProvider.ReadFile(file);
-        //        break;
-        //    }
-        //}
-
         public void Start()
         {
             QueueItemsInFolder(folderInfo);
@@ -45,13 +31,13 @@ namespace SvnBridge.Infrastructure
 
         private void QueueItemsInFolder(FolderMetaData folder)
         {
-            foreach (var file in IterateFiles(folder))
+            foreach (var item in IterateItems(folder))
             {
-                sourceControlProvider.ReadFileAsync(file);
+                sourceControlProvider.ReadFileAsync(item);
             }
         }
 
-        private IEnumerable<ItemMetaData> IterateFiles(FolderMetaData folder)
+        private IEnumerable<ItemMetaData> IterateItems(FolderMetaData folder)
         {
             foreach (ItemMetaData item in folder.Items)
             {

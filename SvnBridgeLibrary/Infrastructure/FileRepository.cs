@@ -8,6 +8,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using System.Threading;
 using SvnBridge.Exceptions;
 using SvnBridge.Net;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Infrastructure
 {
@@ -17,17 +18,22 @@ namespace SvnBridge.Infrastructure
         private readonly IFileCache fileCache;
         private readonly IWebTransferService webTransferService;
         private readonly ILogger logger;
+        private readonly bool useCaching;
 
-        public FileRepository(string serverUrl, ICredentials credentials, IFileCache fileCache, IWebTransferService webTransferService, ILogger logger)
+        public FileRepository(string serverUrl, ICredentials credentials, IFileCache fileCache, IWebTransferService webTransferService, ILogger logger, bool useCaching)
         {
             this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
             this.fileCache = fileCache;
             this.webTransferService = webTransferService;
             this.logger = logger;
+            this.useCaching = useCaching;
         }
 
         public byte[] GetFile(ItemMetaData item)
         {
+            if (!useCaching)
+                return webTransferService.DownloadBytes(item.DownloadUrl, credentials);
+
             byte[] bytes = fileCache.Get(item.Name, item.Revision);
             if (bytes != null)
             {
@@ -43,6 +49,17 @@ namespace SvnBridge.Infrastructure
 
         public void ReadFileAsync(ItemMetaData item)
         {
+            if (!useCaching)
+            {
+                byte[] data = webTransferService.DownloadBytes(item.DownloadUrl, credentials);
+                FileData fileData = new FileData();
+                fileData.Base64DiffData = SvnDiffParser.GetSvnDiffData(data);
+                fileData.Md5 = Helper.GetMd5Checksum(data);
+                item.Data = new FutureFile(() => fileData);
+                item.DataLoaded = true;
+                return;
+            }
+
             byte[] bytes = fileCache.Get(item.Name, item.Revision);
             if (bytes != null)
             {

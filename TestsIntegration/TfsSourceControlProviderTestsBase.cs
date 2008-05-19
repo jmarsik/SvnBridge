@@ -87,7 +87,7 @@ namespace IntegrationTests
             ICredentials credentials = GetCredentials();
             IFileCache fileCache = MockRepository.GenerateStub<IFileCache>();
             ILogger logger = new NullLogger();
-            FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger);
+            FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger, Settings.Default.CacheEnabled);
 			return new SourceControlServicesHub(
 				credentials,
 				webTransferService,
