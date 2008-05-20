@@ -3,6 +3,7 @@ using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
+using System.Collections.Generic;
 
 namespace SvnBridge.SourceControl
 {
@@ -10,6 +11,7 @@ namespace SvnBridge.SourceControl
     {
 		private readonly IMetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly string serverUrl;
+        private static Dictionary<string, ProjectLocationInformation> projectLocations = new Dictionary<string, ProjectLocationInformation>();
 
         public ProjectInformationRepository(
             IMetaDataRepositoryFactory metaDataRepositoryFactory,
@@ -21,27 +23,30 @@ namespace SvnBridge.SourceControl
 
         #region IProjectInformationRepository Members
 
-        public ProjectLocationInformation GetProjectLocation(ICredentials credentials,
-                                                             string projectName)
+        public ProjectLocationInformation GetProjectLocation(ICredentials credentials, string projectName)
         {
             projectName = projectName.ToLower();
-            string[] servers = serverUrl.Split(',');
-            foreach (string server in servers)
+            if (!projectLocations.ContainsKey(projectName))
             {
-                ICredentials credentialsForServer = CredentialsHelper.GetCredentialsForServer(server, credentials);
-                int revision = metaDataRepositoryFactory.GetLatestRevision(server, credentialsForServer);
-            	SourceItem[] items = metaDataRepositoryFactory
-                        .Create(credentialsForServer, server, Constants.ServerRootPath + projectName)
-							.QueryItems(revision, "", Recursion.None);
-
-                if (items != null && items.Length > 0)
+                string[] servers = serverUrl.Split(',');
+                foreach (string server in servers)
                 {
-                    string remoteProjectName = items[0].RemoteName.Substring(Constants.ServerRootPath.Length);
-                    return new ProjectLocationInformation(remoteProjectName, server);
+                    ICredentials credentialsForServer = CredentialsHelper.GetCredentialsForServer(server, credentials);
+                    int revision = metaDataRepositoryFactory.GetLatestRevision(server, credentialsForServer);
+                    SourceItem[] items = metaDataRepositoryFactory
+                            .Create(credentialsForServer, server, Constants.ServerRootPath + projectName)
+                                .QueryItems(revision, "", Recursion.None);
+
+                    if (items != null && items.Length > 0)
+                    {
+                        string remoteProjectName = items[0].RemoteName.Substring(Constants.ServerRootPath.Length);
+                        projectLocations[projectName] = new ProjectLocationInformation(remoteProjectName, server);
+                    }
                 }
-                ;
+                if (!projectLocations.ContainsKey(projectName))
+                    throw new InvalidOperationException("Could not find project '" + projectName + "' in: " + serverUrl);
             }
-            throw new InvalidOperationException("Could not find project '" + projectName + "' in: " + serverUrl);
+            return projectLocations[projectName];
         }
 
         #endregion
