@@ -22,5 +22,9 @@ namespace SvnBridge.SourceControl
                                          ItemSpec[] items,
                                          VersionSpec version);
 
+        ItemSet[] QueryItems(string tfsUrl,
+                             ICredentials credentials,
+                             VersionSpec version,
+                             ItemSpec[] items);
     }
 }

@@ -390,16 +390,10 @@ namespace SvnBridge.SourceControl
             return ItemExists(path, -1);
         }
 
-        public bool ItemExists(string path,
-                               int version)
+        public bool ItemExists(string path, int version)
         {
-            if (version == -1)
-                version = GetLatestVersion();
-
-            SourceItem[] items = MetaDataRepository
-                .QueryItems(version, path, Recursion.None);
-
-            return (items.Length > 0);
+            ItemMetaData item = GetItems(version, path, Recursion.None, true);
+            return (item != null);
         }
 
         public void MakeActivity(string activityId)
@@ -722,7 +716,7 @@ namespace SvnBridge.SourceControl
                 string propertiesForFile = GetPropertiesFileName(path, ItemType.File);
                 string propertiesForFolder = GetPropertiesFileName(path, ItemType.Folder);
                 string propertiesForFolderItems = path + "/" + Constants.PropFolder;
-                items = MetaDataRepository.QueryItems(version, new string[] { path, propertiesForFile, propertiesForFolder, propertiesForFolderItems }, recursion);
+                items = MetaDataRepository.QueryItems(version, new string[] { path, propertiesForFile, propertiesForFolderItems }, recursion);
                 if (items[0].ItemType == ItemType.Folder)
                 {
                     List<string> propertiesForSubFolders = new List<string>();

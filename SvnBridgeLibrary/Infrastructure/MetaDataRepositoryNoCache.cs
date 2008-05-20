@@ -37,28 +37,54 @@ namespace SvnBridge.Infrastructure
 
         public SourceItem[] QueryItems(int revision, string[] paths, Recursion recursion)
         {
-            List<SourceItem> items = new List<SourceItem>();
+            List<ItemSpec> itemSpecs = new List<ItemSpec>();
             foreach (string path in paths)
-                foreach (SourceItem item in QueryItems(revision, path, recursion))
-                    items.Add(item);
+            {
+                ItemSpec itemspec = new ItemSpec();
+                itemspec.item = GetServerPath(path);
+                itemspec.recurse = RecursionType.None;
+                switch (recursion)
+                {
+                    case Recursion.OneLevel:
+                        itemspec.recurse = RecursionType.OneLevel;
+                        break;
+                    case Recursion.Full:
+                        itemspec.recurse = RecursionType.Full;
+                        break;
+                }
+                itemSpecs.Add(itemspec);
+            }
+            ItemSet[] items = sourceControlService.QueryItems(serverUrl, credentials, VersionSpec.FromChangeset(revision), itemSpecs.ToArray());
 
-            return items.ToArray();
+            SortedList<string, SourceItem> result = new SortedList<string, SourceItem>();
+            foreach (ItemSet itemset in items)
+            {
+                foreach (Item item in itemset.Items)
+                {
+                    SourceItem sourceItem = new SourceItem();
+                    sourceItem.RemoteChangesetId = item.cs;
+                    sourceItem.RemoteDate = item.date.ToUniversalTime();
+                    sourceItem.ItemType = item.type;
+                    sourceItem.ItemId = item.itemid;
+                    sourceItem.RemoteName = item.item;
+                    sourceItem.DownloadUrl = serverUrl + "/VersionControl/v1.0/item.asmx?" + item.durl;
+                    if (!result.ContainsKey(sourceItem.RemoteName))
+                    {
+                        result.Add(sourceItem.RemoteName, sourceItem);
+                    }
+                }
+            }
+            List<SourceItem> result2 = new List<SourceItem>();
+            foreach (SourceItem sourceItem in result.Values)
+            {
+                result2.Add(sourceItem);
+            }
+            return result2.ToArray();
         }
 
         public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
         {
-            string serverPath = GetServerPath(path);
-            RecursionType recursionType = RecursionType.None;
-            switch (recursion)
-            {
-                case Recursion.OneLevel:
-                    recursionType = RecursionType.OneLevel;
-                    break;
-                case Recursion.Full:
-                    recursionType = RecursionType.Full;
-                    break;
-            }
-            return sourceControlService.QueryItems(serverUrl, credentials, serverPath, recursionType, VersionSpec.FromChangeset(revision), DeletedState.NonDeleted, ItemType.Any);
+            return QueryItems(revision, new string[] { path }, recursion);
         }
 
         private string GetServerPath(string path)

@@ -35,7 +35,7 @@ namespace TestsEndToEnd
 			initialized = true;
 			testUrl = url;
 
-			new BootStrapper().Start();
+			new BootStrapper(false).Start();
 
 			CreateTempFolder();
 

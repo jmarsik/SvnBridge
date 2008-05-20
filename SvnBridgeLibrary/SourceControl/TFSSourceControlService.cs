@@ -62,5 +62,12 @@ namespace SvnBridge.SourceControl
 				return null;
 			return items[0];
 		}
- 	}
+
+        public ItemSet[] QueryItems(string tfsUrl, ICredentials credentials, VersionSpec version, ItemSpec[] items)
+        {
+            Repository webSvc = CreateProxy(tfsUrl, credentials);
+            string username = TfsUtil.GetUsername(credentials, tfsUrl);
+            return webSvc.QueryItems(null, null, items, version, DeletedState.NonDeleted, ItemType.Any, true);
+        }
+    }
 }
