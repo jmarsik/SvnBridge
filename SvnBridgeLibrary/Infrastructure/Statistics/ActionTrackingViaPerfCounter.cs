@@ -29,11 +29,13 @@ namespace SvnBridge.Infrastructure.Statistics
             var handlers = GatherAllCounters();
 
             TryCreatePerfCounters(handlers);
-
-            foreach (Type type in handlers)
+            if (enabled)
             {
-                string handlerName = type.Name.Replace("Handler", "");
-                performanceCounters[type] = new PerformanceCounter("SvnBridge", handlerName, false);
+                foreach (Type type in handlers)
+                {
+                    string handlerName = type.Name.Replace("Handler", "");
+                    performanceCounters[type] = new PerformanceCounter("SvnBridge", handlerName, false);
+                }
             }
         }
 
@@ -59,7 +61,7 @@ namespace SvnBridge.Infrastructure.Statistics
             }
             catch (SecurityException)
             {
-                enabled = true;
+                enabled = false;
                 bool countersAreMandatory;
                 bool.TryParse(ConfigurationManager.AppSettings["PerfCountersAreMandatory"], out countersAreMandatory);
                 if (countersAreMandatory == false)
