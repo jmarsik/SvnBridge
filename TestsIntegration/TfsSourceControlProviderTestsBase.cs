@@ -27,7 +27,7 @@ namespace IntegrationTests
 		protected readonly TFSSourceControlProvider _provider;
 		protected TFSSourceControlProvider _providerRoot;
 		protected int _lastCommitRevision;
-		private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
+		protected readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
 		private readonly AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 
 		#region Setup/Teardown

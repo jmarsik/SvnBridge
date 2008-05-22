@@ -37,7 +37,7 @@ namespace SvnBridge.SourceControl
                 name = "/" + name;
             foreach (ItemMetaData item in Items)
             {
-                if (item.Name == name && item is MissingFolderMetaData)
+                if (item.Name == name && item is MissingItemMetaData)
                 {
                     Items.Remove(item);
                     return true;

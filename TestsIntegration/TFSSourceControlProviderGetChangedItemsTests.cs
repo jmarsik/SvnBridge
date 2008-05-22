@@ -161,7 +161,25 @@ namespace IntegrationTests
 			Assert.Equal(0, folder.Items.Count);
 		}
 
-		[Fact]
+        [Fact]
+        public void TestGetChangedItemsWithUpdatedThenDeletedFile()
+        {
+            string path = testPath + "/TestFile.txt";
+            WriteFile(path, "Fun text", true);
+            int versionFrom = _lastCommitRevision;
+            WriteFile(testPath + "/TestFile.txt", "New fun text", true);
+            DeleteItem(path, true);
+            int versionTo = _lastCommitRevision;
+            UpdateReportData reportData = new UpdateReportData();
+
+            FolderMetaData folder = _provider.GetChangedItems(testPath, versionFrom, versionTo, reportData);
+
+            Assert.Equal(1, folder.Items.Count);
+            Assert.True(folder.Items[0] is DeleteMetaData);
+            Assert.Equal(path.Substring(1), folder.Items[0].Name);
+        }
+
+        [Fact]
 		public void TestGetChangedItemsWithAddedFileThenEditedThenDeletedFileReturnsNothing()
 		{
 			int versionFrom = _lastCommitRevision;
