@@ -35,12 +35,9 @@ namespace SvnBridge
                 typeof (IActionTracking)
             };
 
-        public BootStrapper() : this(true) {}
-
-        public BootStrapper(bool useCaching)
-        {
+        public BootStrapper()  
+		{
             IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
-            IoC.Container.Configuration["useCaching"] = useCaching;
             IoC.Container.Configuration["persistentCachePath"] =
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
 

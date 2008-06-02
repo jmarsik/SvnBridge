@@ -8,19 +8,19 @@ namespace SvnBridge.Infrastructure
 	{
 		private readonly ITFSSourceControlService sourceControlService;
 		private readonly IPersistentCache persistentCache;
-        private readonly bool useCaching;
+        private readonly bool cacheEnabled;
 
-		public MetaDataRepositoryFactory(ITFSSourceControlService sourceControlService, IPersistentCache persistentCache, bool useCaching)
+		public MetaDataRepositoryFactory(ITFSSourceControlService sourceControlService, IPersistentCache persistentCache, bool cacheEnabled)
 		{
 			this.sourceControlService = sourceControlService;
 			this.persistentCache = persistentCache;
-            this.useCaching = useCaching;
+            this.cacheEnabled = cacheEnabled;
 		}
 
 		public IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath)
 		{
             IMetaDataRepository repository;
-            if (useCaching)
+            if (cacheEnabled)
             {
                 repository = new MetaDataRepository(sourceControlService, credentials,
                     persistentCache,

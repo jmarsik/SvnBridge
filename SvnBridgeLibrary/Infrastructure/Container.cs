@@ -134,6 +134,10 @@ namespace SvnBridge.Infrastructure
             {
                 return value;
             }
+			if (ConfigurationManager.AppSettings[name] != null)
+			{
+				return ConfigurationManager.AppSettings[name];
+			}
 			foreach (SettingsProperty property in settings.Properties)
 			{
 				if (property.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
@@ -166,9 +170,15 @@ namespace SvnBridge.Infrastructure
                         }
                         else
                         {
-                            arg =
-                                IoC.Container.TryGetConfiguration(info.Name) ??
-                                IoC.Resolve(info.ParameterType, dictionary);
+                        	if (IoC.Container.TryGetConfiguration(info.Name) != null)
+                        	{
+                        		arg = IoC.Container.TryGetConfiguration(info.Name);
+                        		arg = Convert.ChangeType(arg, info.ParameterType);
+                        	}
+                        	else
+                        	{
+                        		arg = IoC.Resolve(info.ParameterType, dictionary);
+                        	}
                         }
                         args.Add(arg);
                     }

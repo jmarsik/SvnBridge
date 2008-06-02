@@ -9,8 +9,7 @@ namespace SvnBridge
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            bool cacheEnabled = bool.Parse(ConfigurationManager.AppSettings["CacheEnabled"]);
-            new BootStrapper(cacheEnabled).Start();
+            new BootStrapper().Start();
         }
 
         protected void Application_End(object sender, EventArgs e)

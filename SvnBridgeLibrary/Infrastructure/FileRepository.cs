@@ -18,20 +18,20 @@ namespace SvnBridge.Infrastructure
         private readonly IFileCache fileCache;
         private readonly IWebTransferService webTransferService;
         private readonly ILogger logger;
-        private readonly bool useCaching;
+        private readonly bool cacheEnabled;
 
-        public FileRepository(string serverUrl, ICredentials credentials, IFileCache fileCache, IWebTransferService webTransferService, ILogger logger, bool useCaching)
+        public FileRepository(string serverUrl, ICredentials credentials, IFileCache fileCache, IWebTransferService webTransferService, ILogger logger, bool cacheEnabled)
         {
             this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
             this.fileCache = fileCache;
             this.webTransferService = webTransferService;
             this.logger = logger;
-            this.useCaching = useCaching;
+            this.cacheEnabled = cacheEnabled;
         }
 
         public byte[] GetFile(ItemMetaData item)
         {
-            if (!useCaching)
+            if (!cacheEnabled)
                 return webTransferService.DownloadBytes(item.DownloadUrl, credentials);
 
             byte[] bytes = fileCache.Get(item.Name, item.Revision);
@@ -49,7 +49,7 @@ namespace SvnBridge.Infrastructure
 
         public void ReadFileAsync(ItemMetaData item)
         {
-            if (!useCaching)
+            if (!cacheEnabled)
             {
                 byte[] data = webTransferService.DownloadBytes(item.DownloadUrl, credentials);
                 FileData fileData = new FileData();
