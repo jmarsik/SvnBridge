@@ -8,7 +8,6 @@ using SvnBridge.Net;
 using SvnBridge.Proxies;
 using SvnBridge.SourceControl;
 using System.Configuration;
-using SvnBridge.Properties;
 
 namespace SvnBridge.Infrastructure
 {

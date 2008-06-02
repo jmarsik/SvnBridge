@@ -1,11 +1,17 @@
 using System;
 using System.Collections;
+using SvnBridge.Properties;
 
 namespace SvnBridge.Infrastructure
 {
     public static class IoC
     {
-        public static Container Container = new Container();
+        public static Container Container;
+
+    	static IoC()
+    	{
+    		Reset();
+    	}
 
         public static T Resolve<T>(IDictionary dependencies)
         {
@@ -26,7 +32,7 @@ namespace SvnBridge.Infrastructure
 
         public static void Reset()
         {
-            Container = new Container();
+            Container = new Container(Settings.Default);
         }
     }
 }

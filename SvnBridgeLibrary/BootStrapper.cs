@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -7,13 +6,11 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
-using SvnBridge.Cache;
 using SvnBridge.Infrastructure;
 using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
-using SvnBridge.Properties;
 
 namespace SvnBridge
 {
@@ -46,6 +43,8 @@ namespace SvnBridge
             IoC.Container.Configuration["useCaching"] = useCaching;
             IoC.Container.Configuration["persistentCachePath"] =
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
+
+        	TfsUtil.OnSetupWebRequest = WebRequestSetup.OnWebRequest;
 
             List<Assembly> asms = new List<Assembly>();
             List<string> names = new List<string>();

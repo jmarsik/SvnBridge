@@ -77,7 +77,7 @@ namespace SvnBridge.Handlers
                 sw.Write(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <D:multistatus xmlns:D=""DAV:"" xmlns:ns0=""DAV:"">
 <D:response xmlns:S=""http://subversion.tigris.org/xmlns/svn/"" xmlns:C=""http://subversion.tigris.org/xmlns/custom/"" xmlns:V=""http://subversion.tigris.org/xmlns/dav/"" xmlns:lp1=""DAV:"" xmlns:lp2=""http://subversion.tigris.org/xmlns/dav/"">
-<D:href>"+ GetLocalPath("/!svn/bln/0") + @"</D:href>
+<D:href>" + Helper.UrlEncodeIfNeccesary(GetLocalPath("/!svn/bln/0")) + @"</D:href>
 <D:propstat>
 <D:prop>
 <S:date>" + Helper.FormatDate(firstVersion.LastModifiedDate) + @"</S:date>
@@ -188,7 +188,7 @@ namespace SvnBridge.Handlers
                          "</lp1:getlastmodified>\n");
             string svrVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" +
                                         Helper.Encode(item.Name));
-            writer.Write("<lp1:checked-in><D:href>" + svrVerLocalPath +
+            writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svrVerLocalPath) +
                          "</D:href></lp1:checked-in>\n");
             writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
                          "</D:href></lp1:version-controlled-configuration>\n");
@@ -226,7 +226,7 @@ namespace SvnBridge.Handlers
                          "</lp1:getlastmodified>\n");
             string svnVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" +
                                         Helper.Encode(item.Name));
-            writer.Write("<lp1:checked-in><D:href>" + svnVerLocalPath +
+			writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svnVerLocalPath) +
                          "</D:href></lp1:checked-in>\n");
             writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
                          "</D:href></lp1:version-controlled-configuration>\n");
@@ -415,7 +415,7 @@ namespace SvnBridge.Handlers
                 output.Write(" xmlns:g0=\"DAV:\"");
             }
             output.Write(">\n");
-            output.Write("<D:href>" + node.Href(this) + "</D:href>\n");
+			output.Write("<D:href>" + Helper.UrlEncodeIfNeccesary(node.Href(this)) + "</D:href>\n");
 
             XmlDocument doc = new XmlDocument();
             List<string> propertyResults = new List<string>();

@@ -98,6 +98,11 @@
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />
     <Compile Include="Interfaces\IPathParser.cs" />
     <Compile Include="Interfaces\ISourceControlServicesHub.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <DependentUpon>Settings.settings</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Protocol\DatedRevReportData.cs" />
     <Compile Include="Protocol\FileRevsReportData.cs" />
     <Compile Include="Protocol\RelayReportData.cs" />
@@ -160,11 +165,6 @@
     <Compile Include="Net\IListener.cs" />
     <Compile Include="Net\Listener.cs" />
     <Compile Include="Net\ListenerResponseStream.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="Handlers\PropFindHandler\BcFileNode.cs" />
     <Compile Include="Handlers\PropFindHandler\FileNode.cs" />
     <Compile Include="Handlers\PropFindHandler\INode.cs" />
@@ -227,16 +227,11 @@
     <Compile Include="Utility\SvnDiffParser.cs" />
     <Compile Include="Utility\Helper.cs" />
     <Compile Include="Protocol\WebDav.cs" />
+    <Compile Include="WebRequestSetup.cs" />
     <Compile Include="Web\HttpContextWrapper.cs" />
     <Compile Include="Web\HttpRequestWrapper.cs" />
     <Compile Include="Web\HttpResponseWrapper.cs" />
     <Compile Include="Web\SvnBridgeHttpHandler.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Infrastructure\Messages\GetWorkItemInformationMessage.xml" />
@@ -246,6 +241,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Infrastructure\Messages\SetWorkItemStatusToFixedMessage.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

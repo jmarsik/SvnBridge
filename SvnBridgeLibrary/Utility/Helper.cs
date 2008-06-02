@@ -314,19 +314,19 @@ namespace SvnBridge.Utility
 
         public static string UrlEncodeIfNeccesary(string href)
         {
-            bool containsNonAsciiChar = false;
+			StringBuilder sb = new StringBuilder();
             foreach (char c in href)
             {
                 if (c > 256)
                 {
-                    containsNonAsciiChar = true;
-                    break;
+                	sb.Append(HttpUtility.UrlEncode(c.ToString()));
+                }
+				else
+                {
+                	sb.Append(c);
                 }
             }
-            string encode = Encode(href);
-            if (containsNonAsciiChar)
-                encode = HttpUtility.UrlEncode(href);
-            return encode;
+            return sb.ToString();
         }
     }
 }

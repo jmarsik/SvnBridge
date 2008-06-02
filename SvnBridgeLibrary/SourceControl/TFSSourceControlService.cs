@@ -25,17 +25,7 @@ namespace SvnBridge.SourceControl
 		{
 			this.webSvcFactory = webSvcFactory;
 			this.logger = logger;
-            TfsUtil.OnSetupWebRequest = SetupWebRequest;
 		}
-
-        public static void SetupWebRequest(WebRequest request)
-        {
-            HttpWebRequest httpRequest = request as HttpWebRequest;
-            if (httpRequest != null)
-            {
-                httpRequest.UnsafeAuthenticatedConnectionSharing = false;
-            }
-        }
 
 		public ExtendedItem[][] QueryItemsExtended(string tfsUrl,
 		                                           ICredentials credentials,

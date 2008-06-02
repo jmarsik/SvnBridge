@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Reflection;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
@@ -26,7 +27,14 @@ namespace SvnBridge.Infrastructure
         private readonly Dictionary<Type, Creator> typeToCreator
             = new Dictionary<Type, Creator>();
 
-        public Dictionary<string, object> Configuration
+    	private ApplicationSettingsBase settings;
+
+    	public Container(ApplicationSettingsBase settings)
+    	{
+    		this.settings = settings;
+    	}
+
+    	public Dictionary<string, object> Configuration
         {
             get { return configuration; }
         }
@@ -126,6 +134,13 @@ namespace SvnBridge.Infrastructure
             {
                 return value;
             }
+			foreach (SettingsProperty property in settings.Properties)
+			{
+				if (property.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+				{
+					return settings[property.Name];
+				}
+			}
 			if (PerRequest.IsInitialized && PerRequest.Items.Contains(name))
 			{
 				return PerRequest.Items[name];
