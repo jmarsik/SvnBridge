@@ -64,42 +64,75 @@ namespace SvnBridge
 
         public void Start()
         {
-            foreach (Assembly assembly in assemblies)
-            {
-                foreach (Type type in assembly.GetTypes())
-                {
-                    if (ValidTypeForRegistration(type) == false)
-                    {
-                        continue;
-                    }
-
-
-                    foreach (Type interfaceType in type.GetInterfaces())
-                    {
-                        if (IoC.Container.IsRegistered(interfaceType))
-                        {
-                            continue;
-                        }
-                        object[] attributes = type.GetCustomAttributes(typeof(InterceptorAttribute), true);
-                        if (attributes.Length == 0)
-                        {
-                            IoC.Container.Register(interfaceType, type);
-                        }
-                        else
-                        {
-                            List<Type> interceptors = new List<Type>();
-                            Array.ForEach(attributes, delegate(object attr)
-                            {
-                                interceptors.Add(((InterceptorAttribute)attr).Interceptor);
-                            });
-                            IoC.Container.Register(interfaceType, type, interceptors.ToArray());
-                        }
-                    }
-                }
-            }
+            RegisterTypesFromKnownAssemblies();
+        	RegisterTypeFromAddinAssemblies();
         }
 
-        private bool IsValidInterface(Type interfaceType)
+    	private void RegisterTypeFromAddinAssemblies()
+    	{
+    		string[] assemblyNames = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
+    		foreach (string assemblyName in assemblyNames)
+    		{
+				// Here we assume that the assembly name and the file name are identical.
+    			Assembly assembly = Assembly.Load(Path.GetFileNameWithoutExtension(assemblyName));
+				// we ignore the well known assemblies
+				if(Array.IndexOf(assemblies, assembly)!=-1)
+					continue;
+
+				foreach (Type type in assembly.GetTypes())
+    			{
+					if (typeof(IAssemblyAddin).IsAssignableFrom(type))
+    				{
+    					IAssemblyAddin addin = (IAssemblyAddin) Activator.CreateInstance(type);
+    					addin.Initialize(IoC.Container);
+    				}
+    			}
+    		}
+    	}
+
+    	private void RegisterTypesFromKnownAssemblies()
+    	{
+    		foreach(Type type in GetAllTypesFromAssebmlies())
+    		{
+    			if (ValidTypeForRegistration(type) == false)
+    				continue;
+
+    			foreach (Type interfaceType in type.GetInterfaces())
+    			{
+    				if (IoC.Container.IsRegistered(interfaceType))
+    				{
+    					continue;
+    				}
+    				object[] attributes = type.GetCustomAttributes(typeof(InterceptorAttribute), true);
+    				if (attributes.Length == 0)
+    				{
+    					IoC.Container.Register(interfaceType, type);
+    				}
+    				else
+    				{
+    					List<Type> interceptors = new List<Type>();
+    					Array.ForEach(attributes, delegate(object attr)
+    					{
+    						interceptors.Add(((InterceptorAttribute)attr).Interceptor);
+    					});
+    					IoC.Container.Register(interfaceType, type, interceptors.ToArray());
+    				}
+    			}
+    		}
+    	}
+
+    	private IEnumerable<Type> GetAllTypesFromAssebmlies()
+    	{
+    		foreach (Assembly assembly in assemblies)
+    		{
+    			foreach (Type type in assembly.GetTypes())
+    			{
+    				yield return type;
+    			}
+    		}
+    	}
+
+    	private bool IsValidInterface(Type interfaceType)
         {
             return Array.IndexOf(componentInterfacesNamespace, interfaceType.Namespace) != -1 &&
                    Array.IndexOf(assemblies, interfaceType.Assembly) != -1;

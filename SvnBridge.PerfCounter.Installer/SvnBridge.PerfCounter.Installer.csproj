@@ -49,9 +49,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridgeLibrary.csproj">
+    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridge.Library.csproj">
       <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
-      <Name>SvnBridgeLibrary</Name>
+      <Name>SvnBridge.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

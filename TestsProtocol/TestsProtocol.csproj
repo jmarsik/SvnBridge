@@ -99,9 +99,9 @@
     <Compile Include="Update\UpdateWithSpecialCharacters.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridgeLibrary.csproj">
+    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridge.Library.csproj">
       <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
-      <Name>SvnBridgeLibrary</Name>
+      <Name>SvnBridge.Library</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tests\TestsUnit.csproj">
       <Project>{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}</Project>

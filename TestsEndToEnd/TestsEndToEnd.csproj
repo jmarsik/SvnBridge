@@ -65,9 +65,9 @@
     <Compile Include="UpdateTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridgeLibrary.csproj">
+    <ProjectReference Include="..\SvnBridgeLibrary\SvnBridge.Library.csproj">
       <Project>{95E4E16B-0975-4705-B3A0-83700DE483C2}</Project>
-      <Name>SvnBridgeLibrary</Name>
+      <Name>SvnBridge.Library</Name>
     </ProjectReference>
     <ProjectReference Include="..\TestsIntegration\TestsIntegration.csproj">
       <Project>{1FDFAA1A-E23E-47A7-B50D-E9812D674E1A}</Project>

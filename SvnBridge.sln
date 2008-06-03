@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsProtocol", "TestsProto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeViaIis", "SvnBridgeViaIis\SvnBridgeViaIis.csproj", "{8D9B38FE-25A4-41A2-B6F8-2ACC1F5D261B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridgeLibrary", "SvnBridgeLibrary\SvnBridgeLibrary.csproj", "{95E4E16B-0975-4705-B3A0-83700DE483C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvnBridge.Library", "SvnBridgeLibrary\SvnBridge.Library.csproj", "{95E4E16B-0975-4705-B3A0-83700DE483C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsEndToEnd", "TestsEndToEnd\TestsEndToEnd.csproj", "{7913B9B3-9BDA-48D9-8928-4F46E1CF0E1D}"
 EndProject
