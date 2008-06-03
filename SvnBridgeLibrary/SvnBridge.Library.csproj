@@ -79,7 +79,6 @@
     <Compile Include="Infrastructure\DefaultLogger.cs" />
     <Compile Include="Interfaces\IMetaDataRepository.cs" />
     <Compile Include="Infrastructure\MetaDataRepository.cs" />
-    <Compile Include="Infrastructure\Queries.cs" />
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="Interfaces\IMetaDataRepositoryFactory.cs" />
     <Compile Include="Interfaces\ITfsUrlValidator.cs" />

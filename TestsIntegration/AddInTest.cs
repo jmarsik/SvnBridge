@@ -23,7 +23,7 @@ namespace IntegrationTests
 
 		public void Initialize(Container container)
 		{
-			container.Register<IPAddress>(delegate { return IPAddress.Loopback; });
+			container.OverrideRegisteration<IPAddress>(delegate { return IPAddress.Loopback; });
 		}
 
 		#endregion

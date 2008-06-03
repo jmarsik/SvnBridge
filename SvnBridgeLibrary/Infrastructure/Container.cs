@@ -58,16 +58,18 @@ namespace SvnBridge.Infrastructure
         	Register(service, creator);
         }
 
-    	private Creator GetAutoCreator(Type service, Type impl, params Type[] interceptorsType)
+    	private Creator GetAutoCreator(Type service, Type impl, params Type[] interceptorTypes)
     	{
     		return delegate(Container c, IDictionary deps)
     		{
     			object instance = CreateInstance(impl, deps);
     			List<IInterceptor> interceptors = new List<IInterceptor>();
-    			foreach (Type interceptorType in interceptorsType)
+    			foreach (Type interceptorType in interceptorTypes)
     			{
     				interceptors.Add((IInterceptor) Resolve(interceptorType, deps));
     			}
+				if (interceptors.Count == 0)
+					return instance;
     			return ProxyFactory.Create(service, instance, interceptors.ToArray());
     		};
     	}
@@ -212,5 +214,10 @@ namespace SvnBridge.Infrastructure
         {
             typeToCreator[typeof(TService)] = creator;
         }
+
+		public void OverrideRegisteration<TService, TImpl>()
+		{
+			typeToCreator[typeof(TService)] = GetAutoCreator(typeof(TService), typeof(TImpl));
+		}
     }
 }
