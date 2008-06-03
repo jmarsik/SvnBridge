@@ -27,12 +27,6 @@ namespace SvnBridge.Infrastructure
         private readonly Dictionary<Type, Creator> typeToCreator
             = new Dictionary<Type, Creator>();
 
-    	private ApplicationSettingsBase settings;
-
-    	public Container(ApplicationSettingsBase settings)
-    	{
-    		this.settings = settings;
-    	}
 
     	public Dictionary<string, object> Configuration
         {
@@ -60,19 +54,25 @@ namespace SvnBridge.Infrastructure
                     IoC.Container.Register(interceptorType, interceptorType);
             }
 
-            Register(service, delegate(Container c, IDictionary deps)
-            {
-                object instance = CreateInstance(impl, deps);
-                List<IInterceptor> interceptors = new List<IInterceptor>();
-                foreach (Type interceptorType in interceptorsType)
-                {
-                    interceptors.Add((IInterceptor)Resolve(interceptorType, deps));
-                }
-                return ProxyFactory.Create(service, instance, interceptors.ToArray());
-            });
+        	Creator creator = GetAutoCreator(service, impl,interceptorsType);
+        	Register(service, creator);
         }
 
-        public void Register(Type type,
+    	private Creator GetAutoCreator(Type service, Type impl, params Type[] interceptorsType)
+    	{
+    		return delegate(Container c, IDictionary deps)
+    		{
+    			object instance = CreateInstance(impl, deps);
+    			List<IInterceptor> interceptors = new List<IInterceptor>();
+    			foreach (Type interceptorType in interceptorsType)
+    			{
+    				interceptors.Add((IInterceptor) Resolve(interceptorType, deps));
+    			}
+    			return ProxyFactory.Create(service, instance, interceptors.ToArray());
+    		};
+    	}
+
+    	public void Register(Type type,
                              Creator creator)
         {
             if (IsRegistered(type))
@@ -96,7 +96,12 @@ namespace SvnBridge.Infrastructure
                               IDictionary dependencies)
         {
             Creator creator;
-            if (typeToCreator.TryGetValue(type, out creator) == false)
+			if(ConfigurationManager.AppSettings[type.Name]!=null)
+			{
+				Type impl = Type.GetType(ConfigurationManager.AppSettings[type.Name], true,true);
+				creator = GetAutoCreator(type, impl);
+			}
+        	else if (typeToCreator.TryGetValue(type, out creator) == false)
             {
                 throw new InvalidOperationException("No component registered for " + type);
             }
@@ -137,13 +142,6 @@ namespace SvnBridge.Infrastructure
 			if (ConfigurationManager.AppSettings[name] != null)
 			{
 				return ConfigurationManager.AppSettings[name];
-			}
-			foreach (SettingsProperty property in settings.Properties)
-			{
-				if (property.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
-				{
-					return settings[property.Name];
-				}
 			}
 			if (PerRequest.IsInitialized && PerRequest.Items.Contains(name))
 			{

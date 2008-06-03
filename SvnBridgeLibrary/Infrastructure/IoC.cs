@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using SvnBridge.Properties;
 
 namespace SvnBridge.Infrastructure
 {
@@ -32,7 +31,7 @@ namespace SvnBridge.Infrastructure
 
         public static void Reset()
         {
-            Container = new Container(Settings.Default);
+            Container = new Container();
         }
     }
 }

@@ -60,6 +60,7 @@
     <Compile Include="Infrastructure\Statistics\IActionTracking.cs" />
     <Compile Include="Interfaces\IFileRepository.cs" />
     <Compile Include="Interfaces\IPersistentCache.cs" />
+    <Compile Include="NullImpl\NullActionTracking.cs" />
     <Compile Include="NullImpl\NullCache.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Exceptions\CacheMissException.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="Interfaces\IMetaDataRepository.cs" />
     <Compile Include="Infrastructure\MetaDataRepository.cs" />
     <Compile Include="Infrastructure\Queries.cs" />
-    <Compile Include="Infrastructure\SequentialGuid.cs" />
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="Interfaces\IMetaDataRepositoryFactory.cs" />
     <Compile Include="Interfaces\ITfsUrlValidator.cs" />
@@ -98,11 +98,6 @@
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />
     <Compile Include="Interfaces\IPathParser.cs" />
     <Compile Include="Interfaces\ISourceControlServicesHub.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <DependentUpon>Settings.settings</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Protocol\DatedRevReportData.cs" />
     <Compile Include="Protocol\FileRevsReportData.cs" />
     <Compile Include="Protocol\RelayReportData.cs" />
@@ -241,12 +236,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Infrastructure\Messages\SetWorkItemStatusToFixedMessage.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
