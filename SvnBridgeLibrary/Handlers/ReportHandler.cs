@@ -465,7 +465,8 @@ namespace SvnBridge.Handlers
                         output.Write("<S:deleted-path>/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
                                      "</S:deleted-path>\n");
                     }
-                    else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
+                    else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch ||
+						(change.ChangeType & ChangeType.Merge) == ChangeType.Merge)
                     {
                         var renamedItem = (RenamedSourceItem) change.Item;
                         output.Write("<S:added-path copyfrom-path=\"/" + Helper.EncodeB(renamedItem.OriginalRemoteName) +
