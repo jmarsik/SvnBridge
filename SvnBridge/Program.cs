@@ -66,7 +66,7 @@ namespace SvnBridge
             return null;
         }
 
-        private static ProxyInformation GetProxyInfo()
+        public static ProxyInformation GetProxyInfo()
         {
             var proxyInfo = new ProxyInformation();
             proxyInfo.UseProxy = Settings.Default.UseProxy;
@@ -98,31 +98,37 @@ namespace SvnBridge
 
             if (!presenter.Cancelled)
             {
-                port = Settings.Default.TfsPort = presenter.Port;
+            	port = presenter.Port;
 
-                Settings.Default.UseProxy = proxyInfo.UseProxy;
-                Settings.Default.ProxyUrl = proxyInfo.Url;
-                Settings.Default.ProxyPort = proxyInfo.Port;
-                Settings.Default.ProxyUseDefaultCredentials = proxyInfo.UseDefaultCredentails;
-                Settings.Default.ProxyUsername = proxyInfo.Username;
-
-                byte[] password = null;
-                if (proxyInfo.Password != null)
-                {
-                    password = ProtectedData.Protect(
-                        Encoding.UTF8.GetBytes(proxyInfo.Password),
-                        Encoding.UTF8.GetBytes("ProxyEncryptedPassword"),
-                        DataProtectionScope.CurrentUser
-                        );
-                }
-                Settings.Default.ProxyEncryptedPassword = password;
-
-                Settings.Default.Save();
+            	SaveSettings(proxyInfo, presenter.Port);
             }
-            return !presenter.Cancelled;
+        	return !presenter.Cancelled;
         }
 
-        private static void Run(int port, ProxyInformation proxyInformation)
+    	public static void SaveSettings(ProxyInformation proxyInfo, int port)
+    	{
+    		Settings.Default.TfsPort = port;
+    		Settings.Default.UseProxy = proxyInfo.UseProxy;
+    		Settings.Default.ProxyUrl = proxyInfo.Url;
+    		Settings.Default.ProxyPort = proxyInfo.Port;
+    		Settings.Default.ProxyUseDefaultCredentials = proxyInfo.UseDefaultCredentails;
+    		Settings.Default.ProxyUsername = proxyInfo.Username;
+
+    		byte[] password = null;
+    		if (proxyInfo.Password != null)
+    		{
+    			password = ProtectedData.Protect(
+    				Encoding.UTF8.GetBytes(proxyInfo.Password),
+    				Encoding.UTF8.GetBytes("ProxyEncryptedPassword"),
+    				DataProtectionScope.CurrentUser
+    				);
+    		}
+    		Settings.Default.ProxyEncryptedPassword = password;
+
+    		Settings.Default.Save();
+    	}
+
+    	private static void Run(int port, ProxyInformation proxyInformation)
         {
             Proxy.Set(proxyInformation);
 

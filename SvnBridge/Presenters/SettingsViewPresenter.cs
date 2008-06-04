@@ -55,5 +55,10 @@ namespace SvnBridge.Presenters
 		{
 			view.Show();
 		}
+
+		public void UpdatedProxyInformation()
+		{
+			
+		}
 	}
 }

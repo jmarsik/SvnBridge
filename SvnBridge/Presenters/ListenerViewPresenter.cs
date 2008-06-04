@@ -44,14 +44,15 @@ namespace SvnBridge.Presenters
 
 		public void ChangeSettings(ISettingsView settingsView)
 		{
-			SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView, new ProxyInformation());
+			SettingsViewPresenter settingsViewPresenter = new SettingsViewPresenter(settingsView, Program.GetProxyInfo());
 			settingsViewPresenter.Port = listener.Port;
 			settingsViewPresenter.IgnoredUsedPort = listener.Port;
 			settingsViewPresenter.Show();
 
-			if ((!settingsViewPresenter.Cancelled) && (SettingsHaveChanged(settingsViewPresenter.Port)))
+			if ((!settingsViewPresenter.Cancelled) && (SettingsHaveChanged(settingsViewPresenter)))
 			{
-				ApplyNewSettings(settingsViewPresenter.Port);
+				Program.SaveSettings(settingsViewPresenter.ProxyInformation, settingsViewPresenter.Port);
+				ApplyNewSettings(settingsViewPresenter.ProxyInformation, settingsViewPresenter.Port);
 			}
 		}
 
@@ -73,16 +74,18 @@ namespace SvnBridge.Presenters
 			view.OnListenerStopped();
 		}
 
-		private void ApplyNewSettings(int port)
+		private void ApplyNewSettings(ProxyInformation proxy, int port)
 		{
 			StopListener();
 			listener.Port = port;
+			Proxy.Set(proxy);
 			StartListener();
 		}
 
-		private bool SettingsHaveChanged(int port)
+		private bool SettingsHaveChanged(SettingsViewPresenter presenter)
 		{
-			return port != listener.Port;
+			return presenter.Port != listener.Port ||
+				   presenter.ProxyInformation != Program.GetProxyInfo();
 		}
 
 		public void ShowErrors()

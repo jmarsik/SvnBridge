@@ -49,7 +49,7 @@ namespace IntegrationTests
 													 null,
 													 CreateSourceControlServicesHub());
 
-			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Environment.MachineName;
+			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Environment.MachineName + "-" + Guid.NewGuid();
 			_provider.MakeActivity(_activityId);
 			_provider.MakeCollection(_activityId, testPath);
 

@@ -282,12 +282,6 @@ namespace SvnBridge.SourceControl
             foreach (SourceItemHistory history in logItem.History)
             {
                 List<SourceItem> renamedItems = new List<SourceItem>();
-				BranchItemsFinder branchItemsFinder = new BranchItemsFinder(
-					SourceControlService, 
-					history,
-					serverUrl,
-					rootPath,
-					credentials);
                 foreach (SourceItemChange change in history.Changes)
                 {
                     change.Item.RemoteName = change.Item.RemoteName.Substring(rootPath.Length);
@@ -297,7 +291,16 @@ namespace SvnBridge.SourceControl
                     }
                     else if ((change.ChangeType & ChangeType.Branch) == ChangeType.Branch)
                     {
-                    	BranchRelative[][] branches = branchItemsFinder.FindBranchesFor(change);
+						ChangesetVersionSpec branchChangeset = new ChangesetVersionSpec();
+						branchChangeset.cs = history.ChangeSetID;
+						ItemSpec spec = new ItemSpec();
+						spec.item = Helper.CombinePath(rootPath, change.Item.RemoteName);
+						BranchRelative[][] branches =
+							SourceControlService.QueryBranches(serverUrl,
+															   credentials,
+															   null,
+															   new ItemSpec[] { spec },
+															   branchChangeset);
                         if(branches[0].Length == 0)
                         {
                             // it is a branch without a source ...
