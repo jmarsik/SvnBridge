@@ -1,7 +1,10 @@
 using System;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using CodePlex.TfsLibrary.RegistrationWebSvc;
+using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Infrastructure;
 using SvnBridge.Net;
 using SvnBridge.Presenters;
@@ -16,7 +19,7 @@ namespace SvnBridge
         [STAThread]
         private static void Main(string[] args)
         {
-            Logging.TraceEnabled = Settings.Default.TraceEnabled;
+        	Logging.TraceEnabled = Settings.Default.TraceEnabled;
             Logging.MethodTraceEnabled = false;
 
             new BootStrapper().Start();

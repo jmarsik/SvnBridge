@@ -328,5 +328,12 @@ namespace SvnBridge.Utility
             }
             return sb.ToString();
         }
+
+    	public static string CombinePath(string path1, string path2)
+    	{
+    		if (path1.EndsWith("/") && path2.StartsWith("/"))
+    			return path1 + path2.Substring(1);
+    		return path1 + path2;
+    	}
     }
 }
