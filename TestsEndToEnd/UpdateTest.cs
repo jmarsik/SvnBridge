@@ -8,6 +8,43 @@ namespace TestsEndToEnd
 {
     public class UpdateTest : EndToEndTestBase
     {
+		[SvnBridgeFact]
+		public void CanUpdateWorkingCopy_AfterRenameFromOfFileFromOneFolderToAnother_WhenUpdatingFromTheOriginalFolder()
+		{
+			CreateFolder(testPath + "/src", true);
+			CreateFolder(testPath + "/dest", true);
+			WriteFile(testPath + "/src/file", "blah", true);
+
+			CheckoutAndChangeDirectory();
+
+			Assert.True(File.Exists("src/file"));
+
+			RenameItem(testPath + "/src/file", testPath + "/dest/file", true);
+
+			Svn("up src/file");
+
+			Assert.False(File.Exists("src/file"));
+		}
+
+		[SvnBridgeFact]
+		public void CanUpdateWorkingCopy_AfterRenameFromOfFileFromOneFolderToAnother_WhenUpdatingFromTheDestFolder()
+		{
+			CreateFolder(testPath + "/src", true);
+			CreateFolder(testPath + "/dest", true);
+			WriteFile(testPath + "/src/file", "blah", true);
+
+			CheckoutAndChangeDirectory();
+
+			Assert.True(File.Exists("src/file"));
+
+			RenameItem(testPath + "/src/file", testPath + "/dest/file", true);
+
+			Svn("up dest");
+
+			Assert.False(File.Exists("dest/file"));
+		}
+
+
         [SvnBridgeFact]
         public void CanUpdateWorkingCopy()
         {

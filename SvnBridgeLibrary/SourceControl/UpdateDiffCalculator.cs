@@ -28,17 +28,41 @@ namespace SvnBridge.SourceControl
         public void CalculateDiff(string checkoutRootPath,
                                   int versionTo,
                                   int versionFrom,
-                                  FolderMetaData root,
+                                  FolderMetaData checkoutRoot,
                                   UpdateReportData updateReportData)
         {
             clientExistingFiles = GetClientExistingFiles(checkoutRootPath, updateReportData);
             clientDeletedFiles = GetClientDeletedFiles(checkoutRootPath, updateReportData);
-            if (versionFrom != versionTo)
+
+			if (versionFrom != versionTo)
             {
-                CalculateChangeBetweenVersions(checkoutRootPath,
-                                               root,
+				// we have to calculate the difference from the project root
+				// this is because we may have a file move from below the checkoutRootPath, 
+				// which we still need to consider
+				string projectRootPath = GetProjectRoot(checkoutRootPath);
+            	FolderMetaData projectRoot = checkoutRoot;
+				if(projectRootPath!=checkoutRootPath)
+				{
+					projectRoot = (FolderMetaData)sourceControlProvider.GetItems(versionTo, projectRootPath, Recursion.None);
+				}
+				CalculateChangeBetweenVersions(projectRootPath,
+											   projectRoot,
                                                versionFrom,
                                                versionTo);
+
+				if(projectRootPath!=checkoutRootPath)
+				{
+					// we will now copy all the children to the real checkoutRoot
+					FolderMetaData checkoutRootFromProjectRoot = (FolderMetaData)projectRoot.FindItem("/" + checkoutRootPath);
+					// if it is null, then there were no changes in this diff
+					if (checkoutRootFromProjectRoot != null)
+					{
+						foreach (ItemMetaData item in checkoutRootFromProjectRoot.Items)
+						{
+							checkoutRoot.Items.Add(item);
+						}
+					}
+				}
             }
 
             if (updateReportData.Entries != null)
@@ -51,10 +75,10 @@ namespace SvnBridge.SourceControl
                         continue;
                     if (itemVersionFrom != versionTo)
                     {
-                        FindOrCreateResults results = FindItemOrCreateItem(root, checkoutRootPath, data.path, versionTo,
+                        FindOrCreateResults results = FindItemOrCreateItem(checkoutRoot, checkoutRootPath, data.path, versionTo,
                                                                            Recursion.None);
 
-                        bool changed = CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, root,
+                        bool changed = CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, checkoutRoot,
                                                                       itemVersionFrom, versionTo);
                         if (changed == false)
                             results.RevertAddition();
@@ -65,15 +89,24 @@ namespace SvnBridge.SourceControl
             {
                 if (sourceControlProvider.ItemExists(checkoutRootPath + "/" + missingItem, versionTo))
                 {
-                    FindItemOrCreateItem(root, checkoutRootPath, missingItem, versionTo, Recursion.Full);
+                    FindItemOrCreateItem(checkoutRoot, checkoutRootPath, missingItem, versionTo, Recursion.Full);
                 }
             }
-            FlattenDeletedFolders(root);
-            RemoveMissingItemsWhichAreChildrenOfRenamedItem(root);
-            VerifyNoMissingItemMetaDataRemained(root);
+            FlattenDeletedFolders(checkoutRoot);
+            RemoveMissingItemsWhichAreChildrenOfRenamedItem(checkoutRoot);
+            VerifyNoMissingItemMetaDataRemained(checkoutRoot);
         }
 
-        private void RemoveMissingItemsWhichAreChildrenOfRenamedItem(FolderMetaData root)
+
+    	private static string GetProjectRoot(string path)
+    	{
+    		string[] parts = path.Split(new char[]{'/'}, StringSplitOptions.RemoveEmptyEntries);
+			if (parts.Length == 0)
+				return "";
+    		return parts[0];
+    	}
+
+    	private void RemoveMissingItemsWhichAreChildrenOfRenamedItem(FolderMetaData root)
         {
             foreach (string item in renamedItemsToBeCheckedForDeletedChildren)
             {

@@ -61,7 +61,6 @@
     <Compile Include="PropertiesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SvnBridgeFactAttribute.cs" />
-    <Compile Include="UpdateExtendedTest.cs" />
     <Compile Include="UpdateTest.cs" />
   </ItemGroup>
   <ItemGroup>
