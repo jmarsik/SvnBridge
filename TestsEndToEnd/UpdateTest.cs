@@ -41,7 +41,7 @@ namespace TestsEndToEnd
 
 			Svn("up dest");
 
-			Assert.False(File.Exists("dest/file"));
+			Assert.True(File.Exists("dest/file"));
 		}
 
 
@@ -102,7 +102,6 @@ namespace TestsEndToEnd
             WriteFile(testPath + "/Foo/Y/D.txt", "b", true);
             WriteFile(testPath + "/Foo/obj/b.txt", "b", true);
             DeleteItem(testPath + "/Foo/obj", true);
-            int revision = _lastCommitRevision;
             RenameItem(testPath + "/Foo", testPath + "/Bar", true);
 
             Svn("update");
@@ -380,7 +379,7 @@ namespace TestsEndToEnd
             Svn("commit trunk/b/asdf.txt -m test");
             Svn("update");
             XmlDocument xml = SvnXml("info --xml -R");
-            int version = base._provider.GetLatestVersion();
+            int version = _provider.GetLatestVersion();
             foreach (XmlNode node in xml.SelectNodes("/info/entry/@revision"))
             {
                 Assert.Equal(version, int.Parse(node.Value));
@@ -454,7 +453,7 @@ namespace TestsEndToEnd
             Assert.True(Directory.Exists("testFolder1"));
         }
 
-        private void RmDir(string directory)
+        private static void RmDir(string directory)
         {
             ForAllFilesIn(directory, delegate(FileInfo info)
             {

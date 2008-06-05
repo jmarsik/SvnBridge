@@ -176,16 +176,17 @@ namespace SvnBridge.SourceControl
             if (path.StartsWith("/"))
             {
                 path = path.Substring(1);
-            }
+			}
 
-            FolderMetaData root = (FolderMetaData)GetItems(versionTo, path, Recursion.None);
+
+			FolderMetaData root = (FolderMetaData)GetItems(versionTo, path, Recursion.None);
 
             if (root != null)
             {
                 root.Properties.Clear();
             }
 
-            // the item doesn't exist and the request was for a specific version
+            // the item doesn't exist and the request was for a specific target
             if (root == null && reportData.UpdateTarget != null)
             {
                 root = new FolderMetaData();
@@ -200,9 +201,17 @@ namespace SvnBridge.SourceControl
                 throw new FileNotFoundException(path);
             }
 
-            UpdateDiffCalculator udc = new UpdateDiffCalculator(this);
-            udc.CalculateDiff(path, versionTo, versionFrom, root, reportData);
-
+        	var udc = new UpdateDiffCalculator(this);
+			udc.CalculateDiff(path, versionTo, versionFrom, root, reportData);
+			if (reportData.UpdateTarget != null)
+			{
+				string targetPath = "/" + Helper.CombinePath(path, reportData.UpdateTarget);
+				foreach (ItemMetaData item in new List<ItemMetaData>(root.Items))
+				{
+					if (item.Name.Equals(targetPath, StringComparison.InvariantCultureIgnoreCase) == false)
+						root.Items.Remove(item);
+				}
+			}
             return root;
         }
 

@@ -15,14 +15,14 @@ namespace TestsEndToEnd
 	public abstract class EndToEndTestBase : TFSSourceControlProviderTestsBase
 	{
 		#region Setup/Teardown
-        private string originalCurrentDirectory;
+		private readonly string originalCurrentDirectory;
 
 		protected EndToEndTestBase()
 		{
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 			port = new Random().Next(1024, short.MaxValue);
-            originalCurrentDirectory = Environment.CurrentDirectory;
-        }
+			originalCurrentDirectory = Environment.CurrentDirectory;
+		}
 
 		public string TestUrl
 		{
@@ -42,8 +42,8 @@ namespace TestsEndToEnd
 			Environment.CurrentDirectory = Path.Combine(Path.GetTempPath(), checkoutFolder);
 			Console.WriteLine("cd " + checkoutFolder);
 			listener = IoC.Resolve<IListener>();
-			listener.ListenError += delegate(object sender, ListenErrorEventArgs e) { Console.WriteLine(e.Exception); };
-			listener.Port = this.port;
+			listener.ListenError += ((sender, e) => Console.WriteLine(e.Exception));
+			listener.Port = port;
 
 			listener.Start(parser);
 		}
@@ -58,11 +58,11 @@ namespace TestsEndToEnd
 
 		public override void Dispose()
 		{
-            Environment.CurrentDirectory = originalCurrentDirectory;
+			Environment.CurrentDirectory = originalCurrentDirectory;
 
-			if (initialized==false)
+			if (initialized == false)
 				return;
-			
+
 			listener.Stop();
 
 			base.Dispose();
@@ -73,7 +73,7 @@ namespace TestsEndToEnd
 					{
 						file.Attributes = file.Attributes & ~FileAttributes.ReadOnly;
 					}
-					catch (Exception)
+					catch
 					{
 						// nothing much to do here
 					}
@@ -88,7 +88,7 @@ namespace TestsEndToEnd
 		private string checkoutFolder;
 		protected string testUrl;
 		protected int port;
-		private AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
+		private readonly AuthenticateAsLowPrivilegeUser authenticateAsLowPrivilegeUser;
 		private bool initialized;
 
 		protected static void ForAllFilesInCurrentDirectory(Action<FileInfo> action)
@@ -139,27 +139,38 @@ namespace TestsEndToEnd
 			return err;
 		}
 
-		protected string Svn(string command)
+		protected static string Svn(string command)
 		{
-			StringBuilder output = new StringBuilder();
-			string err = null;
-			ExecuteInternal(command, delegate(Process svn)
+			var output = new StringBuilder();
+			var err = new StringBuilder();
+			var readFromStdError = new Thread(prc =>
 			{
-				ThreadPool.QueueUserWorkItem(delegate
+				string line;
+				while ((line = ((Process)prc).StandardError.ReadLine()) != null)
 				{
-					err = svn.StandardError.ReadToEnd();
-				});
-				ThreadPool.QueueUserWorkItem(delegate
-				{
-					string line;
-					while ((line = svn.StandardOutput.ReadLine()) != null)
-					{
-						Console.WriteLine(line);
-						output.AppendLine(line);
-					}
-				});
+					Console.WriteLine(line);
+					err.AppendLine(line);
+				}
 			});
-			if (string.IsNullOrEmpty(err) == false)
+			var readFromStdOut = new Thread(prc =>
+			{
+				string line;
+				while ((line = ((Process) prc).StandardOutput.ReadLine()) != null)
+				{
+					Console.WriteLine(line);
+					output.AppendLine(line);
+				}
+			});
+			ExecuteInternal(command, svn =>
+			{
+				readFromStdError.Start(svn);
+				readFromStdOut.Start(svn);
+			});
+
+			readFromStdError.Join();
+			readFromStdOut.Join();
+
+			if (err.Length!=0)
 			{
 				throw new InvalidOperationException("Failed to execute command: " + err);
 			}
@@ -168,50 +179,26 @@ namespace TestsEndToEnd
 
 		protected XmlDocument SvnXml(string command)
 		{
-			StringBuilder output = new StringBuilder();
-			string err = null;
-			ExecuteInternal(command, delegate(Process svn)
-			{
-				ThreadPool.QueueUserWorkItem(delegate
-				{
-					err = svn.StandardError.ReadToEnd();
-				});
-				ThreadPool.QueueUserWorkItem(delegate
-				{
-					string line;
-					while ((line = svn.StandardOutput.ReadLine()) != null)
-					{
-                        Console.WriteLine(line);
-						output.AppendLine(line);
-					}
-				});
-			});
-			if (string.IsNullOrEmpty(err) == false)
-			{
-				throw new InvalidOperationException("Failed to execute command: " + err);
-			}
-			if (command.StartsWith("commit"))
-			{
-				// we need to recreate the work space, because
-				// a commit will kill all existing workspaces
-				_provider.MakeActivity(_activityId);
-			}
-			XmlDocument document = new XmlDocument();
-			document.LoadXml(output.ToString());
+			var document = new XmlDocument();
+			document.LoadXml(Svn(command));
 			return document;
 		}
 
 		private static void ExecuteInternal(string command, Action<Process> process)
 		{
-            Console.WriteLine("svn " + command);
-			ProcessStartInfo psi = new ProcessStartInfo("svn", command);
-			psi.RedirectStandardOutput = true;
-			psi.RedirectStandardError = true;
-			psi.CreateNoWindow = true;
-			psi.UseShellExecute = false;
+			Console.WriteLine("svn " + command);
+			var psi = new ProcessStartInfo("svn", command)
+									{
+										RedirectStandardOutput = true,
+										RedirectStandardError = true,
+										CreateNoWindow = true,
+										UseShellExecute = false
+									};
 			Process svn = Process.Start(psi);
 			process(svn);
 			svn.WaitForExit();
+			svn.StandardError.BaseStream.Flush();
+			svn.StandardOutput.BaseStream.Flush();
 		}
 
 		public int Port
