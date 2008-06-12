@@ -27,6 +27,24 @@ namespace TestsEndToEnd
 		}
 
 		[SvnBridgeFact]
+		public void Updating_Directory_With_Files_Using_Different_Versions_Than_Parent_Dir()
+		{
+			CreateFolder(testPath + "/src", true);
+			CreateFolder(testPath + "/src/foo", true);
+			WriteFile(testPath + "/src/foo/bar", "blah3", true);
+
+			CheckoutAndChangeDirectory();
+			WriteFile(testPath + "/src/foo/bar", "blah2", true);
+			Svn("up src/foo/bar -r PREV");
+
+			WriteFile(testPath + "/src/foo/bar", "blah1", true);
+
+			Svn("up src/foo");
+
+			Assert.Equal("blah1", File.ReadAllText("src/foo/bar"));
+		}
+
+		[SvnBridgeFact]
 		public void CanUpdateWorkingCopy_AfterRenameFromOfFileFromOneFolderToAnother_WhenUpdatingFromTheDestFolder()
 		{
 			CreateFolder(testPath + "/src", true);
@@ -228,6 +246,8 @@ namespace TestsEndToEnd
             Svn("commit -m blah");
 
             Svn("update foo.bar --revision PREV");
+
+			Assert.False(File.Exists("foo.bar"));
 
             Svn("update");
 

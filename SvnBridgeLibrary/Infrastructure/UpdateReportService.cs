@@ -93,7 +93,10 @@ namespace SvnBridge.Infrastructure
 
     	private string GetSrcPath(UpdateReportData updateReportRequest)
     	{
-    	    return handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
+    		string url = handler.GetLocalPathFromUrl(updateReportRequest.SrcPath);
+			if (updateReportRequest.UpdateTarget != null)
+				return url + "/" + updateReportRequest.UpdateTarget;
+    		return url;
     	}
 
     	public void ProcessUpdateReportForDirectory(UpdateReportData updateReportRequest,

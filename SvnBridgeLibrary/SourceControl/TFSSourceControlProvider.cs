@@ -208,7 +208,10 @@ namespace SvnBridge.SourceControl
 				string targetPath = "/" + Helper.CombinePath(path, reportData.UpdateTarget);
 				foreach (ItemMetaData item in new List<ItemMetaData>(root.Items))
 				{
-					if (item.Name.Equals(targetPath, StringComparison.InvariantCultureIgnoreCase) == false)
+					string name = item.Name;
+					if (name.StartsWith("/")==false)
+						name = "/" + name;
+					if (name.Equals(targetPath, StringComparison.InvariantCultureIgnoreCase) == false)
 						root.Items.Remove(item);
 				}
 			}

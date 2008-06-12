@@ -75,10 +75,15 @@ namespace SvnBridge.SourceControl
                         continue;
                     if (itemVersionFrom != versionTo)
                     {
-                        FindOrCreateResults results = FindItemOrCreateItem(checkoutRoot, checkoutRootPath, data.path, versionTo,
-                                                                           Recursion.None);
+                      
+                    	string rootPath = checkoutRootPath;
+						if (updateReportData.UpdateTarget != null)
+						    rootPath += "/" + updateReportData.UpdateTarget ;
+						string targetPath = rootPath + "/" + data.path;
 
-                        bool changed = CalculateChangeBetweenVersions(checkoutRootPath + "/" + data.path, checkoutRoot,
+						FindOrCreateResults results = FindItemOrCreateItem(checkoutRoot, rootPath, data.path, versionTo,
+																		 Recursion.None);
+						bool changed = CalculateChangeBetweenVersions(targetPath, checkoutRoot,
                                                                       itemVersionFrom, versionTo);
                         if (changed == false)
                             results.RevertAddition();
