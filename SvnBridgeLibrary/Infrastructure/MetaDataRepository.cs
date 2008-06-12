@@ -47,7 +47,16 @@ namespace SvnBridge.Infrastructure
         	return items.ToArray();
         }
 
-        public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
+    	#region IMetaDataRepository Members
+
+    	public SourceItem[] QueryItems(int revision, int itemId, Recursion recursion)
+    	{
+    		return sourceControlService.QueryItems(serverUrl, credentials, new int[] {itemId}, revision);
+    	}
+
+    	#endregion
+
+    	public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
         {
             List<SourceItem> list = null;
             persistentCache.UnitOfWork(delegate

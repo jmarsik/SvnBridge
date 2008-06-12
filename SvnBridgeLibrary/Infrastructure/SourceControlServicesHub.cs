@@ -1,5 +1,4 @@
 using System.Net;
-using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 
@@ -8,7 +7,6 @@ namespace SvnBridge.Infrastructure
     public class SourceControlServicesHub : ISourceControlServicesHub
     {
         private readonly ICredentials credentials;
-        private readonly IWebTransferService webTransferService;
         private readonly ITFSSourceControlService sourceControlService;
         private readonly IProjectInformationRepository projectInformationRepository;
         private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
@@ -18,11 +16,10 @@ namespace SvnBridge.Infrastructure
 		private readonly IMetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly IFileRepository fileRepository;
 
-    	public SourceControlServicesHub(ICredentials credentials, IWebTransferService webTransferService, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, IFileCache fileCache, IMetaDataRepositoryFactory metaDataRepositoryFactory, IFileRepository fileRepository)
+    	public SourceControlServicesHub(ICredentials credentials, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, IFileCache fileCache, IMetaDataRepositoryFactory metaDataRepositoryFactory, IFileRepository fileRepository)
         {
             this.credentials = credentials;
     		this.metaDataRepositoryFactory = metaDataRepositoryFactory;
-    		this.webTransferService = webTransferService;
             this.sourceControlService = sourceControlService;
             this.projectInformationRepository = projectInformationRepository;
             this.associateWorkItemWithChangeSet = associateWorkItemWithChangeSet;
@@ -35,11 +32,6 @@ namespace SvnBridge.Infrastructure
         public ICredentials Credentials
         {
             get { return credentials; }
-        }
-
-        public IWebTransferService WebTransferService
-        {
-            get { return webTransferService; }
         }
 
         public ITFSSourceControlService SourceControlService

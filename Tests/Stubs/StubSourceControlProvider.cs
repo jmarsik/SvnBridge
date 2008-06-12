@@ -119,7 +119,12 @@ namespace Tests
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void SetProperty(string activityId,
+    	public virtual bool ItemExists(int itemId, int version)
+    	{
+    		throw new NotImplementedException();
+    	}
+
+    	public virtual void SetProperty(string activityId,
                                         string path,
                                         string property,
                                         string value)

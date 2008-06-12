@@ -34,6 +34,11 @@ namespace SvnBridge.Infrastructure
             this.persistentCache = persistentCache;
         }
 
+		public SourceItem[] QueryItems(int revision, int itemId, Recursion recursion)
+		{
+			return sourceControlService.QueryItems(serverUrl, credentials, new int[] { itemId }, revision);
+		}
+
         public SourceItem[] QueryItems(int revision, string[] paths, Recursion recursion)
         {
             List<ItemSpec> itemSpecs = new List<ItemSpec>();

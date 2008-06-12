@@ -52,6 +52,9 @@ namespace SvnBridge.Interfaces
 		bool ItemExists(string path,
 		                int version);
 
+		bool ItemExists(int itemId,
+						int version);
+
 		void MakeActivity(string activityId);
 
 		void MakeCollection(string activityId,

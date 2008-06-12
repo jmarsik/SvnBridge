@@ -90,7 +90,6 @@ namespace IntegrationTests
             FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger, Settings.Default.CacheEnabled);
 			return new SourceControlServicesHub(
 				credentials,
-				webTransferService,
 				tfsSourceControlService,
 				repository,
 				associateWorkItemWithChangeSet,

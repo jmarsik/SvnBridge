@@ -9,6 +9,22 @@ namespace TestsEndToEnd
     public class UpdateTest : EndToEndTestBase
     {
 		[SvnBridgeFact]
+		public void Can_Update_File_After_It_Was_Remove_And_Another_Was_Added_With_Same_Name()
+		{
+			WriteFile(testPath + "/file", "blah1", true);
+
+			CheckoutAndChangeDirectory();
+	
+			DeleteItem(testPath + "/file", true);
+			WriteFile(testPath + "/file", "blah2", true);
+
+			Svn("up");
+
+			Assert.Equal("blah2", File.ReadAllText("file"));
+		}
+
+
+		[SvnBridgeFact]
 		public void CanUpdateWorkingCopy_AfterRenameFromOfFileFromOneFolderToAnother_WhenUpdatingFromTheOriginalFolder()
 		{
 			CreateFolder(testPath + "/src", true);
