@@ -394,7 +394,7 @@ namespace ProtocolTests
             Assert.Equal(expected, actual);
         }
 
-		[Fact(Skip = "This is broken and I can't figure out how the attach framework works")]
+		[Fact]
 		public void Test9()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -404,6 +404,7 @@ namespace ProtocolTests
             metadata.LastModifiedDate = DateTime.Parse("2007-08-08T20:54:17.904624Z");
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Folder12";
+            folder.Id = 1;
             folder.ItemRevision = 5551;
             folder.Author = "jwanagel";
             folder.LastModifiedDate = DateTime.Parse("2007-08-08T20:54:17.904624Z");
@@ -412,8 +413,16 @@ namespace ProtocolTests
             stub.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = GetBytes("New file");
             stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
-
-            stub.Attach(provider.ItemExists, Return.MultipleValues(true, false));
+            stub.Attach((MyMocks.ItemExists)provider.ItemExists, Return.DelegateResult(
+                delegate(object[] parameters)
+                {
+                    string value = parameters[0].ToString();
+                    if (value == "Folder12" ||
+                        value == "1")
+                        return true;
+                    return false;
+                }
+            ));
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

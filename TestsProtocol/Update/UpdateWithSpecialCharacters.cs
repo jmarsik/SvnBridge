@@ -395,7 +395,7 @@ namespace ProtocolTests
             Assert.Equal(expected, actual);
         }
 
-        [Fact(Skip = "This is broken and I can't figure out how the attach framework works")]
+        [Fact]
         public void Test9()
         {
             FolderMetaData metadata = new FolderMetaData();
@@ -404,6 +404,7 @@ namespace ProtocolTests
             metadata.Author = "jwanagel";
             metadata.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
             FolderMetaData folder1 = new FolderMetaData();
+            folder1.Id = 1;
             folder1.Name = "A !@#$%^&()_-+={[}];',.~`";
             folder1.ItemRevision = 5734;
             folder1.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
@@ -423,6 +424,7 @@ namespace ProtocolTests
             folder1.Items.Add(folder3);
             ItemMetaData file2 = new ItemMetaData();
             file2.Name = "A !@#$%^&()_-+={[}];',.~`/G !@#$%^&()_-+={[}];',.~`.txt";
+            file2.Id = 2;
             file2.ItemRevision = 5734;
             file2.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
             file2.Author = "jwanagel";
@@ -434,7 +436,18 @@ namespace ProtocolTests
             file3.Author = "jwanagel";
             folder1.Items.Add(file3);
             stub.Attach(provider.GetChangedItems, metadata);
-			stub.Attach((MyMocks.ItemExists)provider.ItemExists, Return.MultipleValues(true, false, true, false));
+			stub.Attach((MyMocks.ItemExists)provider.ItemExists, Return.DelegateResult(
+                delegate(object[] parameters)
+                {
+                    string value = parameters[0].ToString();
+                    if (value == "A !@#$%^&()_-+={[}];',.~`" ||
+                        value == "A !@#$%^&()_-+={[}];',.~`/G !@#$%^&()_-+={[}];',.~`.txt" ||
+                        value == "1" ||
+                        value == "2")
+                        return true;
+                    return false;
+                }
+            ));
             byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
             stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
 
