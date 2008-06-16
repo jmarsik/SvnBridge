@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 
 namespace SvnBridge
@@ -17,6 +18,7 @@ namespace SvnBridge
 		{
 			request.UnsafeAuthenticatedConnectionSharing = false;
 			request.ServicePoint.ConnectionLimit = 5000;
+			request.ConnectionGroupName = Guid.NewGuid().ToString();
 		}
 	}
 }
