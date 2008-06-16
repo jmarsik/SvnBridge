@@ -538,6 +538,14 @@ namespace SvnBridge.SourceControl
                         item = sourceControlProvider.GetItems(targetVersion, itemName, Recursion.None);
                         if (item == null)
                         {
+							// TFS will report renames even for deleted items, 
+							// since TFS reported that this was renamed, but it doesn't exists
+							// in this revision, we know it is a case of renaming a deleted file.
+							// We can safely ignore this and any of its children.
+							if(IsRenameOperation(change))
+							{
+								return;
+							}
                             item = new MissingItemMetaData(itemName, targetVersion, edit);
                         }
                         if (!lastNamePart)
