@@ -33,6 +33,7 @@ namespace SvnBridge.SourceControl
 		private readonly string projectName;
 		private readonly string rootPath;
 		private readonly string serverUrl;
+		private IIgnoredFilesSpecification ignoredFilesSpecification;
 
 		private ILogger Logger
 		{
@@ -73,9 +74,10 @@ namespace SvnBridge.SourceControl
 			string serverUrl,
 			string projectName,
 			ICredentials credentials,
-			ISourceControlServicesHub sourceControlServicesHub)
+			ISourceControlServicesHub sourceControlServicesHub, IIgnoredFilesSpecification ignoredFilesSpecification)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
+			this.ignoredFilesSpecification = ignoredFilesSpecification;
 			this.credentials = credentials;
 			this.serverUrl = serverUrl;
 			this.projectName = projectName;
@@ -185,8 +187,8 @@ namespace SvnBridge.SourceControl
 			{
 				root = new FolderMetaData();
 				var deletedFile = new DeleteMetaData
-				                  	{
-				                  		ItemRevision = versionTo, 
+									{
+										ItemRevision = versionTo,
 										Name = reportData.UpdateTarget
 									};
 				root.Items.Add(deletedFile);
@@ -197,7 +199,7 @@ namespace SvnBridge.SourceControl
 				throw new FileNotFoundException(path);
 			}
 
-			var udc = new UpdateDiffCalculator(this);
+			var udc = new UpdateDiffCalculator(this, ignoredFilesSpecification);
 			udc.CalculateDiff(path, versionTo, versionFrom, root, reportData);
 			if (reportData.UpdateTarget != null)
 			{
@@ -406,7 +408,7 @@ namespace SvnBridge.SourceControl
 
 		public bool ItemExists(int itemId, int version)
 		{
-			if(itemId==0)
+			if (itemId == 0)
 				throw new ArgumentException("item id cannot be zero", "itemId");
 			var items = MetaDataRepository.QueryItems(version, itemId, Recursion.None);
 			return (items.Length != 0);

@@ -24,7 +24,8 @@ namespace SvnBridge.SourceControl
                 "blah",
                 null,
 				null,
-                CreateSourceControlServicesHub());
+                CreateSourceControlServicesHub(),
+				IoC.Resolve<IIgnoredFilesSpecification>());
         }
 
         public ISourceControlServicesHub CreateSourceControlServicesHub()

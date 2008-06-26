@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
@@ -18,6 +19,7 @@ namespace SvnBridge.Proxies
             return new RemotingProxy(type, interceptors, instance).GetTransparentProxy();
         }
 
+		[DebuggerStepThrough]
         public class RemotingProxy : RealProxy
         {
             private readonly IInterceptor[] interceptors;

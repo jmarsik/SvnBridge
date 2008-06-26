@@ -12,7 +12,7 @@ namespace SvnBridge.SourceControl
     public class UpdateDiffCalculator
     {
         private readonly ISourceControlProvider sourceControlProvider;
-
+    	private readonly IIgnoredFilesSpecification ignoredFilesSpecification;
         private readonly IDictionary<ItemMetaData, bool> additionForPropertyChangeOnly =
             new Dictionary<ItemMetaData, bool>();
 
@@ -20,12 +20,13 @@ namespace SvnBridge.SourceControl
         private Dictionary<string, string> clientDeletedFiles;
         private readonly List<string> renamedItemsToBeCheckedForDeletedChildren = new List<string>();
 
-        public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider)
+        public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider, IIgnoredFilesSpecification ignoredFilesSpecification)
         {
-            this.sourceControlProvider = sourceControlProvider;
+        	this.sourceControlProvider = sourceControlProvider;
+        	this.ignoredFilesSpecification = ignoredFilesSpecification;
         }
 
-        public void CalculateDiff(string checkoutRootPath,
+    	public void CalculateDiff(string checkoutRootPath,
                                   int versionTo,
                                   int versionFrom,
                                   FolderMetaData checkoutRoot,
@@ -209,6 +210,8 @@ namespace SvnBridge.SourceControl
                     for (int i = history.Changes.Count - 1; i >= 0; i--)
                     {
                         SourceItemChange change = history.Changes[i];
+						if(ignoredFilesSpecification.ShouldBeIgnored(change.Item.RemoteName))
+							continue;
                         if (IsAddOperation(change, updatingForwardInTime))
                         {
                             PerformAddOrUpdate(targetVersion, checkoutRootPath, change, root, false);
