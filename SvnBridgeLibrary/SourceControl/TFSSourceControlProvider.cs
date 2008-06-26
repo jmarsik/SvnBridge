@@ -735,7 +735,7 @@ namespace SvnBridge.SourceControl
 				string propertiesForFolder = GetPropertiesFileName(path, ItemType.Folder);
 				string propertiesForFolderItems = path + "/" + Constants.PropFolder;
 				items = MetaDataRepository.QueryItems(version, new string[] { path, propertiesForFile, propertiesForFolderItems }, recursion);
-				if (items[0].ItemType == ItemType.Folder)
+				if (items.Length > 0 && items[0].ItemType == ItemType.Folder)
 				{
 					List<string> propertiesForSubFolders = new List<string>();
 					foreach (SourceItem item in items)
