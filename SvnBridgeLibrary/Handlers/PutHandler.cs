@@ -70,7 +70,7 @@ namespace SvnBridge.Handlers
             {
                 ItemMetaData item = sourceControlProvider.GetItemInActivity(activityId, serverPath);
                 sourceData = sourceControlProvider.ReadFile(item);
-                if (Helper.GetMd5Checksum(sourceData) != baseHash)
+                if (ChecksumMismatch(baseHash, sourceData))
                 {
                     throw new Exception("Checksum mismatch with base file");
                 }
@@ -85,12 +85,21 @@ namespace SvnBridge.Handlers
                     Array.Resize(ref fileData, fileData.Length + newData.Length);
                     Array.Copy(newData, 0, fileData, fileData.Length - newData.Length, newData.Length);
                 }
-                if (Helper.GetMd5Checksum(fileData) != resultHash)
+				if (ChecksumMismatch(resultHash, fileData))
                 {
                     throw new Exception("Checksum mismatch with new file");
                 }
             }
             return sourceControlProvider.WriteFile(activityId, serverPath, fileData);
         }
+
+    	private static bool ChecksumMismatch(string hash, byte[] data)
+    	{
+			// git will not pass the relevant checksum, so we need to ignore 
+			// this
+			if(hash==null)
+				return false;
+    		return Helper.GetMd5Checksum(data) != hash;
+    	}
     }
 }
