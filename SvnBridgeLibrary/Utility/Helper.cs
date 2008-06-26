@@ -115,7 +115,10 @@ namespace SvnBridge.Utility
 
 				if (response != null && response.StatusCode == HttpStatusCode.Unauthorized)
 				{
-					return true;
+					// we need to ensure that common case of:
+					// http://server:80   <- share point
+					// htpp://server:8080 <- TFS
+					return response.Headers["MicrosoftSharePointTeamServices"] == null;
 				}
 
 				return false;
