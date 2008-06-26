@@ -25,7 +25,7 @@ namespace SvnBridge.SourceControl
                 null,
 				null,
                 CreateSourceControlServicesHub(),
-				IoC.Resolve<IIgnoredFilesSpecification>());
+				MockRepository.GenerateStub<IIgnoredFilesSpecification>());
         }
 
         public ISourceControlServicesHub CreateSourceControlServicesHub()
