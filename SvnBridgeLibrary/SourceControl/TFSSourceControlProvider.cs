@@ -385,14 +385,7 @@ namespace SvnBridge.SourceControl
 								string path)
 		{
 			ItemMetaData item = GetItemsWithoutProperties(version, path, Recursion.None);
-			if (item.ItemType == ItemType.Folder)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return item.ItemType == ItemType.Folder;
 		}
 
 		public bool ItemExists(string path)
