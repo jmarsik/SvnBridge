@@ -25,6 +25,15 @@ namespace IntegrationTests.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CacheEnabled {
+            get {
+                return ((bool)(this["CacheEnabled"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Username {
             get {
@@ -56,15 +65,6 @@ namespace IntegrationTests.Properties {
         public string ServerUrl {
             get {
                 return ((string)(this["ServerUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool CacheEnabled {
-            get {
-                return ((bool)(this["CacheEnabled"]));
             }
         }
     }
