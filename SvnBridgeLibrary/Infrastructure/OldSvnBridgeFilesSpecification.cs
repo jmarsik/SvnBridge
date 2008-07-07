@@ -7,7 +7,7 @@ namespace SvnBridge.Infrastructure
 	{
 		public bool ShouldBeIgnored(string file)
 		{
-			return Path.GetExtension(file) == ".svnbridge";
+			return Path.GetFileName(file) == "..svnbridge";
 		}
 	}
 }
