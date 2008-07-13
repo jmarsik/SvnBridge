@@ -6,10 +6,9 @@ namespace SvnBridge.SourceControl
     public static class CredentialsHelper
     {
         public static NetworkCredential DefaultCredentials = CredentialCache.DefaultNetworkCredentials;
-        public static NetworkCredential NullCredentials;
+        public static NetworkCredential NullCredentials = null;
 
-        public static ICredentials GetCredentialsForServer(string tfsUrl,
-                                                           ICredentials credentials)
+        public static ICredentials GetCredentialsForServer(string tfsUrl, ICredentials credentials)
         {
             if (credentials != null)
             {

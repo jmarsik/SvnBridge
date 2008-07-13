@@ -5,7 +5,6 @@ using Rhino.Mocks.Impl;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using Xunit;
-using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace SvnBridge.Net
 {

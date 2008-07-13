@@ -24,7 +24,7 @@ namespace SvnBridge.Net
             this.actionTracking = actionTracking;
         }
 
-        public HttpContextHandlerBase GetHandler(string httpMethod)
+        public virtual HttpContextHandlerBase GetHandler(string httpMethod)
         {
             switch (httpMethod.ToLowerInvariant())
             {
@@ -73,8 +73,22 @@ namespace SvnBridge.Net
                 string tfsUrl = parser.GetServerUrl(request, credential);
                 if (string.IsNullOrEmpty(tfsUrl))
                 {
-                    throw new InvalidOperationException(
-                        "A TFS server URL must be specified before connections can be dispatched.");
+                    throw new InvalidOperationException("A TFS server URL must be specified before connections can be dispatched.");
+                }
+
+                if (credential != null && tfsUrl.ToLowerInvariant().EndsWith("codeplex.com"))
+                {
+                    string username = credential.UserName;
+                    string domain = credential.Domain;
+                    if (!username.ToLowerInvariant().EndsWith("_cp"))
+                    {
+                        username += "_cp";
+                    }
+                    if (domain == "")
+                    {
+                        domain = "snd";
+                    }
+                    credential = new NetworkCredential(username, credential.Password, domain);
                 }
 
                 handler = GetHandler(connection.Request.HttpMethod);
@@ -85,7 +99,6 @@ namespace SvnBridge.Net
                     SendUnsupportedMethodResponse(connection);
                     return;
                 }
-
 
                 try
                 {

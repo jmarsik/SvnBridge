@@ -100,6 +100,7 @@
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />
     <Compile Include="Infrastructure\TestHelper.cs" />
+    <Compile Include="Net\HttpContextDispatcherTests.cs" />
     <Compile Include="Net\HttpRequestTests.cs" />
     <Compile Include="Net\ListenerTests.cs" />
     <Compile Include="PathParsing\PathParsingValidationTest.cs" />

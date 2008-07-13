@@ -34,7 +34,7 @@ namespace SvnBridge.Handlers
 	        get { return credentials; }
 	    }
 
-	    public void Handle(IHttpContext context, IPathParser pathParser, NetworkCredential credentials)
+	    public virtual void Handle(IHttpContext context, IPathParser pathParser, NetworkCredential credentials)
 		{
             PerRequest.Items["credentials"] = credentials;
             this.credentials = credentials;
@@ -57,9 +57,7 @@ namespace SvnBridge.Handlers
 		{
 		}
 
-		protected abstract void Handle(IHttpContext context,
-									   ISourceControlProvider sourceControlProvider);
-
+		protected abstract void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider);
 
 		protected static void SetResponseSettings(IHttpResponse response,
 												  string contentType,
@@ -71,8 +69,7 @@ namespace SvnBridge.Handlers
 			response.StatusCode = status;
 		}
 
-		protected static void WriteToResponse(IHttpResponse response,
-											  string content)
+		protected static void WriteToResponse(IHttpResponse response, string content)
 		{
 			using (StreamWriter writer = new StreamWriter(response.OutputStream))
 			{
