@@ -60,7 +60,6 @@
     <Compile Include="Infrastructure\Statistics\ActionTrackingViaPerfCounter.cs" />
     <Compile Include="Infrastructure\Statistics\IActionTracking.cs" />
     <Compile Include="Interfaces\IAssemblyAddin.cs" />
-    <Compile Include="Interfaces\IFileRepository.cs" />
     <Compile Include="Interfaces\IPersistentCache.cs" />
     <Compile Include="Interfaces\IIgnoredFilesSpecification.cs" />
     <Compile Include="NullImpl\NullActionTracking.cs" />

@@ -14,9 +14,9 @@ namespace SvnBridge.Infrastructure
         private readonly ICache cache;
         private readonly IFileCache fileCache;
 		private readonly IMetaDataRepositoryFactory metaDataRepositoryFactory;
-        private readonly IFileRepository fileRepository;
+        private readonly FileRepository fileRepository;
 
-    	public SourceControlServicesHub(ICredentials credentials, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, IFileCache fileCache, IMetaDataRepositoryFactory metaDataRepositoryFactory, IFileRepository fileRepository)
+    	public SourceControlServicesHub(ICredentials credentials, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, IFileCache fileCache, IMetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
         {
             this.credentials = credentials;
     		this.metaDataRepositoryFactory = metaDataRepositoryFactory;
@@ -69,7 +69,7 @@ namespace SvnBridge.Infrastructure
 			get { return metaDataRepositoryFactory; }
     	}
 
-        public IFileRepository FileRepository
+        public FileRepository FileRepository
         {
             get { return fileRepository; }
         }

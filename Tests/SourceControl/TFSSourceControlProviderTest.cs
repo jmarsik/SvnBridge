@@ -7,17 +7,20 @@ using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using NullLogger=SvnBridge.NullImpl.NullLogger;
+using Tests;
 
 namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlProviderTest : IDisposable
     {
+        private readonly MockFramework attach;
         private readonly MockRepository mocks;
         private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly TFSSourceControlProvider provider;
 
         public TFSSourceControlProviderTest()
         {
+            attach = new MockFramework();
             mocks = new MockRepository();
             associateWorkItemWithChangeSet = mocks.CreateMock<IAssociateWorkItemWithChangeSet>();
             provider = new TFSSourceControlProvider(
@@ -39,7 +42,7 @@ namespace SvnBridge.SourceControl
                 new NullCache(),
                 MockRepository.GenerateStub<IFileCache>(),
 				MockRepository.GenerateStub<IMetaDataRepositoryFactory>(),
-                MockRepository.GenerateStub<IFileRepository>());
+                attach.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null, null, false));
         }
 
         public void Dispose()

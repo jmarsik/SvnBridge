@@ -66,6 +66,8 @@ namespace SvnBridge
         {
             RegisterTypesFromKnownAssemblies();
         	RegisterTypeFromAddinAssemblies();
+            if (!IoC.Container.IsRegistered(typeof(FileRepository)))
+                IoC.Container.Register(typeof(FileRepository), typeof(FileRepository));
         }
 
     	private void RegisterTypeFromAddinAssemblies()
@@ -92,7 +94,7 @@ namespace SvnBridge
 
     	private void RegisterTypesFromKnownAssemblies()
     	{
-    		foreach(Type type in GetAllTypesFromAssebmlies())
+    		foreach(Type type in GetAllTypesFromAssemblies())
     		{
     			if (ValidTypeForRegistration(type) == false)
     				continue;
@@ -121,7 +123,7 @@ namespace SvnBridge
     		}
     	}
 
-    	private IEnumerable<Type> GetAllTypesFromAssebmlies()
+    	private IEnumerable<Type> GetAllTypesFromAssemblies()
     	{
     		foreach (Assembly assembly in assemblies)
     		{

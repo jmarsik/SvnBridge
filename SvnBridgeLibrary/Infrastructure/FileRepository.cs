@@ -12,7 +12,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Infrastructure
 {
-    public class FileRepository : IFileRepository
+    public class FileRepository
     {
         private readonly ICredentials credentials;
         private readonly IFileCache fileCache;
@@ -29,7 +29,7 @@ namespace SvnBridge.Infrastructure
             this.cacheEnabled = cacheEnabled;
         }
 
-        public byte[] GetFile(ItemMetaData item)
+        public virtual byte[] GetFile(ItemMetaData item)
         {
             if (!cacheEnabled)
                 return webTransferService.DownloadBytes(item.DownloadUrl, credentials);
@@ -47,7 +47,7 @@ namespace SvnBridge.Infrastructure
             return downloadBytes;
         }
 
-        public void ReadFileAsync(ItemMetaData item)
+        public virtual void ReadFileAsync(ItemMetaData item)
         {
             if (!cacheEnabled)
             {

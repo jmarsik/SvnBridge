@@ -45,7 +45,7 @@ namespace SvnBridge.SourceControl
 			get { return sourceControlServicesHub.Cache; }
 		}
 
-		private IFileRepository FileRepository
+		private FileRepository FileRepository
 		{
 			get { return sourceControlServicesHub.FileRepository; }
 		}
