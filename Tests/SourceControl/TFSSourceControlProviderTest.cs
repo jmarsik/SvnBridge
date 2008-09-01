@@ -1,7 +1,6 @@
 using System;
 using CodePlex.TfsLibrary.ObjectModel;
 using Rhino.Mocks.Impl;
-using SvnBridge.NullImpl;
 using Xunit;
 using Rhino.Mocks;
 using SvnBridge.Infrastructure;

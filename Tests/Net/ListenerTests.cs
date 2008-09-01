@@ -2,7 +2,6 @@ using System;
 using Rhino.Mocks;
 using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
-using SvnBridge.NullImpl;
 using SvnBridge.PathParsing;
 using Xunit;
 using Assert=CodePlex.NUnitExtensions.Assert;

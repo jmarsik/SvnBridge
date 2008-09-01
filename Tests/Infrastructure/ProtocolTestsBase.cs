@@ -10,7 +10,6 @@ using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
-using SvnBridge.NullImpl;
 using Xunit;
 using SvnBridge;
 using SvnBridge.Net;

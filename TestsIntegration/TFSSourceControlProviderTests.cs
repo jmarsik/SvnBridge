@@ -5,7 +5,6 @@ using CodePlex.TfsLibrary.Utility;
 using SvnBridge.Cache;
 using SvnBridge.Exceptions;
 using SvnBridge.Interfaces;
-using SvnBridge.NullImpl;
 using SvnBridge.SourceControl;
 using SvnBridge.Infrastructure;
 
