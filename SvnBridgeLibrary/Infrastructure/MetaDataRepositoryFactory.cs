@@ -4,7 +4,7 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Infrastructure
 {
-	public class MetaDataRepositoryFactory : IMetaDataRepositoryFactory
+	public class MetaDataRepositoryFactory
 	{
 		private readonly ITFSSourceControlService sourceControlService;
 		private readonly IPersistentCache persistentCache;
@@ -17,7 +17,7 @@ namespace SvnBridge.Infrastructure
             this.cacheEnabled = cacheEnabled;
 		}
 
-		public IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath)
+		public virtual IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath)
 		{
             IMetaDataRepository repository;
             if (cacheEnabled)
@@ -35,7 +35,7 @@ namespace SvnBridge.Infrastructure
 			return repository;
 		}
 
-		public int GetLatestRevision(string tfsUrl, ICredentials credentials)
+		public virtual int GetLatestRevision(string tfsUrl, ICredentials credentials)
 		{
 			return sourceControlService.GetLatestChangeset(tfsUrl, credentials);
 		}

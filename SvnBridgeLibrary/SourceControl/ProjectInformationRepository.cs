@@ -4,17 +4,18 @@ using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
 using System.Collections.Generic;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.SourceControl
 {
     public class ProjectInformationRepository : IProjectInformationRepository
     {
-		private readonly IMetaDataRepositoryFactory metaDataRepositoryFactory;
+		private readonly MetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly string serverUrl;
         private static Dictionary<string, ProjectLocationInformation> projectLocations = new Dictionary<string, ProjectLocationInformation>();
 
         public ProjectInformationRepository(
-            IMetaDataRepositoryFactory metaDataRepositoryFactory,
+            MetaDataRepositoryFactory metaDataRepositoryFactory,
             string serverUrl)
         {
 			this.metaDataRepositoryFactory = metaDataRepositoryFactory;
