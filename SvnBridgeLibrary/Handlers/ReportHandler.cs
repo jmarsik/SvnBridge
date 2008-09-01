@@ -363,7 +363,7 @@ namespace SvnBridge.Handlers
             output.Write(
                 "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
 
-            IUpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
+            UpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
 
             output.Write("<S:target-revision rev=\"" + targetRevision + "\"/>\n");
             updateReportService.ProcessUpdateReportForDirectory(updatereport, metadata, output, true);

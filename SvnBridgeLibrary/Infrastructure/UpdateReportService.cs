@@ -11,7 +11,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Infrastructure
 {
-	public class UpdateReportService : IUpdateReportService
+	public class UpdateReportService
 	{
 		private readonly HttpContextHandlerBase handler;
 		private readonly ISourceControlProvider sourceControlProvider;

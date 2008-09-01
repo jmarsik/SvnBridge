@@ -103,7 +103,6 @@
     <Compile Include="Proxies\RemotingInvocation.cs" />
     <Compile Include="Proxies\RetryOnExceptionsInterceptor.cs" />
     <Compile Include="Interfaces\IItemLoader.cs" />
-    <Compile Include="Interfaces\IUpdateReportService.cs" />
     <Compile Include="Infrastructure\AssociateWorkItemWithChangeSet.cs" />
     <Compile Include="Infrastructure\BrokenXml.cs" />
     <Compile Include="Infrastructure\Clock.cs" />
