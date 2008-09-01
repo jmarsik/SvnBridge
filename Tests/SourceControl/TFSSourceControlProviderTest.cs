@@ -6,7 +6,6 @@ using Xunit;
 using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
-using NullLogger=SvnBridge.NullImpl.NullLogger;
 using Tests;
 using SvnBridge.Cache;
 using Attach;
@@ -40,7 +39,7 @@ namespace SvnBridge.SourceControl
                 MockRepository.GenerateStub<ITFSSourceControlService>(),
                 MockRepository.GenerateStub<IProjectInformationRepository>(),
                 associateWorkItemWithChangeSet,
-                new NullLogger(),
+                attach.CreateObject<DefaultLogger>(),
                 attach.CreateObject<WebCache>(),
                 attach.CreateObject<FileCache>(null),
                 attach.CreateObject<MetaDataRepositoryFactory>(null, null, false),

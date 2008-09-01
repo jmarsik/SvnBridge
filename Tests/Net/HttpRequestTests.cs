@@ -5,11 +5,14 @@ using Rhino.Mocks.Impl;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using Xunit;
+using Tests;
 
 namespace SvnBridge.Net
 {
     public class HttpRequestTests
     {
+        protected MyMocks stub = new MyMocks();
+
         private class StubStream : Stream
         {
             private readonly MemoryStream stream;
@@ -95,7 +98,7 @@ namespace SvnBridge.Net
             StubStream stream = new StubStream(Encoding.ASCII.GetBytes(buffer.ToString()));
 
             Assert.DoesNotThrow(
-                delegate { new ListenerRequest(stream, new SvnBridge.NullImpl.NullLogger()); });
+                delegate { new ListenerRequest(stream, stub.CreateObject<DefaultLogger>()); });
         }
 
         [Fact]
@@ -109,7 +112,7 @@ namespace SvnBridge.Net
             buffer.Append("12345");
             StubStream stream = new StubStream(Encoding.ASCII.GetBytes(buffer.ToString()));
 
-            ListenerRequest request = new ListenerRequest(stream, new NullImpl.NullLogger());
+            ListenerRequest request = new ListenerRequest(stream, stub.CreateObject<DefaultLogger>());
 
             Assert.Equal<string>("/foo/bar", request.Url.LocalPath);
         }

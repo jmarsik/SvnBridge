@@ -79,12 +79,12 @@ namespace IntegrationTests
 			RegistrationService service = new RegistrationService(factory);
 			RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
 			WebTransferService webTransferService = new WebTransferService(system);
-			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service, factory1, webTransferService, system, new NullLogger());
+			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service, factory1, webTransferService, system, mock.CreateObject<DefaultLogger>());
             MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<MemoryBasedPersistentCache>(), Settings.Default.CacheEnabled);
 			ProjectInformationRepository repository = new ProjectInformationRepository(metaDataRepositoryFactory,ServerUrl);
             ICredentials credentials = GetCredentials();
             FileCache fileCache = mock.CreateObject<FileCache>(null);
-            DefaultLogger logger = new NullLogger();
+            DefaultLogger logger = mock.CreateObject<DefaultLogger>();
             FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger, Settings.Default.CacheEnabled);
 			return new SourceControlServicesHub(
 				credentials,

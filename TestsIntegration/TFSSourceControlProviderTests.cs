@@ -39,7 +39,7 @@ namespace IntegrationTests
 																						  factory1,
 																						  webTransferService,
 																						  system,
-																						  new NullLogger());
+                                                                                          mock.CreateObject<DefaultLogger>());
 			TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
 																			 PROJECT_NAME,
 																			 null,

@@ -75,7 +75,7 @@ namespace Tests
             long responseStart = HttpStream.Position;
             HttpStream.Position = 0;
 
-            ListenerContext context = new ListenerContext(HttpStream, new NullLogger());
+            ListenerContext context = new ListenerContext(HttpStream, stub.CreateObject<DefaultLogger>());
             HttpDispatcher.Dispatch(context);
             context.Response.Close();
 
