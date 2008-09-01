@@ -41,7 +41,7 @@ namespace TestsEndToEnd
 
 			Environment.CurrentDirectory = Path.Combine(Path.GetTempPath(), checkoutFolder);
 			Console.WriteLine("cd " + checkoutFolder);
-			listener = IoC.Resolve<IListener>();
+			listener = IoC.Resolve<Listener>();
 			listener.ListenError += ((sender, e) => Console.WriteLine(e.Exception));
 			listener.Port = port;
 
@@ -84,7 +84,7 @@ namespace TestsEndToEnd
 
 		#endregion
 
-		protected IListener listener;
+		protected Listener listener;
 		private string checkoutFolder;
 		protected string testUrl;
 		protected int port;

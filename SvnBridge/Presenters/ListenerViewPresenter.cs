@@ -9,13 +9,13 @@ namespace SvnBridge.Presenters
 	public class ListenerViewPresenter
 	{
 		private readonly IListenerErrorsView errorsView;
-		private readonly IListener listener;
+		private readonly Listener listener;
 		private readonly IListenerView view;
 		private bool closed;
 
 		public ListenerViewPresenter(IListenerView view,
 		                             IListenerErrorsView errorsView,
-		                             IListener listener)
+		                             Listener listener)
 		{
 			this.listener = listener;
 			this.view = view;

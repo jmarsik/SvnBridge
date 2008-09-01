@@ -8,7 +8,7 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.Net
 {
-    public class Listener : IListener
+    public class Listener
     {
         private HttpContextDispatcher dispatcher;
         private bool isListening;
@@ -23,14 +23,12 @@ namespace SvnBridge.Net
             this.actionTracking = actionTracking;
         }
 
-        #region IListener Members
-
         private static event EventHandler<ListenErrorEventArgs> ErrorOccured = delegate { };
 
-        public event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
-        public event EventHandler<FinishedHandlingEventArgs> FinishedHandling = delegate { };
+        public virtual event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
+        public virtual event EventHandler<FinishedHandlingEventArgs> FinishedHandling = delegate { };
 
-        public int Port
+        public virtual int Port
         {
             get { return port.GetValueOrDefault(); }
             set
@@ -44,7 +42,7 @@ namespace SvnBridge.Net
             }
         }
 
-        public void Start(IPathParser parser)
+        public virtual void Start(IPathParser parser)
         {
             if (!port.HasValue)
             {
@@ -65,16 +63,13 @@ namespace SvnBridge.Net
             OnListenException(e.Exception);
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             listener.Stop();
             ErrorOccured -= OnErrorOccured;
 			
             isListening = false;
         }
-
-
-        #endregion
 
         private void Accept(IAsyncResult asyncResult)
         {

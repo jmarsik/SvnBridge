@@ -9,7 +9,7 @@ namespace SvnBridge.Stubs
 
     public delegate void StopDelegate();
 
-    public class StubListener : IListener
+    public class StubListener : Listener
     {
         public int Get_Port;
         public int Set_Port;
@@ -18,22 +18,23 @@ namespace SvnBridge.Stubs
         public bool Stop_Called;
         public StopDelegate Stop_Delegate;
 
-        #region IListener Members
+        public StubListener() : base(null, null) { }
 
-        public event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
-        event EventHandler<FinishedHandlingEventArgs> IListener.FinishedHandling
+        public override event EventHandler<ListenErrorEventArgs> ListenError = delegate { };
+        
+        public override event EventHandler<FinishedHandlingEventArgs> FinishedHandling
         {
             add { }
             remove { }
         }
 
-        public int Port
+        public override int Port
         {
             get { return Get_Port; }
             set { Set_Port = value; }
         }
 
-        public void Start(IPathParser parser)
+        public override void Start(IPathParser parser)
         {
             if (Start_Delegate != null)
             {
@@ -43,7 +44,7 @@ namespace SvnBridge.Stubs
             Start_Called = true;
         }
 
-        public void Stop()
+        public override void Stop()
         {
             if (Stop_Delegate != null)
             {
@@ -51,9 +52,6 @@ namespace SvnBridge.Stubs
             }
             Stop_Called = true;
         }
-
-       
-        #endregion
 
         public bool ListenErrorHasDelegate()
         {

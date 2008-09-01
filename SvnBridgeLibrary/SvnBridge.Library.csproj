@@ -142,7 +142,6 @@
     <Compile Include="Net\IHttpContext.cs" />
     <Compile Include="Net\IHttpRequest.cs" />
     <Compile Include="Net\IHttpResponse.cs" />
-    <Compile Include="Net\IListener.cs" />
     <Compile Include="Net\Listener.cs" />
     <Compile Include="Net\ListenerResponseStream.cs" />
     <Compile Include="Handlers\PropFindHandler\BcFileNode.cs" />
