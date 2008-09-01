@@ -1,14 +1,15 @@
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Utility;
+using SvnBridge.Cache;
 
 namespace SvnBridge.Infrastructure
 {
 	public class TfsUrlValidator : ITfsUrlValidator
 	{
-		private ICache cache;
+		private WebCache cache;
 
-		public TfsUrlValidator(ICache cache)
+		public TfsUrlValidator(WebCache cache)
 		{
 			this.cache = cache;
 		}

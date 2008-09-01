@@ -27,9 +27,9 @@ namespace SvnBridge.Cache
     public class MemoryBasedPersistentCache
     {
         private static readonly ReaderWriterLock rwLock = new ReaderWriterLock();
-        private readonly ICache cache;
+        private readonly WebCache cache;
 
-        public MemoryBasedPersistentCache(ICache cache)
+        public MemoryBasedPersistentCache(WebCache cache)
         {
             this.cache = cache;
         }

@@ -32,7 +32,7 @@ namespace IntegrationTests
 		[Fact]
 		public void WillCacheResults()
 		{
-			ICache cache = new WebCache();
+			WebCache cache = new WebCache();
 			new TfsUrlValidator(cache).IsValidTfsServerUrl(Settings.Default.ServerUrl);
 			Assert.NotNull(cache.Get("IsValidTfsServerUrl_" + Settings.Default.ServerUrl));
 		}
@@ -40,7 +40,7 @@ namespace IntegrationTests
 		[Fact]
 		public void WillGetResultsFromCache()
 		{
-			ICache cache = new WebCache();
+			WebCache cache = new WebCache();
 			cache.Set("IsValidTfsServerUrl_blah", true);
 			bool validUrl = new TfsUrlValidator(cache).IsValidTfsServerUrl("blah");
 			Assert.True(validUrl);

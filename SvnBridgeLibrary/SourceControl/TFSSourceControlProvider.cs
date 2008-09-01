@@ -18,6 +18,7 @@ namespace SvnBridge.SourceControl
 	using Protocol;
 	using Proxies;
 	using Utility;
+    using SvnBridge.Cache;
 
 	[Interceptor(typeof(TracingInterceptor))]
 	[Interceptor(typeof(RetryOnExceptionsInterceptor<SocketException>))]
@@ -40,7 +41,7 @@ namespace SvnBridge.SourceControl
 			get { return sourceControlServicesHub.Logger; }
 		}
 
-		private ICache Cache
+		private WebCache Cache
 		{
 			get { return sourceControlServicesHub.Cache; }
 		}
@@ -59,11 +60,9 @@ namespace SvnBridge.SourceControl
 		{
 			get
 			{
-				return sourceControlServicesHub.MetaDataRepositoryFactory
-					.Create(GetCredentials(), ServerUrl, rootPath);
+				return sourceControlServicesHub.MetaDataRepositoryFactory.Create(GetCredentials(), ServerUrl, rootPath);
 			}
 		}
-
 
 		private AssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet
 		{

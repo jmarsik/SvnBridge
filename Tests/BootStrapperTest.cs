@@ -6,6 +6,7 @@ using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
+using SvnBridge.Cache;
 
 namespace SvnBridge
 {
@@ -30,7 +31,7 @@ namespace SvnBridge
 		public void AfterStartingBootStrapper_CanResolveCache_FromContainer()
 		{
 			new BootStrapper().Start();
-			Assert.NotNull(IoC.Resolve<ICache>());
+			Assert.NotNull(IoC.Resolve<WebCache>());
 		}
 
 		[Fact]

@@ -107,7 +107,6 @@
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Infrastructure\IoC.cs" />
     <Compile Include="Cache\WebCache.cs" />
-    <Compile Include="Interfaces\ICache.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />
     <Compile Include="Handlers\MkActivityHandler.cs" />
     <Compile Include="Handlers\MkColHandler.cs" />

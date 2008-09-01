@@ -7,16 +7,16 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.Cache
 {
-    public class WebCache : ICache
+    public class WebCache
     {
         private readonly System.Web.Caching.Cache cache = HttpRuntime.Cache;
 
-        public CachedResult Get(string key)
+        public virtual CachedResult Get(string key)
         {
             return (CachedResult)cache[key.ToLowerInvariant()];
         }
 
-        public void Set(string key, object obj)
+        public virtual void Set(string key, object obj)
         {
             cache.Add(key.ToLowerInvariant(), 
                 new CachedResult(obj), 
@@ -27,7 +27,7 @@ namespace SvnBridge.Cache
                 null);
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             List<string> keys = new List<string>();
             foreach (DictionaryEntry de in cache)
