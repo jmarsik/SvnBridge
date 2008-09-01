@@ -21,7 +21,7 @@ namespace SvnBridge.SourceControl
 
 	[Interceptor(typeof(TracingInterceptor))]
 	[Interceptor(typeof(RetryOnExceptionsInterceptor<SocketException>))]
-	public class TFSSourceControlProvider : ISourceControlProvider, ICredentialsProvider
+	public class TFSSourceControlProvider : ISourceControlProvider
 	{
 		private readonly ISourceControlServicesHub sourceControlServicesHub;
 
