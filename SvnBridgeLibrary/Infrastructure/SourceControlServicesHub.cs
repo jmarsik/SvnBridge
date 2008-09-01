@@ -5,7 +5,7 @@ using SvnBridge.Cache;
 
 namespace SvnBridge.Infrastructure
 {
-    public class SourceControlServicesHub : ISourceControlServicesHub
+    public class SourceControlServicesHub
     {
         private readonly ICredentials credentials;
         private readonly ITFSSourceControlService sourceControlService;

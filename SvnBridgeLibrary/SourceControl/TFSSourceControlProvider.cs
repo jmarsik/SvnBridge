@@ -23,7 +23,7 @@ namespace SvnBridge.SourceControl
 	[Interceptor(typeof(RetryOnExceptionsInterceptor<SocketException>))]
 	public class TFSSourceControlProvider : ISourceControlProvider
 	{
-		private readonly ISourceControlServicesHub sourceControlServicesHub;
+		private readonly SourceControlServicesHub sourceControlServicesHub;
 
 		private static readonly Regex associatedWorkItems =
 			new Regex(@"Work ?Items?: (.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
@@ -74,7 +74,7 @@ namespace SvnBridge.SourceControl
 			string serverUrl,
 			string projectName,
 			ICredentials credentials,
-			ISourceControlServicesHub sourceControlServicesHub, IIgnoredFilesSpecification ignoredFilesSpecification)
+			SourceControlServicesHub sourceControlServicesHub, IIgnoredFilesSpecification ignoredFilesSpecification)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
 			this.ignoredFilesSpecification = ignoredFilesSpecification;

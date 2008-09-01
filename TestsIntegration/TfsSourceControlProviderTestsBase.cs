@@ -70,7 +70,7 @@ namespace IntegrationTests
 			_providerRoot.MakeActivity(_activityIdRoot);
 		}
 
-		public ISourceControlServicesHub CreateSourceControlServicesHub()
+		public SourceControlServicesHub CreateSourceControlServicesHub()
 		{
 			RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
 			FileSystem system = new FileSystem();

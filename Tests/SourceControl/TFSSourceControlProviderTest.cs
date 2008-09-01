@@ -32,7 +32,7 @@ namespace SvnBridge.SourceControl
 				MockRepository.GenerateStub<IIgnoredFilesSpecification>());
         }
 
-        public ISourceControlServicesHub CreateSourceControlServicesHub()
+        public SourceControlServicesHub CreateSourceControlServicesHub()
         {
             return new SourceControlServicesHub(
                 System.Net.CredentialCache.DefaultCredentials,

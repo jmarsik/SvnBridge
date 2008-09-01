@@ -96,7 +96,6 @@
     <Compile Include="Interfaces\IInvocation.cs" />
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />
     <Compile Include="Interfaces\IPathParser.cs" />
-    <Compile Include="Interfaces\ISourceControlServicesHub.cs" />
     <Compile Include="Protocol\DatedRevReportData.cs" />
     <Compile Include="Protocol\FileRevsReportData.cs" />
     <Compile Include="Protocol\RelayReportData.cs" />

@@ -29,7 +29,7 @@ namespace SvnBridge
         public void Start()
         {
             RegisterType(typeof(FileRepository), typeof(FileRepository));
-            RegisterType(typeof(ISourceControlServicesHub), typeof(SourceControlServicesHub));
+            RegisterType(typeof(SourceControlServicesHub), typeof(SourceControlServicesHub));
             RegisterType(typeof(FileCache), typeof(FileCache));
             RegisterType(typeof(IPersistentCache), typeof(MemoryBasedPersistentCache));
             RegisterType(typeof(ILogger), typeof(DefaultLogger));
