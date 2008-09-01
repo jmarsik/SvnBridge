@@ -65,7 +65,7 @@ namespace SvnBridge.SourceControl
 		}
 
 
-		private IAssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet
+		private AssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet
 		{
 			get { return sourceControlServicesHub.AssociateWorkItemWithChangeSet; }
 		}

@@ -15,7 +15,7 @@ namespace SvnBridge.Infrastructure
     /// <remarks>
     /// Yes, we shouldn't have to write our own SOAP handling, sorry about that.
     /// </remarks>
-    public class AssociateWorkItemWithChangeSet : IAssociateWorkItemWithChangeSet
+    public class AssociateWorkItemWithChangeSet
     {
         private readonly static string associateWorkItemWithChangeSetMessage;
         private readonly static string getWorkItemInformationMessage;
@@ -55,7 +55,7 @@ namespace SvnBridge.Infrastructure
 			}
         }
 
-        public void Associate(int workItemId, int changeSetId)
+        public virtual void Associate(int workItemId, int changeSetId)
         {
 
             HttpWebRequest request = GetWebRequest();
@@ -95,7 +95,7 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-    	public void SetWorkItemFixed(int workItemId)
+    	public virtual void SetWorkItemFixed(int workItemId)
         {
 
             HttpWebRequest request = GetWebRequest();

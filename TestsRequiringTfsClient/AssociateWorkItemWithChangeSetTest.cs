@@ -58,7 +58,7 @@ namespace TestsRequiringTfsClient
         [Fact]
         public void CanAssociateWorkItemWithChangeSet()
         {
-            IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
+            AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
                 new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialsHelper.DefaultCredentials);
             associateWorkItemWithChangeSet.Associate(workItemId, changesetId);
             associateWorkItemWithChangeSet.SetWorkItemFixed(workItemId);
@@ -72,7 +72,7 @@ namespace TestsRequiringTfsClient
         [Fact]
         public void CanAssociateWithWorkItemAfterWorkItemHasBeenModified()
         {
-            IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
+            AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet =
                new AssociateWorkItemWithChangeSet(Settings.Default.ServerUrl, CredentialsHelper.DefaultCredentials);
 
             WorkItem item = store.GetWorkItem(workItemId);

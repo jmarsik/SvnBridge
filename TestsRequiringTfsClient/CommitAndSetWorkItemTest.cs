@@ -33,7 +33,7 @@ namespace TestsRequiringTfsClient
             authenticateAsLowPrivilegeUser.Dispose();
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void CanFixWorkItemByCommitMessage()
         {
             CheckoutAndChangeDirectory();
@@ -49,7 +49,7 @@ namespace TestsRequiringTfsClient
             Assert.Equal("Fixed", item.Reason);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void AssociateTwoChangesetsWithWorkItem()
         {
             CheckoutAndChangeDirectory();
@@ -70,7 +70,7 @@ namespace TestsRequiringTfsClient
             Assert.Equal("Fixed", item.Reason);
         }
 
-        [Fact]
+        [SvnBridgeFact]
         public void AssociatingSingleCheckInWithMultiplyWorkItems()
         {
             int oldWorkItemId = workItemId;

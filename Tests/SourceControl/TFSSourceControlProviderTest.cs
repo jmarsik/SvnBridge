@@ -9,21 +9,22 @@ using SvnBridge.Interfaces;
 using NullLogger=SvnBridge.NullImpl.NullLogger;
 using Tests;
 using SvnBridge.Cache;
+using Attach;
 
 namespace SvnBridge.SourceControl
 {
-    public class TFSSourceControlProviderTest : IDisposable
+    public class TFSSourceControlProviderTest
     {
-        private readonly MockFramework attach;
+        private readonly MyMocks attach;
         private readonly MockRepository mocks;
-        private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
+        private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly TFSSourceControlProvider provider;
 
         public TFSSourceControlProviderTest()
         {
-            attach = new MockFramework();
+            attach = new MyMocks();
             mocks = new MockRepository();
-            associateWorkItemWithChangeSet = mocks.CreateMock<IAssociateWorkItemWithChangeSet>();
+            associateWorkItemWithChangeSet = attach.CreateObject<AssociateWorkItemWithChangeSet>("http://www.codeplex.com", null);
             provider = new TFSSourceControlProvider(
                 "blah",
                 null,
@@ -46,79 +47,101 @@ namespace SvnBridge.SourceControl
                 attach.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null, null, false));
         }
 
-        public void Dispose()
-        {
-            mocks.VerifyAll();
-        }
-
         [Fact]
         public void WillNotAssociateIfCommentHasNoWorkItems()
         {
-            mocks.ReplayAll();
+            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
+
             provider.AssociateWorkItemsWithChangeSet("blah blah", 15);
+
+            Assert.False(r1.WasCalled);
+            Assert.False(r2.WasCalled);
         }
 
         [Fact]
         public void WillExtractWorkItemsFromCheckInCommentsAndAssociateWithChangeSet()
         {
-            associateWorkItemWithChangeSet.Associate(15,15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
-            mocks.ReplayAll();
+            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"blah blah
 Work Item: 15";
+
             provider.AssociateWorkItemsWithChangeSet(comment, 15);
+
+            Assert.Equal(15, r1.Parameters[0]);
+            Assert.Equal(15, r1.Parameters[1]);
+            Assert.Equal(15, r2.Parameters[0]);
         }
 
         [Fact]
         public void CanAssociateMoreThanOneId()
         {
-            associateWorkItemWithChangeSet.Associate(15, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
-            associateWorkItemWithChangeSet.Associate(16, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(16);
-            associateWorkItemWithChangeSet.Associate(17, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(17);
-            mocks.ReplayAll();
+            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"blah blah
 Work Items: 15, 16, 17";
+
             provider.AssociateWorkItemsWithChangeSet(comment, 15);
+
+            Assert.Equal(15, r1.History[0].Parameters[0]);
+            Assert.Equal(15, r1.History[0].Parameters[1]);
+            Assert.Equal(16, r1.History[1].Parameters[0]);
+            Assert.Equal(15, r1.History[1].Parameters[1]);
+            Assert.Equal(17, r1.History[2].Parameters[0]);
+            Assert.Equal(15, r1.History[2].Parameters[1]);
+            Assert.Equal(15, r2.History[0].Parameters[0]);
+            Assert.Equal(16, r2.History[1].Parameters[0]);
+            Assert.Equal(17, r2.History[2].Parameters[0]);
         }
 
         [Fact]
         public void CanAssociateOnMultiplyLines()
         {
-            associateWorkItemWithChangeSet.Associate(15, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
-            associateWorkItemWithChangeSet.Associate(16, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(16);
-            associateWorkItemWithChangeSet.Associate(17, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(17);
-            mocks.ReplayAll();
+            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"blah blah
 Work Items: 15, 16
 Work Item: 17";
-            provider.AssociateWorkItemsWithChangeSet(comment, 15); 
+
+            provider.AssociateWorkItemsWithChangeSet(comment, 15);
+
+            Assert.Equal(15, r1.History[0].Parameters[0]);
+            Assert.Equal(15, r1.History[0].Parameters[1]);
+            Assert.Equal(16, r1.History[1].Parameters[0]);
+            Assert.Equal(15, r1.History[1].Parameters[1]);
+            Assert.Equal(17, r1.History[2].Parameters[0]);
+            Assert.Equal(15, r1.History[2].Parameters[1]);
+            Assert.Equal(15, r2.History[0].Parameters[0]);
+            Assert.Equal(16, r2.History[1].Parameters[0]);
+            Assert.Equal(17, r2.History[2].Parameters[0]);
         }
 
         [Fact]
         public void WillRecognizeWorkItemsIfWorkItemAppearsPreviouslyInText()
         {
-
-            associateWorkItemWithChangeSet.Associate(15, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(15);
-            associateWorkItemWithChangeSet.Associate(16, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(16);
-            associateWorkItemWithChangeSet.Associate(17, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(17);
-            associateWorkItemWithChangeSet.Associate(81, 15);
-            associateWorkItemWithChangeSet.SetWorkItemFixed(81);
-            mocks.ReplayAll();
+            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"Adding work items support and fixing
 other issues with workitems
 Solved Work Items: 15, 16
 Fixed WorkItem: 17
 Assoicate with workitem: 81";
-            provider.AssociateWorkItemsWithChangeSet(comment, 15); 
+
+            provider.AssociateWorkItemsWithChangeSet(comment, 15);
+
+            Assert.Equal(15, r1.History[0].Parameters[0]);
+            Assert.Equal(15, r1.History[0].Parameters[1]);
+            Assert.Equal(16, r1.History[1].Parameters[0]);
+            Assert.Equal(15, r1.History[1].Parameters[1]);
+            Assert.Equal(17, r1.History[2].Parameters[0]);
+            Assert.Equal(15, r1.History[2].Parameters[1]);
+            Assert.Equal(81, r1.History[3].Parameters[0]);
+            Assert.Equal(15, r1.History[3].Parameters[1]);
+            Assert.Equal(15, r2.History[0].Parameters[0]);
+            Assert.Equal(16, r2.History[1].Parameters[0]);
+            Assert.Equal(17, r2.History[2].Parameters[0]);
+            Assert.Equal(81, r2.History[3].Parameters[0]);
         }
     }
 }

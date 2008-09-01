@@ -10,14 +10,14 @@ namespace SvnBridge.Infrastructure
         private readonly ICredentials credentials;
         private readonly ITFSSourceControlService sourceControlService;
         private readonly IProjectInformationRepository projectInformationRepository;
-        private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
+        private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly ILogger logger;
         private readonly ICache cache;
         private readonly FileCache fileCache;
 		private readonly MetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly FileRepository fileRepository;
 
-    	public SourceControlServicesHub(ICredentials credentials, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, FileCache fileCache, MetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
+    	public SourceControlServicesHub(ICredentials credentials, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, FileCache fileCache, MetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
         {
             this.credentials = credentials;
     		this.metaDataRepositoryFactory = metaDataRepositoryFactory;
@@ -45,7 +45,7 @@ namespace SvnBridge.Infrastructure
             get { return projectInformationRepository; }
         }
 
-        public IAssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet
+        public AssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet
         {
             get { return associateWorkItemWithChangeSet; }
         }
