@@ -41,7 +41,7 @@ namespace SvnBridge.SourceControl
                 MockRepository.GenerateStub<IProjectInformationRepository>(),
                 associateWorkItemWithChangeSet,
                 new NullLogger(),
-                new NullCache(),
+                attach.CreateObject<WebCache>(),
                 attach.CreateObject<FileCache>(null),
                 attach.CreateObject<MetaDataRepositoryFactory>(null, null, false),
                 attach.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null, null, false));

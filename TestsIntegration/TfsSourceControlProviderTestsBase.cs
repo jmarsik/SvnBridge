@@ -22,6 +22,7 @@ namespace IntegrationTests
 	public abstract class TFSSourceControlProviderTestsBase : IDisposable
 	{
 		public string ServerUrl = Settings.Default.ServerUrl;
+        protected MyMocks mock;
 		protected const string PROJECT_NAME = "SvnBridgeTesting";
 		protected readonly string _activityId;
 		protected string _activityIdRoot;
@@ -36,6 +37,7 @@ namespace IntegrationTests
 
 		public TFSSourceControlProviderTestsBase()
 		{
+            mock = new MyMocks();
 			PerRequest.Init();
 			new BootStrapper().Start();
             IoC.Resolve<MemoryBasedPersistentCache>().Clear();
@@ -74,24 +76,14 @@ namespace IntegrationTests
 		{
 			RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
 			FileSystem system = new FileSystem();
-
 			RegistrationService service = new RegistrationService(factory);
 			RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
 			WebTransferService webTransferService = new WebTransferService(system);
-
-			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
-																						  factory1,
-																						  webTransferService,
-																						  system,
-																						  new NullLogger());
+			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service, factory1, webTransferService, system, new NullLogger());
             MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<MemoryBasedPersistentCache>(), Settings.Default.CacheEnabled);
-			ProjectInformationRepository repository = new ProjectInformationRepository(
-																					   metaDataRepositoryFactory,
-																					   ServerUrl);
+			ProjectInformationRepository repository = new ProjectInformationRepository(metaDataRepositoryFactory,ServerUrl);
             ICredentials credentials = GetCredentials();
-            MockFramework attach = new MockFramework();
-
-            FileCache fileCache = attach.CreateObject<FileCache>(null);
+            FileCache fileCache = mock.CreateObject<FileCache>(null);
             ILogger logger = new NullLogger();
             FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger, Settings.Default.CacheEnabled);
 			return new SourceControlServicesHub(
@@ -100,7 +92,7 @@ namespace IntegrationTests
 				repository,
 				associateWorkItemWithChangeSet,
 				logger,
-				new NullCache(),
+                mock.CreateObject<WebCache>(),
 				fileCache,
 				metaDataRepositoryFactory,
                 fileRepository);

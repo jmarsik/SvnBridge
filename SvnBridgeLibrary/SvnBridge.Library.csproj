@@ -61,7 +61,6 @@
     <Compile Include="Infrastructure\Statistics\IActionTracking.cs" />
     <Compile Include="Interfaces\IIgnoredFilesSpecification.cs" />
     <Compile Include="NullImpl\NullActionTracking.cs" />
-    <Compile Include="NullImpl\NullCache.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Exceptions\CacheMissException.cs" />
     <Compile Include="Exceptions\EnvironmentValidationException.cs" />
