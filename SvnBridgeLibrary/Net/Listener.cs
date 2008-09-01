@@ -15,9 +15,9 @@ namespace SvnBridge.Net
         private readonly DefaultLogger logger;
         private TcpListener listener;
         private int? port;
-        private IActionTracking actionTracking;
+        private ActionTrackingViaPerfCounter actionTracking;
 
-        public Listener(DefaultLogger logger, IActionTracking actionTracking)
+        public Listener(DefaultLogger logger, ActionTrackingViaPerfCounter actionTracking)
         {
             this.logger = logger;
             this.actionTracking = actionTracking;

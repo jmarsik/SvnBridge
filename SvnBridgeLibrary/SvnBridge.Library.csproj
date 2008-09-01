@@ -58,7 +58,6 @@
     <Compile Include="Infrastructure\MetaDataRepositoryNoCache.cs" />
     <Compile Include="Infrastructure\OldSvnBridgeFilesSpecification.cs" />
     <Compile Include="Infrastructure\Statistics\ActionTrackingViaPerfCounter.cs" />
-    <Compile Include="Infrastructure\Statistics\IActionTracking.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Exceptions\CacheMissException.cs" />
     <Compile Include="Exceptions\EnvironmentValidationException.cs" />

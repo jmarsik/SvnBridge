@@ -16,9 +16,9 @@ namespace SvnBridge.Net
     public class HttpContextDispatcher
     {
         private readonly IPathParser parser;
-        private readonly IActionTracking actionTracking;
+        private readonly ActionTrackingViaPerfCounter actionTracking;
 
-        public HttpContextDispatcher(IPathParser parser, IActionTracking actionTracking)
+        public HttpContextDispatcher(IPathParser parser, ActionTrackingViaPerfCounter actionTracking)
         {
             this.parser = parser;
             this.actionTracking = actionTracking;
@@ -65,7 +65,7 @@ namespace SvnBridge.Net
                 IHttpRequest request = connection.Request;
                 if ("/!stats/request".Equals(request.LocalPath, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    new StatsRenderer(IoC.Resolve<IActionTracking>()).Render(connection);
+                    new StatsRenderer(IoC.Resolve<ActionTrackingViaPerfCounter>()).Render(connection);
                     return;
                 }
 

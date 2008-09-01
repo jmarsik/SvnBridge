@@ -58,11 +58,11 @@ namespace SvnBridge.Net
         }
     }
 
-    public class StubActionTracking : IActionTracking
+    public class StubActionTracking : ActionTrackingViaPerfCounter
     {
-        public void Request(HttpContextHandlerBase handler) {}
-        public void Error() {}
-        public IDictionary<string, long> GetStatistics()
+        public override void Request(HttpContextHandlerBase handler) {}
+        public override void Error() {}
+        public override IDictionary<string, long> GetStatistics()
         {
             return null;
         }

@@ -30,7 +30,7 @@ namespace Tests
             provider = stub.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             StaticServerPathParser pathParser = new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>());
-            HttpDispatcher = new HttpContextDispatcher(pathParser, MockRepository.GenerateStub<IActionTracking>());
+            HttpDispatcher = new HttpContextDispatcher(pathParser, stub.CreateObject<ActionTrackingViaPerfCounter>());
             PerRequest.Init();
         }
 

@@ -20,11 +20,11 @@ namespace SvnBridge.Web
 		    IProjectInformationRepository projectInformationRepository = IoC.Resolve<IProjectInformationRepository>();
 		    if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
 			{
-                dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl, projectInformationRepository), IoC.Resolve<IActionTracking>());
+                dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl, projectInformationRepository), IoC.Resolve<ActionTrackingViaPerfCounter>());
 			}
 			else
 			{
-                dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl, projectInformationRepository), IoC.Resolve<IActionTracking>());
+                dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl, projectInformationRepository), IoC.Resolve<ActionTrackingViaPerfCounter>());
 			}
 		}
 

@@ -7,7 +7,7 @@ using SvnBridge.Handlers;
 
 namespace SvnBridge.Infrastructure.Statistics
 {
-    public class ActionTrackingViaPerfCounter : IActionTracking
+    public class ActionTrackingViaPerfCounter
     {
         private static readonly IDictionary<Type, PerformanceCounter> performanceCounters =
             new Dictionary<Type, PerformanceCounter>();
@@ -89,23 +89,21 @@ namespace SvnBridge.Infrastructure.Statistics
             }
         }
 
-        #region IActionTracking Members
-
-        public void Request(HttpContextHandlerBase handler)
+        public virtual void Request(HttpContextHandlerBase handler)
         {
             if (!enabled)
                 return;
             performanceCounters[handler.GetType()].Increment();
         }
 
-        public void Error()
+        public virtual void Error()
         {
             if (!enabled)
                 return;
             performanceCounters[typeof(Errors)].Increment();
         }
 
-        public IDictionary<string, long> GetStatistics()
+        public virtual IDictionary<string, long> GetStatistics()
         {
             Dictionary<string, long> stats = new Dictionary<string, long>();
             foreach (var counter in performanceCounters.Values)
@@ -114,8 +112,6 @@ namespace SvnBridge.Infrastructure.Statistics
             }
             return stats;
         }
-
-        #endregion
 
         #region Nested type: Errors
 

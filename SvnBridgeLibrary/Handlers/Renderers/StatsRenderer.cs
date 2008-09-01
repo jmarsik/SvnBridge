@@ -6,9 +6,9 @@ namespace SvnBridge.Handlers.Renderers
 {
     public class StatsRenderer
     {
-        private readonly IActionTracking actionTracking;
+        private readonly ActionTrackingViaPerfCounter actionTracking;
 
-        public StatsRenderer(IActionTracking actionTracking)
+        public StatsRenderer(ActionTrackingViaPerfCounter actionTracking)
         {
             this.actionTracking = actionTracking;
         }

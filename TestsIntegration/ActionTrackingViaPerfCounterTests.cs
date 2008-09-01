@@ -6,7 +6,7 @@ namespace IntegrationTests
 {
     public class ActionTrackingViaPerfCounterTests
     {
-        private readonly IActionTracking actionTracking;
+        private readonly ActionTrackingViaPerfCounter actionTracking;
 
         public ActionTrackingViaPerfCounterTests()
         {
