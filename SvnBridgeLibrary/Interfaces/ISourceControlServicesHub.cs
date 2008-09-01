@@ -1,6 +1,7 @@
 using System.Net;
 using SvnBridge.Infrastructure;
 using SvnBridge.SourceControl;
+using SvnBridge.Cache;
 
 namespace SvnBridge.Interfaces
 {
@@ -12,7 +13,7 @@ namespace SvnBridge.Interfaces
         IAssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet { get; }
         ILogger Logger { get; }
         ICache Cache { get; }
-        IFileCache FileCache { get; }
+        FileCache FileCache { get; }
 		IMetaDataRepositoryFactory MetaDataRepositoryFactory { get; }
         FileRepository FileRepository { get; }
     }

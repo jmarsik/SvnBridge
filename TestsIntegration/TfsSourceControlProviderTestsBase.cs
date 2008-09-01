@@ -14,6 +14,8 @@ using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.NullImpl;
 using SvnBridge.SourceControl;
+using Tests;
+using SvnBridge.Cache;
 
 namespace IntegrationTests
 {
@@ -87,7 +89,9 @@ namespace IntegrationTests
 																					   metaDataRepositoryFactory,
 																					   ServerUrl);
             ICredentials credentials = GetCredentials();
-            IFileCache fileCache = MockRepository.GenerateStub<IFileCache>();
+            MockFramework attach = new MockFramework();
+
+            FileCache fileCache = attach.CreateObject<FileCache>(null);
             ILogger logger = new NullLogger();
             FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger, Settings.Default.CacheEnabled);
 			return new SourceControlServicesHub(

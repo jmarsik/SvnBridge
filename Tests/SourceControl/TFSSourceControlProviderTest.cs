@@ -8,6 +8,7 @@ using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using NullLogger=SvnBridge.NullImpl.NullLogger;
 using Tests;
+using SvnBridge.Cache;
 
 namespace SvnBridge.SourceControl
 {
@@ -40,7 +41,7 @@ namespace SvnBridge.SourceControl
                 associateWorkItemWithChangeSet,
                 new NullLogger(),
                 new NullCache(),
-                MockRepository.GenerateStub<IFileCache>(),
+                attach.CreateObject<FileCache>(null),
 				MockRepository.GenerateStub<IMetaDataRepositoryFactory>(),
                 attach.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null, null, false));
         }

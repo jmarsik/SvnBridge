@@ -1,6 +1,7 @@
 using System.Net;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
+using SvnBridge.Cache;
 
 namespace SvnBridge.Infrastructure
 {
@@ -12,11 +13,11 @@ namespace SvnBridge.Infrastructure
         private readonly IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly ILogger logger;
         private readonly ICache cache;
-        private readonly IFileCache fileCache;
+        private readonly FileCache fileCache;
 		private readonly IMetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly FileRepository fileRepository;
 
-    	public SourceControlServicesHub(ICredentials credentials, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, IFileCache fileCache, IMetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
+    	public SourceControlServicesHub(ICredentials credentials, ITFSSourceControlService sourceControlService, IProjectInformationRepository projectInformationRepository, IAssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, ILogger logger, ICache cache, FileCache fileCache, IMetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
         {
             this.credentials = credentials;
     		this.metaDataRepositoryFactory = metaDataRepositoryFactory;
@@ -59,7 +60,7 @@ namespace SvnBridge.Infrastructure
             get { return cache; }
         }
 
-        public IFileCache FileCache
+        public FileCache FileCache
         {
             get { return fileCache; }
         }

@@ -8,7 +8,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Cache
 {
-	public class FileCache : IFileCache, ICanValidateMyEnvironment
+	public class FileCache : ICanValidateMyEnvironment
 	{
 		private const string verificationExtension = ".verification";
 
@@ -20,7 +20,7 @@ namespace SvnBridge.Cache
 			rootCachePath = fileCachePath;
 		}
 
-		public byte[] Get(string filename, int revision)
+		public virtual byte[] Get(string filename, int revision)
 		{
             byte[] result = null;
             GetInternal(filename, revision,delegate(string path)
@@ -51,7 +51,7 @@ namespace SvnBridge.Cache
 	        }
 	    }
 
-	    public void Set(string filename, int revision, byte[] data)
+        public virtual void Set(string filename, int revision, byte[] data)
 		{
 			EnsureRootDirectoryExists();
 
@@ -69,7 +69,7 @@ namespace SvnBridge.Cache
 		}
 
 
-	    public FileData GetText(string filename, int revision)
+        public virtual FileData GetText(string filename, int revision)
 	    {
             FileData result = null;
             GetInternal(filename, revision, delegate(string path)

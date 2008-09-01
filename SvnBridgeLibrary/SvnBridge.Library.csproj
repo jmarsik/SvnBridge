@@ -92,7 +92,6 @@
     <Compile Include="Infrastructure\SourceControlServicesHub.cs" />
     <Compile Include="Interfaces\CachedResult.cs" />
     <Compile Include="Interfaces\ICanValidateMyEnvironment.cs" />
-    <Compile Include="Interfaces\IFileCache.cs" />
     <Compile Include="Interfaces\IInterceptor.cs" />
     <Compile Include="Interfaces\IInvocation.cs" />
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />

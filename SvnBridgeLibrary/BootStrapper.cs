@@ -30,7 +30,7 @@ namespace SvnBridge
         {
             RegisterType(typeof(FileRepository), typeof(FileRepository));
             RegisterType(typeof(ISourceControlServicesHub), typeof(SourceControlServicesHub));
-            RegisterType(typeof(IFileCache), typeof(FileCache));
+            RegisterType(typeof(FileCache), typeof(FileCache));
             RegisterType(typeof(IPersistentCache), typeof(MemoryBasedPersistentCache));
             RegisterType(typeof(ILogger), typeof(DefaultLogger));
             RegisterType(typeof(IIgnoredFilesSpecification), typeof(OldSvnBridgeFilesSpecification));

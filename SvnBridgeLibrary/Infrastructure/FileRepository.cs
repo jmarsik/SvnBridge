@@ -9,18 +9,19 @@ using System.Threading;
 using SvnBridge.Exceptions;
 using SvnBridge.Net;
 using SvnBridge.Utility;
+using SvnBridge.Cache;
 
 namespace SvnBridge.Infrastructure
 {
     public class FileRepository
     {
         private readonly ICredentials credentials;
-        private readonly IFileCache fileCache;
+        private readonly FileCache fileCache;
         private readonly IWebTransferService webTransferService;
         private readonly ILogger logger;
         private readonly bool cacheEnabled;
 
-        public FileRepository(string serverUrl, ICredentials credentials, IFileCache fileCache, IWebTransferService webTransferService, ILogger logger, bool cacheEnabled)
+        public FileRepository(string serverUrl, ICredentials credentials, FileCache fileCache, IWebTransferService webTransferService, ILogger logger, bool cacheEnabled)
         {
             this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
             this.fileCache = fileCache;
