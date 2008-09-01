@@ -18,10 +18,10 @@ namespace SvnBridge.Infrastructure
         private readonly ICredentials credentials;
         private readonly FileCache fileCache;
         private readonly IWebTransferService webTransferService;
-        private readonly ILogger logger;
+        private readonly DefaultLogger logger;
         private readonly bool cacheEnabled;
 
-        public FileRepository(string serverUrl, ICredentials credentials, FileCache fileCache, IWebTransferService webTransferService, ILogger logger, bool cacheEnabled)
+        public FileRepository(string serverUrl, ICredentials credentials, FileCache fileCache, IWebTransferService webTransferService, DefaultLogger logger, bool cacheEnabled)
         {
             this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
             this.fileCache = fileCache;

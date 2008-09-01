@@ -102,7 +102,6 @@
     <Compile Include="Infrastructure\BrokenXml.cs" />
     <Compile Include="Infrastructure\Clock.cs" />
     <Compile Include="Infrastructure\Container.cs" />
-    <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Infrastructure\IoC.cs" />
     <Compile Include="Cache\WebCache.cs" />
     <Compile Include="Handlers\MergeHandler.cs" />

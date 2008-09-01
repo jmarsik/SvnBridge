@@ -84,7 +84,7 @@ namespace IntegrationTests
 			ProjectInformationRepository repository = new ProjectInformationRepository(metaDataRepositoryFactory,ServerUrl);
             ICredentials credentials = GetCredentials();
             FileCache fileCache = mock.CreateObject<FileCache>(null);
-            ILogger logger = new NullLogger();
+            DefaultLogger logger = new NullLogger();
             FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger, Settings.Default.CacheEnabled);
 			return new SourceControlServicesHub(
 				credentials,

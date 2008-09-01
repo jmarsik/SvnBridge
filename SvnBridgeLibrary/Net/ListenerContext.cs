@@ -9,7 +9,7 @@ namespace SvnBridge.Net
         private readonly ListenerRequest request;
         private readonly ListenerResponse response;
 
-        public ListenerContext(Stream stream, ILogger logger)
+        public ListenerContext(Stream stream, DefaultLogger logger)
         {
             request = new ListenerRequest(stream, logger);
             response = new ListenerResponse(request, stream);

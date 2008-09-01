@@ -10,9 +10,9 @@ namespace SvnBridge.Proxies
 	public class RetryOnExceptionsInterceptor<TException> : IInterceptor
 	   where TException : Exception
 	{
-		private readonly ILogger logger;
+        private readonly DefaultLogger logger;
 
-		public RetryOnExceptionsInterceptor(ILogger logger)
+        public RetryOnExceptionsInterceptor(DefaultLogger logger)
 		{
 			this.logger = logger;
 		}

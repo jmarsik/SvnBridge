@@ -12,12 +12,12 @@ namespace SvnBridge.Net
     {
         private HttpContextDispatcher dispatcher;
         private bool isListening;
-        private readonly ILogger logger;
+        private readonly DefaultLogger logger;
         private TcpListener listener;
         private int? port;
         private IActionTracking actionTracking;
 
-        public Listener(ILogger logger, IActionTracking actionTracking)
+        public Listener(DefaultLogger logger, IActionTracking actionTracking)
         {
             this.logger = logger;
             this.actionTracking = actionTracking;

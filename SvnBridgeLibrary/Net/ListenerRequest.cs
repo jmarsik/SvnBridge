@@ -16,7 +16,7 @@ namespace SvnBridge.Net
 		private string path;
 		private Uri url;
 
-		public ListenerRequest(Stream stream, ILogger logger)
+        public ListenerRequest(Stream stream, DefaultLogger logger)
 		{
 			headers = new NameValueCollection();
 
@@ -79,7 +79,7 @@ namespace SvnBridge.Net
 			}
 		}
 
-		private void ParseRequest(Stream stream, ILogger logger)
+        private void ParseRequest(Stream stream, DefaultLogger logger)
 		{
 			MemoryStream buffer = new MemoryStream();
 

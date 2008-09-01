@@ -13,9 +13,9 @@ namespace SvnBridge.Proxies
 	{
 		private static IDictionary<Type, XmlSerializer> typeToXmlSerializers = new Dictionary<Type, XmlSerializer>();
 
-		private readonly ILogger logger;
+        private readonly DefaultLogger logger;
 
-		public TracingInterceptor(ILogger logger)
+        public TracingInterceptor(DefaultLogger logger)
 		{
 			this.logger = logger;
 		}

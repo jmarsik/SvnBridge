@@ -9,12 +9,11 @@ using System.Configuration;
 
 namespace SvnBridge.Infrastructure
 {
-    public class DefaultLogger : ILogger, ICanValidateMyEnvironment
+    public class DefaultLogger : ICanValidateMyEnvironment
     {
-        #region ILogger Members
         string logPath;
 
-        public void Error(string message, Exception exception)
+        public virtual void Error(string message, Exception exception)
         {
             WebException we = exception as WebException;
             if (we != null && we.Response != null)
@@ -34,26 +33,24 @@ namespace SvnBridge.Infrastructure
             Log("Error", message, exception.ToString());
         }
 
-        public void Info(string message, Exception exception)
+        public virtual void Info(string message, Exception exception)
         {
             Log("Info", message, exception.ToString());
         }
 
-        public void Trace(string message, params object[] args)
+        public virtual void Trace(string message, params object[] args)
         {
             if (Logging.TraceEnabled == false)
                 return;
             Log("Trace", string.Format(message, args), null);
         }
 
-        public void TraceMessage(string message)
+        public virtual void TraceMessage(string message)
         {
             if (Logging.TraceEnabled == false)
                 return;
             Log("TraceMessage", message, null);
         }
-
-        #endregion
 
         private void Log(string level, string message, string exception)
         {

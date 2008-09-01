@@ -7,12 +7,13 @@ using CodePlex.TfsLibrary.Utility;
 using System.Text;
 using System.IO;
 using SvnBridge.Interfaces;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.SourceControl
 {
 	public class TFSSourceControlService : SourceControlService, ITFSSourceControlService
 	{
-		private readonly ILogger logger;
+        private readonly DefaultLogger logger;
 		private readonly IRepositoryWebSvcFactory webSvcFactory;
 
 		public TFSSourceControlService(
@@ -20,7 +21,7 @@ namespace SvnBridge.SourceControl
 			IRepositoryWebSvcFactory webSvcFactory, 
 			IWebTransferService webTransferService, 
 			IFileSystem fileSystem,
-			ILogger logger)
+            DefaultLogger logger)
 			: base(registrationService, webSvcFactory, webTransferService, fileSystem)
 		{
 			this.webSvcFactory = webSvcFactory;

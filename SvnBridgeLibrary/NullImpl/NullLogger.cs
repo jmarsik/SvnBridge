@@ -1,29 +1,25 @@
 using System;
 using SvnBridge.Interfaces;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.NullImpl
 {
-	public class NullLogger : ILogger
+    public class NullLogger : DefaultLogger
 	{
-		#region ILogger Members
-
-		public void Error(string message, Exception exception)
+		public override void Error(string message, Exception exception)
 		{
 		}
 
-		public void Info(string message, Exception exception)
+        public override void Info(string message, Exception exception)
 		{
 		}
 
-		public void Trace(string message, params object[] args)
+        public override void Trace(string message, params object[] args)
 		{
 		}
 
-		public void TraceMessage(string message)
+        public override void TraceMessage(string message)
 		{
-			
 		}
-
-		#endregion
 	}
 }

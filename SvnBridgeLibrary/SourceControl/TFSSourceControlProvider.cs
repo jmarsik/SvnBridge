@@ -36,7 +36,7 @@ namespace SvnBridge.SourceControl
 		private readonly string serverUrl;
         private OldSvnBridgeFilesSpecification ignoredFilesSpecification;
 
-		private ILogger Logger
+        private DefaultLogger Logger
 		{
 			get { return sourceControlServicesHub.Logger; }
 		}
