@@ -8,6 +8,7 @@ using SvnBridge.Net;
 using SvnBridge.Proxies;
 using SvnBridge.SourceControl;
 using System.Configuration;
+using SvnBridge.Cache;
 
 namespace SvnBridge.Infrastructure
 {
@@ -18,12 +19,12 @@ namespace SvnBridge.Infrastructure
         private readonly string serverUrl;
         private readonly string rootPath;
         private readonly ICredentials credentials;
-        private readonly IPersistentCache persistentCache;
+        private readonly MemoryBasedPersistentCache persistentCache;
 
         public MetaDataRepositoryNoCache(
             ITFSSourceControlService sourceControlService,
             ICredentials credentials,
-            IPersistentCache persistentCache,
+            MemoryBasedPersistentCache persistentCache,
             string serverUrl,
             string rootPath)
         {

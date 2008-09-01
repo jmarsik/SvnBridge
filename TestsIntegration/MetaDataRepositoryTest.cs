@@ -13,6 +13,7 @@ using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using Xunit;
+using SvnBridge.Cache;
 
 namespace IntegrationTests
 {
@@ -28,7 +29,7 @@ namespace IntegrationTests
 			sourceControlService = IoC.Resolve<ITFSSourceControlService>();
 
 			repository = new MetaDataRepository(sourceControlService, credentials,
-												IoC.Resolve<IPersistentCache>(), ServerUrl, Constants.ServerRootPath + PROJECT_NAME);
+                                                IoC.Resolve<MemoryBasedPersistentCache>(), ServerUrl, Constants.ServerRootPath + PROJECT_NAME);
 		}
 
 	    [Fact]

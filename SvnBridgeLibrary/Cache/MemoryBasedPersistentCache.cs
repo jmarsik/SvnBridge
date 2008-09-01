@@ -7,6 +7,8 @@ using SvnBridge.Net;
 
 namespace SvnBridge.Cache
 {
+    public delegate void Action();
+    
     /// <summary>
     /// This class uses two levels of caching in order to ensure persistance.
     /// The first is the per request items, and the second is the global cache.
@@ -22,7 +24,7 @@ namespace SvnBridge.Cache
     /// Reads goes first to the per request cache, and then to system cache, if it is not there.
     /// Writes goes to both of them.
     /// </summary>
-    public class MemoryBasedPersistentCache : IPersistentCache
+    public class MemoryBasedPersistentCache
     {
         private static readonly ReaderWriterLock rwLock = new ReaderWriterLock();
         private readonly ICache cache;
@@ -32,9 +34,7 @@ namespace SvnBridge.Cache
             this.cache = cache;
         }
 
-        #region IPersistentCache Members
-
-        public CachedResult Get(string key)
+        public virtual CachedResult Get(string key)
         {
             CachedResult result = null;
             ReadLock(delegate
@@ -75,14 +75,14 @@ namespace SvnBridge.Cache
             }
         }
 
-        public void Set(string key, object obj)
+        public virtual void Set(string key, object obj)
         {
             cache.Set(key, obj);
             PerRequest.Items[key] = obj;
 
         }
 
-        public void UnitOfWork(Action action)
+        public virtual void UnitOfWork(Action action)
         {
             if (rwLock.IsWriterLockHeld)
             {
@@ -101,7 +101,7 @@ namespace SvnBridge.Cache
             }
         }
 
-        public bool Contains(string key)
+        public virtual bool Contains(string key)
         {
             bool result = false;
             ReadLock(delegate
@@ -113,7 +113,7 @@ namespace SvnBridge.Cache
             return result;
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             rwLock.AcquireWriterLock(Timeout.Infinite);
             try
@@ -128,7 +128,7 @@ namespace SvnBridge.Cache
             }
         }
 
-        public void Add(string key, string value)
+        public virtual void Add(string key, string value)
         {
             if(value==null)
                 return;
@@ -147,7 +147,7 @@ namespace SvnBridge.Cache
             items.Add(value);
         }
 
-        public List<T> GetList<T>(string key)
+        public virtual List<T> GetList<T>(string key)
         {
             List<T> items = new List<T>();
             ReadLock(delegate
@@ -172,7 +172,5 @@ namespace SvnBridge.Cache
             });
             return items;
         }
-
-        #endregion
     }
 }

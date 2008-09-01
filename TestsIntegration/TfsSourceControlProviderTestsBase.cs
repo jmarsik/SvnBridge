@@ -38,7 +38,7 @@ namespace IntegrationTests
 		{
 			PerRequest.Init();
 			new BootStrapper().Start();
-			IoC.Resolve<IPersistentCache>().Clear();
+            IoC.Resolve<MemoryBasedPersistentCache>().Clear();
 
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
 
@@ -84,7 +84,7 @@ namespace IntegrationTests
 																						  webTransferService,
 																						  system,
 																						  new NullLogger());
-			MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<IPersistentCache>(),Settings.Default.CacheEnabled);
+            MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<MemoryBasedPersistentCache>(), Settings.Default.CacheEnabled);
 			ProjectInformationRepository repository = new ProjectInformationRepository(
 																					   metaDataRepositoryFactory,
 																					   ServerUrl);
