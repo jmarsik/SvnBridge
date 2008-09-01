@@ -44,7 +44,7 @@ namespace IntegrationTests
 																			 PROJECT_NAME,
 																			 null,
 																			 CreateSourceControlServicesHub(),
-				IoC.Resolve<IIgnoredFilesSpecification>());
+                IoC.Resolve<OldSvnBridgeFilesSpecification>());
 		}
 
 		[Fact]

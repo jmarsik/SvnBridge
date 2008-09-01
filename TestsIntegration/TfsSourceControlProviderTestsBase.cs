@@ -52,7 +52,7 @@ namespace IntegrationTests
 													 PROJECT_NAME,
 													 null,
 													 CreateSourceControlServicesHub(),
-				IoC.Resolve<IIgnoredFilesSpecification>());
+                IoC.Resolve<OldSvnBridgeFilesSpecification>());
 
 			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Environment.MachineName + "-" + Guid.NewGuid();
 			_provider.MakeActivity(_activityId);
@@ -68,7 +68,7 @@ namespace IntegrationTests
 														 PROJECT_NAME + testPath,
 														 null,
 														 CreateSourceControlServicesHub(),
-				IoC.Resolve<IIgnoredFilesSpecification>());
+                IoC.Resolve<OldSvnBridgeFilesSpecification>());
 			_providerRoot.MakeActivity(_activityIdRoot);
 		}
 

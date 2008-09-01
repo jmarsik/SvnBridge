@@ -30,7 +30,7 @@ namespace SvnBridge.SourceControl
                 null,
 				null,
                 CreateSourceControlServicesHub(),
-				MockRepository.GenerateStub<IIgnoredFilesSpecification>());
+                attach.CreateObject<OldSvnBridgeFilesSpecification>());
         }
 
         public SourceControlServicesHub CreateSourceControlServicesHub()

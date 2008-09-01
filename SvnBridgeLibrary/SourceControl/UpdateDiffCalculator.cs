@@ -6,13 +6,14 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 using SvnBridge.Utility;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.SourceControl
 {
     public class UpdateDiffCalculator
     {
         private readonly ISourceControlProvider sourceControlProvider;
-    	private readonly IIgnoredFilesSpecification ignoredFilesSpecification;
+        private readonly OldSvnBridgeFilesSpecification ignoredFilesSpecification;
         private readonly IDictionary<ItemMetaData, bool> additionForPropertyChangeOnly =
             new Dictionary<ItemMetaData, bool>();
 
@@ -20,7 +21,7 @@ namespace SvnBridge.SourceControl
         private Dictionary<string, string> clientDeletedFiles;
         private readonly List<string> renamedItemsToBeCheckedForDeletedChildren = new List<string>();
 
-        public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider, IIgnoredFilesSpecification ignoredFilesSpecification)
+        public UpdateDiffCalculator(ISourceControlProvider sourceControlProvider, OldSvnBridgeFilesSpecification ignoredFilesSpecification)
         {
         	this.sourceControlProvider = sourceControlProvider;
         	this.ignoredFilesSpecification = ignoredFilesSpecification;

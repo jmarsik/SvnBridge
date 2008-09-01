@@ -59,7 +59,6 @@
     <Compile Include="Infrastructure\OldSvnBridgeFilesSpecification.cs" />
     <Compile Include="Infrastructure\Statistics\ActionTrackingViaPerfCounter.cs" />
     <Compile Include="Infrastructure\Statistics\IActionTracking.cs" />
-    <Compile Include="Interfaces\IIgnoredFilesSpecification.cs" />
     <Compile Include="NullImpl\NullActionTracking.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Exceptions\CacheMissException.cs" />

@@ -34,7 +34,7 @@ namespace SvnBridge.SourceControl
 		private readonly string projectName;
 		private readonly string rootPath;
 		private readonly string serverUrl;
-		private IIgnoredFilesSpecification ignoredFilesSpecification;
+        private OldSvnBridgeFilesSpecification ignoredFilesSpecification;
 
 		private ILogger Logger
 		{
@@ -73,7 +73,7 @@ namespace SvnBridge.SourceControl
 			string serverUrl,
 			string projectName,
 			ICredentials credentials,
-			SourceControlServicesHub sourceControlServicesHub, IIgnoredFilesSpecification ignoredFilesSpecification)
+            SourceControlServicesHub sourceControlServicesHub, OldSvnBridgeFilesSpecification ignoredFilesSpecification)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
 			this.ignoredFilesSpecification = ignoredFilesSpecification;

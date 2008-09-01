@@ -3,7 +3,7 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.Infrastructure
 {
-	public class OldSvnBridgeFilesSpecification : IIgnoredFilesSpecification
+	public class OldSvnBridgeFilesSpecification
 	{
 		public bool ShouldBeIgnored(string file)
 		{
