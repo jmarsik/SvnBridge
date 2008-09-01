@@ -7,7 +7,7 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Infrastructure
 {
-    public class AsyncItemLoader : IItemLoader
+    public class AsyncItemLoader
     {
         private readonly FolderMetaData folderInfo;
         private readonly ISourceControlProvider sourceControlProvider;
