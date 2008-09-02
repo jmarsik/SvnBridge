@@ -14,7 +14,7 @@ namespace SvnBridge.Presenters
 
         public ListenerViewPresenterTests()
         {
-            IoC.Container.Register(typeof(TfsUrlValidator), typeof(StubTfsUrlValidator));
+            IoC.Register(typeof(TfsUrlValidator), typeof(StubTfsUrlValidator));
             stubListener = new StubListener();
             stubView = new StubListenerView();
             stubErrorView = new StubErrorsView();

@@ -11,45 +11,61 @@ namespace SvnBridge.Infrastructure
 {
     public class Container
     {
-        private delegate object Creator(Container c, IDictionary constructorParams);
+        private delegate object Creator(IDictionary constructorParams);
 
-        private readonly Dictionary<Type, bool> performedValidation = new Dictionary<Type, bool>();
         private readonly Dictionary<Type, Creator> typeToCreator = new Dictionary<Type, Creator>();
+        private readonly Dictionary<Type, bool> performedValidation = new Dictionary<Type, bool>();
 
-        public void Register(Type service, Type impl, params Type[] interceptorsType)
+        public void Register(Type service, Type impl)
         {
             if (!typeToCreator.ContainsKey(service))
             {
-                foreach (Type interceptorType in interceptorsType)
+                lock (typeToCreator)
                 {
-                    Register(interceptorType, interceptorType);
+                    if (!typeToCreator.ContainsKey(service))
+                    {
+                        List<Type> interceptorTypes = GetInterceptorTypes(impl);
+                        Creator creator = GetAutoCreator(service, impl, interceptorTypes);
+                        typeToCreator.Add(service, creator);
+                    }
                 }
-                Creator creator = GetAutoCreator(service, impl, interceptorsType);
-                typeToCreator.Add(service, creator);
             }
         }
 
         public object Resolve(Type type, IDictionary constructorParams)
         {
             Creator creator;
-            if (typeToCreator.TryGetValue(type, out creator) == false)
+            bool typeRegistered;
+            lock (typeToCreator)
             {
-                throw new InvalidOperationException("No component registered for " + type);
+                typeRegistered = typeToCreator.TryGetValue(type, out creator);
             }
-            object resolve = creator(this, constructorParams);
+            if (!typeRegistered)
+            {
+                if (type.IsInterface)
+                {
+                    throw new InvalidOperationException("No component registered for interface " + type);
+                }
+                Register(type, type);
+                lock (typeToCreator)
+                {
+                    creator = typeToCreator[type];
+                }
+            }
+            object resolve = creator(constructorParams);
             PerformEnvironmentValidation(type, resolve);
             return resolve;
         }
 
-        private Creator GetAutoCreator(Type service, Type impl, params Type[] interceptorTypes)
+        private Creator GetAutoCreator(Type service, Type impl, List<Type> interceptorTypes)
         {
-            return delegate(Container c, IDictionary deps)
+            return delegate(IDictionary constructorParams)
             {
-                object instance = CreateInstance(impl, deps);
+                object instance = CreateInstance(impl, constructorParams);
                 List<IInterceptor> interceptors = new List<IInterceptor>();
                 foreach (Type interceptorType in interceptorTypes)
                 {
-                    interceptors.Add((IInterceptor)Resolve(interceptorType, deps));
+                    interceptors.Add((IInterceptor)Resolve(interceptorType, constructorParams));
                 }
                 if (interceptors.Count == 0)
                     return instance;
@@ -113,19 +129,34 @@ namespace SvnBridge.Infrastructure
             return null;
         }
 
+        private List<Type> GetInterceptorTypes(Type impl)
+        {
+            List<Type> interceptors = new List<Type>();
+            object[] attributes = impl.GetCustomAttributes(typeof(InterceptorAttribute), true);
+            foreach (object attribute in attributes)
+            {
+                Type interceptorType = ((InterceptorAttribute)attribute).Interceptor;
+                Register(interceptorType, interceptorType);
+                interceptors.Add(interceptorType);
+            }
+            return interceptors;
+        }
+
         private void PerformEnvironmentValidation(Type type, object resolve)
         {
             ICanValidateMyEnvironment validator = resolve as ICanValidateMyEnvironment;
             if (validator == null)
                 return;
-            if (performedValidation.ContainsKey(type) == false)
+
+            if (!performedValidation.ContainsKey(type))
             {
                 lock (performedValidation)
                 {
-                    if (performedValidation.ContainsKey(type))
-                        return;
-                    validator.ValidateEnvironment();
-                    performedValidation[type] = true;
+                    if (!performedValidation.ContainsKey(type))
+                    {
+                        validator.ValidateEnvironment();
+                        performedValidation[type] = true;
+                    }
                 }
             }
         }

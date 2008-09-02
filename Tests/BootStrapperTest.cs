@@ -36,10 +36,18 @@ namespace SvnBridge
 			Assert.NotNull(IoC.Resolve<TFSSourceControlService>(dependencies));
 		}
 
+        [Fact]
+        public void Resolve_TypeNotRegisteredButIsConcrete_AutomaticallyRegisterType()
+        {
+            StubCanValidateMyEnvironment result = (StubCanValidateMyEnvironment)IoC.Resolve<StubCanValidateMyEnvironment>();
+
+            Assert.Equal(1, result.ValidateEnvironment_CallCount);
+        }
+
 		[Fact]
 		public void ContainerWillCallEnvironmentValidation()
 		{
-            IoC.Container.Register(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
+            IoC.Register(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
 
             StubCanValidateMyEnvironment result = (StubCanValidateMyEnvironment)IoC.Resolve<ICanValidateMyEnvironment>();
 
@@ -49,7 +57,7 @@ namespace SvnBridge
 		[Fact]
 		public void ContainerWillCallEnvironmentValidation_OnlyOnce()
 		{
-            IoC.Container.Register(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
+            IoC.Register(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
 
             StubCanValidateMyEnvironment result1 = (StubCanValidateMyEnvironment)IoC.Resolve<ICanValidateMyEnvironment>();
             StubCanValidateMyEnvironment result2 = (StubCanValidateMyEnvironment)IoC.Resolve<ICanValidateMyEnvironment>();

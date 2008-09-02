@@ -5,12 +5,17 @@ namespace SvnBridge.Infrastructure
 {
     public static class IoC
     {
-        public static Container Container;
+        private static Container Container;
 
     	static IoC()
     	{
     		Reset();
     	}
+
+        public static void Register(Type service, Type impl)
+        {
+            Container.Register(service, impl);
+        }
 
         public static T Resolve<T>()
         {
