@@ -50,7 +50,6 @@
   <ItemGroup>
     <Compile Include="BootStrapper.cs" />
     <Compile Include="Cache\HashSet.cs" />
-    <Compile Include="Cache\ISet.cs" />
     <Compile Include="Cache\MemoryBasedPersistentCache.cs" />
     <Compile Include="Handlers\Renderers\StatsRenderer.cs" />
     <Compile Include="Infrastructure\FileRepository.cs" />

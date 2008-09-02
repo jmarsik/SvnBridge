@@ -71,7 +71,7 @@ namespace IntegrationTests
 				cache.Add("list", "I#" + i);
 			}
 
-			ISet<string> list = (ISet<string>)cache.Get("list").Value;
+			HashSet<string> list = (HashSet<string>)cache.Get("list").Value;
 			int j=0;
 			foreach (string s in list)
 			{

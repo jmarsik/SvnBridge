@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace SvnBridge.Cache
 {
 	[Serializable]
-	public class HashSet<T> : ISet<T>
+    public class HashSet<T> : IEnumerable<T>
 	{
 		private readonly Dictionary<T, object> inner = new Dictionary<T, object>();
 
@@ -35,13 +35,9 @@ namespace SvnBridge.Cache
 
 		#endregion
 
-		#region ISet<T> Members
-
 		public void Add(T item)
 		{
 			inner[item] = null;
 		}
-
-		#endregion
 	}
 }

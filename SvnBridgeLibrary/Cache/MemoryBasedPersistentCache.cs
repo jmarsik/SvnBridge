@@ -133,11 +133,11 @@ namespace SvnBridge.Cache
             if(value==null)
                 return;
 
-            ISet<string> items;
+            HashSet<string> items;
             CachedResult result = Get(key);
             if (result != null)
             {
-                items = (ISet<string>)result.Value;
+                items = (HashSet<string>)result.Value;
             }
             else
             {
