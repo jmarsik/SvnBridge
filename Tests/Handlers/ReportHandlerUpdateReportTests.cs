@@ -76,11 +76,7 @@ namespace SvnBridge.Handlers
             stubs.Attach(provider.GetChangedItems, metadata);
             stubs.Attach(provider.ItemExists, true);
             byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
-            stubs.Attach(provider.ReadFileAsync, new FileData
-            {
-                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
-                Md5 = Helper.GetMd5Checksum(fileData)
-            });
+            stubs.Attach(provider.ReadFileAsync, fileData);
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
@@ -107,11 +103,7 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(folder);
             stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stubs.Attach(provider.ReadFileAsync, new FileData
-            {
-                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
-                Md5 = Helper.GetMd5Checksum(fileData)
-            });
+            stubs.Attach(provider.ReadFileAsync, fileData);
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
@@ -140,12 +132,7 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(folder);
             stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stubs.Attach(provider.ReadFileAsync, new FileData
-            {
-                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
-                Md5 = Helper.GetMd5Checksum(fileData)
-            });
-            ;
+            stubs.Attach(provider.ReadFileAsync, fileData);
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
@@ -174,12 +161,7 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(item);
             stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stubs.Attach(provider.ReadFileAsync, new FileData
-            {
-                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
-                Md5 = Helper.GetMd5Checksum(fileData)
-            });
-            ;
+            stubs.Attach(provider.ReadFileAsync, fileData);
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
@@ -208,12 +190,7 @@ namespace SvnBridge.Handlers
             metadata.Items.Add(item);
             stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stubs.Attach(provider.ReadFileAsync, new FileData
-            {
-                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
-                Md5 = Helper.GetMd5Checksum(fileData)
-            });
-            ;
+            stubs.Attach(provider.ReadFileAsync, fileData);
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
@@ -240,12 +217,7 @@ namespace SvnBridge.Handlers
             Results r = stubs.Attach(provider.GetChangedItems, folder);
             stubs.Attach(provider.ItemExists, false);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stubs.Attach(provider.ReadFileAsync, new FileData
-            {
-                Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
-                Md5 = Helper.GetMd5Checksum(fileData)
-            });
-            ;
+            stubs.Attach(provider.ReadFileAsync, fileData);
             request.Path = "http://localhost:8082/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5700</S:target-revision><S:entry rev=\"5699\" ></S:entry></S:update-report>";

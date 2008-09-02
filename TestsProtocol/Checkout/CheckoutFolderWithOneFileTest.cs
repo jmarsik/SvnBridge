@@ -764,7 +764,7 @@ namespace ProtocolTests
             metadata.Items.Add(item);
             stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("More fun\r\n\r\nTest2.txt\r\n\r\nAnother fun");
-            stubs.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stubs.Attach(provider.ReadFileAsync, fileData);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

@@ -7,6 +7,7 @@ using SvnBridge.Cache;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Infrastructure;
+using SvnBridge.Utility;
 
 namespace Tests
 {
@@ -148,12 +149,12 @@ namespace Tests
             return base.Attach((Delegate)method, (byte[])returnValue);
         }
 
-
-        public Results Attach(ReadFileAsync method, FileData returnValue)
+        public Results Attach(ReadFileAsync method, byte[] fileData)
         {
             return base.Attach((Delegate)method, Return.DelegateResult(delegate(object[] parameters)
             {
-                ((ItemMetaData)parameters[0]).Data = returnValue;
+                ((ItemMetaData)parameters[0]).Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData);
+                ((ItemMetaData)parameters[0]).Md5Hash = Helper.GetMd5Checksum(fileData);
                 ((ItemMetaData)parameters[0]).DataLoaded = true;
                 return null;
             }));

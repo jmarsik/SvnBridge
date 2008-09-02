@@ -12,8 +12,9 @@ namespace SvnBridge.SourceControl
     	private FolderMetaData parent;
 
         public string Author;
-        public FileData Data;
         public bool DataLoaded = false;
+        public string Base64DiffData = null;
+        public string Md5Hash = null;
         public Exception DataLoadedError;
         public string DownloadUrl = null;
         public int Id;
@@ -26,7 +27,6 @@ namespace SvnBridge.SourceControl
         public ItemMetaData()
         {
         }
-
 
         public ItemMetaData(string name)
         {
@@ -114,5 +114,3 @@ namespace SvnBridge.SourceControl
     	}
     }
 }
-
-

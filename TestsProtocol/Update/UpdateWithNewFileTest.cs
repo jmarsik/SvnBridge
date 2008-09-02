@@ -418,7 +418,7 @@ namespace ProtocolTests
             folder.Items.Add(item);
             stubs.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("New file");
-            stubs.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stubs.Attach(provider.ReadFileAsync, fileData);
             stubs.Attach((MyMocks.ItemExists)provider.ItemExists, Return.DelegateResult(
                 delegate(object[] parameters)
                 {

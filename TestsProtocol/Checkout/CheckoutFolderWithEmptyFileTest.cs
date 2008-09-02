@@ -763,8 +763,7 @@ namespace ProtocolTests
             metadata.Items.Add(item);
             stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = new byte[0];
-            stubs.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
-
+            stubs.Attach(provider.ReadFileAsync, fileData);
 
             string request =
                 "REPORT /!svn/vcc/default HTTP/1.1\r\n" +

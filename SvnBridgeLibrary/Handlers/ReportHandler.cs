@@ -218,14 +218,14 @@ namespace SvnBridge.Handlers
                         Thread.Sleep(100);
 
                     output.Write("<S:apply-textdelta>");
-                    output.Write(item.Data.Base64DiffData);
+                    output.Write(item.Base64DiffData);
                     output.Write("\n");
                     output.Write("</S:apply-textdelta>\n");
-                    output.Write("<S:close-file checksum=\"{0}\"/>\n", item.Data.Md5);
+                    output.Write("<S:close-file checksum=\"{0}\"/>\n", item.Md5Hash);
 
                     // Release data memory
                     item.DataLoaded = false;
-                    item.Data = null;
+                    item.Base64DiffData = null;
                 }
             }
             output.Write("<S:close-directory />\n");

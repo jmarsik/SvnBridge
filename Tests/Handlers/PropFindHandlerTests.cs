@@ -227,7 +227,7 @@ namespace SvnBridge.Handlers
             item.LastModifiedDate = dt;
             stubs.Attach(provider.GetItems, item);
             byte[] fileData = new byte[]{1,2,3,4,5};
-            stubs.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stubs.Attach(provider.ReadFileAsync, fileData);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getcontentlength xmlns=\"DAV:\"/></prop></propfind>";
