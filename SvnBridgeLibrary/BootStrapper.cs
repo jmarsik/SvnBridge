@@ -19,7 +19,6 @@ namespace SvnBridge
     {
         public BootStrapper()  
 		{
-            IoC.Container.Configuration["fileCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileCache");
             IoC.Container.Configuration["persistentCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
         	TfsUtil.OnSetupWebRequest = WebRequestSetup.OnWebRequest;
         }
@@ -28,7 +27,6 @@ namespace SvnBridge
         {
             RegisterType(typeof(FileRepository), typeof(FileRepository));
             RegisterType(typeof(SourceControlServicesHub), typeof(SourceControlServicesHub));
-            RegisterType(typeof(FileCache), typeof(FileCache));
             RegisterType(typeof(MemoryBasedPersistentCache), typeof(MemoryBasedPersistentCache));
             RegisterType(typeof(DefaultLogger), typeof(DefaultLogger));
             RegisterType(typeof(ActionTrackingViaPerfCounter), typeof(ActionTrackingViaPerfCounter));

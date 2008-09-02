@@ -10,7 +10,7 @@ namespace Tests
 {
     public class StubSourceControlProvider : TFSSourceControlProvider
     {
-        public StubSourceControlProvider() : base("http://www.codeplex.com", null, null, new SourceControlServicesHub(null, null, null, null, null, null, null, null, null)) { }
+        public StubSourceControlProvider() : base("http://www.codeplex.com", null, null, new SourceControlServicesHub(null, null, null, null, null, null, null, null)) { }
 
         public int GetLatestVersion_Return;
 

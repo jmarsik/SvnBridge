@@ -79,9 +79,8 @@ namespace IntegrationTests
             MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, IoC.Resolve<MemoryBasedPersistentCache>(), Settings.Default.CacheEnabled);
 			ProjectInformationRepository repository = new ProjectInformationRepository(metaDataRepositoryFactory,ServerUrl);
             ICredentials credentials = GetCredentials();
-            FileCache fileCache = mock.CreateObject<FileCache>(null);
             DefaultLogger logger = mock.CreateObject<DefaultLogger>();
-            FileRepository fileRepository = new FileRepository(ServerUrl, credentials, fileCache, webTransferService, logger, Settings.Default.CacheEnabled);
+            FileRepository fileRepository = new FileRepository(ServerUrl, credentials, webTransferService, logger);
 			return new SourceControlServicesHub(
 				credentials,
 				tfsSourceControlService,
@@ -89,7 +88,6 @@ namespace IntegrationTests
 				associateWorkItemWithChangeSet,
 				logger,
                 mock.CreateObject<WebCache>(),
-				fileCache,
 				metaDataRepositoryFactory,
                 fileRepository);
 		}

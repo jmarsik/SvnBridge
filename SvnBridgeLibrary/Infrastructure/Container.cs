@@ -63,12 +63,6 @@ namespace SvnBridge.Infrastructure
             };
         }
 
-        public void Clear()
-        {
-            typeToCreator.Clear();
-            configuration.Clear();
-        }
-
         private object TryGetConfiguration(string name)
         {
             object value;

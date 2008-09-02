@@ -36,9 +36,8 @@ namespace SvnBridge.SourceControl
                 associateWorkItemWithChangeSet,
                 stubs.CreateObject<DefaultLogger>(),
                 stubs.CreateObject<WebCache>(),
-                stubs.CreateObject<FileCache>(null),
                 stubs.CreateObject<MetaDataRepositoryFactory>(null, null, false),
-                stubs.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null, null, false));
+                stubs.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null));
         }
 
         [Fact]

@@ -13,11 +13,10 @@ namespace SvnBridge.Infrastructure
         private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly DefaultLogger logger;
         private readonly WebCache cache;
-        private readonly FileCache fileCache;
 		private readonly MetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly FileRepository fileRepository;
 
-        public SourceControlServicesHub(ICredentials credentials, TFSSourceControlService sourceControlService, ProjectInformationRepository projectInformationRepository, AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, DefaultLogger logger, WebCache cache, FileCache fileCache, MetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
+        public SourceControlServicesHub(ICredentials credentials, TFSSourceControlService sourceControlService, ProjectInformationRepository projectInformationRepository, AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, DefaultLogger logger, WebCache cache, MetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
         {
             this.credentials = credentials;
     		this.metaDataRepositoryFactory = metaDataRepositoryFactory;
@@ -26,7 +25,6 @@ namespace SvnBridge.Infrastructure
             this.associateWorkItemWithChangeSet = associateWorkItemWithChangeSet;
             this.logger = logger;
             this.cache = cache;
-            this.fileCache = fileCache;
             this.fileRepository = fileRepository;
         }
 
@@ -58,11 +56,6 @@ namespace SvnBridge.Infrastructure
         public WebCache Cache
         {
             get { return cache; }
-        }
-
-        public FileCache FileCache
-        {
-            get { return fileCache; }
         }
 
     	public MetaDataRepositoryFactory MetaDataRepositoryFactory
