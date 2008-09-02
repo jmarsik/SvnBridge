@@ -49,22 +49,19 @@ namespace SvnBridge
 
         private void RegisterType(Type interfaceType, Type type)
         {
-            if (!IoC.Container.IsRegistered(interfaceType))
+            object[] attributes = type.GetCustomAttributes(typeof(InterceptorAttribute), true);
+            if (attributes.Length == 0)
             {
-                object[] attributes = type.GetCustomAttributes(typeof(InterceptorAttribute), true);
-                if (attributes.Length == 0)
+                IoC.Container.Register(interfaceType, type);
+            }
+            else
+            {
+                List<Type> interceptors = new List<Type>();
+                Array.ForEach(attributes, delegate(object attr)
                 {
-                    IoC.Container.Register(interfaceType, type);
-                }
-                else
-                {
-                    List<Type> interceptors = new List<Type>();
-                    Array.ForEach(attributes, delegate(object attr)
-                    {
-                        interceptors.Add(((InterceptorAttribute)attr).Interceptor);
-                    });
-                    IoC.Container.Register(interfaceType, type, interceptors.ToArray());
-                }
+                    interceptors.Add(((InterceptorAttribute)attr).Interceptor);
+                });
+                IoC.Container.Register(interfaceType, type, interceptors.ToArray());
             }
         }
     }

@@ -39,25 +39,23 @@ namespace SvnBridge
 		[Fact]
 		public void ContainerWillCallEnvironmentValidation()
 		{
-			StubCanValidateMyEnvironment validate = new StubCanValidateMyEnvironment();
-			IoC.Container.OverrideRegisteration(typeof(ICanValidateMyEnvironment), validate);
+            IoC.Container.Register(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
 
-			IoC.Resolve<ICanValidateMyEnvironment>();
+            StubCanValidateMyEnvironment result = (StubCanValidateMyEnvironment)IoC.Resolve<ICanValidateMyEnvironment>();
 
-            Assert.Equal(1, validate.ValidateEnvironment_CallCount);
+            Assert.Equal(1, result.ValidateEnvironment_CallCount);
 		}
 
 		[Fact]
 		public void ContainerWillCallEnvironmentValidation_OnlyOnce()
 		{
-            StubCanValidateMyEnvironment validate = new StubCanValidateMyEnvironment();
-			IoC.Container.OverrideRegisteration(typeof(ICanValidateMyEnvironment), validate);
+            IoC.Container.Register(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
 
-			IoC.Resolve<ICanValidateMyEnvironment>();
-			IoC.Resolve<ICanValidateMyEnvironment>();
-			IoC.Resolve<ICanValidateMyEnvironment>();
+            StubCanValidateMyEnvironment result1 = (StubCanValidateMyEnvironment)IoC.Resolve<ICanValidateMyEnvironment>();
+            StubCanValidateMyEnvironment result2 = (StubCanValidateMyEnvironment)IoC.Resolve<ICanValidateMyEnvironment>();
 
-            Assert.Equal(1, validate.ValidateEnvironment_CallCount);
+            Assert.Equal(1, result1.ValidateEnvironment_CallCount);
+            Assert.Equal(0, result2.ValidateEnvironment_CallCount);
         }
     }
 }

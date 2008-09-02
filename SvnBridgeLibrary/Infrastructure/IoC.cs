@@ -12,19 +12,17 @@ namespace SvnBridge.Infrastructure
     		Reset();
     	}
 
-        public static T Resolve<T>(IDictionary dependencies)
-        {
-            return Container.Resolve<T>(dependencies);
-        }
-
         public static T Resolve<T>()
         {
-            return Container.Resolve<T>(new Hashtable());
+            return (T)Container.Resolve(typeof(T), new Hashtable());
         }
 
+        public static T Resolve<T>(IDictionary dependencies)
+        {
+            return (T)Container.Resolve(typeof(T), dependencies);
+        }
 
-        public static object Resolve(Type type,
-                                     IDictionary dependencies)
+        public static object Resolve(Type type, IDictionary dependencies)
         {
             return Container.Resolve(type, dependencies);
         }
