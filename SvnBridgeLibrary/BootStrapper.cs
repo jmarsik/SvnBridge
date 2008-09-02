@@ -40,7 +40,7 @@ namespace SvnBridge
             RegisterType(typeof(TFSSourceControlProvider), typeof(TFSSourceControlProvider));
             RegisterType(typeof(TFSSourceControlService), typeof(TFSSourceControlService));
             RegisterType(typeof(IProjectInformationRepository), typeof(ProjectInformationRepository));
-            RegisterType(typeof(ITfsUrlValidator), typeof(TfsUrlValidator));
+            RegisterType(typeof(TfsUrlValidator), typeof(TfsUrlValidator));
             RegisterType(typeof(IRegistrationService), typeof(RegistrationService));
             RegisterType(typeof(IWebTransferService), typeof(WebTransferService));
             RegisterType(typeof(IRegistrationWebSvcFactory), typeof(RegistrationWebSvcFactory));

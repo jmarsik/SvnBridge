@@ -5,7 +5,7 @@ using SvnBridge.Cache;
 
 namespace SvnBridge.Infrastructure
 {
-	public class TfsUrlValidator : ITfsUrlValidator
+	public class TfsUrlValidator
 	{
 		private WebCache cache;
 
@@ -14,7 +14,7 @@ namespace SvnBridge.Infrastructure
 			this.cache = cache;
 		}
 
-		public bool IsValidTfsServerUrl(string url)
+		public virtual bool IsValidTfsServerUrl(string url)
 		{
 			string cacheKey = "IsValidTfsServerUrl_" + url;
 			CachedResult result = cache.Get(cacheKey);

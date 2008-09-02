@@ -4,19 +4,21 @@ using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Stubs;
 using Xunit;
+using Tests;
+using SvnBridge.Infrastructure;
+using Attach;
 
 namespace SvnBridge.PathParsing
 {
-    public class RequestBasePathParserTest : IDisposable
+    public class RequestBasePathParserTest
     {
-        readonly MockRepository mocks = new MockRepository();
+        private readonly MyMocks stubs = new MyMocks();
 
         [Fact]
         public void CanParseServerFromUrl()
         {
-            ITfsUrlValidator urlValidator = mocks.DynamicMock<ITfsUrlValidator>();
-            Expect.Call(urlValidator.IsValidTfsServerUrl("https://tfs03.codeplex.com")).Return(true);
-            mocks.ReplayAll();
+            TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
+            Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(true));
 
             RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
             StubHttpRequest request = new StubHttpRequest
@@ -25,14 +27,14 @@ namespace SvnBridge.PathParsing
             };
             string url = parser.GetServerUrl(request, null);
             Assert.Equal("https://tfs03.codeplex.com", url);
+            Assert.Equal("https://tfs03.codeplex.com", r1.Parameters[0]);
         }
 
         [Fact]
         public void CanParseServerFromUrl_WillUseHttpIfHttpsIsNotValid()
         {
-            ITfsUrlValidator urlValidator = mocks.DynamicMock<ITfsUrlValidator>();
-            Expect.Call(urlValidator.IsValidTfsServerUrl("https://tfs03.codeplex.com")).Return(false);
-            mocks.ReplayAll();
+            TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
+            Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(false));
 
             RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
             IHttpRequest request = new StubHttpRequest
@@ -41,15 +43,15 @@ namespace SvnBridge.PathParsing
             };
             string url = parser.GetServerUrl(request, null);
             Assert.Equal("http://tfs03.codeplex.com", url);
+            Assert.Equal("https://tfs03.codeplex.com", r1.History[0].Parameters[0]);
         }
 
 
         [Fact]
         public void CanParseServerFromUrl_WithPort()
         {
-            ITfsUrlValidator urlValidator = mocks.DynamicMock<ITfsUrlValidator>();
-            Expect.Call(urlValidator.IsValidTfsServerUrl("https://tfs03.codeplex.com:8080")).Return(true);
-            mocks.ReplayAll();
+            TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
+            Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(true));
 
             RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
             IHttpRequest request = new StubHttpRequest
@@ -58,15 +60,15 @@ namespace SvnBridge.PathParsing
             };
             string url = parser.GetServerUrl(request, null);
             Assert.Equal("https://tfs03.codeplex.com:8080", url);
+            Assert.Equal("https://tfs03.codeplex.com:8080", r1.Parameters[0]);
         }
 
 
         [Fact]
         public void CanParseServerFromUrl_WithPortAndNestedFolder()
         {
-            ITfsUrlValidator urlValidator = mocks.DynamicMock<ITfsUrlValidator>();
-            Expect.Call(urlValidator.IsValidTfsServerUrl("https://tfs03.codeplex.com:8080")).Return(true);
-            mocks.ReplayAll();
+            TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
+            Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(true));
 
             RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
             IHttpRequest request = new StubHttpRequest
@@ -75,31 +77,21 @@ namespace SvnBridge.PathParsing
             };
             string url = parser.GetServerUrl(request,null);
             Assert.Equal("https://tfs03.codeplex.com:8080", url);
+            Assert.Equal("https://tfs03.codeplex.com:8080", r1.Parameters[0]);
         }
-
 
         [Fact]
         public void CanGetLocalPath_WithoutServerUrl()
         {
-            IHttpRequest request = mocks.Stub<IHttpRequest>();
-            SetupResult.For(request.Url).Return(new Uri("http://localhost:8081/tfs03.codeplex.com:8080/SvnBridge"));
+            StubHttpRequest request = new StubHttpRequest();
+            request.Url = new Uri("http://localhost:8081/tfs03.codeplex.com:8080/SvnBridge");
 
-            ITfsUrlValidator urlValidator = mocks.Stub<ITfsUrlValidator>();
-            mocks.ReplayAll();
+            TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
 
             RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
             string url = parser.GetLocalPath(request);
             Assert.Equal("/SvnBridge", url);
 
         }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            mocks.VerifyAll();
-        }
-
-        #endregion
     }
 }

@@ -65,6 +65,7 @@ namespace Tests
         public delegate int StreamRead(byte[] buffer, int offset, int count);
         public delegate bool WriteFile(string activityId, string path, byte[] fileData);
         public delegate Guid GetRepositoryUuid();
+        public delegate bool IsValidTfsServerUrl(string url);
 
         public Results Attach(DeleteItem method, bool returnValue)
         {
@@ -213,6 +214,11 @@ namespace Tests
         }
 
         public Results Attach(GetItems method, Return action)
+        {
+            return base.Attach((Delegate)method, action);
+        }
+
+        public Results Attach(IsValidTfsServerUrl method, Return action)
         {
             return base.Attach((Delegate)method, action);
         }

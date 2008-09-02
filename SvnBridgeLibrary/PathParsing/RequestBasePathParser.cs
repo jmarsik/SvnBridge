@@ -3,14 +3,15 @@ using System.IO;
 using System.Net;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
+using SvnBridge.Infrastructure;
 
 namespace SvnBridge.PathParsing
 {
 	public class RequestBasePathParser : BasePathParser
 	{
-		private readonly ITfsUrlValidator urlValidator;
+		private readonly TfsUrlValidator urlValidator;
 
-		public RequestBasePathParser(ITfsUrlValidator urlValidator)
+		public RequestBasePathParser(TfsUrlValidator urlValidator)
 		{
 			this.urlValidator = urlValidator;
 		}

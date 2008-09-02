@@ -14,7 +14,7 @@ namespace SvnBridge.Presenters
 
         public ListenerViewPresenterTests()
         {
-            IoC.Container.Register(typeof(ITfsUrlValidator), typeof(StubTfsUrlValidator));
+            IoC.Container.Register(typeof(TfsUrlValidator), typeof(StubTfsUrlValidator));
             stubListener = new StubListener();
             stubView = new StubListenerView();
             stubErrorView = new StubErrorsView();
@@ -25,9 +25,11 @@ namespace SvnBridge.Presenters
             IoC.Reset();
         }
 
-        public class StubTfsUrlValidator : ITfsUrlValidator
+        public class StubTfsUrlValidator : TfsUrlValidator
         {
-            public bool IsValidTfsServerUrl(string url)
+            public StubTfsUrlValidator() : base(null) { }
+
+            public override bool IsValidTfsServerUrl(string url)
             {
                 throw new System.NotImplementedException();
             }
