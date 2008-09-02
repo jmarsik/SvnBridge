@@ -12,7 +12,7 @@ namespace SvnBridge.SourceControl
     	private FolderMetaData parent;
 
         public string Author;
-        public FutureFile Data;
+        public FileData Data;
         public bool DataLoaded = false;
         public Exception DataLoadedError;
         public string DownloadUrl = null;

@@ -34,10 +34,9 @@ namespace SvnBridge.Infrastructure
         public virtual void ReadFileAsync(ItemMetaData item)
         {
             byte[] data = webTransferService.DownloadBytes(item.DownloadUrl, credentials);
-            FileData fileData = new FileData();
-            fileData.Base64DiffData = SvnDiffParser.GetSvnDiffData(data);
-            fileData.Md5 = Helper.GetMd5Checksum(data);
-            item.Data = new FutureFile(() => fileData);
+            item.Data = new FileData();
+            item.Data.Base64DiffData = SvnDiffParser.GetSvnDiffData(data);
+            item.Data.Md5 = Helper.GetMd5Checksum(data);
             item.DataLoaded = true;
         }
     }

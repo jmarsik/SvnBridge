@@ -153,12 +153,8 @@ namespace Tests
         {
             return base.Attach((Delegate)method, Return.DelegateResult(delegate(object[] parameters)
             {
-                FutureFile file = new FutureFile(delegate
-                {
-                    return returnValue;
-                });
-                ((ItemMetaData)parameters[0]).Data = file;
-                ((ItemMetaData) parameters[0]).DataLoaded = true;
+                ((ItemMetaData)parameters[0]).Data = returnValue;
+                ((ItemMetaData)parameters[0]).DataLoaded = true;
                 return null;
             }));
         }

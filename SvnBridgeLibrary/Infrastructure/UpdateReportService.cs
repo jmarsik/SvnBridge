@@ -74,17 +74,16 @@ namespace SvnBridge.Infrastructure
 				while (item.DataLoaded == false)
 					Thread.Sleep(100);
 
-				FileData fileData = item.Data.Value;
-
-				item.DataLoaded = false;
-				item.Data = null;
-
 				output.Write("<S:txdelta>");
-				output.Write(fileData.Base64DiffData);
+                output.Write(item.Data.Base64DiffData);
 				output.Write("\n</S:txdelta>");
-				output.Write("<S:prop><V:md5-checksum>" + fileData.Md5 +
-							 "</V:md5-checksum></S:prop>\n");
-				if (existingFile)
+                output.Write("<S:prop><V:md5-checksum>" + item.Data.Md5 + "</V:md5-checksum></S:prop>\n");
+
+                // Release data memory
+                item.DataLoaded = false;
+                item.Data = null;
+                
+                if (existingFile)
 				{
 					output.Write("</S:open-file>\n");
 				}
