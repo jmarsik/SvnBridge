@@ -9,9 +9,19 @@ using System.Configuration;
 
 namespace SvnBridge.Infrastructure
 {
-    public class DefaultLogger : ICanValidateMyEnvironment
+    public class DefaultLogger
     {
+        static bool environmentValidated;
         string logPath;
+
+        public DefaultLogger()
+        {
+            if (!environmentValidated)
+            {
+                WriteLogMessageWithNoExceptionHandling("test", "can write to file", null);
+                environmentValidated = true;
+            }
+        }
 
         public virtual void Error(string message, Exception exception)
         {
@@ -125,14 +135,5 @@ namespace SvnBridge.Infrastructure
             writer.WriteCData(message);
             writer.WriteEndElement();
         }
-
-        #region ICanValidateMyEnvironment Members
-
-        public void ValidateEnvironment()
-        {
-            WriteLogMessageWithNoExceptionHandling("test", "can write to file", null);
-        }
-
-        #endregion
     }
 }

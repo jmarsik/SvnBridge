@@ -20,20 +20,14 @@ namespace SvnBridge.Infrastructure
 
 		public virtual IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath)
 		{
-            IMetaDataRepository repository;
             if (cacheEnabled)
             {
-                repository = new MetaDataRepository(sourceControlService, credentials,
-                    persistentCache,
-                    serverUrl, rootPath);
+                return new MetaDataRepository(sourceControlService, credentials, persistentCache, serverUrl, rootPath);
             }
             else
             {
-                repository = new MetaDataRepositoryNoCache(sourceControlService, credentials,
-                    persistentCache,
-                    serverUrl, rootPath);
+                return new MetaDataRepositoryNoCache(sourceControlService, credentials, persistentCache, serverUrl, rootPath);
             }
-			return repository;
 		}
 
 		public virtual int GetLatestRevision(string tfsUrl, ICredentials credentials)

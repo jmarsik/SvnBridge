@@ -40,7 +40,7 @@ namespace SvnBridge
         [Fact]
         public void Resolve_UsingConcreteTypeWithoutRegistering_SuccessfullyReturnsObject()
         {
-            StubCanValidateMyEnvironment result = container.Resolve<StubCanValidateMyEnvironment>();
+            StubContainerTest result = container.Resolve<StubContainerTest>();
 
             Assert.NotNull(result);
         }
@@ -48,9 +48,9 @@ namespace SvnBridge
 		[Fact]
 		public void Resolve_UsingInterfaceAfterRegistering_ReturnsRegisteredConcreteType()
 		{
-            container.RegisterType(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
+            container.RegisterType(typeof(IStubContainerTest), typeof(StubContainerTest2));
 
-            StubCanValidateMyEnvironment result = container.Resolve<ICanValidateMyEnvironment>() as StubCanValidateMyEnvironment;
+            StubContainerTest2 result = container.Resolve<IStubContainerTest>() as StubContainerTest2;
 
             Assert.NotNull(result);
 		}
@@ -58,7 +58,7 @@ namespace SvnBridge
         [Fact]
         public void Resolve_UsingInterfaceWithoutRegistering_ReturnsError()
         {
-            Exception result = Record.Exception(delegate() { container.Resolve<ICanValidateMyEnvironment>(); });
+            Exception result = Record.Exception(delegate() { container.Resolve<IStubContainerTest>(); });
 
             Assert.NotNull(result);
             Assert.IsAssignableFrom<InvalidOperationException>(result);
@@ -101,28 +101,6 @@ namespace SvnBridge
             Assert.True(TestInterceptor.Invoke_WasCalled);
         }
 
-        [Fact]
-        public void Resolve_ClassImplementsICanValidateMyEnvironment_ContainerWillCallEnvironmentValidation()
-        {
-            container.RegisterType(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
-
-            StubCanValidateMyEnvironment result = (StubCanValidateMyEnvironment)container.Resolve<ICanValidateMyEnvironment>();
-
-            Assert.Equal(1, result.ValidateEnvironment_CallCount);
-        }
-
-        [Fact]
-        public void Resolve_ClassImplementsICanValidateMyEnvironment_ContainerWillCallEnvironmentValidationOnlyOnce()
-        {
-            container.RegisterType(typeof(ICanValidateMyEnvironment), typeof(StubCanValidateMyEnvironment));
-
-            StubCanValidateMyEnvironment result1 = (StubCanValidateMyEnvironment)container.Resolve<ICanValidateMyEnvironment>();
-            StubCanValidateMyEnvironment result2 = (StubCanValidateMyEnvironment)container.Resolve<ICanValidateMyEnvironment>();
-
-            Assert.Equal(1, result1.ValidateEnvironment_CallCount);
-            Assert.Equal(0, result2.ValidateEnvironment_CallCount);
-        }
-
         public class TestInterceptor : IInterceptor
         {
             public static bool Invoke_WasCalled;
@@ -134,7 +112,7 @@ namespace SvnBridge
             }
         }
 
-        public class StubContainerTest2
+        public class StubContainerTest2 : IStubContainerTest
         {
             public StubContainerTest Constructor_Param;
 
@@ -142,6 +120,10 @@ namespace SvnBridge
             {
                 Constructor_Param = param;
             }
+        }
+
+        public interface IStubContainerTest
+        {
         }
 
         [Interceptor(typeof(TestInterceptor))]

@@ -109,7 +109,6 @@
     <Compile Include="SourceControl\ProjectInformationRepositoryTest.cs" />
     <Compile Include="SourceControl\TFSSourceControlProviderTest.cs" />
     <Compile Include="SourceControl\TFSSourceControlServiceTest.cs" />
-    <Compile Include="Stubs\StubCanValidateMyEnvironment.cs" />
     <Compile Include="Stubs\StubErrorsView.cs" />
     <Compile Include="Stubs\StubInvocation.cs" />
     <Compile Include="Stubs\StubSourceControlProvider.cs" />

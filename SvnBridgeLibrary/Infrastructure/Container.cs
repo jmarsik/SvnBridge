@@ -69,9 +69,7 @@ namespace SvnBridge.Infrastructure
                     creator = typeToCreator[type];
                 }
             }
-            object resolve = creator(constructorParams);
-            PerformEnvironmentValidation(type, resolve);
-            return resolve;
+            return creator(constructorParams);
         }
 
         private Creator GetAutoCreator(Type service, Type impl, List<Type> interceptorTypes)
@@ -157,25 +155,6 @@ namespace SvnBridge.Infrastructure
                 interceptors.Add(interceptorType);
             }
             return interceptors;
-        }
-
-        private void PerformEnvironmentValidation(Type type, object resolve)
-        {
-            ICanValidateMyEnvironment validator = resolve as ICanValidateMyEnvironment;
-            if (validator == null)
-                return;
-
-            if (!performedValidation.ContainsKey(type))
-            {
-                lock (performedValidation)
-                {
-                    if (!performedValidation.ContainsKey(type))
-                    {
-                        validator.ValidateEnvironment();
-                        performedValidation[type] = true;
-                    }
-                }
-            }
         }
     }
 }
