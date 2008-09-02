@@ -17,7 +17,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestDestinationInResponseMessageIsDecodedAndEncoded()
         {
-            Results r = stub.Attach(provider.CopyItem);
+            Results r = stubs.Attach(provider.CopyItem);
             request.Path = "http://localhost:8082/!svn/bc/5730/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
             request.Headers["Destination"] =
                 "http://localhost:8084//!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
@@ -33,7 +33,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestHandleProducesCorrectOutput()
         {
-            Results r = stub.Attach(provider.CopyItem);
+            Results r = stubs.Attach(provider.CopyItem);
             request.Path = "http://localhost:8082/!svn/bc/5522/File.txt";
             request.Headers["Destination"] =
                 "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt";
@@ -65,7 +65,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestLocationResponseHeaderIsDecoded()
         {
-            Results r = stub.Attach(provider.CopyItem);
+            Results r = stubs.Attach(provider.CopyItem);
             request.Path = "http://localhost:8082/!svn/bc/5730/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
             request.Headers["Destination"] =
                 "http://localhost:8084//!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
@@ -81,7 +81,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestSourceControlProviderCalledCorrectlyWithSpecialCharactersInPath()
         {
-            Results r = stub.Attach(provider.CopyItem);
+            Results r = stubs.Attach(provider.CopyItem);
             request.Path = "http://localhost:8082/!svn/bc/5730/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
             request.Headers["Destination"] =
                 "http://localhost:8084//!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";

@@ -25,7 +25,7 @@ namespace SvnBridge.Handlers
             item.ItemRevision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
         }
 
         #endregion

@@ -16,7 +16,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyHandleCorrectlyInvokesSourceControlProviderForDeleteActivity()
         {
-            Results r = stub.Attach(provider.DeleteActivity);
+            Results r = stubs.Attach(provider.DeleteActivity);
             request.Path = "http://localhost:8082/!svn/act/5b34ae67-87de-3741-a590-8bda26893532";
 
         	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
@@ -28,7 +28,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyHandleCorrectlyInvokesSourceControlProviderForDeleteFile()
         {
-            Results r = stub.Attach(provider.DeleteItem, true);
+            Results r = stubs.Attach(provider.DeleteItem, true);
             request.Path =
                 "http://localhost:8082//!svn/wrk/c512ecbe-7577-ce46-939c-a9e81eb4d98e/Spikes/SvnFacade/trunk/Test4.txt";
 
@@ -42,7 +42,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyHandleDecodesPathWhenInvokingSourceControlProviderForDeleteItem()
         {
-            Results r = stub.Attach(provider.DeleteItem, true);
+            Results r = stubs.Attach(provider.DeleteItem, true);
             request.Path =
                 "http://localhost:8082//!svn/wrk/125c1a75-a7a6-104d-a661-54689d30dc99/Spikes/SvnFacade/trunk/New%20Folder%206";
 
@@ -54,7 +54,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyHandleReturnsCorrectResponseWhenDeleteFileNotFound()
         {
-            Results r = stub.Attach(provider.DeleteItem, false);
+            Results r = stubs.Attach(provider.DeleteItem, false);
             request.Path =
                 "http://localhost:8082//!svn/wrk/70df3104-9f67-8d4e-add7-6012fe86c03a/Spikes/SvnFacade/trunk/New%20Folder/Test2.txt";
 

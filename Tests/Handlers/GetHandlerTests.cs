@@ -19,8 +19,8 @@ namespace SvnBridge.Handlers
         {
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            Results getItemsResult = stub.Attach(provider.GetItems, item);
-            Results readFileResult = stub.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("asdf"));
+            Results getItemsResult = stubs.Attach(provider.GetItems, item);
+            Results readFileResult = stubs.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("asdf"));
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo/Bar.txt";
 
         	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);

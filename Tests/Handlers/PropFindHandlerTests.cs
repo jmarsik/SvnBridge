@@ -28,7 +28,7 @@ namespace SvnBridge.Handlers
         {
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             BcFileNode node = new BcFileNode(1234, item, provider);
 
@@ -39,11 +39,11 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestBcMd5Checksum()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
-            stub.Attach(provider.GetItems, item);
-            stub.AttachReadFile(provider.ReadFile, new byte[4] {0, 1, 2, 3});
+            stubs.Attach(provider.GetItems, item);
+            stubs.AttachReadFile(provider.ReadFile, new byte[4] {0, 1, 2, 3});
 
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo/Bar.txt";
             request.Input =
@@ -61,11 +61,11 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestCorrectlyInvokesProviderWithBcPathAndDepthOne()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, true);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Foo";
-            Results results = stub.Attach(provider.GetItems, folder);
+            Results results = stubs.Attach(provider.GetItems, folder);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>";
@@ -82,7 +82,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestInvalidDepthThrowsEx()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/Folder%20With%20Spaces";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
@@ -96,10 +96,10 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestPropFindLockDiscovery()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
@@ -115,11 +115,11 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestPropFindWithDepthOneIncludesFolderAndChildren()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, Return.MultipleValues(true, false));
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, Return.MultipleValues(true, false));
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "Foo";
-            stub.Attach(provider.GetItems, folder);
+            stubs.Attach(provider.GetItems, folder);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo/Bar.txt";
             folder.Items.Add(item);
@@ -138,10 +138,10 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyBaselineRelativePathPropertyForFolderReturnsDecoded()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Folder With Spaces";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/Folder%20With%20Spaces";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
@@ -157,14 +157,14 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyCreationDate()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
             item.ItemRevision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><creationdate xmlns=\"DAV:\"/></prop></propfind>";
@@ -180,13 +180,13 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyCreatorDisplayName()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
             item.ItemRevision = 1234;
             item.Author = "user_foo";
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><creator-displayname xmlns=\"DAV:\"/></prop></propfind>";
@@ -201,10 +201,10 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyDeadPropCountReturnsZero()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Foo";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><deadprop-count xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
@@ -219,16 +219,16 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyGetContentLengthForFolder()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
             item.ItemRevision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
             byte[] fileData = new byte[]{1,2,3,4,5};
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stubs.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getcontentlength xmlns=\"DAV:\"/></prop></propfind>";
@@ -243,10 +243,10 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
         {
-            Results r1 = stub.Attach(provider.ItemExists, true);
+            Results r1 = stubs.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "New%20Folder%207";
-            Results r2 = stub.Attach(provider.GetItems, item);
+            Results r2 = stubs.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/Spikes/SvnFacade/trunk/New%20Folder%207";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
@@ -261,11 +261,11 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyPathIsDecodedWhenInvokingSourceControlProviderForSvnBcFolderPath()
         {
-            Results r = stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, true);
+            Results r = stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "Test Project";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/3444/Test%20Project";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
@@ -279,14 +279,14 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyVersionName()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Foo";
             item.ItemRevision = 1234;
             item.Author = "user_foo";
             DateTime dt = DateTime.Now.ToUniversalTime();
             item.LastModifiedDate = dt;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-name xmlns=\"DAV:\"/></prop></propfind>";

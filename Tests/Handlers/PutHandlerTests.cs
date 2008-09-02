@@ -19,7 +19,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestCorrectOutput()
         {
-            Results r = stub.Attach(provider.WriteFile, true);
+            Results r = stubs.Attach(provider.WriteFile, true);
             request.Path =
                 "http://localhost:8082//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New%20Folder%207/Empty%20File%202.txt";
             request.Input = "SVN\0";
@@ -49,7 +49,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestPathIsDecodedWhenInvokingSourceControlProviderForFolderPath()
         {
-            Results r = stub.Attach(provider.WriteFile, false);
+            Results r = stubs.Attach(provider.WriteFile, false);
             request.Path =
                 "http://localhost:8082//!svn/wrk/be3dd5c3-e77f-f246-a1e8-640012b047a2/Spikes/SvnFacade/trunk/New%20Folder%207/Empty%20File%202.txt";
             request.Input = "SVN\0";
@@ -62,7 +62,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestResourceIsProperlyEncoded()
         {
-            Results r = stub.Attach(provider.WriteFile, true);
+            Results r = stubs.Attach(provider.WriteFile, true);
             request.Path =
                 "http://localhost:8082//!svn/wrk/b50ca3a0-05d8-5b4d-8b51-11fce9cbc603/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60..txt";
             request.Input = "SVN\0";
@@ -78,8 +78,8 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestThrowsExceptionIfBaseFileDoesNotMatchChecksum()
         {
-            stub.Attach(provider.GetItemInActivity, new ItemMetaData());
-            stub.AttachReadFile(provider.ReadFile, new byte[] { });
+            stubs.Attach(provider.GetItemInActivity, new ItemMetaData());
+            stubs.AttachReadFile(provider.ReadFile, new byte[] { });
             request.Path = "http://localhost:8082//!svn/wrk/61652fe8-44cd-8d43-810f-c95deccc6db3/Test.txt";
             request.Input = "SVN\0\0\u0004\u0008\u0001\u0008\u0088bbbb111a";
             request.Headers["X-SVN-Base-Fulltext-MD5"] = "65ba841e01d6db7733e90a5b7f9e6f80";
@@ -93,8 +93,8 @@ namespace SvnBridge.Handlers
         [Fact]
         public void TestThrowsExceptionIfBaseFileDoesNotMatchChecksumWhenUpdateToEmptyFile()
         {
-            stub.Attach(provider.GetItemInActivity, new ItemMetaData());
-            stub.AttachReadFile(provider.ReadFile, new byte[] { });
+            stubs.Attach(provider.GetItemInActivity, new ItemMetaData());
+            stubs.AttachReadFile(provider.ReadFile, new byte[] { });
             request.Path = "http://localhost:8082//!svn/wrk/61652fe8-44cd-8d43-810f-c95deccc6db3/Test.txt";
             request.Input = "SVN\0";
             request.Headers["X-SVN-Base-Fulltext-MD5"] = "65ba841e01d6db7733e90a5b7f9e6f80";

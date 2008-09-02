@@ -25,7 +25,7 @@ namespace SvnBridge.Handlers
             MergeActivityResponse mergeResponse =
                 new MergeActivityResponse(5719, DateTime.Parse("2007-12-14T02:38:56.191037Z"), "bradwils");
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/A !@#$%^&()_-+={[}];',~`..txt"));
-            Results r = stub.Attach((MyMocks.MergeActivity) provider.MergeActivity, mergeResponse);
+            Results r = stubs.Attach((MyMocks.MergeActivity) provider.MergeActivity, mergeResponse);
             request.Path = "http://localhost:8082/";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
@@ -44,7 +44,7 @@ namespace SvnBridge.Handlers
             MergeActivityResponse mergeResponse =
                 new MergeActivityResponse(5719, DateTime.Parse("2007-12-14T02:38:56.191037Z"), "bradwils");
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/A !@#$%^&()_-+={[}];',~`..txt"));
-            Results r = stub.Attach((MyMocks.MergeActivity) provider.MergeActivity, mergeResponse);
+            Results r = stubs.Attach((MyMocks.MergeActivity) provider.MergeActivity, mergeResponse);
             request.Path = "http://localhost:8082/";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
@@ -58,7 +58,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyHandleProducesCorrectOutputForConflict()
         {
-            stub.Attach((MyMocks.MergeActivity) provider.MergeActivity, new ConflictException("Conflict at '/Test.txt'"));
+            stubs.Attach((MyMocks.MergeActivity) provider.MergeActivity, new ConflictException("Conflict at '/Test.txt'"));
             request.Path = "http://localhost:8082/";
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/61652fe8-44cd-8d43-810f-c95deccc6db3</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";

@@ -14,7 +14,7 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyHandleDecodesPathWhenInvokingSourceControlProvider()
         {
-            Results r = stub.Attach(provider.ItemExists, true);
+            Results r = stubs.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/Spikes/SvnFacade/trunk/New%20Folder%207";
 
         	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);

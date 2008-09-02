@@ -27,7 +27,7 @@ namespace SvnBridge.Handlers
             DeleteMetaData file1 = new DeleteMetaData();
             file1.Name = "F !@#$%^&()_-+={[}];',.~`.txt";
             metadata.Items.Add(file1);
-            stub.Attach(provider.GetChangedItems, metadata);
+            stubs.Attach(provider.GetChangedItems, metadata);
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
@@ -49,7 +49,7 @@ namespace SvnBridge.Handlers
             DeleteFolderMetaData folder1 = new DeleteFolderMetaData();
             folder1.Name = "B !@#$%^&()_-+={[}];',.~`";
             metadata.Items.Add(folder1);
-            stub.Attach(provider.GetChangedItems, metadata);
+            stubs.Attach(provider.GetChangedItems, metadata);
             request.Path = "http://localhost:8084/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
@@ -74,10 +74,10 @@ namespace SvnBridge.Handlers
             file1.LastModifiedDate = DateTime.Parse("2008-01-20T08:55:13.330897Z");
             file1.Author = "jwanagel";
             metadata.Items.Add(file1);
-            stub.Attach(provider.GetChangedItems, metadata);
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.GetChangedItems, metadata);
+            stubs.Attach(provider.ItemExists, true);
             byte[] fileData = Encoding.UTF8.GetBytes("1234abcd");
-            stub.Attach(provider.ReadFileAsync, new FileData
+            stubs.Attach(provider.ReadFileAsync, new FileData
             {
                 Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
                 Md5 = Helper.GetMd5Checksum(fileData)
@@ -106,9 +106,9 @@ namespace SvnBridge.Handlers
             folder.Author = "bradwils";
             folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(folder);
-            stub.Attach(provider.GetItems, metadata);
+            stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData
+            stubs.Attach(provider.ReadFileAsync, new FileData
             {
                 Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
                 Md5 = Helper.GetMd5Checksum(fileData)
@@ -139,9 +139,9 @@ namespace SvnBridge.Handlers
             folder.Author = "bradwils";
             folder.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(folder);
-            stub.Attach(provider.GetItems, metadata);
+            stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData
+            stubs.Attach(provider.ReadFileAsync, new FileData
             {
                 Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
                 Md5 = Helper.GetMd5Checksum(fileData)
@@ -173,9 +173,9 @@ namespace SvnBridge.Handlers
             item.Author = "bradwils";
             item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(item);
-            stub.Attach(provider.GetItems, metadata);
+            stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData
+            stubs.Attach(provider.ReadFileAsync, new FileData
             {
                 Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
                 Md5 = Helper.GetMd5Checksum(fileData)
@@ -207,9 +207,9 @@ namespace SvnBridge.Handlers
             item.Author = "bradwils";
             item.LastModifiedDate = DateTime.Parse("2007-12-15T00:56:55.541665Z");
             metadata.Items.Add(item);
-            stub.Attach(provider.GetItems, metadata);
+            stubs.Attach(provider.GetItems, metadata);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData
+            stubs.Attach(provider.ReadFileAsync, new FileData
             {
                 Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
                 Md5 = Helper.GetMd5Checksum(fileData)
@@ -238,10 +238,10 @@ namespace SvnBridge.Handlers
             folder.Items[0].Author = "jwanagel";
             folder.Items[0].ItemRevision = 5700;
             folder.Items[0].LastModifiedDate = DateTime.Parse("2007-09-05T18:37:14.239559Z");
-            Results r = stub.Attach(provider.GetChangedItems, folder);
-            stub.Attach(provider.ItemExists, false);
+            Results r = stubs.Attach(provider.GetChangedItems, folder);
+            stubs.Attach(provider.ItemExists, false);
             byte[] fileData = Encoding.UTF8.GetBytes("test");
-            stub.Attach(provider.ReadFileAsync, new FileData
+            stubs.Attach(provider.ReadFileAsync, new FileData
             {
                 Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData),
                 Md5 = Helper.GetMd5Checksum(fileData)
@@ -301,8 +301,8 @@ namespace SvnBridge.Handlers
             folder.Items[0].LastModifiedDate = DateTime.Parse("2007-08-21T00:41:27.680005Z");
             ((FolderMetaData)folder.Items[0]).Items.Add(new DeleteMetaData());
             ((FolderMetaData)folder.Items[0]).Items[0].Name = "Test.txt";
-            Results r = stub.Attach(provider.GetChangedItems, folder);
-            stub.Attach(provider.ItemExists, true);
+            Results r = stubs.Attach(provider.GetChangedItems, folder);
+            stubs.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5698</S:target-revision><S:entry rev=\"5697\" ></S:entry></S:update-report>";
@@ -349,8 +349,8 @@ namespace SvnBridge.Handlers
             folder.Author = "jwanagel";
             folder.ItemRevision = 5713;
             folder.LastModifiedDate = DateTime.Parse("2007-09-17T02:38:24.225369Z");
-            stub.Attach(provider.GetChangedItems, folder);
-            stub.Attach(provider.GetLatestVersion, 5713);
+            stubs.Attach(provider.GetChangedItems, folder);
+            stubs.Attach(provider.GetLatestVersion, 5713);
             request.Path = "http://localhost:8085/!svn/vcc/default";
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8085</S:src-path><S:entry rev=\"5713\" ></S:entry></S:update-report>";

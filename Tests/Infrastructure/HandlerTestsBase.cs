@@ -14,7 +14,7 @@ namespace SvnBridge.Infrastructure
         protected StubSourceControlProvider provider;
         protected StubHttpRequest request;
         protected StubHttpResponse response;
-        protected MyMocks stub = new MyMocks();
+        protected MyMocks stubs = new MyMocks();
         protected string tfsUrl;
 
         public HandlerTestsBase()
@@ -24,7 +24,7 @@ namespace SvnBridge.Infrastructure
 
         public virtual void Setup()
         {
-            provider = stub.CreateObject<StubSourceControlProvider>();
+            provider = stubs.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             context = new StubHttpContext();
             request = new StubHttpRequest();
