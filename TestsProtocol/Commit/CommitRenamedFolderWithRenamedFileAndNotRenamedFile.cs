@@ -12,7 +12,7 @@ namespace ProtocolTests
         [Fact]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
+            stubs.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -61,7 +61,7 @@ namespace ProtocolTests
         [Fact]
         public void Test10()
         {
-            stub.Attach(provider.DeleteItem, true);
+            stubs.Attach(provider.DeleteItem, true);
 
             string request =
                 "DELETE //!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
@@ -89,12 +89,12 @@ namespace ProtocolTests
         [Fact]
         public void Test11()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, true);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, true);
             FolderMetaData item = new FolderMetaData();
             item.Name = "B !@#$%^&()_-+={[}];',.~`";
             item.ItemRevision = 5730;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
@@ -142,7 +142,7 @@ namespace ProtocolTests
         [Fact]
         public void Test12()
         {
-            stub.Attach(provider.GetLatestVersion, 5730);
+            stubs.Attach(provider.GetLatestVersion, 5730);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -190,7 +190,7 @@ namespace ProtocolTests
         [Fact]
         public void Test13()
         {
-            stub.Attach(provider.CopyItem);
+            stubs.Attach(provider.CopyItem);
 
             string request =
                 "COPY /!svn/bc/5730/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60 HTTP/1.1\r\n" +
@@ -230,7 +230,7 @@ namespace ProtocolTests
         [Fact]
         public void Test14()
         {
-            stub.Attach(provider.DeleteItem, true);
+            stubs.Attach(provider.DeleteItem, true);
 
             string request =
                 "DELETE //!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60.txt HTTP/1.1\r\n" +
@@ -258,12 +258,12 @@ namespace ProtocolTests
         [Fact]
         public void Test15()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, false);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, false);
             ItemMetaData item = new ItemMetaData();
             item.Name = "B !@#$%^&()_-+={[}];',.~`/C !@#$%^&()_-+={[}];',.~`.txt";
             item.ItemRevision = 5730;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60.txt HTTP/1.1\r\n" +
@@ -357,7 +357,7 @@ namespace ProtocolTests
         [Fact]
         public void Test17()
         {
-            stub.Attach(provider.CopyItem);
+            stubs.Attach(provider.CopyItem);
 
             string request =
                 "COPY /!svn/bc/5730/B%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60/C%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60.txt HTTP/1.1\r\n" +
@@ -404,7 +404,7 @@ namespace ProtocolTests
             mergeResponse.Items.Add(
                 new MergeActivityResponseItem(ItemType.File,
                                               "/BB !@#$%^&()_-+={[}];',.~`/CC !@#$%^&()_-+={[}];',.~`.txt"));
-            stub.Attach(provider.MergeActivity, mergeResponse);
+            stubs.Attach(provider.MergeActivity, mergeResponse);
 
             string request =
                 "MERGE / HTTP/1.1\r\n" +
@@ -486,7 +486,7 @@ namespace ProtocolTests
         [Fact]
         public void Test19()
         {
-            stub.Attach(provider.DeleteActivity);
+            stubs.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/15407bc3-2250-aa4c-aa51-4e65b2c824c3 HTTP/1.1\r\n" +
@@ -513,7 +513,7 @@ namespace ProtocolTests
         [Fact]
         public void Test2()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -556,7 +556,7 @@ namespace ProtocolTests
         [Fact]
         public void Test3()
         {
-            stub.Attach(provider.MakeActivity);
+            stubs.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/15407bc3-2250-aa4c-aa51-4e65b2c824c3 HTTP/1.1\r\n" +
@@ -595,10 +595,10 @@ namespace ProtocolTests
         [Fact]
         public void Test4()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            stub.Attach(provider.GetItems, folder);
+            stubs.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -643,7 +643,7 @@ namespace ProtocolTests
         [Fact]
         public void Test5()
         {
-            stub.Attach(provider.GetLatestVersion, 5730);
+            stubs.Attach(provider.GetLatestVersion, 5730);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -726,7 +726,7 @@ namespace ProtocolTests
         [Fact]
         public void Test7()
         {
-            stub.Attach(provider.SetActivityComment);
+            stubs.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/15407bc3-2250-aa4c-aa51-4e65b2c824c3/5730 HTTP/1.1\r\n" +
@@ -770,13 +770,13 @@ namespace ProtocolTests
         [Fact]
         public void Test8()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, true);
-            stub.Attach(provider.GetLatestVersion, 5730);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, true);
+            stubs.Attach(provider.GetLatestVersion, 5730);
             ItemMetaData item = new ItemMetaData();
             item.Name = "";
             item.ItemRevision = 5730;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -823,7 +823,7 @@ namespace ProtocolTests
         {
             ItemMetaData item = new ItemMetaData();
             item.ItemRevision = 0;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5730/ HTTP/1.1\r\n" +

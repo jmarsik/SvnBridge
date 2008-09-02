@@ -8,48 +8,49 @@ using SvnBridge.Interfaces;
 using Tests;
 using SvnBridge.Cache;
 using Attach;
+using System.Net;
 
 namespace SvnBridge.SourceControl
 {
     public class TFSSourceControlProviderTest
     {
-        private readonly MyMocks attach;
+        private readonly MyMocks stubs;
         private readonly MockRepository mocks;
         private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly TFSSourceControlProvider provider;
 
         public TFSSourceControlProviderTest()
         {
-            attach = new MyMocks();
+            stubs = new MyMocks();
             mocks = new MockRepository();
-            associateWorkItemWithChangeSet = attach.CreateObject<AssociateWorkItemWithChangeSet>("http://www.codeplex.com", null);
+            associateWorkItemWithChangeSet = stubs.CreateObject<AssociateWorkItemWithChangeSet>("http://www.codeplex.com", null);
             provider = new TFSSourceControlProvider(
                 "blah",
                 null,
 				null,
                 CreateSourceControlServicesHub(),
-                attach.CreateObject<OldSvnBridgeFilesSpecification>());
+                stubs.CreateObject<OldSvnBridgeFilesSpecification>());
         }
 
         public SourceControlServicesHub CreateSourceControlServicesHub()
         {
             return new SourceControlServicesHub(
-                System.Net.CredentialCache.DefaultCredentials,
+                CredentialCache.DefaultCredentials,
                 new StubTFSSourceControlService(),
-                MockRepository.GenerateStub<IProjectInformationRepository>(),
+                stubs.CreateObject<ProjectInformationRepository>(null, null),
                 associateWorkItemWithChangeSet,
-                attach.CreateObject<DefaultLogger>(),
-                attach.CreateObject<WebCache>(),
-                attach.CreateObject<FileCache>(null),
-                attach.CreateObject<MetaDataRepositoryFactory>(null, null, false),
-                attach.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null, null, false));
+                stubs.CreateObject<DefaultLogger>(),
+                stubs.CreateObject<WebCache>(),
+                stubs.CreateObject<FileCache>(null),
+                stubs.CreateObject<MetaDataRepositoryFactory>(null, null, false),
+                stubs.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null, null, false));
         }
 
         [Fact]
         public void WillNotAssociateIfCommentHasNoWorkItems()
         {
-            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
-            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
+            Results r1 = stubs.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = stubs.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
 
             provider.AssociateWorkItemsWithChangeSet("blah blah", 15);
 
@@ -60,8 +61,8 @@ namespace SvnBridge.SourceControl
         [Fact]
         public void WillExtractWorkItemsFromCheckInCommentsAndAssociateWithChangeSet()
         {
-            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
-            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
+            Results r1 = stubs.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = stubs.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"blah blah
 Work Item: 15";
 
@@ -75,8 +76,8 @@ Work Item: 15";
         [Fact]
         public void CanAssociateMoreThanOneId()
         {
-            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
-            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
+            Results r1 = stubs.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = stubs.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"blah blah
 Work Items: 15, 16, 17";
 
@@ -96,8 +97,8 @@ Work Items: 15, 16, 17";
         [Fact]
         public void CanAssociateOnMultiplyLines()
         {
-            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
-            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
+            Results r1 = stubs.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = stubs.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"blah blah
 Work Items: 15, 16
 Work Item: 17";
@@ -118,8 +119,8 @@ Work Item: 17";
         [Fact]
         public void WillRecognizeWorkItemsIfWorkItemAppearsPreviouslyInText()
         {
-            Results r1 = attach.Attach(associateWorkItemWithChangeSet.Associate);
-            Results r2 = attach.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
+            Results r1 = stubs.Attach(associateWorkItemWithChangeSet.Associate);
+            Results r2 = stubs.Attach(associateWorkItemWithChangeSet.SetWorkItemFixed);
             string comment = @"Adding work items support and fixing
 other issues with workitems
 Solved Work Items: 15, 16

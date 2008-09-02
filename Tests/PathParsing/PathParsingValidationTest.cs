@@ -3,12 +3,16 @@ using System.Reflection;
 using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using Xunit;
+using SvnBridge.SourceControl;
+using Tests;
 
 namespace SvnBridge.PathParsing
 {
 	public class PathParsingValidationTest
 	{
-		[Fact]
+        protected MyMocks stubs = new MyMocks();
+        
+        [Fact]
 		public void StaticServerWithProjectNameInHostNamePathParser_DoesNotAcceptInvalidUrl()
 		{
 			ValidateParserWillNotAcceptInvalidTfsUrl<StaticServerWithProjectNameInHostNamePathParser>();
@@ -45,13 +49,13 @@ namespace SvnBridge.PathParsing
         }
 
 
-		private static void ValidateParserWillNotAcceptInvalidTfsUrl<T>()
+		private void ValidateParserWillNotAcceptInvalidTfsUrl<T>()
 		{
 			Assert.Throws<InvalidOperationException>(delegate
 			{
 				try
 				{
-					Activator.CreateInstance(typeof (T), "blah", MockRepository.GenerateStub<IProjectInformationRepository>());
+					Activator.CreateInstance(typeof (T), "blah", stubs.CreateObject<ProjectInformationRepository>(null, null));
 				}
 				catch (TargetInvocationException e)
 				{
@@ -60,9 +64,9 @@ namespace SvnBridge.PathParsing
 			});
 		}
 
-        private static void ValidateParserWillAcceptValidTfsUrl<T>(string url)
+        private void ValidateParserWillAcceptValidTfsUrl<T>(string url)
         {
-            Activator.CreateInstance(typeof(T), url, MockRepository.GenerateStub<IProjectInformationRepository>());
+            Activator.CreateInstance(typeof(T), url, stubs.CreateObject<ProjectInformationRepository>(null, null));
         }
 	}
 }

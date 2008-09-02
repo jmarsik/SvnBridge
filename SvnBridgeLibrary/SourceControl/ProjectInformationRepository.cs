@@ -8,7 +8,7 @@ using SvnBridge.Infrastructure;
 
 namespace SvnBridge.SourceControl
 {
-    public class ProjectInformationRepository : IProjectInformationRepository
+    public class ProjectInformationRepository
     {
 		private readonly MetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly string serverUrl;
@@ -22,9 +22,7 @@ namespace SvnBridge.SourceControl
             this.serverUrl = serverUrl;
         }
 
-        #region IProjectInformationRepository Members
-
-        public ProjectLocationInformation GetProjectLocation(ICredentials credentials, string projectName)
+        public virtual ProjectLocationInformation GetProjectLocation(ICredentials credentials, string projectName)
         {
             projectName = projectName.ToLower();
             if (!projectLocations.ContainsKey(projectName))
@@ -49,7 +47,5 @@ namespace SvnBridge.SourceControl
             }
             return projectLocations[projectName];
         }
-
-        #endregion
     }
 }

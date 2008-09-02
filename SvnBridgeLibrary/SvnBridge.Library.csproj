@@ -112,7 +112,6 @@
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
     <Compile Include="Infrastructure\UpdateReportService.cs" />
-    <Compile Include="Interfaces\IProjectInformationRepository.cs" />
     <Compile Include="ListenErrorEventArgs.cs" />
     <Compile Include="Net\FinishedHandlingEventArgs.cs" />
     <Compile Include="Net\Proxy.cs" />

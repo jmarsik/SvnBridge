@@ -23,14 +23,14 @@ namespace Tests
     {
         protected HttpContextDispatcher HttpDispatcher;
         protected StubSourceControlProvider provider;
-        protected MyMocks stub = new MyMocks();
+        protected MyMocks stubs = new MyMocks();
 
         protected ProtocolTestsBase()
         {
-            provider = stub.CreateObject<StubSourceControlProvider>();
+            provider = stubs.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            StaticServerPathParser pathParser = new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>());
-            HttpDispatcher = new HttpContextDispatcher(pathParser, stub.CreateObject<ActionTrackingViaPerfCounter>());
+            StaticServerPathParser pathParser = new StaticServerPathParser("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null));
+            HttpDispatcher = new HttpContextDispatcher(pathParser, stubs.CreateObject<ActionTrackingViaPerfCounter>());
             PerRequest.Init();
         }
 
@@ -74,7 +74,7 @@ namespace Tests
             long responseStart = HttpStream.Position;
             HttpStream.Position = 0;
 
-            ListenerContext context = new ListenerContext(HttpStream, stub.CreateObject<DefaultLogger>());
+            ListenerContext context = new ListenerContext(HttpStream, stubs.CreateObject<DefaultLogger>());
             HttpDispatcher.Dispatch(context);
             context.Response.Close();
 

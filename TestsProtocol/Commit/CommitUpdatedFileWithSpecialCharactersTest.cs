@@ -13,7 +13,7 @@ namespace ProtocolTests
         [Fact]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
+            stubs.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -62,7 +62,7 @@ namespace ProtocolTests
         [Fact]
         public void Test10()
         {
-            stub.Attach(provider.GetLatestVersion, 5716);
+            stubs.Attach(provider.GetLatestVersion, 5716);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -110,12 +110,12 @@ namespace ProtocolTests
         [Fact]
         public void Test11()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.GetLatestVersion, 5718);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.GetLatestVersion, 5718);
             ItemMetaData item = new ItemMetaData();
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
             item.ItemRevision = 5718;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /!svn/bc/5718/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',~%60..txt HTTP/1.1\r\n" +
@@ -162,7 +162,7 @@ namespace ProtocolTests
         {
             ItemMetaData item = new ItemMetaData();
             item.ItemRevision = 0;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5718/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',~%60..txt HTTP/1.1\r\n" +
@@ -202,11 +202,11 @@ namespace ProtocolTests
         [Fact]
         public void Test13()
         {
-            stub.Attach(provider.ItemExists, false);
+            stubs.Attach(provider.ItemExists, false);
             ItemMetaData item = new ItemMetaData();
-            stub.Attach(provider.GetItemInActivity, item);
-            stub.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("test"));
-            stub.Attach(provider.WriteFile, false);
+            stubs.Attach(provider.GetItemInActivity, item);
+            stubs.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("test"));
+            stubs.Attach(provider.WriteFile, false);
 
             string request =
                 "PUT //!svn/wrk/f86c2543-a3d3-d04f-b458-8924481e51c6/A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',~%60..txt HTTP/1.1\r\n" +
@@ -241,7 +241,7 @@ namespace ProtocolTests
             MergeActivityResponse mergeResponse =
                 new MergeActivityResponse(5719, DateTime.Parse("2007-12-14T02:38:56.191037Z"), "bradwils");
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/A !@#$%^&()_-+={[}];',~`..txt"));
-            stub.Attach(provider.MergeActivity, mergeResponse);
+            stubs.Attach(provider.MergeActivity, mergeResponse);
 
             string request =
                 "MERGE / HTTP/1.1\r\n" +
@@ -305,7 +305,7 @@ namespace ProtocolTests
         [Fact]
         public void Test15()
         {
-            stub.Attach(provider.DeleteActivity);
+            stubs.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6 HTTP/1.1\r\n" +
@@ -332,7 +332,7 @@ namespace ProtocolTests
         [Fact]
         public void Test2()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -375,7 +375,7 @@ namespace ProtocolTests
         [Fact]
         public void Test3()
         {
-            stub.Attach(provider.MakeActivity);
+            stubs.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6 HTTP/1.1\r\n" +
@@ -414,10 +414,10 @@ namespace ProtocolTests
         [Fact]
         public void Test4()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "/";
-            stub.Attach(provider.GetItems, folder);
+            stubs.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -462,7 +462,7 @@ namespace ProtocolTests
         [Fact]
         public void Test5()
         {
-            stub.Attach(provider.GetLatestVersion, 5718);
+            stubs.Attach(provider.GetLatestVersion, 5718);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -545,7 +545,7 @@ namespace ProtocolTests
         [Fact]
         public void Test7()
         {
-            stub.Attach(provider.SetActivityComment);
+            stubs.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/f86c2543-a3d3-d04f-b458-8924481e51c6/5718 HTTP/1.1\r\n" +
@@ -589,12 +589,12 @@ namespace ProtocolTests
         [Fact]
         public void Test8()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.GetLatestVersion, 5718);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.GetLatestVersion, 5718);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
             folder.ItemRevision = 5718;
-            stub.Attach(provider.GetItems, folder);
+            stubs.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -639,11 +639,11 @@ namespace ProtocolTests
         [Fact]
         public void Test9()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new ItemMetaData();
             item.Name = "A !@#$%^&()_-+={[}];',~`..txt";
             item.ItemRevision = 5718;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /A%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',~%60..txt HTTP/1.1\r\n" +

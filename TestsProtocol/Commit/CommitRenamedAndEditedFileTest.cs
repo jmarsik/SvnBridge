@@ -12,7 +12,7 @@ namespace ProtocolTests
         [Fact]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
+            stubs.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -61,7 +61,7 @@ namespace ProtocolTests
         [Fact]
         public void Test10()
         {
-            stub.Attach(provider.ItemExists, false);
+            stubs.Attach(provider.ItemExists, false);
 
             string request =
                 "PROPFIND /Fun2.txt HTTP/1.1\r\n" +
@@ -103,11 +103,11 @@ namespace ProtocolTests
         [Fact]
         public void Test11()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, false);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, false);
             ItemMetaData item = new ItemMetaData();
             item.Name = "FunRenamedAgain.txt";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /FunRenamedAgain.txt HTTP/1.1\r\n" +
@@ -201,7 +201,7 @@ namespace ProtocolTests
         [Fact]
         public void Test13()
         {
-            stub.Attach(provider.CopyItem);
+            stubs.Attach(provider.CopyItem);
 
             string request =
                 "COPY /!svn/bc/5522/FunRenamedAgain.txt HTTP/1.1\r\n" +
@@ -241,7 +241,7 @@ namespace ProtocolTests
         [Fact]
         public void Test14()
         {
-            stub.Attach(provider.DeleteItem, true);
+            stubs.Attach(provider.DeleteItem, true);
 
             string request =
                 "DELETE //!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FunRenamedAgain.txt HTTP/1.1\r\n" +
@@ -269,10 +269,10 @@ namespace ProtocolTests
         [Fact]
         public void Test15()
         {
-            stub.Attach(provider.ItemExists, false);
+            stubs.Attach(provider.ItemExists, false);
             ItemMetaData item = new ItemMetaData();
-            stub.Attach(provider.GetItems, item);
-            stub.Attach(provider.WriteFile, false);
+            stubs.Attach(provider.GetItems, item);
+            stubs.Attach(provider.WriteFile, false);
 
             string request =
                 "PUT //!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/Fun2.txt HTTP/1.1\r\n" +
@@ -307,7 +307,7 @@ namespace ProtocolTests
                 new MergeActivityResponse(5523, DateTime.Parse("2007-07-19T20:33:06.674229Z"), "jwanagel");
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.Folder, "/"));
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/Fun2.txt"));
-            stub.Attach(provider.MergeActivity, mergeResponse);
+            stubs.Attach(provider.MergeActivity, mergeResponse);
 
             string request =
                 "MERGE / HTTP/1.1\r\n" +
@@ -380,7 +380,7 @@ namespace ProtocolTests
         [Fact]
         public void Test17()
         {
-            stub.Attach(provider.DeleteActivity);
+            stubs.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/cdfcf93f-8649-5e44-a8ec-b3f40e10e907 HTTP/1.1\r\n" +
@@ -407,7 +407,7 @@ namespace ProtocolTests
         [Fact]
         public void Test2()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS / HTTP/1.1\r\n" +
@@ -450,7 +450,7 @@ namespace ProtocolTests
         [Fact]
         public void Test3()
         {
-            stub.Attach(provider.MakeActivity);
+            stubs.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/cdfcf93f-8649-5e44-a8ec-b3f40e10e907 HTTP/1.1\r\n" +
@@ -489,10 +489,10 @@ namespace ProtocolTests
         [Fact]
         public void Test4()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "";
-            stub.Attach(provider.GetItems, folder);
+            stubs.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -537,7 +537,7 @@ namespace ProtocolTests
         [Fact]
         public void Test5()
         {
-            stub.Attach(provider.GetLatestVersion, 5522);
+            stubs.Attach(provider.GetLatestVersion, 5522);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -620,7 +620,7 @@ namespace ProtocolTests
         [Fact]
         public void Test7()
         {
-            stub.Attach(provider.SetActivityComment);
+            stubs.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/5522 HTTP/1.1\r\n" +
@@ -664,13 +664,13 @@ namespace ProtocolTests
         [Fact]
         public void Test8()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.IsDirectory, true);
-            stub.Attach(provider.GetLatestVersion, 5522);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, true);
+            stubs.Attach(provider.GetLatestVersion, 5522);
             ItemMetaData item = new ItemMetaData();
             item.Name = "";
             item.ItemRevision = 5522;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -717,7 +717,7 @@ namespace ProtocolTests
         {
             ItemMetaData item = new ItemMetaData();
             item.ItemRevision = 0;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5522/ HTTP/1.1\r\n" +

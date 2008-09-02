@@ -7,19 +7,20 @@ using Xunit;
 using Assert=CodePlex.NUnitExtensions.Assert;
 using SvnBridge.Infrastructure;
 using Tests;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Net
 {
     public class ListenerTests
     {
-        protected MyMocks stub = new MyMocks();
+        protected MyMocks stubs = new MyMocks();
 
         [Fact]
         public void SetPortAfterStartThrows()
         {
-            Listener listener = new Listener(stub.CreateObject<DefaultLogger>(), stub.CreateObject<ActionTrackingViaPerfCounter>());
+            Listener listener = new Listener(stubs.CreateObject<DefaultLogger>(), stubs.CreateObject<ActionTrackingViaPerfCounter>());
             listener.Port = 10011;
-            listener.Start(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>()));
+            listener.Start(new StaticServerPathParser("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null)));
 
             Assert.Throws<InvalidOperationException>(
                 delegate { listener.Port = 8082; });
@@ -30,10 +31,10 @@ namespace SvnBridge.Net
         [Fact]
         public void StartWithoutSettingPortThrows()
         {
-            Listener listener = new Listener(stub.CreateObject<DefaultLogger>(), stub.CreateObject<ActionTrackingViaPerfCounter>());
+            Listener listener = new Listener(stubs.CreateObject<DefaultLogger>(), stubs.CreateObject<ActionTrackingViaPerfCounter>());
             
             Assert.Throws<InvalidOperationException>(
-				delegate { listener.Start(new StaticServerPathParser("http://foo", MockRepository.GenerateStub<IProjectInformationRepository>())); });
+				delegate { listener.Start(new StaticServerPathParser("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null))); });
         }
     }
 }

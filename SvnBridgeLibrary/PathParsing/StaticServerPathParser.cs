@@ -9,9 +9,9 @@ namespace SvnBridge.PathParsing
 	public class StaticServerPathParser : BasePathParser
 	{
 		private readonly string server;
-	    private readonly IProjectInformationRepository projectInformationRepository;
+	    private readonly ProjectInformationRepository projectInformationRepository;
 
-        public StaticServerPathParser(string server, IProjectInformationRepository projectInformationRepository)
+        public StaticServerPathParser(string server, ProjectInformationRepository projectInformationRepository)
         {
             foreach (string singleServerUrl in server.Split(','))
             {

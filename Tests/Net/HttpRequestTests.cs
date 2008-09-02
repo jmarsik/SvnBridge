@@ -11,7 +11,7 @@ namespace SvnBridge.Net
 {
     public class HttpRequestTests
     {
-        protected MyMocks stub = new MyMocks();
+        protected MyMocks stubs = new MyMocks();
 
         private class StubStream : Stream
         {
@@ -98,7 +98,7 @@ namespace SvnBridge.Net
             StubStream stream = new StubStream(Encoding.ASCII.GetBytes(buffer.ToString()));
 
             Assert.DoesNotThrow(
-                delegate { new ListenerRequest(stream, stub.CreateObject<DefaultLogger>()); });
+                delegate { new ListenerRequest(stream, stubs.CreateObject<DefaultLogger>()); });
         }
 
         [Fact]
@@ -112,7 +112,7 @@ namespace SvnBridge.Net
             buffer.Append("12345");
             StubStream stream = new StubStream(Encoding.ASCII.GetBytes(buffer.ToString()));
 
-            ListenerRequest request = new ListenerRequest(stream, stub.CreateObject<DefaultLogger>());
+            ListenerRequest request = new ListenerRequest(stream, stubs.CreateObject<DefaultLogger>());
 
             Assert.Equal<string>("/foo/bar", request.Url.LocalPath);
         }

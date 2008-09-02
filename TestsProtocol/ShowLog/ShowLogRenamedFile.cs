@@ -14,7 +14,7 @@ namespace ProtocolTests
         [Fact]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
+            stubs.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /newFolder3 HTTP/1.1\r\n" +
@@ -64,7 +64,7 @@ namespace ProtocolTests
         [Fact]
         public void Test10()
         {
-            stub.Attach(provider.GetLatestVersion, 5531);
+            stubs.Attach(provider.GetLatestVersion, 5531);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -153,10 +153,10 @@ namespace ProtocolTests
         [Fact]
         public void Test12()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "newFolder3";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder3 HTTP/1.1\r\n" +
@@ -262,7 +262,7 @@ namespace ProtocolTests
             histories.Add(history1);
             histories.Add(history2);
 
-            stub.Attach(provider.GetLog, new LogItem(@"C:\", "newFolder2", histories.ToArray()));
+            stubs.Attach(provider.GetLog, new LogItem(@"C:\", "newFolder2", histories.ToArray()));
 
             string request =
                 "REPORT /!svn/bc/5531/newFolder3 HTTP/1.1\r\n" +
@@ -317,10 +317,10 @@ namespace ProtocolTests
         [Fact]
         public void Test2()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "newFolder3";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder3 HTTP/1.1\r\n" +
@@ -371,7 +371,7 @@ namespace ProtocolTests
         [Fact]
         public void Test3()
         {
-            stub.Attach(provider.GetLatestVersion, 5531);
+            stubs.Attach(provider.GetLatestVersion, 5531);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -460,10 +460,10 @@ namespace ProtocolTests
         [Fact]
         public void Test5()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "newFolder3";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder3 HTTP/1.1\r\n" +
@@ -511,7 +511,7 @@ namespace ProtocolTests
         [Fact]
         public void Test6()
         {
-            stub.Attach(provider.GetLatestVersion, 5531);
+            stubs.Attach(provider.GetLatestVersion, 5531);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -600,7 +600,7 @@ namespace ProtocolTests
         [Fact]
         public void Test8()
         {
-            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
+            stubs.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND /newFolder3 HTTP/1.1\r\n" +
@@ -650,10 +650,10 @@ namespace ProtocolTests
         [Fact]
         public void Test9()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "newFolder3";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /newFolder3 HTTP/1.1\r\n" +

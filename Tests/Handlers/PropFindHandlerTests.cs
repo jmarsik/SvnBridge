@@ -20,7 +20,7 @@ namespace SvnBridge.Handlers
     	public PropFindHandlerTests()
     	{
     		handler = new PropFindHandler();
-			handler.Initialize(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()));
+            handler.Initialize(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)));
     	}
 
         [Fact]
@@ -50,7 +50,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:propfind xmlns:D='DAV:'><D:prop><D:md5-checksum/></D:prop></D:propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -71,7 +71,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "1";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal(1, results.CallCount);
             Assert.Equal(1234, results.Parameters[0]);
@@ -88,7 +88,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "2";
 
-			Exception result = Record.Exception(delegate { handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null); });
+			Exception result = Record.Exception(delegate { handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null); });
 
             Assert.IsType(typeof(InvalidOperationException), result);
         }
@@ -106,7 +106,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:propfind xmlns:D='DAV:'><D:prop><D:lockdiscovery/></D:prop></D:propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<D:lockdiscovery/>"));
@@ -128,7 +128,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><resourcetype xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "1";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<D:href>/!svn/bc/1234/Foo/</D:href>"));
@@ -147,7 +147,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             string expected = "<lp2:baseline-relative-path>Folder With Spaces</lp2:baseline-relative-path>";
@@ -170,7 +170,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><creationdate xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -192,7 +192,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><creator-displayname xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:creator-displayname>user_foo</lp1:creator-displayname>"));
@@ -210,7 +210,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><deadprop-count xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
@@ -234,7 +234,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getcontentlength xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<g0:getcontentlength/>"));
@@ -252,7 +252,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal("/Spikes/SvnFacade/trunk/New Folder 7", r1.Parameters[0]);
             Assert.Equal("/Spikes/SvnFacade/trunk/New Folder 7", r2.Parameters[1]);
@@ -271,7 +271,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal("/Test Project", r.Parameters[0]);
         }
@@ -292,7 +292,7 @@ namespace SvnBridge.Handlers
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-name xmlns=\"DAV:\"/></prop></propfind>";
             request.Headers["Depth"] = "0";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(result.Contains("<lp1:version-name>1234</lp1:version-name>"));

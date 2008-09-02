@@ -6,6 +6,7 @@ using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.PathParsing;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Web
 {
@@ -17,7 +18,7 @@ namespace SvnBridge.Web
 		{
 			string tfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
 		    PerRequest.Items["serverUrl"] = tfsUrl;
-		    IProjectInformationRepository projectInformationRepository = IoC.Resolve<IProjectInformationRepository>();
+		    ProjectInformationRepository projectInformationRepository = IoC.Resolve<ProjectInformationRepository>();
 		    if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
 			{
                 dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl, projectInformationRepository), IoC.Resolve<ActionTrackingViaPerfCounter>());

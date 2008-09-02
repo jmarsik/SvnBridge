@@ -1,11 +1,12 @@
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.PathParsing
 {
 	public class StaticServerWithProjectNameInHostNamePathParser : StaticServerPathParser
 	{
-	    public StaticServerWithProjectNameInHostNamePathParser(string server, IProjectInformationRepository projectInformationRepository) : base(server, projectInformationRepository)
+	    public StaticServerWithProjectNameInHostNamePathParser(string server, ProjectInformationRepository projectInformationRepository) : base(server, projectInformationRepository)
 	    {
 	    }
 

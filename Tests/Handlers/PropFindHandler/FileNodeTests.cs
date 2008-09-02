@@ -39,7 +39,7 @@ namespace SvnBridge.Handlers
             FileNode node = new FileNode(item, null);
 
         	GetHandler handler = new GetHandler();
-			handler.Initialize(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()));
+			handler.Initialize(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)));
             handler.SetSourceControlProvider(sourceControlProvider);
         	string result = node.GetProperty(handler, xml.CreateElement("checked-in"));
 

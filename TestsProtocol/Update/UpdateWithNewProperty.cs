@@ -13,7 +13,7 @@ namespace ProtocolTests
         [Fact]
         public void Test1()
         {
-            stub.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
+            stubs.Attach((MyMocks.ItemExists) provider.ItemExists, new NetworkAccessDeniedException());
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -63,10 +63,10 @@ namespace ProtocolTests
         [Fact]
         public void Test2()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -117,7 +117,7 @@ namespace ProtocolTests
         [Fact]
         public void Test3()
         {
-            stub.Attach(provider.GetLatestVersion, 5551);
+            stubs.Attach(provider.GetLatestVersion, 5551);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -206,10 +206,10 @@ namespace ProtocolTests
         [Fact]
         public void Test5()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -257,7 +257,7 @@ namespace ProtocolTests
         [Fact]
         public void Test6()
         {
-            stub.Attach(provider.GetLatestVersion, 5551);
+            stubs.Attach(provider.GetLatestVersion, 5551);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -346,10 +346,10 @@ namespace ProtocolTests
         [Fact]
         public void Test8()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             ItemMetaData item = new FolderMetaData();
             item.Name = "";
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND / HTTP/1.1\r\n" +
@@ -410,10 +410,10 @@ namespace ProtocolTests
             folder.LastModifiedDate = DateTime.Parse("2007-08-08T20:54:17.904624Z");
             folder.Properties["svn:ignore"] = "*.ignore3\n";
             metadata.Items.Add(folder);
-            stub.Attach(provider.GetChangedItems, metadata);
+            stubs.Attach(provider.GetChangedItems, metadata);
             byte[] fileData = GetBytes("New file");
-            stub.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
-            stub.Attach((MyMocks.ItemExists)provider.ItemExists, Return.DelegateResult(
+            stubs.Attach(provider.ReadFileAsync, new FileData { Base64DiffData = SvnDiffParser.GetSvnDiffData(fileData), Md5 = Helper.GetMd5Checksum(fileData) });
+            stubs.Attach((MyMocks.ItemExists)provider.ItemExists, Return.DelegateResult(
                 delegate(object[] parameters)
                 {
                     string value = parameters[0].ToString();

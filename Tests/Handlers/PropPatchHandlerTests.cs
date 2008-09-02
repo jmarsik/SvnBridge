@@ -6,6 +6,7 @@ using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.PathParsing;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
@@ -21,7 +22,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">Deleted a file</log></D:prop></D:set>\n</D:propertyupdate>\n";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             string expected =
@@ -49,7 +50,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><S:ignore>*.bad\n</S:ignore></D:prop></D:set></D:propertyupdate>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             string expected =
@@ -76,7 +77,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">Test comment</log></D:prop></D:set>\n</D:propertyupdate>\n";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
         }
@@ -89,7 +90,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<D:propertyupdate xmlns:D=\"DAV:\"><D:set><D:prop><log xmlns=\"http://subversion.tigris.org/xmlns/svn/\">Test comment</log></D:prop></D:set>\n</D:propertyupdate>\n";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);
             Assert.Equal("Test comment", r.Parameters[1]);
@@ -103,7 +104,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><S:ignore>*.bad\n</S:ignore></D:prop></D:set></D:propertyupdate>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal("be05cf36-7514-3f4d-81ea-7822f7b1dfe7", r.Parameters[0]);
             Assert.Equal("/Folder1", r.Parameters[1]);
@@ -120,7 +121,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\" ?><D:propertyupdate xmlns:D=\"DAV:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\"><D:set><D:prop><S:mime-type>application/octet-stream</S:mime-type></D:prop></D:set></D:propertyupdate>";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, MockRepository.GenerateStub<IProjectInformationRepository>()), null);
+        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             Assert.True(

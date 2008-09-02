@@ -13,7 +13,7 @@ namespace ProtocolTests
         [Fact]
         public void Test1()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
 
             string request =
                 "OPTIONS /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -55,11 +55,11 @@ namespace ProtocolTests
         [Fact]
         public void Test10()
         {
-            stub.Attach(provider.ItemExists, false);
+            stubs.Attach(provider.ItemExists, false);
             ItemMetaData item = new ItemMetaData();
-            stub.Attach(provider.GetItemInActivity, item);
-            stub.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("Fun text\r\nMore"));
-            stub.Attach(provider.WriteFile, false);
+            stubs.Attach(provider.GetItemInActivity, item);
+            stubs.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("Fun text\r\nMore"));
+            stubs.Attach(provider.WriteFile, false);
 
             string request =
                 "PUT //!svn/wrk/c59fa648-d006-554a-ad31-6de1e409bd8f/Spikes/SvnFacade/trunk/Test3.txt HTTP/1.1\r\n" +
@@ -96,7 +96,7 @@ namespace ProtocolTests
             MergeActivityResponse mergeResponse =
                 new MergeActivityResponse(5481, DateTime.Parse("2007-06-21T00:03:06.131918Z"), "jwanagel");
             mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/Spikes/SvnFacade/trunk/Test3.txt"));
-            stub.Attach(provider.MergeActivity, mergeResponse);
+            stubs.Attach(provider.MergeActivity, mergeResponse);
 
             string request =
                 "MERGE /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -160,7 +160,7 @@ namespace ProtocolTests
         [Fact]
         public void Test12()
         {
-            stub.Attach(provider.DeleteActivity);
+            stubs.Attach(provider.DeleteActivity);
 
             string request =
                 "DELETE /!svn/act/c59fa648-d006-554a-ad31-6de1e409bd8f HTTP/1.1\r\n" +
@@ -187,7 +187,7 @@ namespace ProtocolTests
         [Fact]
         public void Test2()
         {
-            stub.Attach((MyMocks.MakeActivity) provider.MakeActivity, new NetworkAccessDeniedException());
+            stubs.Attach((MyMocks.MakeActivity) provider.MakeActivity, new NetworkAccessDeniedException());
 
             string request =
                 "MKACTIVITY /!svn/act/c59fa648-d006-554a-ad31-6de1e409bd8f HTTP/1.1\r\n" +
@@ -228,7 +228,7 @@ namespace ProtocolTests
         [Fact]
         public void Test3()
         {
-            stub.Attach(provider.MakeActivity);
+            stubs.Attach(provider.MakeActivity);
 
             string request =
                 "MKACTIVITY /!svn/act/c59fa648-d006-554a-ad31-6de1e409bd8f HTTP/1.1\r\n" +
@@ -267,10 +267,10 @@ namespace ProtocolTests
         [Fact]
         public void Test4()
         {
-            stub.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.ItemExists, true);
             FolderMetaData folder = new FolderMetaData();
             folder.Name = "/Spikes/SvnFacade/trunk";
-            stub.Attach(provider.GetItems, folder);
+            stubs.Attach(provider.GetItems, folder);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -315,7 +315,7 @@ namespace ProtocolTests
         [Fact]
         public void Test5()
         {
-            stub.Attach(provider.GetLatestVersion, 5480);
+            stubs.Attach(provider.GetLatestVersion, 5480);
 
             string request =
                 "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
@@ -398,7 +398,7 @@ namespace ProtocolTests
         [Fact]
         public void Test7()
         {
-            stub.Attach(provider.SetActivityComment);
+            stubs.Attach(provider.SetActivityComment);
 
             string request =
                 "PROPPATCH //!svn/wbl/c59fa648-d006-554a-ad31-6de1e409bd8f/5480 HTTP/1.1\r\n" +
@@ -442,12 +442,12 @@ namespace ProtocolTests
         [Fact]
         public void Test8()
         {
-            stub.Attach(provider.ItemExists, true);
-            stub.Attach(provider.GetLatestVersion, 5480);
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.GetLatestVersion, 5480);
             FolderMetaData item = new FolderMetaData();
             item.Name = "Spikes/SvnFacade/trunk";
             item.ItemRevision = 5480;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "PROPFIND /Spikes/SvnFacade/trunk HTTP/1.1\r\n" +
@@ -494,7 +494,7 @@ namespace ProtocolTests
         {
             ItemMetaData item = new ItemMetaData();
             item.ItemRevision = 0;
-            stub.Attach(provider.GetItems, item);
+            stubs.Attach(provider.GetItems, item);
 
             string request =
                 "CHECKOUT /!svn/ver/5406/Spikes/SvnFacade/trunk/Test3.txt HTTP/1.1\r\n" +
