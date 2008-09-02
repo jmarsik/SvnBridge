@@ -42,8 +42,7 @@ namespace IntegrationTests
 			TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
 																			 PROJECT_NAME,
 																			 null,
-																			 CreateSourceControlServicesHub(),
-                IoC.Resolve<OldSvnBridgeFilesSpecification>());
+																			 CreateSourceControlServicesHub());
 		}
 
 		[Fact]

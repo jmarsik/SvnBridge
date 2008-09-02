@@ -49,8 +49,7 @@ namespace IntegrationTests
 			_provider = new TFSSourceControlProvider(ServerUrl,
 													 PROJECT_NAME,
 													 null,
-													 CreateSourceControlServicesHub(),
-                IoC.Resolve<OldSvnBridgeFilesSpecification>());
+													 CreateSourceControlServicesHub());
 
 			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Environment.MachineName + "-" + Guid.NewGuid();
 			_provider.MakeActivity(_activityId);
@@ -65,8 +64,7 @@ namespace IntegrationTests
 			_providerRoot = new TFSSourceControlProvider(ServerUrl,
 														 PROJECT_NAME + testPath,
 														 null,
-														 CreateSourceControlServicesHub(),
-                IoC.Resolve<OldSvnBridgeFilesSpecification>());
+														 CreateSourceControlServicesHub());
 			_providerRoot.MakeActivity(_activityIdRoot);
 		}
 

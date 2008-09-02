@@ -24,8 +24,7 @@ namespace SvnBridge.SourceControl
                 "blah",
                 null,
 				null,
-                CreateSourceControlServicesHub(),
-                stubs.CreateObject<OldSvnBridgeFilesSpecification>());
+                CreateSourceControlServicesHub());
         }
 
         public SourceControlServicesHub CreateSourceControlServicesHub()

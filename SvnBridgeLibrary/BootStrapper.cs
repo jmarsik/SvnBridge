@@ -31,7 +31,6 @@ namespace SvnBridge
             RegisterType(typeof(FileCache), typeof(FileCache));
             RegisterType(typeof(MemoryBasedPersistentCache), typeof(MemoryBasedPersistentCache));
             RegisterType(typeof(DefaultLogger), typeof(DefaultLogger));
-            RegisterType(typeof(OldSvnBridgeFilesSpecification), typeof(OldSvnBridgeFilesSpecification));
             RegisterType(typeof(ActionTrackingViaPerfCounter), typeof(ActionTrackingViaPerfCounter));
             RegisterType(typeof(MetaDataRepositoryFactory), typeof(MetaDataRepositoryFactory));
             RegisterType(typeof(Listener), typeof(Listener));

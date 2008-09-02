@@ -13,7 +13,6 @@ namespace SvnBridge.SourceControl
     public class UpdateDiffCalculator
     {
         private readonly TFSSourceControlProvider sourceControlProvider;
-        private readonly OldSvnBridgeFilesSpecification ignoredFilesSpecification;
         private readonly IDictionary<ItemMetaData, bool> additionForPropertyChangeOnly =
             new Dictionary<ItemMetaData, bool>();
 
@@ -21,10 +20,9 @@ namespace SvnBridge.SourceControl
         private Dictionary<string, string> clientDeletedFiles;
         private readonly List<string> renamedItemsToBeCheckedForDeletedChildren = new List<string>();
 
-        public UpdateDiffCalculator(TFSSourceControlProvider sourceControlProvider, OldSvnBridgeFilesSpecification ignoredFilesSpecification)
+        public UpdateDiffCalculator(TFSSourceControlProvider sourceControlProvider)
         {
         	this.sourceControlProvider = sourceControlProvider;
-        	this.ignoredFilesSpecification = ignoredFilesSpecification;
         }
 
     	public void CalculateDiff(string checkoutRootPath,
@@ -211,7 +209,7 @@ namespace SvnBridge.SourceControl
                     for (int i = history.Changes.Count - 1; i >= 0; i--)
                     {
                         SourceItemChange change = history.Changes[i];
-						if(ignoredFilesSpecification.ShouldBeIgnored(change.Item.RemoteName))
+						if(ShouldBeIgnored(change.Item.RemoteName))
 							continue;
                         if (IsAddOperation(change, updatingForwardInTime))
                         {
@@ -604,6 +602,11 @@ namespace SvnBridge.SourceControl
                 if (additionForPropertyChangeOnly.ContainsKey(item) == false)
                     additionForPropertyChangeOnly[item] = propertyChange;
             }
+        }
+
+        private bool ShouldBeIgnored(string file)
+        {
+            return Path.GetFileName(file) == "..svnbridge";
         }
 
         private void ProcessDeletedItem(string checkoutRootPath,

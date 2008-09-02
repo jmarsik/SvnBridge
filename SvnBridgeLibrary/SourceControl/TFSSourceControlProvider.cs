@@ -34,7 +34,6 @@ namespace SvnBridge.SourceControl
 		private readonly string projectName;
 		private readonly string rootPath;
 		private readonly string serverUrl;
-        private OldSvnBridgeFilesSpecification ignoredFilesSpecification;
 
         private DefaultLogger Logger
 		{
@@ -73,10 +72,9 @@ namespace SvnBridge.SourceControl
 			string serverUrl,
 			string projectName,
 			ICredentials credentials,
-            SourceControlServicesHub sourceControlServicesHub, OldSvnBridgeFilesSpecification ignoredFilesSpecification)
+            SourceControlServicesHub sourceControlServicesHub)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
-			this.ignoredFilesSpecification = ignoredFilesSpecification;
 			this.credentials = credentials;
 			this.serverUrl = serverUrl;
 			this.projectName = projectName;
@@ -196,7 +194,7 @@ namespace SvnBridge.SourceControl
 				throw new FileNotFoundException(path);
 			}
 
-			var udc = new UpdateDiffCalculator(this, ignoredFilesSpecification);
+			var udc = new UpdateDiffCalculator(this);
 			udc.CalculateDiff(path, versionTo, versionFrom, root, reportData);
 			if (reportData.UpdateTarget != null)
 			{
