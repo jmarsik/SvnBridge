@@ -11,16 +11,10 @@ namespace SvnBridge.Infrastructure
 {
     public class Container
     {
-        public delegate object Creator(Container c, IDictionary dependencies);
+        private delegate object Creator(Container c, IDictionary constructorParams);
 
-        private readonly Dictionary<string, object> configuration = new Dictionary<string, object>();
         private readonly Dictionary<Type, bool> performedValidation = new Dictionary<Type, bool>();
         private readonly Dictionary<Type, Creator> typeToCreator = new Dictionary<Type, Creator>();
-
-    	public Dictionary<string, object> Configuration
-        {
-            get { return configuration; }
-        }
 
         public void Register(Type service, Type impl, params Type[] interceptorsType)
         {
@@ -35,14 +29,14 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-        public object Resolve(Type type, IDictionary dependencies)
+        public object Resolve(Type type, IDictionary constructorParams)
         {
             Creator creator;
             if (typeToCreator.TryGetValue(type, out creator) == false)
             {
                 throw new InvalidOperationException("No component registered for " + type);
             }
-            object resolve = creator(this, dependencies);
+            object resolve = creator(this, constructorParams);
             PerformEnvironmentValidation(type, resolve);
             return resolve;
         }
@@ -63,25 +57,7 @@ namespace SvnBridge.Infrastructure
             };
         }
 
-        private object TryGetConfiguration(string name)
-        {
-            object value;
-            if (configuration.TryGetValue(name, out value))
-            {
-                return value;
-            }
-            if (ConfigurationManager.AppSettings[name] != null)
-            {
-                return ConfigurationManager.AppSettings[name];
-            }
-            if (PerRequest.IsInitialized && PerRequest.Items.Contains(name))
-            {
-                return PerRequest.Items[name];
-            }
-            return null;
-        }
-
-        private object CreateInstance(Type type, IDictionary dictionary)
+        private object CreateInstance(Type type, IDictionary constructorParams)
         {
             List<object> args = new List<object>();
             ConstructorInfo[] constructors = type.GetConstructors();
@@ -92,28 +68,25 @@ namespace SvnBridge.Infrastructure
                     try
                     {
                         object arg;
-                        if (dictionary.Contains(info.Name))
+                        if (constructorParams.Contains(info.Name))
                         {
-                            arg = dictionary[info.Name];
+                            arg = constructorParams[info.Name];
                         }
-                        else
-                        {
-                        	if (IoC.Container.TryGetConfiguration(info.Name) != null)
-                        	{
-                        		arg = IoC.Container.TryGetConfiguration(info.Name);
-                        		arg = Convert.ChangeType(arg, info.ParameterType);
-                        	}
-                        	else
-                        	{
-                        		arg = IoC.Resolve(info.ParameterType, dictionary);
-                        	}
-                        }
+                        else if (TryGetConfiguration(info.Name) != null)
+                    	{
+                    		arg = TryGetConfiguration(info.Name);
+                    		arg = Convert.ChangeType(arg, info.ParameterType);
+                    	}
+                    	else
+                    	{
+                    		arg = Resolve(info.ParameterType, constructorParams);
+                    	}
                         args.Add(arg);
                     }
                     catch (Exception e)
                     {
                         throw new InvalidOperationException(
-                            "Failed when trying to resolve dependency '" + info.Name + "' for: " + type, e);
+                            "Failed trying to resolve constructor parameter '" + info.Name + "' for: " + type, e);
                     }
                 }
             }
@@ -125,6 +98,19 @@ namespace SvnBridge.Infrastructure
             {
                 return Activator.CreateInstance(type);
             }
+        }
+
+        private object TryGetConfiguration(string name)
+        {
+            if (ConfigurationManager.AppSettings[name] != null)
+            {
+                return ConfigurationManager.AppSettings[name];
+            }
+            if (PerRequest.IsInitialized && PerRequest.Items.Contains(name))
+            {
+                return PerRequest.Items[name];
+            }
+            return null;
         }
 
         private void PerformEnvironmentValidation(Type type, object resolve)

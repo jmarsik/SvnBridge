@@ -19,7 +19,6 @@ namespace SvnBridge
     {
         public BootStrapper()  
 		{
-            IoC.Container.Configuration["persistentCachePath"] = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MetaDataCache");
         	TfsUtil.OnSetupWebRequest = WebRequestSetup.OnWebRequest;
         }
 
