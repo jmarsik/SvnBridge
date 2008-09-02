@@ -1,5 +1,4 @@
 using System.Xml;
-using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using SvnBridge.PathParsing;
 using Xunit;

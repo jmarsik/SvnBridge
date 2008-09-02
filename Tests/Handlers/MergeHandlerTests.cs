@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using Attach;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
-using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.Exceptions;

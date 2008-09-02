@@ -1,5 +1,4 @@
 using System;
-using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Stubs;

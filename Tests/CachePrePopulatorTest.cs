@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CodePlex.TfsLibrary.ObjectModel;
-using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using Xunit;

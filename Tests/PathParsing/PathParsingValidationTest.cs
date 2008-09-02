@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.SourceControl;

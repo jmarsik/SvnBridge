@@ -1,5 +1,4 @@
 using System;
-using Rhino.Mocks;
 using SvnBridge.Infrastructure.Statistics;
 using SvnBridge.Interfaces;
 using SvnBridge.PathParsing;

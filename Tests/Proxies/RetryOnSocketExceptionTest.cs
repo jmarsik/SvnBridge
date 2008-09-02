@@ -2,89 +2,75 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using Xunit;
-using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using SvnBridge.Proxies;
 using Tests;
 using SvnBridge.Infrastructure;
+using SvnBridge.Stubs;
 
 namespace SvnBridge.Proxies
 {
-    public class RetryOnSocketExceptionTest : IDisposable
+    public class RetryOnSocketExceptionTest
     {
-        private readonly MockRepository mocks;
-        private readonly MyMocks attach;
+        private readonly MyMocks stubs;
 
         public RetryOnSocketExceptionTest()
         {
-            mocks = new MockRepository();
-            attach = new MyMocks();
-        }
-
-        public void Dispose()
-        {
-            mocks.VerifyAll();
+            stubs = new MyMocks();
         }
 
         [Fact]
         public void WillNotFailOnFirstSocketException()
         {
-			RetryOnExceptionsInterceptor<SocketException> interceptor = new RetryOnExceptionsInterceptor<SocketException>(attach.CreateObject<DefaultLogger>());
-            IInvocation mock = mocks.CreateMock<IInvocation>();
-            // first call throws
-            Expect.Call(mock.Proceed).Throw(new SocketException());
-
-            // second succeed
-            Expect.Call(mock.Proceed);
-
-            mocks.ReplayAll();
+			RetryOnExceptionsInterceptor<SocketException> interceptor = new RetryOnExceptionsInterceptor<SocketException>(stubs.CreateObject<DefaultLogger>());
+            StubInvocation mock = new StubInvocation();
+            mock.Proceed_ReturnList.Add(new SocketException());
+            mock.Proceed_ReturnList.Add(null);
 
             interceptor.Invoke(mock);
+
+            Assert.Equal(2, mock.Proceed_CallCount);
         }
 
         [Fact]
         public void WillNotFailOnFirstWebException()
         {
-            RetryOnExceptionsInterceptor<WebException> interceptor = new RetryOnExceptionsInterceptor<WebException>(attach.CreateObject<DefaultLogger>());
-            IInvocation mock = mocks.CreateMock<IInvocation>();
-            // first call throws
-            Expect.Call(mock.Proceed).Throw(new WebException());
-
-            // second succeed
-            Expect.Call(mock.Proceed);
-
-            mocks.ReplayAll();
+            RetryOnExceptionsInterceptor<WebException> interceptor = new RetryOnExceptionsInterceptor<WebException>(stubs.CreateObject<DefaultLogger>());
+            StubInvocation mock = new StubInvocation();
+            mock.Proceed_ReturnList.Add(new WebException());
+            mock.Proceed_ReturnList.Add(null);
 
             interceptor.Invoke(mock);
+
+            Assert.Equal(2, mock.Proceed_CallCount);
         }
 
         [Fact]
         public void WillFailOnNonSocketOrWebException()
         {
-            RetryOnExceptionsInterceptor<WebException> interceptor = new RetryOnExceptionsInterceptor<WebException>(attach.CreateObject<DefaultLogger>());
-            IInvocation mock = mocks.CreateMock<IInvocation>();
-          
-            Expect.Call(mock.Proceed).Throw(new InvalidOperationException());
-
-            mocks.ReplayAll();
+            RetryOnExceptionsInterceptor<WebException> interceptor = new RetryOnExceptionsInterceptor<WebException>(stubs.CreateObject<DefaultLogger>());
+            StubInvocation mock = new StubInvocation();
+            mock.Proceed_ReturnList.Add(new InvalidOperationException());
 
             Exception result = Record.Exception(delegate { interceptor.Invoke(mock); });
 
             Assert.IsType(typeof(InvalidOperationException), result);
+            Assert.Equal(1, mock.Proceed_CallCount);
         }
 
         [Fact]
         public void WillThrowAfterThreeAttempts()
         {
-            RetryOnExceptionsInterceptor<SocketException> interceptor = new RetryOnExceptionsInterceptor<SocketException>(attach.CreateObject<DefaultLogger>());
-            IInvocation mock = mocks.CreateMock<IInvocation>();
-            Expect.Call(mock.Proceed).Throw(new SocketException()).Repeat.Times(3);
-
-            mocks.ReplayAll();
+            RetryOnExceptionsInterceptor<SocketException> interceptor = new RetryOnExceptionsInterceptor<SocketException>(stubs.CreateObject<DefaultLogger>());
+            StubInvocation mock = new StubInvocation();
+            mock.Proceed_ReturnList.Add(new SocketException());
+            mock.Proceed_ReturnList.Add(new SocketException());
+            mock.Proceed_ReturnList.Add(new SocketException());
 
             Exception result = Record.Exception(delegate { interceptor.Invoke(mock); });
 
             Assert.IsType(typeof(SocketException), result);
+            Assert.Equal(3, mock.Proceed_CallCount);
         }
     }
 }

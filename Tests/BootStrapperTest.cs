@@ -2,30 +2,20 @@ using System;
 using System.Collections;
 using System.Net;
 using Xunit;
-using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using SvnBridge.Cache;
+using Tests;
 
 namespace SvnBridge
 {
 	public class BootStrapperTest : IDisposable
 	{
-		#region Setup/Teardown
-        public BootStrapperTest()
-        {
-            mocks = new MockRepository();
-        }
-
         public void Dispose()
         {
-            mocks.VerifyAll();
             IoC.Reset();
         }
-		#endregion
-
-		private MockRepository mocks;
 
 		[Fact]
 		public void AfterStartingBootStrapper_CanResolveCache_FromContainer()
@@ -49,39 +39,25 @@ namespace SvnBridge
 		[Fact]
 		public void ContainerWillCallEnvironmentValidation()
 		{
-			MockRepository mocks = new MockRepository();
-
-			ICanValidateMyEnvironment validate = mocks.CreateMock<ICanValidateMyEnvironment>();
-			validate.ValidateEnvironment();
-
-			mocks.ReplayAll();
-
+			StubCanValidateMyEnvironment validate = new StubCanValidateMyEnvironment();
 			IoC.Container.OverrideRegisteration(typeof(ICanValidateMyEnvironment), validate);
-
 
 			IoC.Resolve<ICanValidateMyEnvironment>();
 
-			mocks.VerifyAll();
+            Assert.Equal(1, validate.ValidateEnvironment_CallCount);
 		}
 
 		[Fact]
 		public void ContainerWillCallEnvironmentValidation_OnlyOnce()
 		{
-			MockRepository mocks = new MockRepository();
-
-			ICanValidateMyEnvironment validate = mocks.CreateMock<ICanValidateMyEnvironment>();
-			validate.ValidateEnvironment();
-			LastCall.Repeat.Once();
-
-			mocks.ReplayAll();
-
+            StubCanValidateMyEnvironment validate = new StubCanValidateMyEnvironment();
 			IoC.Container.OverrideRegisteration(typeof(ICanValidateMyEnvironment), validate);
 
 			IoC.Resolve<ICanValidateMyEnvironment>();
 			IoC.Resolve<ICanValidateMyEnvironment>();
 			IoC.Resolve<ICanValidateMyEnvironment>();
 
-			mocks.VerifyAll();
-		}
+            Assert.Equal(1, validate.ValidateEnvironment_CallCount);
+        }
     }
 }

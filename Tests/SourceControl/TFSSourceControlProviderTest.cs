@@ -1,8 +1,6 @@
 using System;
 using CodePlex.TfsLibrary.ObjectModel;
-using Rhino.Mocks.Impl;
 using Xunit;
-using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using Tests;
@@ -15,14 +13,12 @@ namespace SvnBridge.SourceControl
     public class TFSSourceControlProviderTest
     {
         private readonly MyMocks stubs;
-        private readonly MockRepository mocks;
         private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly TFSSourceControlProvider provider;
 
         public TFSSourceControlProviderTest()
         {
             stubs = new MyMocks();
-            mocks = new MockRepository();
             associateWorkItemWithChangeSet = stubs.CreateObject<AssociateWorkItemWithChangeSet>("http://www.codeplex.com", null);
             provider = new TFSSourceControlProvider(
                 "blah",

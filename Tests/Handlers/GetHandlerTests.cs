@@ -1,7 +1,6 @@
 using System.IO;
 using System.Text;
 using Attach;
-using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using Xunit;
 using SvnBridge.Infrastructure;

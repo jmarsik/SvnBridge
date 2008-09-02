@@ -9,7 +9,6 @@ using CodePlex.TfsLibrary.Utility;
 using SvnBridge;
 using SvnBridge.Net;
 using IntegrationTests.Properties;
-using Rhino.Mocks;
 using SvnBridge.Infrastructure;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;

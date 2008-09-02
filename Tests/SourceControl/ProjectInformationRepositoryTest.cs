@@ -3,8 +3,6 @@ using System.Net;
 using CodePlex.TfsLibrary.ObjectModel;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using Xunit;
-using Rhino.Mocks;
-using Rhino.Mocks.Constraints;
 using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
