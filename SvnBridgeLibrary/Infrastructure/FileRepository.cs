@@ -17,13 +17,11 @@ namespace SvnBridge.Infrastructure
     {
         private readonly ICredentials credentials;
         private readonly IWebTransferService webTransferService;
-        private readonly DefaultLogger logger;
 
-        public FileRepository(string serverUrl, ICredentials credentials, IWebTransferService webTransferService, DefaultLogger logger)
+        public FileRepository(string serverUrl, ICredentials credentials, IWebTransferService webTransferService)
         {
             this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
             this.webTransferService = webTransferService;
-            this.logger = logger;
         }
 
         public virtual byte[] GetFile(ItemMetaData item)

@@ -37,7 +37,7 @@ namespace SvnBridge.SourceControl
                 stubs.CreateObject<DefaultLogger>(),
                 stubs.CreateObject<WebCache>(),
                 stubs.CreateObject<MetaDataRepositoryFactory>(null, null, false),
-                stubs.CreateObject<FileRepository>("http://www.codeplex.com", null, null, null));
+                stubs.CreateObject<FileRepository>("http://www.codeplex.com", null, null));
         }
 
         [Fact]

@@ -38,7 +38,7 @@ namespace IntegrationTests
 																						  factory1,
 																						  webTransferService,
 																						  system,
-                                                                                          mock.CreateObject<DefaultLogger>());
+                                                                                          stubs.CreateObject<DefaultLogger>());
 			TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
 																			 PROJECT_NAME,
 																			 null,

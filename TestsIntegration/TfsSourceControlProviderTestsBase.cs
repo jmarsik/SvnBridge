@@ -20,7 +20,7 @@ namespace IntegrationTests
 	public abstract class TFSSourceControlProviderTestsBase : IDisposable
 	{
 		public string ServerUrl = Settings.Default.ServerUrl;
-        protected MyMocks mock;
+        protected MyMocks stubs;
 		protected const string PROJECT_NAME = "SvnBridgeTesting";
 		protected readonly string _activityId;
 		protected string _activityIdRoot;
@@ -35,7 +35,7 @@ namespace IntegrationTests
 
 		public TFSSourceControlProviderTestsBase()
 		{
-            mock = new MyMocks();
+            stubs = new MyMocks();
 			PerRequest.Init();
 			new BootStrapper().Start();
             Container.Resolve<MemoryBasedPersistentCache>().Clear();
@@ -75,19 +75,18 @@ namespace IntegrationTests
 			RegistrationService service = new RegistrationService(factory);
 			RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
 			WebTransferService webTransferService = new WebTransferService(system);
-			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service, factory1, webTransferService, system, mock.CreateObject<DefaultLogger>());
+			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service, factory1, webTransferService, system, stubs.CreateObject<DefaultLogger>());
             MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, Container.Resolve<MemoryBasedPersistentCache>(), Settings.Default.CacheEnabled);
 			ProjectInformationRepository repository = new ProjectInformationRepository(metaDataRepositoryFactory,ServerUrl);
             ICredentials credentials = GetCredentials();
-            DefaultLogger logger = mock.CreateObject<DefaultLogger>();
-            FileRepository fileRepository = new FileRepository(ServerUrl, credentials, webTransferService, logger);
+            FileRepository fileRepository = new FileRepository(ServerUrl, credentials, webTransferService);
 			return new SourceControlServicesHub(
 				credentials,
 				tfsSourceControlService,
 				repository,
 				associateWorkItemWithChangeSet,
-				logger,
-                mock.CreateObject<WebCache>(),
+                stubs.CreateObject<DefaultLogger>(),
+                stubs.CreateObject<WebCache>(),
 				metaDataRepositoryFactory,
                 fileRepository);
 		}
