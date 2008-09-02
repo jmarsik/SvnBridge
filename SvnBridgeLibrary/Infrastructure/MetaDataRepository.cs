@@ -14,14 +14,14 @@ namespace SvnBridge.Infrastructure
     [Interceptor(typeof(TracingInterceptor))]
     public class MetaDataRepository : IMetaDataRepository
     {
-        private readonly ITFSSourceControlService sourceControlService;
+        private readonly TFSSourceControlService sourceControlService;
         private readonly string serverUrl;
         private readonly string rootPath;
         private readonly ICredentials credentials;
         private readonly MemoryBasedPersistentCache persistentCache;
 
         public MetaDataRepository(
-            ITFSSourceControlService sourceControlService,
+            TFSSourceControlService sourceControlService,
             ICredentials credentials,
             MemoryBasedPersistentCache persistentCache,
             string serverUrl,

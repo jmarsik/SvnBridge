@@ -35,7 +35,7 @@ namespace SvnBridge.SourceControl
         {
             return new SourceControlServicesHub(
                 System.Net.CredentialCache.DefaultCredentials,
-                MockRepository.GenerateStub<ITFSSourceControlService>(),
+                new StubTFSSourceControlService(),
                 MockRepository.GenerateStub<IProjectInformationRepository>(),
                 associateWorkItemWithChangeSet,
                 attach.CreateObject<DefaultLogger>(),

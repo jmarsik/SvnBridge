@@ -43,7 +43,7 @@ namespace SvnBridge
 			dependencies["projectName"] = "as";
 			dependencies["credentials"] = CredentialCache.DefaultCredentials;
 			dependencies["rootCachePath"] = ".";
-			Assert.NotNull(IoC.Resolve<ITFSSourceControlService>(dependencies));
+			Assert.NotNull(IoC.Resolve<TFSSourceControlService>(dependencies));
 		}
 
 		[Fact]

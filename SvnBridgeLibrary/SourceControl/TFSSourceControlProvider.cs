@@ -51,7 +51,7 @@ namespace SvnBridge.SourceControl
 			get { return sourceControlServicesHub.FileRepository; }
 		}
 
-		private ITFSSourceControlService SourceControlService
+		private TFSSourceControlService SourceControlService
 		{
 			get { return sourceControlServicesHub.SourceControlService; }
 		}

@@ -7,11 +7,11 @@ namespace SvnBridge.Infrastructure
 {
 	public class MetaDataRepositoryFactory
 	{
-		private readonly ITFSSourceControlService sourceControlService;
+		private readonly TFSSourceControlService sourceControlService;
         private readonly MemoryBasedPersistentCache persistentCache;
         private readonly bool cacheEnabled;
 
-        public MetaDataRepositoryFactory(ITFSSourceControlService sourceControlService, MemoryBasedPersistentCache persistentCache, bool cacheEnabled)
+        public MetaDataRepositoryFactory(TFSSourceControlService sourceControlService, MemoryBasedPersistentCache persistentCache, bool cacheEnabled)
 		{
 			this.sourceControlService = sourceControlService;
 			this.persistentCache = persistentCache;

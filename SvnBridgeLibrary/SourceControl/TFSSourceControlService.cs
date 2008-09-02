@@ -11,7 +11,7 @@ using SvnBridge.Infrastructure;
 
 namespace SvnBridge.SourceControl
 {
-	public class TFSSourceControlService : SourceControlService, ITFSSourceControlService
+	public class TFSSourceControlService : SourceControlService
 	{
         private readonly DefaultLogger logger;
 		private readonly IRepositoryWebSvcFactory webSvcFactory;

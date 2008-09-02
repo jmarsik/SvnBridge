@@ -131,7 +131,6 @@
     <Compile Include="SourceControl\FindOrCreateResults.cs" />
     <Compile Include="SourceControl\FutureFile.cs" />
     <Compile Include="SourceControl\FutureInvocationException.cs" />
-    <Compile Include="SourceControl\ITFSSourceControlService.cs" />
     <Compile Include="SourceControl\MissingItemMetaData.cs" />
     <Compile Include="SourceControl\ProjectLocationInformation.cs" />
     <Compile Include="SourceControl\ProjectInformationRepository.cs" />
