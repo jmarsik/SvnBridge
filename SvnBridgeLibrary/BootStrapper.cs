@@ -24,11 +24,11 @@ namespace SvnBridge
 
         public void Start()
         {
-            IoC.Register(typeof(IRegistrationService), typeof(RegistrationService));
-            IoC.Register(typeof(IWebTransferService), typeof(WebTransferService));
-            IoC.Register(typeof(IRegistrationWebSvcFactory), typeof(RegistrationWebSvcFactory));
-            IoC.Register(typeof(IRepositoryWebSvcFactory), typeof(RepositoryWebSvcFactory));
-            IoC.Register(typeof(IFileSystem), typeof(FileSystem));
+            Container.Register(typeof(IRegistrationService), typeof(RegistrationService));
+            Container.Register(typeof(IWebTransferService), typeof(WebTransferService));
+            Container.Register(typeof(IRegistrationWebSvcFactory), typeof(RegistrationWebSvcFactory));
+            Container.Register(typeof(IRepositoryWebSvcFactory), typeof(RepositoryWebSvcFactory));
+            Container.Register(typeof(IFileSystem), typeof(FileSystem));
         }
     }
 }

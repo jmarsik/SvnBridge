@@ -132,7 +132,7 @@ namespace SvnBridge
         {
             Proxy.Set(proxyInformation);
 
-            var listener = IoC.Resolve<Listener>();
+            var listener = Container.Resolve<Listener>();
 
             listener.Port = port;
 

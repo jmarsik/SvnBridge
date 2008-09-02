@@ -29,7 +29,7 @@ namespace SvnBridge.SourceControl
                 deps["serverUrl"] = serverUrl;
                 deps["projectName"] = projectName;
                 deps["credentials"] = credentials;
-                return IoC.Resolve<TFSSourceControlProvider>(deps);
+                return Container.Resolve<TFSSourceControlProvider>(deps);
             }
             else
             {

@@ -11,12 +11,29 @@ namespace SvnBridge.Infrastructure
 {
     public class Container
     {
+        private static Container container = new Container();
+
+        public static void Register(Type service, Type impl)
+        {
+            container.RegisterType(service, impl);
+        }
+
+        public static T Resolve<T>()
+        {
+            return (T)container.ResolveType(typeof(T), new Hashtable());
+        }
+
+        public static T Resolve<T>(IDictionary constructorParams)
+        {
+            return (T)container.ResolveType(typeof(T), constructorParams);
+        }
+
         private delegate object Creator(IDictionary constructorParams);
 
         private readonly Dictionary<Type, Creator> typeToCreator = new Dictionary<Type, Creator>();
         private readonly Dictionary<Type, bool> performedValidation = new Dictionary<Type, bool>();
 
-        public void Register(Type service, Type impl)
+        public void RegisterType(Type service, Type impl)
         {
             if (!typeToCreator.ContainsKey(service))
             {
@@ -32,7 +49,7 @@ namespace SvnBridge.Infrastructure
             }
         }
 
-        public object Resolve(Type type, IDictionary constructorParams)
+        public object ResolveType(Type type, IDictionary constructorParams)
         {
             Creator creator;
             bool typeRegistered;
@@ -46,7 +63,7 @@ namespace SvnBridge.Infrastructure
                 {
                     throw new InvalidOperationException("No component registered for interface " + type);
                 }
-                Register(type, type);
+                RegisterType(type, type);
                 lock (typeToCreator)
                 {
                     creator = typeToCreator[type];
@@ -65,7 +82,7 @@ namespace SvnBridge.Infrastructure
                 List<IInterceptor> interceptors = new List<IInterceptor>();
                 foreach (Type interceptorType in interceptorTypes)
                 {
-                    interceptors.Add((IInterceptor)Resolve(interceptorType, constructorParams));
+                    interceptors.Add((IInterceptor)ResolveType(interceptorType, constructorParams));
                 }
                 if (interceptors.Count == 0)
                     return instance;
@@ -95,7 +112,7 @@ namespace SvnBridge.Infrastructure
                     	}
                     	else
                     	{
-                    		arg = Resolve(info.ParameterType, constructorParams);
+                    		arg = ResolveType(info.ParameterType, constructorParams);
                     	}
                         args.Add(arg);
                     }
@@ -136,7 +153,7 @@ namespace SvnBridge.Infrastructure
             foreach (object attribute in attributes)
             {
                 Type interceptorType = ((InterceptorAttribute)attribute).Interceptor;
-                Register(interceptorType, interceptorType);
+                RegisterType(interceptorType, interceptorType);
                 interceptors.Add(interceptorType);
             }
             return interceptors;

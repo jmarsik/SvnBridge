@@ -63,7 +63,7 @@ namespace SvnBridge.Presenters
 
 		public void StartListener()
 		{
-			IPathParser parser = new RequestBasePathParser(IoC.Resolve<TfsUrlValidator>());
+			IPathParser parser = new RequestBasePathParser(Container.Resolve<TfsUrlValidator>());
 			listener.Start(parser);
 			view.OnListenerStarted();
 		}

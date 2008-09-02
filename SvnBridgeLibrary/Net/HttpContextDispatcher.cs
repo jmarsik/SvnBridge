@@ -65,7 +65,7 @@ namespace SvnBridge.Net
                 IHttpRequest request = connection.Request;
                 if ("/!stats/request".Equals(request.LocalPath, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    new StatsRenderer(IoC.Resolve<ActionTrackingViaPerfCounter>()).Render(connection);
+                    new StatsRenderer(Container.Resolve<ActionTrackingViaPerfCounter>()).Render(connection);
                     return;
                 }
 

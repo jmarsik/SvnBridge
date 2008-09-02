@@ -8,34 +8,14 @@ using System;
 
 namespace SvnBridge.Presenters
 {
-	public class ListenerViewPresenterTests : IDisposable
+	public class ListenerViewPresenterTests
 	{
-		#region Setup/Teardown
-
         public ListenerViewPresenterTests()
         {
-            IoC.Register(typeof(TfsUrlValidator), typeof(StubTfsUrlValidator));
             stubListener = new StubListener();
             stubView = new StubListenerView();
             stubErrorView = new StubErrorsView();
         }
-
-        public void Dispose()
-        {
-            IoC.Reset();
-        }
-
-        public class StubTfsUrlValidator : TfsUrlValidator
-        {
-            public StubTfsUrlValidator() : base(null) { }
-
-            public override bool IsValidTfsServerUrl(string url)
-            {
-                throw new System.NotImplementedException();
-            }
-        }
-
-		#endregion
 
 		private readonly StubListenerView stubView;
 		private readonly StubListener stubListener;

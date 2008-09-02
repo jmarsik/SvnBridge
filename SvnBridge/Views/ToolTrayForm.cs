@@ -20,7 +20,7 @@ namespace SvnBridge.Views
 			showErrorsToolStripMenuItem.Click += OnShowErrorsClick;
             invokeDeubgger.Click+=((sender, e) => Debugger.Launch());
             cacheClear.Click += (sender, e) => {
-                IoC.Resolve<MemoryBasedPersistentCache>().Clear();
+                SvnBridge.Infrastructure.Container.Resolve<MemoryBasedPersistentCache>().Clear();
                 GC.Collect(2);
             };
         }

@@ -18,14 +18,14 @@ namespace SvnBridge.Web
 		{
 			string tfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
 		    PerRequest.Items["serverUrl"] = tfsUrl;
-		    ProjectInformationRepository projectInformationRepository = IoC.Resolve<ProjectInformationRepository>();
+		    ProjectInformationRepository projectInformationRepository = Container.Resolve<ProjectInformationRepository>();
 		    if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
 			{
-                dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl, projectInformationRepository), IoC.Resolve<ActionTrackingViaPerfCounter>());
+                dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl, projectInformationRepository), Container.Resolve<ActionTrackingViaPerfCounter>());
 			}
 			else
 			{
-                dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl, projectInformationRepository), IoC.Resolve<ActionTrackingViaPerfCounter>());
+                dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl, projectInformationRepository), Container.Resolve<ActionTrackingViaPerfCounter>());
 			}
 		}
 

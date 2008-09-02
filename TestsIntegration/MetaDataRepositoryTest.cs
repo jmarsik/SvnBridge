@@ -26,10 +26,10 @@ namespace IntegrationTests
 		public MetaDataRepositoryTest()
 		{
 			credentials = GetCredentials();
-			sourceControlService = IoC.Resolve<TFSSourceControlService>();
+			sourceControlService = Container.Resolve<TFSSourceControlService>();
 
 			repository = new MetaDataRepository(sourceControlService, credentials,
-                                                IoC.Resolve<MemoryBasedPersistentCache>(), ServerUrl, Constants.ServerRootPath + PROJECT_NAME);
+                                                Container.Resolve<MemoryBasedPersistentCache>(), ServerUrl, Constants.ServerRootPath + PROJECT_NAME);
 		}
 
 	    [Fact]
