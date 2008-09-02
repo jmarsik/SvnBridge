@@ -8,6 +8,7 @@ using System.Net;
 using SvnBridge.Stubs;
 using System.Collections.Specialized;
 using SvnBridge.Infrastructure.Statistics;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Net
 {
@@ -125,7 +126,7 @@ namespace SvnBridge.Net
             Handle_credentials = credentials;
         }
 
-        protected override void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider)
         {
         }
     }

@@ -13,10 +13,10 @@ namespace SvnBridge.Nodes
     public class FileNode : INode
     {
         private readonly ItemMetaData item;
-        private readonly ISourceControlProvider sourceControlProvider;
+        private readonly TFSSourceControlProvider sourceControlProvider;
 
         public FileNode(ItemMetaData item,
-                        ISourceControlProvider sourceControlProvider)
+                        TFSSourceControlProvider sourceControlProvider)
         {
             this.item = item;
             this.sourceControlProvider = sourceControlProvider;

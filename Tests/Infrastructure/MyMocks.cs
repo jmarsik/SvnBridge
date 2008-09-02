@@ -6,6 +6,7 @@ using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Cache;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
+using SvnBridge.Infrastructure;
 
 namespace Tests
 {
@@ -36,6 +37,13 @@ namespace Tests
 
     public class MyMocks : MockFramework
     {
+        public TFSSourceControlProvider CreateTFSSourceControlProviderStub()
+        {
+            TFSSourceControlProvider stub = CreateObject<TFSSourceControlProvider>("http://www.codeplex.com", null, null, new SourceControlServicesHub(null, null, null, null, null, null, null, null, null), null);
+            this.Attach(stub.GetRepositoryUuid, Return.Value(new Guid("81a5aebe-f34e-eb42-b435-ac1ecbb335f7")));
+            return stub;
+        }
+
         public delegate void Associate(int workItemId, int changeSetId);
         public delegate void SetWorkItemFixed(int workItemId);
         public delegate void CopyItem(string activityId, string path, string targetPath);
@@ -56,6 +64,7 @@ namespace Tests
         public delegate void SetProperty(string activityId, string path, string property, string value);
         public delegate int StreamRead(byte[] buffer, int offset, int count);
         public delegate bool WriteFile(string activityId, string path, byte[] fileData);
+        public delegate Guid GetRepositoryUuid();
 
         public Results Attach(DeleteItem method, bool returnValue)
         {
@@ -196,6 +205,16 @@ namespace Tests
         public Results Attach(SetWorkItemFixed method)
         {
             return base.Attach((Delegate)method);
+        }
+
+        public Results Attach(GetRepositoryUuid method, Return action)
+        {
+            return base.Attach((Delegate)method, action);
+        }
+
+        public Results Attach(GetItems method, Return action)
+        {
+            return base.Attach((Delegate)method, action);
         }
     }
 }

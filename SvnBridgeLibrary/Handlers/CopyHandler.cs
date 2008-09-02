@@ -2,13 +2,14 @@ using System.Text;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Utility;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
     public class CopyHandler : HttpContextHandlerBase
     {
         protected override void Handle(IHttpContext context,
-                                       ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;

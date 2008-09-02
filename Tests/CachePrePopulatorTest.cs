@@ -5,29 +5,22 @@ using Rhino.Mocks;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using Xunit;
+using Tests;
+using Attach;
 
 namespace SvnBridge
 {
-    public class CachePrePopulatorTest : IDisposable
+    public class CachePrePopulatorTest
     {
+        private readonly MyMocks stubs = new MyMocks();
         private readonly CachePrePopulator cachePopulator;
-        private readonly MockRepository mocks = new MockRepository();
-        private readonly ISourceControlProvider sourceControlProvider;
+        private readonly TFSSourceControlProvider sourceControlProvider;
 
         public CachePrePopulatorTest()
         {
-            sourceControlProvider = mocks.CreateMock<ISourceControlProvider>();
+            sourceControlProvider = stubs.CreateTFSSourceControlProviderStub();
             cachePopulator = new CachePrePopulator(sourceControlProvider);
         }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            mocks.VerifyAll();
-        }
-
-        #endregion
 
         [Fact]
         public void WillCallGetItemsOnSeparateItemsInTheCache()
@@ -39,13 +32,13 @@ namespace SvnBridge
                     new SourceItemChange {Item = new SourceItem {RemoteName = "$/SvnBridge/foo"}},
                 }
             };
-
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/foo", Recursion.Full))
-                .Return(null);
-
-            mocks.ReplayAll();
+            Results r1 = stubs.Attach(sourceControlProvider.GetItems, Return.Value(null));
 
             cachePopulator.PrePopulateCacheWithChanges(history, 15);
+
+            Assert.Equal(15, r1.Parameters[0]);
+            Assert.Equal("$/SvnBridge/foo", r1.Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.Parameters[2]);
         }
 
 
@@ -62,13 +55,13 @@ namespace SvnBridge
                     new SourceItemChange {Item = new SourceItem {RemoteName = "$/SvnBridge/foo/1/2/3"}},
                 }
             };
-
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/foo", Recursion.Full))
-                .Return(null);
-
-            mocks.ReplayAll();
+            Results r1 = stubs.Attach(sourceControlProvider.GetItems, Return.Value(null));
 
             cachePopulator.PrePopulateCacheWithChanges(history, 15);
+
+            Assert.Equal(15, r1.Parameters[0]);
+            Assert.Equal("$/SvnBridge/foo", r1.Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.Parameters[2]);
         }
 
         [Fact]
@@ -82,13 +75,13 @@ namespace SvnBridge
                     new SourceItemChange {Item = new SourceItem {RemoteName = "$/SvnBridge/foo/1/2/3"}},
                 }
             };
-
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/foo", Recursion.Full))
-                .Return(null);
-
-            mocks.ReplayAll();
+            Results r1 = stubs.Attach(sourceControlProvider.GetItems, Return.Value(null));
 
             cachePopulator.PrePopulateCacheWithChanges(history, 15);
+
+            Assert.Equal(15, r1.Parameters[0]);
+            Assert.Equal("$/SvnBridge/foo", r1.Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.Parameters[2]);
         }
 
 
@@ -105,13 +98,13 @@ namespace SvnBridge
                     new SourceItemChange {Item = new SourceItem {RemoteName = "$/SvnBridge/foo/1/2/3"}},
                 }
             };
-
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/foo", Recursion.Full))
-                .Return(null);
-
-            mocks.ReplayAll();
+            Results r1 = stubs.Attach(sourceControlProvider.GetItems, Return.Value(null));
 
             cachePopulator.PrePopulateCacheWithChanges(history, 15);
+
+            Assert.Equal(15, r1.Parameters[0]);
+            Assert.Equal("$/SvnBridge/foo", r1.Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.Parameters[2]);
         }
 
         [Fact]
@@ -129,13 +122,13 @@ namespace SvnBridge
                     new SourceItemChange {Item = new SourceItem {RemoteName = "$/SvnBridge/fey"}},
                 }
             };
-
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge", Recursion.Full))
-                .Return(null);
-
-            mocks.ReplayAll();
+            Results r1 = stubs.Attach(sourceControlProvider.GetItems, Return.Value(null));
 
             cachePopulator.PrePopulateCacheWithChanges(history, 15);
+
+            Assert.Equal(15, r1.Parameters[0]);
+            Assert.Equal("$/SvnBridge", r1.Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.Parameters[2]);
         }
 
         [Fact]
@@ -151,19 +144,22 @@ namespace SvnBridge
                     new SourceItemChange {Item = new SourceItem {RemoteName = "$/SvnBridge/baz"}},
                 }
             };
-
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/foo", Recursion.Full))
-                .Return(null);
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/bar", Recursion.Full))
-                            .Return(null);
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/fubar", Recursion.Full))
-                            .Return(null);
-            Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge/baz", Recursion.Full))
-                            .Return(null);
-
-            mocks.ReplayAll();
+            Results r1 = stubs.Attach(sourceControlProvider.GetItems, Return.Value(null));
 
             cachePopulator.PrePopulateCacheWithChanges(history, 15);
+
+            Assert.Equal(15, r1.History[0].Parameters[0]);
+            Assert.Equal("$/SvnBridge/foo", r1.History[0].Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.History[0].Parameters[2]);
+            Assert.Equal(15, r1.History[1].Parameters[0]);
+            Assert.Equal("$/SvnBridge/bar", r1.History[1].Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.History[1].Parameters[2]);
+            Assert.Equal(15, r1.History[2].Parameters[0]);
+            Assert.Equal("$/SvnBridge/fubar", r1.History[2].Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.History[2].Parameters[2]);
+            Assert.Equal(15, r1.History[3].Parameters[0]);
+            Assert.Equal("$/SvnBridge/baz", r1.History[3].Parameters[1]);
+            Assert.Equal(Recursion.Full, r1.History[3].Parameters[2]);
         }
 
         [Fact]
@@ -181,15 +177,16 @@ namespace SvnBridge
                     new SourceItemChange {Item = new SourceItem {RemoteName = "$/SvnBridge6"}},
                 }
             };
-            for (int i = 0; i < 6; i++)
-            {
-                Expect.Call(sourceControlProvider.GetItems(15, "$/SvnBridge" + (i+1), Recursion.Full))
-                          .Return(null);
-            }
-
-            mocks.ReplayAll();
+            Results r1 = stubs.Attach(sourceControlProvider.GetItems, Return.Value(null));
 
             cachePopulator.PrePopulateCacheWithChanges(history, 15);
+
+            for (int i = 0; i < 6; i++)
+            {
+                Assert.Equal(15, r1.History[i].Parameters[0]);
+                Assert.Equal("$/SvnBridge" + (i + 1), r1.History[i].Parameters[1]);
+                Assert.Equal(Recursion.Full, r1.History[i].Parameters[2]);
+            }
         }
     }
 }

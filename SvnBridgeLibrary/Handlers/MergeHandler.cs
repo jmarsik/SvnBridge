@@ -13,7 +13,7 @@ namespace SvnBridge.Handlers
 	public class MergeHandler : HttpContextHandlerBase
 	{
 		protected override void Handle(IHttpContext context,
-									   ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
 		{
 			IHttpRequest request = context.Request;
 			IHttpResponse response = context.Response;

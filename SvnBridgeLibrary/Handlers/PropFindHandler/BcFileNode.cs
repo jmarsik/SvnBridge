@@ -15,7 +15,7 @@ namespace SvnBridge.Nodes
 
         public BcFileNode(int requestVersion,
                           ItemMetaData item,
-                          ISourceControlProvider sourceControlProvider)
+                          TFSSourceControlProvider sourceControlProvider)
         {
             this.requestVersion = requestVersion;
             this.item = item;

@@ -6,13 +6,14 @@ using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Protocol;
 using SvnBridge.Utility;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
 	public class PropPatchHandler : HttpContextHandlerBase
 	{
 		protected override void Handle(IHttpContext context,
-									   ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
 		{
 			IHttpRequest request = context.Request;
 			IHttpResponse response = context.Response;
@@ -32,7 +33,7 @@ namespace SvnBridge.Handlers
 			}
 		}
 
-		private void PropPatch(ISourceControlProvider sourceControlProvider,
+        private void PropPatch(TFSSourceControlProvider sourceControlProvider,
 							   PropertyUpdateData request,
 							   string path,
 							   TextWriter output)
@@ -82,7 +83,7 @@ namespace SvnBridge.Handlers
 			return propertyName;
 		}
 
-		private void OutputSetPropertiesResponse(string path, PropertyUpdateData request, ISourceControlProvider sourceControlProvider, string activityId, TextWriter output, string itemPath)
+        private void OutputSetPropertiesResponse(string path, PropertyUpdateData request, TFSSourceControlProvider sourceControlProvider, string activityId, TextWriter output, string itemPath)
 		{
 			foreach (XmlElement prop in request.Set.Prop.Properties)
 			{
@@ -121,7 +122,7 @@ namespace SvnBridge.Handlers
 			output.Write("</D:prop>\n");
 		}
 
-		private void OutputLogResponse(string path, PropertyUpdateData request, ISourceControlProvider sourceControlProvider, string activityId, TextWriter output)
+        private void OutputLogResponse(string path, PropertyUpdateData request, TFSSourceControlProvider sourceControlProvider, string activityId, TextWriter output)
 		{
 			sourceControlProvider.SetActivityComment(activityId, request.Set.Prop.Properties[0].InnerText);
 			output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");

@@ -4,165 +4,144 @@ using CodePlex.TfsLibrary.ObjectModel;
 using SvnBridge.Interfaces;
 using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
+using SvnBridge.Infrastructure;
 
 namespace Tests
 {
-    public class StubSourceControlProvider : ISourceControlProvider
+    public class StubSourceControlProvider : TFSSourceControlProvider
     {
-        #region ISourceControlProvider Members
+        public StubSourceControlProvider() : base("http://www.codeplex.com", null, null, new SourceControlServicesHub(null, null, null, null, null, null, null, null, null), null) { }
 
-        public virtual ItemMetaData GetItemInActivity(string activityId,
-                                                      string path)
+        public int GetLatestVersion_Return;
+
+        public override ItemMetaData GetItemInActivity(string activityId, string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void MakeActivity(string activityId)
+        public override void MakeActivity(string activityId)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void SetActivityComment(string activityId,
-                                               string comment)
+        public override void SetActivityComment(string activityId, string comment)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool WriteFile(string activityId,
-                                      string path,
-                                      byte[] fileData)
+        public override bool WriteFile(string activityId, string path, byte[] fileData)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void ReadFileAsync(ItemMetaData item)
+        public override void ReadFileAsync(ItemMetaData item)
         {
             throw new NotImplementedException();
         }
 
-    	public Guid GetRepositoryUuid()
+    	public override Guid GetRepositoryUuid()
     	{
 			return new Guid("81a5aebe-f34e-eb42-b435-ac1ecbb335f7");
     	}
 
-        public virtual int GetVersionForDate(DateTime date)
+        public override int GetVersionForDate(DateTime date)
         {
             throw new NotImplementedException();
         }
 
-    	public virtual ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset)
+    	public override ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset)
     	{
     		throw new NotImplementedException();
     	}
 
-    	public virtual MergeActivityResponse MergeActivity(string activityId)
+    	public override MergeActivityResponse MergeActivity(string activityId)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void DeleteActivity(string activityId)
+        public override void DeleteActivity(string activityId)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual byte[] ReadFile(ItemMetaData item)
+        public override byte[] ReadFile(ItemMetaData item)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool ItemExists(string path)
+        public override bool ItemExists(string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual LogItem GetLog(string path,
-                                      int versionFrom,
-                                      int versionTo,
-                                      Recursion recursion,
-                                      int maxCount)
+        public override LogItem GetLog(string path, int versionFrom, int versionTo, Recursion recursion, int maxCount)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual ItemMetaData GetItems(int version,
-                                             string path,
-                                             Recursion recursion)
+        public override ItemMetaData GetItems(int version, string path, Recursion recursion)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual ItemMetaData GetItemsWithoutProperties(int version, string path, Recursion recursion)
+        public override ItemMetaData GetItemsWithoutProperties(int version, string path, Recursion recursion)
         {
             return GetItems(version, path, recursion);
         }
 
-        public virtual bool IsDirectory(int version,
-                                        string path)
+        public override bool IsDirectory(int version, string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual int GetLatestVersion()
+        public override int GetLatestVersion()
+        {
+            return GetLatestVersion_Return;
+        }
+
+        public override void MakeCollection(string activityId, string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual void MakeCollection(string activityId,
-                                           string path)
+        public override bool ItemExists(string path, int version)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual bool ItemExists(string path,
-                                       int version)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-    	public virtual bool ItemExists(int itemId, int version)
+    	public override bool ItemExists(int itemId, int version)
     	{
     		throw new NotImplementedException();
     	}
 
-    	public virtual void SetProperty(string activityId,
-                                        string path,
-                                        string property,
-                                        string value)
+    	public override void SetProperty(string activityId, string path, string property, string value)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-    	public void RemoveProperty(string activityId, string path, string property)
+    	public override void RemoveProperty(string activityId, string path, string property)
     	{
     		throw new NotImplementedException();
     	}
 
-    	public virtual bool DeleteItem(string activityId,
-                                       string path)
+    	public override bool DeleteItem(string activityId, string path)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public virtual FolderMetaData GetChangedItems(string path,
-                                                      int versionFrom,
-                                                      int VersionTo,
-                                                      UpdateReportData reportData)
+        public override FolderMetaData GetChangedItems(string path, int versionFrom, int VersionTo, UpdateReportData reportData)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public string ServerUrl
+        public override string ServerUrl
         {
             get { throw new NotImplementedException(); }
         }
 
-        public virtual void CopyItem(string activityId,
-                                     string path,
-                                     string targetPath)
+        public override void CopyItem(string activityId, string path, string targetPath)
         {
             throw new Exception("The method or operation is not implemented.");
         }
-
-        #endregion
     }
 }

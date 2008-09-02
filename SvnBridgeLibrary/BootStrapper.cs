@@ -37,7 +37,7 @@ namespace SvnBridge
             RegisterType(typeof(Listener), typeof(Listener));
             RegisterType(typeof(AssociateWorkItemWithChangeSet), typeof(AssociateWorkItemWithChangeSet));
             RegisterType(typeof(WebCache), typeof(WebCache));
-            RegisterType(typeof(ISourceControlProvider), typeof(TFSSourceControlProvider));
+            RegisterType(typeof(TFSSourceControlProvider), typeof(TFSSourceControlProvider));
             RegisterType(typeof(ITFSSourceControlService), typeof(TFSSourceControlService));
             RegisterType(typeof(IProjectInformationRepository), typeof(ProjectInformationRepository));
             RegisterType(typeof(ITfsUrlValidator), typeof(TfsUrlValidator));

@@ -10,9 +10,9 @@ namespace SvnBridge.Infrastructure
     public class AsyncItemLoader
     {
         private readonly FolderMetaData folderInfo;
-        private readonly ISourceControlProvider sourceControlProvider;
+        private readonly TFSSourceControlProvider sourceControlProvider;
 
-        public AsyncItemLoader(FolderMetaData folderInfo, ISourceControlProvider sourceControlProvider)
+        public AsyncItemLoader(FolderMetaData folderInfo, TFSSourceControlProvider sourceControlProvider)
         {
             this.folderInfo = folderInfo;
             this.sourceControlProvider = sourceControlProvider;

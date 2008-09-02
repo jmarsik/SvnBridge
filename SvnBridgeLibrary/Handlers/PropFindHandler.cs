@@ -18,7 +18,7 @@ namespace SvnBridge.Handlers
     public class PropFindHandler : HttpContextHandlerBase
     {
         protected override void Handle(IHttpContext context,
-                                       ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -67,7 +67,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void HandleSvnSyncProp(ISourceControlProvider sourceControlProvider, string requestPath, Stream stream)
+        private void HandleSvnSyncProp(TFSSourceControlProvider sourceControlProvider, string requestPath, Stream stream)
         {
             ItemMetaData firstVersion = GetItems(sourceControlProvider, 1, Constants.ServerRootPath, Recursion.None, true);
 
@@ -104,7 +104,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static FolderMetaData GetFolderInfo(ISourceControlProvider sourceControlProvider,
+        private static FolderMetaData GetFolderInfo(TFSSourceControlProvider sourceControlProvider,
                                                     string depth,
                                                     string path,
                                                     int? version,
@@ -129,7 +129,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static ItemMetaData GetItems(ISourceControlProvider sourceControlProvider,
+        private static ItemMetaData GetItems(TFSSourceControlProvider sourceControlProvider,
                                              int version,
                                              string path,
                                              Recursion recursion,
@@ -142,7 +142,7 @@ namespace SvnBridge.Handlers
                 return sourceControlProvider.GetItemsWithoutProperties(version, Helper.Decode(path), recursion);
         }
 
-        private void HandleAllProp(ISourceControlProvider sourceControlProvider,
+        private void HandleAllProp(TFSSourceControlProvider sourceControlProvider,
                                    string requestPath,
                                    Stream outputStream)
         {
@@ -172,7 +172,7 @@ namespace SvnBridge.Handlers
         private void WriteAllPropForFolder(TextWriter writer,
                                            string requestPath,
                                            ItemMetaData item,
-                                           ISourceControlProvider sourceControlProvider)
+                                           TFSSourceControlProvider sourceControlProvider)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
@@ -210,7 +210,7 @@ namespace SvnBridge.Handlers
                                          string requestPath,
                                          ItemMetaData item,
                                          byte[] itemData,
-                                         ISourceControlProvider sourceControlProvider)
+                                         TFSSourceControlProvider sourceControlProvider)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
@@ -252,7 +252,7 @@ namespace SvnBridge.Handlers
         }
 
         private void HandleProp(
-            ISourceControlProvider sourceControlProvider,
+            TFSSourceControlProvider sourceControlProvider,
             string requestPath,
             string depthHeader,
             string labelHeader,
@@ -277,7 +277,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void WriteVccResponse(ISourceControlProvider sourceControlProvider,
+        private void WriteVccResponse(TFSSourceControlProvider sourceControlProvider,
                                       string requestPath,
                                       string label,
                                       PropData data,
@@ -309,7 +309,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void WriteBcResponse(ISourceControlProvider sourceControlProvider,
+        private void WriteBcResponse(TFSSourceControlProvider sourceControlProvider,
                                      string requestPath,
                                      string depthHeader,
                                      PropData data,
@@ -350,7 +350,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void WritePathResponse(ISourceControlProvider sourceControlProvider,
+        private void WritePathResponse(TFSSourceControlProvider sourceControlProvider,
                                        string requestPath,
                                        string depth,
                                        PropData data,

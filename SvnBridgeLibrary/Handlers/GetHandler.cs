@@ -15,7 +15,7 @@ namespace SvnBridge.Handlers
 	public class GetHandler : HttpContextHandlerBase
 	{
 		protected override void Handle(IHttpContext context,
-									   ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
 		{
 			IHttpRequest request = context.Request;
 			IHttpResponse response = context.Response;

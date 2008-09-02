@@ -11,7 +11,7 @@ namespace SvnBridge.Handlers
     public class PutHandler : HttpContextHandlerBase
     {
         protected override void Handle(IHttpContext context,
-                                       ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -50,7 +50,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private bool Put(ISourceControlProvider sourceControlProvider,
+        private bool Put(TFSSourceControlProvider sourceControlProvider,
                          string path,
                          Stream inputStream,
                          string baseHash,

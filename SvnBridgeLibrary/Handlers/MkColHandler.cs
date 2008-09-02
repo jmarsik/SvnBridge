@@ -4,13 +4,14 @@ using SvnBridge.Exceptions;
 using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.Utility;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
     public class MkColHandler : HttpContextHandlerBase
     {
         protected override void Handle(IHttpContext context,
-                                       ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -30,7 +31,7 @@ namespace SvnBridge.Handlers
         }
 
         private static void MakeCollection(string path,
-                                           ISourceControlProvider sourceControlProvider)
+                                           TFSSourceControlProvider sourceControlProvider)
         {
             if (!path.StartsWith("//"))
             {

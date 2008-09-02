@@ -17,12 +17,12 @@ namespace SvnBridge.Handlers
 		private IHttpContext httpContext;
 	    private ICredentials credentials;
 
-	    public void SetSourceControlProvider(ISourceControlProvider value)
+        public void SetSourceControlProvider(TFSSourceControlProvider value)
 	    {
 	        sourceControlProvider = value;
 	    }
 
-	    ISourceControlProvider sourceControlProvider;
+        TFSSourceControlProvider sourceControlProvider;
 
 		public IPathParser PathParser
 		{
@@ -57,7 +57,7 @@ namespace SvnBridge.Handlers
 		{
 		}
 
-		protected abstract void Handle(IHttpContext context, ISourceControlProvider sourceControlProvider);
+        protected abstract void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider);
 
 		protected static void SetResponseSettings(IHttpResponse response,
 												  string contentType,

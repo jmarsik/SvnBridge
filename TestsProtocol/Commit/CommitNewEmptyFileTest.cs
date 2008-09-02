@@ -4,6 +4,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using Xunit;
 using SvnBridge.SourceControl;
 using Tests;
+using Attach;
 
 namespace ProtocolTests
 {
@@ -103,7 +104,7 @@ namespace ProtocolTests
         [Fact]
         public void Test11()
         {
-            stub.Attach(provider.GetItems, null);
+            stub.Attach(provider.GetItems, Return.Value(null));
             stub.Attach(provider.WriteFile, true);
 
             string request =

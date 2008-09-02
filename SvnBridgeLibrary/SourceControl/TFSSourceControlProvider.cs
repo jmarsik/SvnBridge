@@ -22,7 +22,7 @@ namespace SvnBridge.SourceControl
 
 	[Interceptor(typeof(TracingInterceptor))]
 	[Interceptor(typeof(RetryOnExceptionsInterceptor<SocketException>))]
-	public class TFSSourceControlProvider : ISourceControlProvider
+	public class TFSSourceControlProvider : MarshalByRefObject
 	{
 		private readonly SourceControlServicesHub sourceControlServicesHub;
 
@@ -88,14 +88,12 @@ namespace SvnBridge.SourceControl
 				rootPath = Constants.ServerRootPath + this.projectName + "/";
 		}
 
-		#region ISourceControlProvider Members
-
-		public string ServerUrl
+		public virtual string ServerUrl
 		{
 			get { return serverUrl; }
 		}
 
-		public void CopyItem(string activityId,
+		public virtual void CopyItem(string activityId,
 							 string path,
 							 string targetPath)
 		{
@@ -107,13 +105,13 @@ namespace SvnBridge.SourceControl
 			ProcessCopyItem(activityId, copyAction, false);
 		}
 
-		public void DeleteActivity(string activityId)
+		public virtual void DeleteActivity(string activityId)
 		{
 			SourceControlService.DeleteWorkspace(serverUrl, credentials, activityId);
 			ActivityRepository.Delete(activityId);
 		}
 
-		public bool DeleteItem(string activityId,
+		public virtual bool DeleteItem(string activityId,
 							   string path)
 		{
 			if ((GetItems(-1, path, Recursion.None, true) == null) && (GetPendingItem(activityId, path) == null))
@@ -163,7 +161,7 @@ namespace SvnBridge.SourceControl
 			return true;
 		}
 
-		public FolderMetaData GetChangedItems(string path,
+		public virtual FolderMetaData GetChangedItems(string path,
 											  int versionFrom,
 											  int versionTo,
 											  UpdateReportData reportData)
@@ -216,7 +214,7 @@ namespace SvnBridge.SourceControl
 		}
 
 
-		public ItemMetaData GetItemInActivity(string activityId,
+		public virtual ItemMetaData GetItemInActivity(string activityId,
 											  string path)
 		{
 
@@ -233,14 +231,12 @@ namespace SvnBridge.SourceControl
 			return GetItemsWithoutProperties(-1, path, Recursion.None);
 		}
 
-		public ItemMetaData GetItems(int version,
-									 string path,
-									 Recursion recursion)
+		public virtual ItemMetaData GetItems(int version, string path, Recursion recursion)
 		{
 			return GetItems(version, path, recursion, false);
 		}
 
-		public ItemMetaData GetItemsWithoutProperties(int version,
+		public virtual ItemMetaData GetItemsWithoutProperties(int version,
 													  string path,
 													  Recursion recursion)
 		{
@@ -253,7 +249,7 @@ namespace SvnBridge.SourceControl
 		/// type, and will only live for the current request.
 		/// </summary>
 		/// <returns></returns>
-		public int GetLatestVersion()
+		public virtual int GetLatestVersion()
 		{
 			const string latestVersion = "Repository.Latest.Version";
 			if (PerRequest.Items[latestVersion] != null)
@@ -263,7 +259,7 @@ namespace SvnBridge.SourceControl
 			return changeset;
 		}
 
-		public LogItem GetLog(string path,
+		public virtual LogItem GetLog(string path,
 							  int versionFrom,
 							  int versionTo,
 							  Recursion recursion,
@@ -380,25 +376,25 @@ namespace SvnBridge.SourceControl
 			return log;
 		}
 
-		public bool IsDirectory(int version,
+		public virtual bool IsDirectory(int version,
 								string path)
 		{
 			ItemMetaData item = GetItemsWithoutProperties(version, path, Recursion.None);
 			return item.ItemType == ItemType.Folder;
 		}
 
-		public bool ItemExists(string path)
+		public virtual bool ItemExists(string path)
 		{
 			return ItemExists(path, -1);
 		}
 
-		public bool ItemExists(string path, int version)
+		public virtual bool ItemExists(string path, int version)
 		{
 			ItemMetaData item = GetItems(version, path, Recursion.None, true);
 			return (item != null);
 		}
 
-		public bool ItemExists(int itemId, int version)
+		public virtual bool ItemExists(int itemId, int version)
 		{
 			if (itemId == 0)
 				throw new ArgumentException("item id cannot be zero", "itemId");
@@ -406,7 +402,7 @@ namespace SvnBridge.SourceControl
 			return (items.Length != 0);
 		}
 
-		public void MakeActivity(string activityId)
+		public virtual void MakeActivity(string activityId)
 		{
 			ClearExistingTempWorkspaces(true);
 
@@ -432,7 +428,7 @@ namespace SvnBridge.SourceControl
 			}
 		}
 
-		public void MakeCollection(string activityId,
+		public virtual void MakeCollection(string activityId,
 								   string path)
 		{
 			if (ItemExists(path))
@@ -470,7 +466,7 @@ namespace SvnBridge.SourceControl
 
 		}
 
-		public MergeActivityResponse MergeActivity(string activityId)
+		public virtual MergeActivityResponse MergeActivity(string activityId)
 		{
 			MergeActivityResponse response = null;
 			ActivityRepository.Use(activityId, delegate(Activity activity)
@@ -545,7 +541,7 @@ namespace SvnBridge.SourceControl
 			return response;
 		}
 
-		public void AssociateWorkItemsWithChangeSet(string comment, int changesetId)
+		public virtual void AssociateWorkItemsWithChangeSet(string comment, int changesetId)
 		{
 			MatchCollection matches = associatedWorkItems.Matches(comment ?? "");
 			foreach (Match match in matches)
@@ -577,17 +573,17 @@ namespace SvnBridge.SourceControl
 			}
 		}
 
-		public byte[] ReadFile(ItemMetaData item)
+		public virtual byte[] ReadFile(ItemMetaData item)
 		{
 			return FileRepository.GetFile(item);
 		}
 
-		public void ReadFileAsync(ItemMetaData item)
+		public virtual void ReadFileAsync(ItemMetaData item)
 		{
 			FileRepository.ReadFileAsync(item);
 		}
 
-		public Guid GetRepositoryUuid()
+		public virtual Guid GetRepositoryUuid()
 		{
 			string cacheKey = "GetRepositoryUuid_" + serverUrl;
 			CachedResult result = Cache.Get(cacheKey);
@@ -598,7 +594,7 @@ namespace SvnBridge.SourceControl
 			return id;
 		}
 
-		public int GetVersionForDate(DateTime date)
+		public virtual int GetVersionForDate(DateTime date)
 		{
 			DateVersionSpec dateVersion = new DateVersionSpec();
 			dateVersion.date = date.ToUniversalTime();
@@ -650,7 +646,7 @@ namespace SvnBridge.SourceControl
 			return spec;
 		}
 
-		public void SetActivityComment(string activityId,
+		public virtual void SetActivityComment(string activityId,
 									   string comment)
 		{
 			ActivityRepository.Use(activityId, delegate(Activity activity)
@@ -659,7 +655,7 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		public void SetProperty(string activityId,
+		public virtual void SetProperty(string activityId,
 								string path,
 								string property,
 								string value)
@@ -675,7 +671,7 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		public void RemoveProperty(string activityId,
+		public virtual void RemoveProperty(string activityId,
 								   string path,
 								   string property)
 		{
@@ -689,14 +685,12 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		public bool WriteFile(string activityId,
+		public virtual bool WriteFile(string activityId,
 							  string path,
 							  byte[] fileData)
 		{
 			return WriteFile(activityId, path, fileData, false);
 		}
-
-		#endregion
 
 		private ItemMetaData GetItems(int version, string path, Recursion recursion, bool returnPropertyFiles)
 		{
@@ -1435,12 +1429,12 @@ namespace SvnBridge.SourceControl
 			}
 		}
 
-		public ICredentials GetCredentials()
+		public virtual ICredentials GetCredentials()
 		{
 			return credentials;
 		}
 
-		public ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset)
+		public virtual ItemMetaData[] GetPreviousVersionOfItems(SourceItem[] items, int changeset)
 		{
 			int previousRevision = (changeset - 1);
 

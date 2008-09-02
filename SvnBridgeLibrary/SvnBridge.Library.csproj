@@ -184,9 +184,6 @@
     <Compile Include="SourceControl\DeleteFolderMetaData.cs" />
     <Compile Include="SourceControl\DeleteMetaData.cs" />
     <Compile Include="SourceControl\FolderMetaData.cs" />
-    <Compile Include="Interfaces\ISourceControlProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="SourceControl\ItemMetaData.cs" />
     <Compile Include="SourceControl\MergeActivityResponse.cs" />
     <Compile Include="SourceControl\MergeActivityResponseItem.cs" />

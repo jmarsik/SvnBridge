@@ -6,6 +6,7 @@ using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.Nodes;
 using SvnBridge.SourceControl;
+using Tests;
 
 namespace SvnBridge.Handlers
 {
@@ -28,10 +29,8 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyCheckedInPropertyGetsEncoded()
         {
-            MockRepository mocks = new MockRepository();
-            ISourceControlProvider sourceControlProvider = mocks.Stub<ISourceControlProvider>();
-            SetupResult.For(sourceControlProvider.GetLatestVersion()).Return(5718);
-            mocks.ReplayAll();
+            StubSourceControlProvider sourceControlProvider = new StubSourceControlProvider();
+            sourceControlProvider.GetLatestVersion_Return = 5718;
 
             XmlDocument xml = new XmlDocument();
             ItemMetaData item = new ItemMetaData();

@@ -8,10 +8,10 @@ namespace SvnBridge.SourceControl
 {
     public class CachePrePopulator
     {
-        private readonly ISourceControlProvider sourceControlProvider;
+        private readonly TFSSourceControlProvider sourceControlProvider;
         readonly Dictionary<string, HashSet<string>> hierarchy = new Dictionary<string, HashSet<string>>();
 
-        public CachePrePopulator(ISourceControlProvider sourceControlProvider)
+        public CachePrePopulator(TFSSourceControlProvider sourceControlProvider)
         {
             this.sourceControlProvider = sourceControlProvider;
         }

@@ -2,6 +2,7 @@ using System;
 using System.Xml;
 using SvnBridge.Handlers;
 using SvnBridge.Interfaces;
+using SvnBridge.SourceControl;
 
 namespace SvnBridge.Nodes
 {
@@ -10,9 +11,9 @@ namespace SvnBridge.Nodes
     {
         private string label;
         private string path;
-        private ISourceControlProvider sourceControlProvider;
+        private TFSSourceControlProvider sourceControlProvider;
 
-        public SvnVccDefaultNode(ISourceControlProvider sourceControlProvider,
+        public SvnVccDefaultNode(TFSSourceControlProvider sourceControlProvider,
                                  string path,
                                  string label)
         {

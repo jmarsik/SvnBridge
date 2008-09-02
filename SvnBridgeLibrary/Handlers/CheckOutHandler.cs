@@ -11,7 +11,7 @@ namespace SvnBridge.Handlers
 	public class CheckOutHandler : HttpContextHandlerBase
 	{
 		protected override void Handle(IHttpContext context,
-									   ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
 		{
 			IHttpRequest request = context.Request;
 			IHttpResponse response = context.Response;
@@ -55,7 +55,7 @@ namespace SvnBridge.Handlers
 		}
 
 		private string CheckOut(
-			ISourceControlProvider sourceControlProvider,
+            TFSSourceControlProvider sourceControlProvider,
 			CheckoutData request,
 			string path)
 		{

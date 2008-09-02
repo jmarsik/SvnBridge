@@ -19,7 +19,7 @@ namespace SvnBridge.Handlers
     public class ReportHandler : HttpContextHandlerBase
     {
         protected override void Handle(IHttpContext context,
-                                       ISourceControlProvider sourceControlProvider)
+                                       TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -103,7 +103,7 @@ namespace SvnBridge.Handlers
         }
 
         private void ReplayReport(IHttpRequest request, IHttpResponse response,
-                                  ISourceControlProvider sourceControlProvider, ReplayReportData replayReport)
+                                  TFSSourceControlProvider sourceControlProvider, ReplayReportData replayReport)
         {
             if (replayReport.Revision == 0)
             {
@@ -163,7 +163,7 @@ namespace SvnBridge.Handlers
         }
 
         private void OutputEditorReport(
-            ISourceControlProvider sourceControlProvider,
+            TFSSourceControlProvider sourceControlProvider,
             FolderMetaData folder,
             int revision,
             bool isRoot,
@@ -229,7 +229,7 @@ namespace SvnBridge.Handlers
         }
 
         private void SendBlameResponse(IHttpRequest request, IHttpResponse response,
-                                       ISourceControlProvider sourceControlProvider, string serverPath,
+                                       TFSSourceControlProvider sourceControlProvider, string serverPath,
                                        FileRevsReportData data)
         {
             LogItem log = sourceControlProvider.GetLog(
@@ -308,7 +308,7 @@ namespace SvnBridge.Handlers
 </D:error>");
         }
 
-        private void GetDatedRevReport(ISourceControlProvider sourceControlProvider, DatedRevReportData data,
+        private void GetDatedRevReport(TFSSourceControlProvider sourceControlProvider, DatedRevReportData data,
                                        TextWriter output)
         {
             int targetRevision = sourceControlProvider.GetVersionForDate(data.CreationDate);
@@ -327,7 +327,7 @@ namespace SvnBridge.Handlers
             writer.Write("</S:get-locks-report>\n");
         }
 
-        private void GetLocationsReport(ISourceControlProvider sourceControlProvider,
+        private void GetLocationsReport(TFSSourceControlProvider sourceControlProvider,
                                         GetLocationsReportData getLocationsReport,
                                         string path,
                                         StreamWriter output)
@@ -357,7 +357,7 @@ namespace SvnBridge.Handlers
             output.Write("</S:get-locations-report>\n");
         }
 
-        private void UpdateReport(ISourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output, FolderMetaData metadata, int targetRevision)
+        private void UpdateReport(TFSSourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output, FolderMetaData metadata, int targetRevision)
         {
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write(
@@ -372,7 +372,7 @@ namespace SvnBridge.Handlers
         }
 
         private FolderMetaData GetMetadataForUpdate(IHttpRequest request, UpdateReportData updatereport,
-                                                    ISourceControlProvider sourceControlProvider, out int targetRevision)
+                                                    TFSSourceControlProvider sourceControlProvider, out int targetRevision)
         {
             string basePath = PathParser.GetLocalPath(request, updatereport.SrcPath);
             FolderMetaData metadata;
@@ -406,7 +406,7 @@ namespace SvnBridge.Handlers
             return metadata;
         }
 
-        private static void LogReport(ISourceControlProvider sourceControlProvider,
+        private static void LogReport(TFSSourceControlProvider sourceControlProvider,
                                       LogReportData logreport,
                                       string path,
                                       TextWriter output)
