@@ -46,7 +46,7 @@ namespace TestsEndToEnd
 		}
 
 		[SvnBridgeFact]
-		public void CanRenamFile()
+		public void CanRenameFile()
 		{
 			CheckoutAndChangeDirectory();
 			File.WriteAllText("test.txt", "blah");
@@ -57,7 +57,7 @@ namespace TestsEndToEnd
 		}
 
 		[SvnBridgeFact]
-		public void CanRenamAndEditFile()
+		public void CanRenameAndEditFile()
 		{
 			CheckoutAndChangeDirectory();
 			File.WriteAllText("test.txt", "blah");
@@ -69,7 +69,7 @@ namespace TestsEndToEnd
 		}
 
 		[SvnBridgeFact]
-		public void CanEditAndRenamFile()
+		public void CanEditAndRenameFile()
 		{
 			CheckoutAndChangeDirectory();
 			File.WriteAllText("test.txt", "blah");
