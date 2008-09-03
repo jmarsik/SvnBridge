@@ -59,318 +59,6 @@ namespace ProtocolTests
         }
 
         [Fact]
-        public void Test10()
-        {
-            stubs.Attach(provider.DeleteItem, true);
-
-            string request =
-                "DELETE //!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/Fun.txt HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "X-SVN-Version-Name: 5519\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n";
-
-            string expected =
-                "HTTP/1.1 204 No Content\r\n" +
-                "Date: Sat, 14 Jul 2007 00:20:16 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 0\r\n" +
-                "Content-Type: text/plain\r\n" +
-                "\r\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Test11()
-        {
-            stubs.Attach(provider.ItemExists, false);
-
-            string request =
-                "PROPFIND /FunRenamed.txt HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Content-Length: 300\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "Depth: 0\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
-
-            string expected =
-                "HTTP/1.1 404 Not Found\r\n" +
-                "Date: Sat, 14 Jul 2007 00:20:16 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 304\r\n" +
-                "Content-Type: text/html; charset=iso-8859-1\r\n" +
-                "\r\n" +
-                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
-                "<html><head>\n" +
-                "<title>404 Not Found</title>\n" +
-                "</head><body>\n" +
-                "<h1>Not Found</h1>\n" +
-                "<p>The requested URL /FunRenamed.txt was not found on this server.</p>\n" +
-                "<hr>\n" +
-                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
-                "</body></html>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Test12()
-        {
-            stubs.Attach(provider.ItemExists, true);
-            stubs.Attach(provider.IsDirectory, false);
-            ItemMetaData item = new ItemMetaData();
-            item.Name = "Fun.txt";
-            stubs.Attach(provider.GetItems, item);
-
-            string request =
-                "PROPFIND /Fun.txt HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Content-Length: 300\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "Depth: 0\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
-
-            string expected =
-                "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 638\r\n" +
-                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
-                "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/Fun.txt</D:href>\n" +
-                "<D:propstat>\n" +
-                "<D:prop>\n" +
-                "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
-                "<lp1:resourcetype/>\n" +
-                "<lp2:baseline-relative-path>Fun.txt</lp2:baseline-relative-path>\n" +
-                "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
-                "</D:prop>\n" +
-                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
-                "</D:propstat>\n" +
-                "</D:response>\n" +
-                "</D:multistatus>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Test13()
-        {
-            string request =
-                "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Content-Length: 148\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "Label: 5519\r\n" +
-                "Depth: 0\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-collection xmlns=\"DAV:\"/><version-name xmlns=\"DAV:\"/></prop></propfind>";
-
-            string expected =
-                "HTTP/1.1 207 Multi-Status\r\n" +
-                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Vary: Label\r\n" +
-                "Content-Length: 440\r\n" +
-                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
-                "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
-                "<D:href>/!svn/bln/5519</D:href>\n" +
-                "<D:propstat>\n" +
-                "<D:prop>\n" +
-                "<lp1:baseline-collection><D:href>/!svn/bc/5519/</D:href></lp1:baseline-collection>\n" +
-                "<lp1:version-name>5519</lp1:version-name>\n" +
-                "</D:prop>\n" +
-                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
-                "</D:propstat>\n" +
-                "</D:response>\n" +
-                "</D:multistatus>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Test14()
-        {
-            stubs.Attach(provider.CopyItem);
-
-            string request =
-                "COPY /!svn/bc/5519/Fun.txt HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Depth: 0\r\n" +
-                "Destination: http://localhost:8082//!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/FunRenamed.txt\r\n" +
-                "Overwrite: T\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n";
-
-            string expected =
-                "HTTP/1.1 201 Created\r\n" +
-                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Location: http://localhost:8082//!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/FunRenamed.txt\r\n" +
-                "Content-Length: 331\r\n" +
-                "Content-Type: text/html\r\n" +
-                "\r\n" +
-                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
-                "<html><head>\n" +
-                "<title>201 Created</title>\n" +
-                "</head><body>\n" +
-                "<h1>Created</h1>\n" +
-                "<p>Destination //!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/FunRenamed.txt has been created.</p>\n" +
-                "<hr />\n" +
-                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
-                "</body></html>\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Test15()
-        {
-            MergeActivityResponse mergeResponse =
-                new MergeActivityResponse(5520, DateTime.Parse("2007-07-14T00:20:17.921981Z"), "jwanagel");
-            mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/FunRenamed.txt"));
-            mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.Folder, "/"));
-            stubs.Attach(provider.MergeActivity, mergeResponse);
-
-            string request =
-                "MERGE / HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Content-Length: 297\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "X-SVN-Options:  release-locks\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Accept-Encoding: gzip\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/401a0b6e-92aa-5243-a0bd-ba726579727b</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
-
-            string expected =
-                "HTTP/1.1 200 OK\r\n" +
-                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Cache-Control: no-cache\r\n" +
-                "Transfer-Encoding: chunked\r\n" +
-                "Content-Type: text/xml\r\n" +
-                "\r\n" +
-                "3b4\r\n" +
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<D:merge-response xmlns:D=\"DAV:\">\n" +
-                "<D:updated-set>\n" +
-                "<D:response>\n" +
-                "<D:href>/!svn/vcc/default</D:href>\n" +
-                "<D:propstat><D:prop>\n" +
-                "<D:resourcetype><D:baseline/></D:resourcetype>\n" +
-                "\n" +
-                "<D:version-name>5520</D:version-name>\n" +
-                "<D:creationdate>2007-07-14T00:20:17.921981Z</D:creationdate>\n" +
-                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
-                "</D:prop>\n" +
-                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
-                "</D:propstat>\n" +
-                "</D:response>\n" +
-                "<D:response>\n" +
-                "<D:href>/FunRenamed.txt</D:href>\n" +
-                "<D:propstat><D:prop>\n" +
-                "<D:resourcetype/>\n" +
-                "<D:checked-in><D:href>/!svn/ver/5520/FunRenamed.txt</D:href></D:checked-in>\n" +
-                "</D:prop>\n" +
-                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
-                "</D:propstat>\n" +
-                "</D:response>\n" +
-                "<D:response>\n" +
-                "<D:href>/</D:href>\n" +
-                "<D:propstat><D:prop>\n" +
-                "<D:resourcetype><D:collection/></D:resourcetype>\n" +
-                "<D:checked-in><D:href>/!svn/ver/5520/</D:href></D:checked-in>\n" +
-                "</D:prop>\n" +
-                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
-                "</D:propstat>\n" +
-                "</D:response>\n" +
-                "</D:updated-set>\n" +
-                "</D:merge-response>\n" +
-                "\r\n" +
-                "0\r\n" +
-                "\r\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Test16()
-        {
-            stubs.Attach(provider.DeleteActivity);
-
-            string request =
-                "DELETE /!svn/act/401a0b6e-92aa-5243-a0bd-ba726579727b HTTP/1.1\r\n" +
-                "Host: localhost:8082\r\n" +
-                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
-                "Connection: TE\r\n" +
-                "TE: trailers\r\n" +
-                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
-                "\r\n";
-
-            string expected =
-                "HTTP/1.1 204 No Content\r\n" +
-                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
-                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
-                "Content-Length: 0\r\n" +
-                "Content-Type: text/plain\r\n" +
-                "\r\n";
-
-            string actual = ProcessRequest(request, ref expected);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         public void Test2()
         {
             stubs.Attach(provider.ItemExists, true);
@@ -714,6 +402,318 @@ namespace ProtocolTests
                 "<hr />\n" +
                 "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
                 "</body></html>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Test10()
+        {
+            stubs.Attach(provider.DeleteItem, true);
+
+            string request =
+                "DELETE //!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/Fun.txt HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "X-SVN-Version-Name: 5519\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n";
+
+            string expected =
+                "HTTP/1.1 204 No Content\r\n" +
+                "Date: Sat, 14 Jul 2007 00:20:16 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Content-Length: 0\r\n" +
+                "Content-Type: text/plain\r\n" +
+                "\r\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Test11()
+        {
+            stubs.Attach(provider.ItemExists, false);
+
+            string request =
+                "PROPFIND /FunRenamed.txt HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Length: 300\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "Depth: 0\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
+
+            string expected =
+                "HTTP/1.1 404 Not Found\r\n" +
+                "Date: Sat, 14 Jul 2007 00:20:16 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Content-Length: 304\r\n" +
+                "Content-Type: text/html; charset=iso-8859-1\r\n" +
+                "\r\n" +
+                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
+                "<html><head>\n" +
+                "<title>404 Not Found</title>\n" +
+                "</head><body>\n" +
+                "<h1>Not Found</h1>\n" +
+                "<p>The requested URL /FunRenamed.txt was not found on this server.</p>\n" +
+                "<hr>\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
+                "</body></html>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Test12()
+        {
+            stubs.Attach(provider.ItemExists, true);
+            stubs.Attach(provider.IsDirectory, false);
+            ItemMetaData item = new ItemMetaData();
+            item.Name = "Fun.txt";
+            stubs.Attach(provider.GetItems, item);
+
+            string request =
+                "PROPFIND /Fun.txt HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Length: 300\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "Depth: 0\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><version-controlled-configuration xmlns=\"DAV:\"/><resourcetype xmlns=\"DAV:\"/><baseline-relative-path xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/><repository-uuid xmlns=\"http://subversion.tigris.org/xmlns/dav/\"/></prop></propfind>";
+
+            string expected =
+                "HTTP/1.1 207 Multi-Status\r\n" +
+                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Content-Length: 638\r\n" +
+                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n" +
+                "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
+                "<D:href>/Fun.txt</D:href>\n" +
+                "<D:propstat>\n" +
+                "<D:prop>\n" +
+                "<lp1:version-controlled-configuration><D:href>/!svn/vcc/default</D:href></lp1:version-controlled-configuration>\n" +
+                "<lp1:resourcetype/>\n" +
+                "<lp2:baseline-relative-path>Fun.txt</lp2:baseline-relative-path>\n" +
+                "<lp2:repository-uuid>81a5aebe-f34e-eb42-b435-ac1ecbb335f7</lp2:repository-uuid>\n" +
+                "</D:prop>\n" +
+                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
+                "</D:propstat>\n" +
+                "</D:response>\n" +
+                "</D:multistatus>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Test13()
+        {
+            string request =
+                "PROPFIND /!svn/vcc/default HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Length: 148\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "Label: 5519\r\n" +
+                "Depth: 0\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><baseline-collection xmlns=\"DAV:\"/><version-name xmlns=\"DAV:\"/></prop></propfind>";
+
+            string expected =
+                "HTTP/1.1 207 Multi-Status\r\n" +
+                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Vary: Label\r\n" +
+                "Content-Length: 440\r\n" +
+                "Content-Type: text/xml; charset=\"utf-8\"\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n" +
+                "<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n" +
+                "<D:href>/!svn/bln/5519</D:href>\n" +
+                "<D:propstat>\n" +
+                "<D:prop>\n" +
+                "<lp1:baseline-collection><D:href>/!svn/bc/5519/</D:href></lp1:baseline-collection>\n" +
+                "<lp1:version-name>5519</lp1:version-name>\n" +
+                "</D:prop>\n" +
+                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
+                "</D:propstat>\n" +
+                "</D:response>\n" +
+                "</D:multistatus>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Test14()
+        {
+            stubs.Attach(provider.CopyItem);
+
+            string request =
+                "COPY /!svn/bc/5519/Fun.txt HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Depth: 0\r\n" +
+                "Destination: http://localhost:8082//!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/FunRenamed.txt\r\n" +
+                "Overwrite: T\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n";
+
+            string expected =
+                "HTTP/1.1 201 Created\r\n" +
+                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Location: http://localhost:8082//!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/FunRenamed.txt\r\n" +
+                "Content-Length: 331\r\n" +
+                "Content-Type: text/html\r\n" +
+                "\r\n" +
+                "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
+                "<html><head>\n" +
+                "<title>201 Created</title>\n" +
+                "</head><body>\n" +
+                "<h1>Created</h1>\n" +
+                "<p>Destination //!svn/wrk/401a0b6e-92aa-5243-a0bd-ba726579727b/FunRenamed.txt has been created.</p>\n" +
+                "<hr />\n" +
+                "<address>Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2 Server at localhost Port 8082</address>\n" +
+                "</body></html>\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Test15()
+        {
+            MergeActivityResponse mergeResponse =
+                new MergeActivityResponse(5520, DateTime.Parse("2007-07-14T00:20:17.921981Z"), "jwanagel");
+            mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.File, "/FunRenamed.txt"));
+            mergeResponse.Items.Add(new MergeActivityResponseItem(ItemType.Folder, "/"));
+            stubs.Attach(provider.MergeActivity, mergeResponse);
+
+            string request =
+                "MERGE / HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Content-Length: 297\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "X-SVN-Options:  release-locks\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Accept-Encoding: gzip\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:merge xmlns:D=\"DAV:\"><D:source><D:href>/!svn/act/401a0b6e-92aa-5243-a0bd-ba726579727b</D:href></D:source><D:no-auto-merge/><D:no-checkout/><D:prop><D:checked-in/><D:version-name/><D:resourcetype/><D:creationdate/><D:creator-displayname/></D:prop></D:merge>";
+
+            string expected =
+                "HTTP/1.1 200 OK\r\n" +
+                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Cache-Control: no-cache\r\n" +
+                "Transfer-Encoding: chunked\r\n" +
+                "Content-Type: text/xml\r\n" +
+                "\r\n" +
+                "3b4\r\n" +
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<D:merge-response xmlns:D=\"DAV:\">\n" +
+                "<D:updated-set>\n" +
+                "<D:response>\n" +
+                "<D:href>/!svn/vcc/default</D:href>\n" +
+                "<D:propstat><D:prop>\n" +
+                "<D:resourcetype><D:baseline/></D:resourcetype>\n" +
+                "\n" +
+                "<D:version-name>5520</D:version-name>\n" +
+                "<D:creationdate>2007-07-14T00:20:17.921981Z</D:creationdate>\n" +
+                "<D:creator-displayname>jwanagel</D:creator-displayname>\n" +
+                "</D:prop>\n" +
+                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
+                "</D:propstat>\n" +
+                "</D:response>\n" +
+                "<D:response>\n" +
+                "<D:href>/FunRenamed.txt</D:href>\n" +
+                "<D:propstat><D:prop>\n" +
+                "<D:resourcetype/>\n" +
+                "<D:checked-in><D:href>/!svn/ver/5520/FunRenamed.txt</D:href></D:checked-in>\n" +
+                "</D:prop>\n" +
+                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
+                "</D:propstat>\n" +
+                "</D:response>\n" +
+                "<D:response>\n" +
+                "<D:href>/</D:href>\n" +
+                "<D:propstat><D:prop>\n" +
+                "<D:resourcetype><D:collection/></D:resourcetype>\n" +
+                "<D:checked-in><D:href>/!svn/ver/5520/</D:href></D:checked-in>\n" +
+                "</D:prop>\n" +
+                "<D:status>HTTP/1.1 200 OK</D:status>\n" +
+                "</D:propstat>\n" +
+                "</D:response>\n" +
+                "</D:updated-set>\n" +
+                "</D:merge-response>\n" +
+                "\r\n" +
+                "0\r\n" +
+                "\r\n";
+
+            string actual = ProcessRequest(request, ref expected);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Test16()
+        {
+            stubs.Attach(provider.DeleteActivity);
+
+            string request =
+                "DELETE /!svn/act/401a0b6e-92aa-5243-a0bd-ba726579727b HTTP/1.1\r\n" +
+                "Host: localhost:8082\r\n" +
+                "User-Agent: SVN/1.4.2 (r22196) neon/0.26.2\r\n" +
+                "Connection: TE\r\n" +
+                "TE: trailers\r\n" +
+                "Authorization: Basic andhbmFnZWw6UGFzc0B3b3JkMQ==\r\n" +
+                "\r\n";
+
+            string expected =
+                "HTTP/1.1 204 No Content\r\n" +
+                "Date: Sat, 14 Jul 2007 00:20:17 GMT\r\n" +
+                "Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2\r\n" +
+                "Content-Length: 0\r\n" +
+                "Content-Type: text/plain\r\n" +
+                "\r\n";
 
             string actual = ProcessRequest(request, ref expected);
 

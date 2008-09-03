@@ -8,19 +8,19 @@ namespace SvnBridge.Handlers
 {
     public class CopyHandler : HttpContextHandlerBase
     {
-        protected override void Handle(IHttpContext context,
-                                       TFSSourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
 
-            string path = GetPath(request);
-
             SetResponseSettings(response, "text/html", Encoding.UTF8, 201);
 
-			string activityId = PathParser.GetActivityIdFromDestination(request.Headers["Destination"]);
-			string destination = PathParser.GetPathFromDestination(Helper.DecodeC(request.Headers["Destination"]));
+            string activityId = PathParser.GetActivityIdFromDestination(request.Headers["Destination"]);
+
+            string path = GetPath(request);
             path = path.Substring(path.IndexOf('/', 9));
+
+			string destination = PathParser.GetPathFromDestination(Helper.DecodeC(request.Headers["Destination"]));
             string targetPath = destination.Substring(destination.IndexOf('/', 12));
             sourceControlProvider.CopyItem(activityId, path, targetPath);
 

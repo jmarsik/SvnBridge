@@ -40,6 +40,11 @@ namespace SvnBridge.Infrastructure
 			return sourceControlService.QueryItems(serverUrl, credentials, new int[] { itemId }, revision);
 		}
 
+        public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
+        {
+            return QueryItems(revision, new string[] { path }, recursion);
+        }
+
         public SourceItem[] QueryItems(int revision, string[] paths, Recursion recursion)
         {
             List<ItemSpec> itemSpecs = new List<ItemSpec>();
@@ -85,11 +90,6 @@ namespace SvnBridge.Infrastructure
                 result2.Add(sourceItem);
             }
             return result2.ToArray();
-        }
-
-        public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
-        {
-            return QueryItems(revision, new string[] { path }, recursion);
         }
 
         private string GetServerPath(string path)

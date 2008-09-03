@@ -14,11 +14,11 @@ namespace SvnBridge.Infrastructure
     [Interceptor(typeof(TracingInterceptor))]
     public class MetaDataRepository : IMetaDataRepository
     {
-        private readonly TFSSourceControlService sourceControlService;
         private readonly string serverUrl;
         private readonly string rootPath;
         private readonly ICredentials credentials;
         private readonly MemoryBasedPersistentCache persistentCache;
+        private readonly TFSSourceControlService sourceControlService;
 
         public MetaDataRepository(
             TFSSourceControlService sourceControlService,
@@ -48,14 +48,10 @@ namespace SvnBridge.Infrastructure
         	return items.ToArray();
         }
 
-    	#region IMetaDataRepository Members
-
     	public SourceItem[] QueryItems(int revision, int itemId, Recursion recursion)
     	{
     		return sourceControlService.QueryItems(serverUrl, credentials, new int[] {itemId}, revision);
     	}
-
-    	#endregion
 
     	public SourceItem[] QueryItems(int revision, string path, Recursion recursion)
         {
@@ -171,7 +167,6 @@ namespace SvnBridge.Infrastructure
                 {
 
                     string itemCacheKey = GetItemCacheKey(revision, item.RemoteName);
-
 
                     persistentCache.Set(itemCacheKey, item);
 

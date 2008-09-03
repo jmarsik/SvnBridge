@@ -24,5 +24,15 @@ namespace SvnBridge.PathParsing
 
             Assert.Equal("/", result);
         }
+
+        [Fact]
+        public void Test()
+        {
+            StaticServerPathParser parser = new StaticServerPathParser("http://svnbridgetesting.redmond.corp.microsoft.com", stubs.CreateObject<ProjectInformationRepository>(null, null));
+
+            string result = parser.GetPathFromDestination("http://svnbridgetesting.redmond.corp.microsoft.com/svn/!svn/wrk/6874f51f-0540-b24f-bbd8-eac3072c5a51/Test/Test2.txt");
+
+            Assert.Equal("/!svn/wrk/6874f51f-0540-b24f-bbd8-eac3072c5a51/Test/Test2.txt", result);
+        }
     }
 }

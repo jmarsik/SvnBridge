@@ -62,7 +62,7 @@ namespace SvnBridge.PathParsing
 
 		public override string GetPathFromDestination(string href)
 		{
-			return href.Substring(href.IndexOf("/", href.IndexOf("://") + 3));
+            return href.Substring(href.IndexOf("/!svn/wrk/"));
 		}
 	}
 }

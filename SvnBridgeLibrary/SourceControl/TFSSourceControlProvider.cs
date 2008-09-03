@@ -91,9 +91,7 @@ namespace SvnBridge.SourceControl
 			get { return serverUrl; }
 		}
 
-		public virtual void CopyItem(string activityId,
-							 string path,
-							 string targetPath)
+		public virtual void CopyItem(string activityId, string path, string targetPath)
 		{
 			CopyAction copyAction = new CopyAction(path, targetPath, false);
 			ActivityRepository.Use(activityId, delegate(Activity activity)
@@ -109,8 +107,7 @@ namespace SvnBridge.SourceControl
 			ActivityRepository.Delete(activityId);
 		}
 
-		public virtual bool DeleteItem(string activityId,
-							   string path)
+		public virtual bool DeleteItem(string activityId, string path)
 		{
 			if ((GetItems(-1, path, Recursion.None, true) == null) && (GetPendingItem(activityId, path) == null))
 			{
@@ -159,16 +156,12 @@ namespace SvnBridge.SourceControl
 			return true;
 		}
 
-		public virtual FolderMetaData GetChangedItems(string path,
-											  int versionFrom,
-											  int versionTo,
-											  UpdateReportData reportData)
+		public virtual FolderMetaData GetChangedItems(string path, int versionFrom, int versionTo, UpdateReportData reportData)
 		{
 			if (path.StartsWith("/"))
 			{
 				path = path.Substring(1);
 			}
-
 
 			var root = (FolderMetaData)GetItems(versionTo, path, Recursion.None);
 
@@ -212,8 +205,7 @@ namespace SvnBridge.SourceControl
 		}
 
 
-		public virtual ItemMetaData GetItemInActivity(string activityId,
-											  string path)
+		public virtual ItemMetaData GetItemInActivity(string activityId, string path)
 		{
 
 			ActivityRepository.Use(activityId, delegate(Activity activity)
@@ -234,9 +226,7 @@ namespace SvnBridge.SourceControl
 			return GetItems(version, path, recursion, false);
 		}
 
-		public virtual ItemMetaData GetItemsWithoutProperties(int version,
-													  string path,
-													  Recursion recursion)
+		public virtual ItemMetaData GetItemsWithoutProperties(int version, string path, Recursion recursion)
 		{
 			return GetItems(version, path, recursion, false);
 		}
@@ -257,11 +247,7 @@ namespace SvnBridge.SourceControl
 			return changeset;
 		}
 
-		public virtual LogItem GetLog(string path,
-							  int versionFrom,
-							  int versionTo,
-							  Recursion recursion,
-							  int maxCount)
+		public virtual LogItem GetLog(string path, int versionFrom, int versionTo, Recursion recursion, int maxCount)
 		{
 			if (path.StartsWith("/"))
 			{
@@ -374,8 +360,7 @@ namespace SvnBridge.SourceControl
 			return log;
 		}
 
-		public virtual bool IsDirectory(int version,
-								string path)
+		public virtual bool IsDirectory(int version, string path)
 		{
 			ItemMetaData item = GetItemsWithoutProperties(version, path, Recursion.None);
 			return item.ItemType == ItemType.Folder;
@@ -426,8 +411,7 @@ namespace SvnBridge.SourceControl
 			}
 		}
 
-		public virtual void MakeCollection(string activityId,
-								   string path)
+		public virtual void MakeCollection(string activityId, string path)
 		{
 			if (ItemExists(path))
 			{
@@ -494,12 +478,7 @@ namespace SvnBridge.SourceControl
 				{
 					try
 					{
-						changesetId =
-							SourceControlService.Commit(serverUrl,
-														credentials,
-														activityId,
-														activity.Comment,
-														commitServerList);
+						changesetId = SourceControlService.Commit(serverUrl, credentials, activityId, activity.Comment, commitServerList);
 					}
 					catch (TfsFailureException)
 					{
@@ -644,8 +623,7 @@ namespace SvnBridge.SourceControl
 			return spec;
 		}
 
-		public virtual void SetActivityComment(string activityId,
-									   string comment)
+		public virtual void SetActivityComment(string activityId, string comment)
 		{
 			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
@@ -653,10 +631,7 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		public virtual void SetProperty(string activityId,
-								string path,
-								string property,
-								string value)
+		public virtual void SetProperty(string activityId, string path, string property, string value)
 		{
 			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
@@ -669,9 +644,7 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		public virtual void RemoveProperty(string activityId,
-								   string path,
-								   string property)
+		public virtual void RemoveProperty(string activityId, string path, string property)
 		{
 			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
@@ -683,9 +656,7 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		public virtual bool WriteFile(string activityId,
-							  string path,
-							  byte[] fileData)
+		public virtual bool WriteFile(string activityId, string path, byte[] fileData)
 		{
 			return WriteFile(activityId, path, fileData, false);
 		}
@@ -795,9 +766,7 @@ namespace SvnBridge.SourceControl
 				return false;
 		}
 
-		private static void UpdateItemRevisionsBasedOnPropertyItemRevisions(IDictionary<string, FolderMetaData> folders,
-																			IEnumerable<KeyValuePair<string, int>>
-																				itemPropertyRevision)
+		private static void UpdateItemRevisionsBasedOnPropertyItemRevisions(IDictionary<string, FolderMetaData> folders, IEnumerable<KeyValuePair<string, int>> itemPropertyRevision)
 		{
 			foreach (KeyValuePair<string, int> propertyRevision in itemPropertyRevision)
 			{
@@ -825,8 +794,7 @@ namespace SvnBridge.SourceControl
 			}
 		}
 
-		private bool RevertDelete(string activityId,
-								  string path)
+		private bool RevertDelete(string activityId, string path)
 		{
 			bool reverted = false;
 			ActivityRepository.Use(activityId, delegate(Activity activity)
@@ -852,8 +820,7 @@ namespace SvnBridge.SourceControl
 			return reverted;
 		}
 
-		private MergeActivityResponse GenerateMergeResponse(string activityId,
-															int changesetId)
+		private MergeActivityResponse GenerateMergeResponse(string activityId, int changesetId)
 		{
 			MergeActivityResponse mergeResponse = new MergeActivityResponse(changesetId, DateTime.Now, "unknown");
 			List<string> baseFolders = new List<string>();
@@ -901,10 +868,7 @@ namespace SvnBridge.SourceControl
 			return mergeResponse;
 		}
 
-		private void AddBaseFolderIfRequired(string activityId,
-											 ActivityItem item,
-											 ICollection<string> baseFolders,
-											 MergeActivityResponse mergeResponse)
+		private void AddBaseFolderIfRequired(string activityId, ActivityItem item, ICollection<string> baseFolders, MergeActivityResponse mergeResponse)
 		{
 			string folderName = GetFolderName(item.Path);
 			if (((item.Action == ActivityItemAction.New) || (item.Action == ActivityItemAction.Deleted) ||
@@ -935,10 +899,7 @@ namespace SvnBridge.SourceControl
 			}
 		}
 
-		private bool WriteFile(string activityId,
-							   string path,
-							   byte[] fileData,
-							   bool reportUpdatedFile)
+		private bool WriteFile(string activityId, string path, byte[] fileData, bool reportUpdatedFile)
 		{
 			bool replaced = RevertDelete(activityId, path);
 			bool newFile = true;
@@ -1022,8 +983,7 @@ namespace SvnBridge.SourceControl
 			return newFile;
 		}
 
-		private void ConvertCopyToRename(string activityId,
-										 CopyAction copy)
+		private void ConvertCopyToRename(string activityId, CopyAction copy)
 		{
 
 			ActivityRepository.Use(activityId, delegate(Activity activity)
@@ -1044,32 +1004,24 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		private static string GetLocalPath(string activityId,
-										   string path)
+		private static string GetLocalPath(string activityId, string path)
 		{
 			return Constants.LocalPrefix + activityId + path.Replace('/', '\\');
 		}
 
-		private void UpdateLocalVersion(string activityId,
-										ItemMetaData item,
-										string localPath)
+		private void UpdateLocalVersion(string activityId, ItemMetaData item, string localPath)
 		{
 			UpdateLocalVersion(activityId, item.Id, item.ItemRevision, localPath);
 		}
 
-		private void UpdateLocalVersion(string activityId,
-										int itemId,
-										int itemRevision,
-										string localPath)
+		private void UpdateLocalVersion(string activityId, int itemId, int itemRevision, string localPath)
 		{
 			List<LocalUpdate> updates = new List<LocalUpdate>();
 			updates.Add(LocalUpdate.FromLocal(itemId, localPath, itemRevision));
 			SourceControlService.UpdateLocalVersions(serverUrl, credentials, activityId, updates);
 		}
 
-		private void ProcessCopyItem(string activityId,
-									 CopyAction copyAction,
-									 bool forceRename)
+		private void ProcessCopyItem(string activityId, CopyAction copyAction, bool forceRename)
 		{
 			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
@@ -1180,8 +1132,7 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		private static string GetPropertiesFolderName(string path,
-													  ItemType itemType)
+		private static string GetPropertiesFolderName(string path, ItemType itemType)
 		{
 			if (itemType == ItemType.Folder)
 			{
@@ -1213,8 +1164,7 @@ namespace SvnBridge.SourceControl
 			return itemPath;
 		}
 
-		private static string GetPropertiesFileName(string path,
-													ItemType itemType)
+		private static string GetPropertiesFileName(string path, ItemType itemType)
 		{
 			if (itemType == ItemType.Folder)
 			{
@@ -1231,8 +1181,7 @@ namespace SvnBridge.SourceControl
 			return Constants.PropFolder + "/" + path;
 		}
 
-		private void ProcessDeleteItem(string activityId,
-									   string path)
+		private void ProcessDeleteItem(string activityId, string path)
 		{
 			ActivityRepository.Use(activityId, delegate(Activity activity)
 			{
@@ -1261,8 +1210,7 @@ namespace SvnBridge.SourceControl
 			});
 		}
 
-		private ItemProperties ReadPropertiesForItem(string path,
-													 ItemType itemType)
+		private ItemProperties ReadPropertiesForItem(string path, ItemType itemType)
 		{
 			ItemProperties properties = null;
 			string propertiesPath = GetPropertiesFileName(path, itemType);
@@ -1369,8 +1317,7 @@ namespace SvnBridge.SourceControl
 			return folderName;
 		}
 
-		private ItemMetaData GetPendingItem(string activityId,
-											string path)
+		private ItemMetaData GetPendingItem(string activityId, string path)
 		{
 			ItemSpec spec = new ItemSpec();
 			spec.item = Helper.CombinePath(rootPath, path);
@@ -1395,8 +1342,7 @@ namespace SvnBridge.SourceControl
 		}
 
 
-		private void SetItemProperties(IDictionary<string, FolderMetaData> folders,
-									   IEnumerable<KeyValuePair<string, ItemProperties>> properties)
+		private void SetItemProperties(IDictionary<string, FolderMetaData> folders, IEnumerable<KeyValuePair<string, ItemProperties>> properties)
 		{
 			foreach (KeyValuePair<string, ItemProperties> itemProperties in properties)
 			{
