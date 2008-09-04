@@ -27,7 +27,7 @@ namespace Tests
         protected ProtocolTestsBase()
         {
             provider = stubs.CreateTFSSourceControlProviderStub();
-            SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
+            SourceControlProviderFactory.CreateOverride = provider;
             PathParserProjectInPath pathParser = new PathParserProjectInPath("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null));
             HttpDispatcher = new HttpContextDispatcher(pathParser, stubs.CreateObject<ActionTrackingViaPerfCounter>());
             PerRequest.Init();
@@ -35,7 +35,7 @@ namespace Tests
 
         public void Dispose()
         {
-            SourceControlProviderFactory.CreateDelegate = null;
+            SourceControlProviderFactory.CreateOverride = null;
         }
 
         protected static byte[] GetBytes(string data)

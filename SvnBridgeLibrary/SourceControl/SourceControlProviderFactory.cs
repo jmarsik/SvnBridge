@@ -11,27 +11,18 @@ namespace SvnBridge.SourceControl
 
     public static class SourceControlProviderFactory
     {
-        private static CreateSourceControlProvider createDelegate;
-
-        public static CreateSourceControlProvider CreateDelegate
-        {
-            set { createDelegate = value; }
-        }
+        public static TFSSourceControlProvider CreateOverride;
 
         public static TFSSourceControlProvider Create(string serverUrl, string projectName, NetworkCredential credentials)
         {
-            if (createDelegate == null)
-            {
-                Hashtable deps = new Hashtable();
-                deps["serverUrl"] = serverUrl;
-                deps["projectName"] = projectName;
-                deps["credentials"] = credentials;
-                return Container.Resolve<TFSSourceControlProvider>(deps);
-            }
-            else
-            {
-                return createDelegate(serverUrl, credentials);
-            }
+            if (CreateOverride != null)
+                return CreateOverride;
+
+            Hashtable deps = new Hashtable();
+            deps["serverUrl"] = serverUrl;
+            deps["projectName"] = projectName;
+            deps["credentials"] = credentials;
+            return Container.Resolve<TFSSourceControlProvider>(deps);
         }
     }
 }

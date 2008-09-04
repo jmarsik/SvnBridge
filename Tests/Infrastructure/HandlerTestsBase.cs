@@ -6,10 +6,11 @@ using SvnBridge.Stubs;
 using Tests;
 using SvnBridge.Net;
 using Attach;
+using System;
 
 namespace SvnBridge.Infrastructure
 {
-    public abstract class HandlerTestsBase
+    public abstract class HandlerTestsBase : IDisposable
     {
         protected StubHttpContext context;
         protected StubHttpRequest request;
@@ -21,7 +22,7 @@ namespace SvnBridge.Infrastructure
         public HandlerTestsBase()
         {
             provider = stubs.CreateTFSSourceControlProviderStub();
-            SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
+            SourceControlProviderFactory.CreateOverride = provider;
             context = new StubHttpContext();
             request = new StubHttpRequest();
             request.Headers = new NameValueCollection();
@@ -31,6 +32,11 @@ namespace SvnBridge.Infrastructure
             context.Response = response;
             tfsUrl = "http://tfsserver";
             PerRequest.Init();
+        }
+
+        public void Dispose()
+        {
+            SourceControlProviderFactory.CreateOverride = null;
         }
     }
 }
