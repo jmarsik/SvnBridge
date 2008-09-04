@@ -11,12 +11,8 @@ namespace SvnBridge.Handlers
 {
     public class PropFindHandlerAllPropForFolderTests : HandlerTestsBase
     {
-        #region Setup/Teardown
-
-        public override void Setup()
+        public PropFindHandlerAllPropForFolderTests()
         {
-            base.Setup();
-
             handler = new PropFindHandler();
 
             item = new FolderMetaData();
@@ -26,8 +22,6 @@ namespace SvnBridge.Handlers
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
             stubs.Attach(provider.GetItems, item);
         }
-
-        #endregion
 
         private PropFindHandler handler;
         private FolderMetaData item;

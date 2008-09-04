@@ -20,11 +20,6 @@ namespace SvnBridge.Infrastructure
 
         public HandlerTestsBase()
         {
-            Setup();
-        }
-
-        public virtual void Setup()
-        {
             provider = stubs.CreateTFSSourceControlProviderStub();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             context = new StubHttpContext();

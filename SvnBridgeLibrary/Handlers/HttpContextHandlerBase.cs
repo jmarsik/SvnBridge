@@ -59,10 +59,7 @@ namespace SvnBridge.Handlers
 
         protected abstract void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider);
 
-		protected static void SetResponseSettings(IHttpResponse response,
-												  string contentType,
-												  Encoding contentEncoding,
-												  int status)
+		protected static void SetResponseSettings(IHttpResponse response, string contentType, Encoding contentEncoding, int status)
 		{
 			response.ContentType = contentType;
 			response.ContentEncoding = contentEncoding;

@@ -68,22 +68,19 @@ namespace SvnBridge.SourceControl
 			get { return sourceControlServicesHub.AssociateWorkItemWithChangeSet; }
 		}
 
-		public TFSSourceControlProvider(
-			string serverUrl,
-			string projectName,
-			ICredentials credentials,
-            SourceControlServicesHub sourceControlServicesHub)
+		public TFSSourceControlProvider(string serverUrl, string projectName, ICredentials credentials, SourceControlServicesHub sourceControlServicesHub)
 		{
 			this.sourceControlServicesHub = sourceControlServicesHub;
 			this.credentials = credentials;
 			this.serverUrl = serverUrl;
 			this.projectName = projectName;
 			this.credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
+            rootPath = Constants.ServerRootPath;
 
-			if (string.IsNullOrEmpty(projectName))
-				rootPath = Constants.ServerRootPath;
-			else
-				rootPath = Constants.ServerRootPath + this.projectName + "/";
+            if (!string.IsNullOrEmpty(projectName))
+            {
+                rootPath += projectName + "/";
+            }
 		}
 
 		public virtual string ServerUrl
