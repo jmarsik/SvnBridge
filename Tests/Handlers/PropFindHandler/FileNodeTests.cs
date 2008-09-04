@@ -6,6 +6,7 @@ using SvnBridge.Infrastructure;
 using SvnBridge.Nodes;
 using SvnBridge.SourceControl;
 using Tests;
+using Attach;
 
 namespace SvnBridge.Handlers
 {
@@ -28,8 +29,8 @@ namespace SvnBridge.Handlers
         [Fact]
         public void VerifyCheckedInPropertyGetsEncoded()
         {
-            StubSourceControlProvider sourceControlProvider = new StubSourceControlProvider();
-            sourceControlProvider.GetLatestVersion_Return = 5718;
+            TFSSourceControlProvider sourceControlProvider = stubs.CreateTFSSourceControlProviderStub();
+            stubs.Attach(sourceControlProvider.GetLatestVersion, 5718);
 
             XmlDocument xml = new XmlDocument();
             ItemMetaData item = new ItemMetaData();

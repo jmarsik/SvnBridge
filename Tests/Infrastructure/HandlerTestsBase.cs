@@ -5,15 +5,16 @@ using SvnBridge.SourceControl;
 using SvnBridge.Stubs;
 using Tests;
 using SvnBridge.Net;
+using Attach;
 
 namespace SvnBridge.Infrastructure
 {
     public abstract class HandlerTestsBase
     {
         protected StubHttpContext context;
-        protected StubSourceControlProvider provider;
         protected StubHttpRequest request;
         protected StubHttpResponse response;
+        protected TFSSourceControlProvider provider;
         protected MyMocks stubs = new MyMocks();
         protected string tfsUrl;
 
@@ -24,7 +25,7 @@ namespace SvnBridge.Infrastructure
 
         public virtual void Setup()
         {
-            provider = stubs.CreateObject<StubSourceControlProvider>();
+            provider = stubs.CreateTFSSourceControlProviderStub();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             context = new StubHttpContext();
             request = new StubHttpRequest();

@@ -42,6 +42,9 @@ namespace Tests
         {
             TFSSourceControlProvider stub = CreateObject<TFSSourceControlProvider>("http://www.codeplex.com", null, null, new SourceControlServicesHub(null, null, null, null, null, null, null, null));
             this.Attach(stub.GetRepositoryUuid, Return.Value(new Guid("81a5aebe-f34e-eb42-b435-ac1ecbb335f7")));
+            this.Attach(stub.GetItemsWithoutProperties, Return.DelegateResult(
+                delegate(object[] parameters) { return stub.GetItems((int)parameters[0], (string)parameters[1], (Recursion)parameters[2]); }
+            ));
             return stub;
         }
 

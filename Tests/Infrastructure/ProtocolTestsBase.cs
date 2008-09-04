@@ -21,12 +21,12 @@ namespace Tests
     public abstract class ProtocolTestsBase : IDisposable
     {
         protected HttpContextDispatcher HttpDispatcher;
-        protected StubSourceControlProvider provider;
+        protected TFSSourceControlProvider provider;
         protected MyMocks stubs = new MyMocks();
 
         protected ProtocolTestsBase()
         {
-            provider = stubs.CreateObject<StubSourceControlProvider>();
+            provider = stubs.CreateTFSSourceControlProviderStub();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
             PathParserProjectInPath pathParser = new PathParserProjectInPath("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null));
             HttpDispatcher = new HttpContextDispatcher(pathParser, stubs.CreateObject<ActionTrackingViaPerfCounter>());
