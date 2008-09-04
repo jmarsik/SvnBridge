@@ -19,15 +19,17 @@ namespace SvnBridge.Web
 			string tfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
 		    PerRequest.Items["serverUrl"] = tfsUrl;
 		    ProjectInformationRepository projectInformationRepository = Container.Resolve<ProjectInformationRepository>();
+            IPathParser pathParser;
 		    if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
 			{
-                dispatcher = new HttpContextDispatcher(new StaticServerWithProjectNameInHostNamePathParser(tfsUrl, projectInformationRepository), Container.Resolve<ActionTrackingViaPerfCounter>());
+                pathParser = new PathParserProjectInDomain(tfsUrl, projectInformationRepository);
 			}
 			else
 			{
-                dispatcher = new HttpContextDispatcher(new StaticServerPathParser(tfsUrl, projectInformationRepository), Container.Resolve<ActionTrackingViaPerfCounter>());
+                pathParser = new PathParserProjectInPath(tfsUrl, projectInformationRepository);
 			}
-		}
+            dispatcher = new HttpContextDispatcher(pathParser, Container.Resolve<ActionTrackingViaPerfCounter>());
+        }
 
 		#region IHttpHandler Members
 

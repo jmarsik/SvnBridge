@@ -4,9 +4,9 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.PathParsing
 {
-	public class StaticServerWithProjectNameInHostNamePathParser : StaticServerPathParser
+	public class PathParserProjectInDomain : PathParserProjectInPath
 	{
-	    public StaticServerWithProjectNameInHostNamePathParser(string server, ProjectInformationRepository projectInformationRepository) : base(server, projectInformationRepository)
+	    public PathParserProjectInDomain(string server, ProjectInformationRepository projectInformationRepository) : base(server, projectInformationRepository)
 	    {
 	    }
 

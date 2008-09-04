@@ -22,7 +22,7 @@ namespace SvnBridge.Handlers
             request.Path =
                 "http://localhost:8082//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Spikes/SvnFacade/trunk/New%20Folder%206";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             string expected =
@@ -50,7 +50,7 @@ namespace SvnBridge.Handlers
             stubs.Attach(provider.MakeCollection, new FolderAlreadyExistsException());
             request.Path = "http://localhost:8082//!svn/wrk/de1ec288-d55c-6146-950d-ceaf2ce9403b/newdir";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             string expected =
@@ -76,7 +76,7 @@ namespace SvnBridge.Handlers
             request.Path =
                 "http://localhost:8081//!svn/wrk/5b34ae67-87de-3741-a590-8bda26893532/Spikes/SvnFacade/trunk/Empty";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal(1, r.CallCount);
             Assert.Equal("5b34ae67-87de-3741-a590-8bda26893532", r.Parameters[0]);
@@ -89,7 +89,7 @@ namespace SvnBridge.Handlers
             Results r = stubs.Attach(provider.MakeCollection);
             request.Path = "http://localhost:8081//!svn/wrk/0eaf3261-5f80-a140-b21d-c1b0316a256a/Folder%20With%20Spaces";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal("/Folder With Spaces", r.Parameters[1]);
         }

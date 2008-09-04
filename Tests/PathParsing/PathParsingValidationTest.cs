@@ -14,37 +14,37 @@ namespace SvnBridge.PathParsing
         [Fact]
 		public void StaticServerWithProjectNameInHostNamePathParser_DoesNotAcceptInvalidUrl()
 		{
-			ValidateParserWillNotAcceptInvalidTfsUrl<StaticServerWithProjectNameInHostNamePathParser>();
+			ValidateParserWillNotAcceptInvalidTfsUrl<PathParserProjectInDomain>();
 		}
 
 		[Fact]
 		public void StaticServerPathParser_DoesNotAcceptInvalidUrl()
 		{
-			ValidateParserWillNotAcceptInvalidTfsUrl<StaticServerPathParser>();
+			ValidateParserWillNotAcceptInvalidTfsUrl<PathParserProjectInPath>();
 		}
 
         [Fact]
         public void StaticServerPathParser_AcceptValidUrl()
         {
-            ValidateParserWillAcceptValidTfsUrl<StaticServerPathParser>("https://codeplex.com");
+            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInPath>("https://codeplex.com");
         }
 
         [Fact]
         public void StaticServerWithProjectNameInHostNamePathParser_AcceptValidUrl()
         {
-            ValidateParserWillAcceptValidTfsUrl<StaticServerWithProjectNameInHostNamePathParser>("https://codeplex.com");
+            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInDomain>("https://codeplex.com");
         }
 
         [Fact]
         public void StaticServerPathParser_AcceptValidUrl_Muliple()
         {
-            ValidateParserWillAcceptValidTfsUrl<StaticServerPathParser>("https://codeplex.com,https://www.codeplex.com");
+            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInPath>("https://codeplex.com,https://www.codeplex.com");
         }
 
         [Fact]
         public void StaticServerWithProjectNameInHostNamePathParser_AcceptValidUrl_Muliple()
         {
-            ValidateParserWillAcceptValidTfsUrl<StaticServerWithProjectNameInHostNamePathParser>("https://codeplex.com,https://www.codeplex.com");
+            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInDomain>("https://codeplex.com,https://www.codeplex.com");
         }
 
 

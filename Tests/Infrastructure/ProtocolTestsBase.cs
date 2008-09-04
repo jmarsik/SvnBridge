@@ -28,7 +28,7 @@ namespace Tests
         {
             provider = stubs.CreateObject<StubSourceControlProvider>();
             SourceControlProviderFactory.CreateDelegate = delegate { return provider; };
-            StaticServerPathParser pathParser = new StaticServerPathParser("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null));
+            PathParserProjectInPath pathParser = new PathParserProjectInPath("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null));
             HttpDispatcher = new HttpContextDispatcher(pathParser, stubs.CreateObject<ActionTrackingViaPerfCounter>());
             PerRequest.Init();
         }

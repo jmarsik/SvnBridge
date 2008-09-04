@@ -22,7 +22,7 @@ namespace SvnBridge.Handlers
             request.Headers["Destination"] =
                 "http://localhost:8084//!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
 
             Assert.True(
@@ -38,7 +38,7 @@ namespace SvnBridge.Handlers
             request.Headers["Destination"] =
                 "http://localhost:8082//!svn/wrk/cdfcf93f-8649-5e44-a8ec-b3f40e10e907/FileRenamed.txt";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             string expected =
                 "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n" +
@@ -70,7 +70,7 @@ namespace SvnBridge.Handlers
             request.Headers["Destination"] =
                 "http://localhost:8084//!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.True(
                 response.Headers.Contains(
@@ -86,7 +86,7 @@ namespace SvnBridge.Handlers
             request.Headers["Destination"] =
                 "http://localhost:8084//!svn/wrk/15407bc3-2250-aa4c-aa51-4e65b2c824c3/BB%20!@%23$%25%5E&()_-+=%7B%5B%7D%5D%3B',.~%60";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal(1, r.CallCount);
             Assert.Equal("15407bc3-2250-aa4c-aa51-4e65b2c824c3", r.Parameters[0]);

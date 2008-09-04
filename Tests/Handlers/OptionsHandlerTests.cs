@@ -17,7 +17,7 @@ namespace SvnBridge.Handlers
             Results r = stubs.Attach(provider.ItemExists, true);
             request.Path = "http://localhost:8082/Spikes/SvnFacade/trunk/New%20Folder%207";
 
-        	handler.Handle(context, new StaticServerPathParser(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
 
             Assert.Equal("/Spikes/SvnFacade/trunk/New Folder 7", r.Parameters[0]);
         }

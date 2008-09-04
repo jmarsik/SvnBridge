@@ -17,7 +17,7 @@ namespace SvnBridge.PathParsing
         [Fact]
         public void VerifyGetLocalPathWhenPathIsRootReturnsRootPath()
         {
-            StaticServerPathParser parser = new StaticServerPathParser("http://www.codeplex.com", stubs.CreateObject<ProjectInformationRepository>(null, null));
+            PathParserProjectInPath parser = new PathParserProjectInPath("http://www.codeplex.com", stubs.CreateObject<ProjectInformationRepository>(null, null));
             StubHttpRequest request = new StubHttpRequest();
 
             string result = parser.GetLocalPath(request, "http://www.root.com");
@@ -28,7 +28,7 @@ namespace SvnBridge.PathParsing
         [Fact]
         public void Test()
         {
-            StaticServerPathParser parser = new StaticServerPathParser("http://svnbridgetesting.redmond.corp.microsoft.com", stubs.CreateObject<ProjectInformationRepository>(null, null));
+            PathParserProjectInPath parser = new PathParserProjectInPath("http://svnbridgetesting.redmond.corp.microsoft.com", stubs.CreateObject<ProjectInformationRepository>(null, null));
 
             string result = parser.GetPathFromDestination("http://svnbridgetesting.redmond.corp.microsoft.com/svn/!svn/wrk/6874f51f-0540-b24f-bbd8-eac3072c5a51/Test/Test2.txt");
 

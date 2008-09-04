@@ -7,8 +7,7 @@ using SvnBridge.Interfaces;
 
 namespace SvnBridge.SourceControl
 {
-    public delegate TFSSourceControlProvider CreateSourceControlProvider(string serverUrl,
-                                                                       NetworkCredential credentials);
+    public delegate TFSSourceControlProvider CreateSourceControlProvider(string serverUrl, NetworkCredential credentials);
 
     public static class SourceControlProviderFactory
     {
@@ -19,9 +18,7 @@ namespace SvnBridge.SourceControl
             set { createDelegate = value; }
         }
 
-        public static TFSSourceControlProvider Create(string serverUrl,
-                                                    string projectName,
-                                                    NetworkCredential credentials)
+        public static TFSSourceControlProvider Create(string serverUrl, string projectName, NetworkCredential credentials)
         {
             if (createDelegate == null)
             {

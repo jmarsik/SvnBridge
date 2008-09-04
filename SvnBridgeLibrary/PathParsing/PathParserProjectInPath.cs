@@ -6,12 +6,12 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.PathParsing
 {
-	public class StaticServerPathParser : BasePathParser
+	public class PathParserProjectInPath : BasePathParser
 	{
 		private readonly string server;
 	    private readonly ProjectInformationRepository projectInformationRepository;
 
-        public StaticServerPathParser(string server, ProjectInformationRepository projectInformationRepository)
+        public PathParserProjectInPath(string server, ProjectInformationRepository projectInformationRepository)
         {
             foreach (string singleServerUrl in server.Split(','))
             {

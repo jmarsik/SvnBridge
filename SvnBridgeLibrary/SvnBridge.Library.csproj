@@ -72,9 +72,9 @@
     <Compile Include="Infrastructure\MetaDataRepository.cs" />
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="PathParsing\BasePathParser.cs" />
-    <Compile Include="PathParsing\RequestBasePathParser.cs" />
-    <Compile Include="PathParsing\StaticServerPathParser.cs" />
-    <Compile Include="PathParsing\StaticServerWithProjectNameInHostNamePathParser.cs" />
+    <Compile Include="PathParsing\PathParserServerAndProjectInPath.cs" />
+    <Compile Include="PathParsing\PathParserProjectInPath.cs" />
+    <Compile Include="PathParsing\PathParserProjectInDomain.cs" />
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />
     <Compile Include="Infrastructure\ExceptionHelper.cs" />
     <Compile Include="Infrastructure\SourceControlServicesHub.cs" />

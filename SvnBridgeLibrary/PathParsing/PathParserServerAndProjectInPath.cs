@@ -7,11 +7,11 @@ using SvnBridge.Infrastructure;
 
 namespace SvnBridge.PathParsing
 {
-	public class RequestBasePathParser : BasePathParser
+	public class PathParserServerAndProjectInPath : BasePathParser
 	{
 		private readonly TfsUrlValidator urlValidator;
 
-		public RequestBasePathParser(TfsUrlValidator urlValidator)
+		public PathParserServerAndProjectInPath(TfsUrlValidator urlValidator)
 		{
 			this.urlValidator = urlValidator;
 		}

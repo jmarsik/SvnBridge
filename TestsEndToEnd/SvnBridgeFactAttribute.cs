@@ -53,7 +53,7 @@ namespace TestsEndToEnd
 			                 (new Uri(test.ServerUrl).Host + ":" + new Uri(test.ServerUrl).Port)
 			                 + "/SvnBridgeTesting" + test.TestPath;
 
-			IPathParser parser = new RequestBasePathParser(new TfsUrlValidator(new WebCache()));
+			IPathParser parser = new PathParserServerAndProjectInPath(new TfsUrlValidator(new WebCache()));
 
 			((EndToEndTestBase) testClass).Initialize(testUrl, parser);
 			try

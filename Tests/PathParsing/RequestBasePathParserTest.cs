@@ -19,7 +19,7 @@ namespace SvnBridge.PathParsing
             TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
             Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(true));
 
-            RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
+            PathParserServerAndProjectInPath parser = new PathParserServerAndProjectInPath(urlValidator);
             StubHttpRequest request = new StubHttpRequest
             {
                 Url = new Uri("http://localhost:8081/tfs03.codeplex.com/SvnBridge")
@@ -35,7 +35,7 @@ namespace SvnBridge.PathParsing
             TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
             Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(false));
 
-            RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
+            PathParserServerAndProjectInPath parser = new PathParserServerAndProjectInPath(urlValidator);
             IHttpRequest request = new StubHttpRequest
             {
                 Url = new Uri("http://localhost:8081/tfs03.codeplex.com/SvnBridge")
@@ -52,7 +52,7 @@ namespace SvnBridge.PathParsing
             TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
             Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(true));
 
-            RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
+            PathParserServerAndProjectInPath parser = new PathParserServerAndProjectInPath(urlValidator);
             IHttpRequest request = new StubHttpRequest
             {
                 Url = new Uri("http://localhost:8081/tfs03.codeplex.com:8080/SvnBridge")
@@ -69,7 +69,7 @@ namespace SvnBridge.PathParsing
             TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
             Results r1 = stubs.Attach(urlValidator.IsValidTfsServerUrl, Return.Value(true));
 
-            RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
+            PathParserServerAndProjectInPath parser = new PathParserServerAndProjectInPath(urlValidator);
             IHttpRequest request = new StubHttpRequest
             {
                 Url = new Uri("http://localhost:8081/tfs03.codeplex.com:8080/SvnBridge/Foo")
@@ -87,7 +87,7 @@ namespace SvnBridge.PathParsing
 
             TfsUrlValidator urlValidator = stubs.CreateObject<TfsUrlValidator>(null);
 
-            RequestBasePathParser parser = new RequestBasePathParser(urlValidator);
+            PathParserServerAndProjectInPath parser = new PathParserServerAndProjectInPath(urlValidator);
             string url = parser.GetLocalPath(request);
             Assert.Equal("/SvnBridge", url);
 
