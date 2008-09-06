@@ -22,7 +22,7 @@ namespace SvnBridge.Infrastructure
         public HandlerTestsBase()
         {
             provider = stubs.CreateTFSSourceControlProviderStub();
-            SourceControlProviderFactory.CreateOverride = provider;
+            Container.Register(typeof(TFSSourceControlProvider), provider);
             context = new StubHttpContext();
             request = new StubHttpRequest();
             request.Headers = new NameValueCollection();
@@ -36,7 +36,7 @@ namespace SvnBridge.Infrastructure
 
         public void Dispose()
         {
-            SourceControlProviderFactory.CreateOverride = null;
+            Container.Reset();
         }
     }
 }

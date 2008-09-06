@@ -13,7 +13,17 @@ namespace SvnBridge.Infrastructure
     {
         private static Container container = new Container();
 
+        public static void Reset()
+        {
+            container = new Container();
+        }
+
         public static void Register(Type service, Type impl)
+        {
+            container.RegisterType(service, impl);
+        }
+
+        public static void Register(Type service, object impl)
         {
             container.RegisterType(service, impl);
         }
@@ -47,6 +57,11 @@ namespace SvnBridge.Infrastructure
                     }
                 }
             }
+        }
+
+        public void RegisterType(Type service, object impl)
+        {
+            typeToCreator.Add(service, delegate(IDictionary constructorParams) { return impl; });
         }
 
         public object ResolveType(Type type, IDictionary constructorParams)

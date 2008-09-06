@@ -8,6 +8,8 @@ using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.SourceControl;
 using SvnBridge.Utility;
+using SvnBridge.Infrastructure;
+using System.Collections;
 
 namespace SvnBridge.Handlers
 {
@@ -43,8 +45,13 @@ namespace SvnBridge.Handlers
 			string tfsUrl = pathParser.GetServerUrl(request, credentials);
             string projectName = pathParser.GetProjectName(context.Request);
 
-			sourceControlProvider = SourceControlProviderFactory.Create(tfsUrl, projectName, credentials);
-		    Handle(context, sourceControlProvider);
+            Hashtable constructorParams = new Hashtable();
+            constructorParams["serverUrl"] = tfsUrl;
+            constructorParams["projectName"] = projectName;
+            constructorParams["credentials"] = credentials;
+            sourceControlProvider = Container.Resolve<TFSSourceControlProvider>(constructorParams);
+
+            Handle(context, sourceControlProvider);
 		}
 
 		public void Initialize(IHttpContext context, IPathParser parser)
