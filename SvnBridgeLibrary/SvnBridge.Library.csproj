@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SvnBridge</RootNamespace>
-    <AssemblyName>SvnFacade.Library</AssemblyName>
+    <AssemblyName>SvnBridge.Library</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>

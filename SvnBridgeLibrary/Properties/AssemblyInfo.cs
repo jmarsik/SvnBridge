@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly : AssemblyTitle("SvnFacadeLibrary")]
+[assembly : AssemblyTitle("SvnBridgeLibrary")]
 [assembly : AssemblyDescription("")]
 [assembly : AssemblyConfiguration("")]
-[assembly : AssemblyCompany("MSIT")]
-[assembly : AssemblyProduct("SvnFacadeLibrary")]
-[assembly : AssemblyCopyright("Copyright © MSIT 2007")]
+[assembly : AssemblyCompany("Microsoft")]
+[assembly : AssemblyProduct("SvnBridgeLibrary")]
+[assembly : AssemblyCopyright("Copyright © Microsoft 2007")]
 [assembly : AssemblyTrademark("")]
 [assembly : AssemblyCulture("")]
 
