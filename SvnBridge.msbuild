@@ -20,7 +20,7 @@
 	<Target Name="Test" DependsOnTargets="UnitTest;ProtocolTest;IntegrationTest;EndToEndTest" />
 
 	<Target Name="Zip" DependsOnTargets="Merge">
-		<Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip Merge\SvnBridge.exe"/>
+		<Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip Merge\SvnBridge.exe Merge\SvnBridge.dll"/>
 	</Target>
 
 	<!-- Individiual targets -->
