@@ -68,11 +68,11 @@ namespace SvnBridge
         public void Resolve_ConstructorParametersAreSpecified_ConstructorCalledWithCorrectValues()
         {
             Hashtable constructorParams = new Hashtable();
-            constructorParams["containerTest"] = 987;
+            constructorParams["cacheEnabled"] = false;
 
             StubContainerTest result = container.Resolve<StubContainerTest>(constructorParams);
 
-            Assert.Equal(987, result.Constructor_Param);
+            Assert.Equal(false, result.Constructor_Param);
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace SvnBridge
         {
             StubContainerTest result = container.Resolve<StubContainerTest>();
 
-            Assert.Equal(123, result.Constructor_Param);
+            Assert.Equal(true, result.Constructor_Param);
         }
 
         [Fact]
@@ -129,11 +129,11 @@ namespace SvnBridge
         [Interceptor(typeof(TestInterceptor))]
         public class StubContainerTest : MarshalByRefObject
         {
-            public int Constructor_Param;
+            public bool Constructor_Param;
 
-            public StubContainerTest(int containerTest)
+            public StubContainerTest(bool cacheEnabled)
             {
-                Constructor_Param = containerTest;
+                Constructor_Param = cacheEnabled;
             }
 
             public void Test()
