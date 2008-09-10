@@ -20,7 +20,7 @@ namespace IntegrationTests
 	public class MetaDataRepositoryTest : TFSSourceControlProviderTestsBase
 	{
 		private readonly TFSSourceControlService sourceControlService;
-		private readonly MetaDataRepository repository;
+		private readonly MetaDataRepositoryCache repository;
 		private readonly ICredentials credentials;
 
 		public MetaDataRepositoryTest()
@@ -28,7 +28,7 @@ namespace IntegrationTests
 			credentials = GetCredentials();
 			sourceControlService = Container.Resolve<TFSSourceControlService>();
 
-			repository = new MetaDataRepository(sourceControlService, credentials,
+			repository = new MetaDataRepositoryCache(sourceControlService, credentials,
                                                 Container.Resolve<MemoryBasedPersistentCache>(), ServerUrl, Constants.ServerRootPath + PROJECT_NAME);
 		}
 

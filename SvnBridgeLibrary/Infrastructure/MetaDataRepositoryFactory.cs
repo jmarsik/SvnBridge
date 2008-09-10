@@ -22,7 +22,7 @@ namespace SvnBridge.Infrastructure
 		{
             if (cacheEnabled)
             {
-                return new MetaDataRepository(sourceControlService, credentials, persistentCache, serverUrl, rootPath);
+                return new MetaDataRepositoryCache(sourceControlService, credentials, persistentCache, serverUrl, rootPath);
             }
             else
             {

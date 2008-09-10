@@ -1,8 +1,7 @@
 namespace SvnBridge.Interfaces
 {
     /// <summary>
-    /// We need this helper class to get
-    /// null caching
+    /// We need this helper class so we can store a null cache value
     /// </summary>
     public class CachedResult
     {

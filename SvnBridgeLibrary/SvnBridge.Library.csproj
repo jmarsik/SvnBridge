@@ -69,7 +69,7 @@
     <Compile Include="Net\PerRequest.cs" />
     <Compile Include="Infrastructure\DefaultLogger.cs" />
     <Compile Include="Interfaces\IMetaDataRepository.cs" />
-    <Compile Include="Infrastructure\MetaDataRepository.cs" />
+    <Compile Include="Infrastructure\MetaDataRepositoryCache.cs" />
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="PathParsing\BasePathParser.cs" />
     <Compile Include="PathParsing\PathParserServerAndProjectInPath.cs" />
@@ -78,7 +78,7 @@
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />
     <Compile Include="Infrastructure\ExceptionHelper.cs" />
     <Compile Include="Infrastructure\SourceControlServicesHub.cs" />
-    <Compile Include="Interfaces\CachedResult.cs" />
+    <Compile Include="Cache\CachedResult.cs" />
     <Compile Include="Interfaces\IInterceptor.cs" />
     <Compile Include="Interfaces\IInvocation.cs" />
     <Compile Include="Infrastructure\InterceptorAttribute.cs" />

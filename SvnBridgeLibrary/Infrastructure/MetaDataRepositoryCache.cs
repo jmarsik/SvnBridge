@@ -12,7 +12,7 @@ using SvnBridge.Cache;
 namespace SvnBridge.Infrastructure
 {
     [Interceptor(typeof(TracingInterceptor))]
-    public class MetaDataRepository : IMetaDataRepository
+    public class MetaDataRepositoryCache : IMetaDataRepository
     {
         private readonly string serverUrl;
         private readonly string rootPath;
@@ -20,7 +20,7 @@ namespace SvnBridge.Infrastructure
         private readonly MemoryBasedPersistentCache persistentCache;
         private readonly TFSSourceControlService sourceControlService;
 
-        public MetaDataRepository(
+        public MetaDataRepositoryCache(
             TFSSourceControlService sourceControlService,
             ICredentials credentials,
             MemoryBasedPersistentCache persistentCache,
