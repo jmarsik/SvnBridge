@@ -62,9 +62,7 @@ namespace SvnBridge.Infrastructure.Statistics
             catch (SecurityException)
             {
                 enabled = false;
-                bool countersAreMandatory;
-                bool.TryParse(ConfigurationManager.AppSettings["PerfCountersAreMandatory"], out countersAreMandatory);
-                if (countersAreMandatory == false)
+                if (!Configuration.PerfCountersMandatory)
                     return;
                 throw new InvalidOperationException("Could not create performance counters for SvnBridge. Please run the SvnBridge.PerfCounter.Installer.exe program to install them." + Environment.NewLine +
                     "You can also make them optional by turning off the 'PerfCountersAreMandatory' setting in the application configuration file.");

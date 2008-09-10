@@ -23,10 +23,10 @@
     <Setting Name="ProxyEncryptedPassword" Type="System.Byte[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="LogPath" Type="System.String" Scope="Application">
+    <Setting Name="LogPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TraceEnabled" Type="System.Boolean" Scope="Application">
+    <Setting Name="TraceEnabled" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

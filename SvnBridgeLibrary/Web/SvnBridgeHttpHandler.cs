@@ -1,4 +1,3 @@
-using System.Configuration;
 using System.Reflection;
 using System.Web;
 using SvnBridge.Infrastructure;
@@ -16,11 +15,11 @@ namespace SvnBridge.Web
 
 		public SvnBridgeHttpHandler()
 		{
-			string tfsUrl = ConfigurationManager.AppSettings["TfsUrl"];
+			string tfsUrl = Configuration.TfsUrl;
 		    PerRequest.Items["serverUrl"] = tfsUrl;
 		    ProjectInformationRepository projectInformationRepository = Container.Resolve<ProjectInformationRepository>();
             IPathParser pathParser;
-		    if (ConfigurationManager.AppSettings["URLIncludesProjectName"].ToLower() == "true")
+		    if (Configuration.UrlIncludesProjectName)
 			{
                 pathParser = new PathParserProjectInDomain(tfsUrl, projectInformationRepository);
 			}

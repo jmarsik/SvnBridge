@@ -148,9 +148,9 @@ namespace SvnBridge.Infrastructure
 
         private object TryGetConfiguration(string name)
         {
-            if (ConfigurationManager.AppSettings[name] != null)
+            if (Configuration.AppSettings(name) != null)
             {
-                return ConfigurationManager.AppSettings[name];
+                return Configuration.AppSettings(name);
             }
             if (PerRequest.IsInitialized && PerRequest.Items.Contains(name))
             {

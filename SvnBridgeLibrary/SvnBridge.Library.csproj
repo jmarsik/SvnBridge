@@ -52,6 +52,7 @@
     <Compile Include="Cache\HashSet.cs" />
     <Compile Include="Cache\MemoryBasedPersistentCache.cs" />
     <Compile Include="Handlers\Renderers\StatsRenderer.cs" />
+    <Compile Include="Infrastructure\Configuration.cs" />
     <Compile Include="Infrastructure\FileRepository.cs" />
     <Compile Include="Infrastructure\MetaDataRepositoryNoCache.cs" />
     <Compile Include="Infrastructure\Statistics\ActionTrackingViaPerfCounter.cs" />

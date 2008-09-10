@@ -70,8 +70,7 @@ namespace SvnBridge.Infrastructure
             }
             catch (Exception)
             {
-                //We don't have anything to do here, can't 
-                // fix errors in error handling code
+                //We don't have anything to do here, can't fix errors in error handling code
             }
         }
 
@@ -101,9 +100,11 @@ namespace SvnBridge.Infrastructure
             {
                 if (logPath != null)
                     return logPath;
-                logPath = ConfigurationManager.AppSettings["LogPath"];
+
+                logPath = Configuration.LogPath;
                 if (logPath != null)
-                    return logPath.Replace("~", AppDomain.CurrentDomain.BaseDirectory);
+                    return logPath;
+
                 logPath = "";
                 try
                 {
