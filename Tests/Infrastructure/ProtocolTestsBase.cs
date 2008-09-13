@@ -30,7 +30,7 @@ namespace Tests
             Container.Register(typeof(TFSSourceControlProvider), provider);
             PathParserProjectInPath pathParser = new PathParserProjectInPath("http://foo", stubs.CreateObject<ProjectInformationRepository>(null, null));
             HttpDispatcher = new HttpContextDispatcher(pathParser, stubs.CreateObject<ActionTrackingViaPerfCounter>());
-            PerRequest.Init();
+            RequestCache.Init();
         }
 
         public void Dispose()

@@ -22,7 +22,7 @@ namespace SvnBridgeServer
 		public SvnBridgeHttpHandler()
 		{
 			string tfsUrl = Configuration.TfsUrl;
-		    PerRequest.Items["serverUrl"] = tfsUrl;
+		    RequestCache.Items["serverUrl"] = tfsUrl;
 		    ProjectInformationRepository projectInformationRepository = Container.Resolve<ProjectInformationRepository>();
             IPathParser pathParser;
 		    if (Configuration.UrlIncludesProjectName)

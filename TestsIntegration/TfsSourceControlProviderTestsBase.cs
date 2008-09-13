@@ -36,7 +36,7 @@ namespace IntegrationTests
 		public TFSSourceControlProviderTestsBase()
 		{
             stubs = new MyMocks();
-			PerRequest.Init();
+			RequestCache.Init();
 			new BootStrapper().Start();
             Container.Resolve<MemoryBasedPersistentCache>().Clear();
 
@@ -151,7 +151,7 @@ namespace IntegrationTests
 			_lastCommitRevision = response.Version;
 			_provider.DeleteActivity(_activityId);
 			_provider.MakeActivity(_activityId);
-			PerRequest.Init();
+			RequestCache.Init();
 			return response;
 		}
 
@@ -159,7 +159,7 @@ namespace IntegrationTests
 		{
 			MergeActivityResponse response = _providerRoot.MergeActivity(_activityIdRoot);
 			_lastCommitRevision = response.Version;
-			PerRequest.Init();
+			RequestCache.Init();
 			_providerRoot.DeleteActivity(_activityIdRoot);
 			_providerRoot.MakeActivity(_activityIdRoot);
 			return response;

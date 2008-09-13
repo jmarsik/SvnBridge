@@ -107,12 +107,12 @@ namespace SvnBridge.Infrastructure
         {
             get
             {
-                string currentUserName = PerRequest.Items["CurrentUserName"] as string;
+                string currentUserName = RequestCache.Items["CurrentUserName"] as string;
                 if (currentUserName != null)
                     return currentUserName;
                 NetworkCredential credential = credentials.GetCredential(new Uri(serverUrl), "Basic");
                 currentUserName = credential.UserName + "@" + credential.Domain;
-                PerRequest.Items["CurrentUserName"] = currentUserName;
+                RequestCache.Items["CurrentUserName"] = currentUserName;
                 return currentUserName;
             }
         }

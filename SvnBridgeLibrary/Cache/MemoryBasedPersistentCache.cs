@@ -39,9 +39,9 @@ namespace SvnBridge.Cache
             CachedResult result = null;
             ReadLock(delegate
             {
-                if (PerRequest.Items.Contains(key))
+                if (RequestCache.Items.Contains(key))
                 {
-                    result = new CachedResult(PerRequest.Items[key]);
+                    result = new CachedResult(RequestCache.Items[key]);
                 }
                 else
                 {
@@ -50,7 +50,7 @@ namespace SvnBridge.Cache
                     {
                         // we have to store it back in the per request, to ensure that we
                         // wouldn't lose it during this request
-                        PerRequest.Items[key] = result.Value;
+                        RequestCache.Items[key] = result.Value;
                     }
                 }
             });
@@ -78,7 +78,7 @@ namespace SvnBridge.Cache
         public virtual void Set(string key, object obj)
         {
             cache.Set(key, obj);
-            PerRequest.Items[key] = obj;
+            RequestCache.Items[key] = obj;
 
         }
 
@@ -106,7 +106,7 @@ namespace SvnBridge.Cache
             bool result = false;
             ReadLock(delegate
             {
-                result = PerRequest.Items.Contains(key);
+                result = RequestCache.Items.Contains(key);
                 if (result == false)
                     result = cache.Get(key) != null;
             });
@@ -118,8 +118,8 @@ namespace SvnBridge.Cache
             rwLock.AcquireWriterLock(Timeout.Infinite);
             try
             {
-                if(PerRequest.IsInitialized)
-                    PerRequest.Items.Clear();
+                if(RequestCache.IsInitialized)
+                    RequestCache.Items.Clear();
                 cache.Clear();
             }
             finally

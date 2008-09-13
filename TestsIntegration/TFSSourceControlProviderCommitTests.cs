@@ -24,7 +24,7 @@ namespace IntegrationTests
 			_provider.MergeActivity(activity2);
 
 			_provider.MergeActivity(activity1);
-			PerRequest.Init();
+			RequestCache.Init();
 
 			FolderMetaData items = (FolderMetaData)_provider.GetItems(_provider.GetLatestVersion(), testPath, Recursion.Full);
 			Assert.Equal(2, items.Items.Count);

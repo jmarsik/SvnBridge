@@ -17,7 +17,7 @@ namespace IntegrationTests
 		{
             WebCache webCache = new WebCache();
             webCache.Clear();
-			PerRequest.Init();
+			RequestCache.Init();
             cache = new MemoryBasedPersistentCache(webCache);
 		}
 

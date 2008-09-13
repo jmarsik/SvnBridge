@@ -31,7 +31,7 @@ namespace SvnBridge.Infrastructure
             response.OutputStream = new MemoryStream(Constants.BufferSize);
             context.Response = response;
             tfsUrl = "http://tfsserver";
-            PerRequest.Init();
+            RequestCache.Init();
         }
 
         public void Dispose()

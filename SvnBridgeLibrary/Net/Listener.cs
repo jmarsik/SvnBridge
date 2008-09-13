@@ -107,7 +107,7 @@ namespace SvnBridge.Net
                 DateTime start = DateTime.Now;
                 try
                 {
-					PerRequest.Init();
+					RequestCache.Init();
                     dispatcher.Dispatch(connection);
                 }
                 catch (Exception exception)
@@ -143,7 +143,7 @@ namespace SvnBridge.Net
                 }
                 finally
                 {
-                    PerRequest.Dispose();
+                    RequestCache.Dispose();
                     FlushConnection(connection);
                     TimeSpan duration = DateTime.Now - start;
                     FinishedHandling(this, new FinishedHandlingEventArgs(duration,

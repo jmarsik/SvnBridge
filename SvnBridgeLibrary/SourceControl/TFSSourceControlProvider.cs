@@ -237,10 +237,10 @@ namespace SvnBridge.SourceControl
 		public virtual int GetLatestVersion()
 		{
 			const string latestVersion = "Repository.Latest.Version";
-			if (PerRequest.Items[latestVersion] != null)
-				return (int)PerRequest.Items[latestVersion];
+			if (RequestCache.Items[latestVersion] != null)
+				return (int)RequestCache.Items[latestVersion];
 			int changeset = SourceControlService.GetLatestChangeset(serverUrl, credentials);
-			PerRequest.Items[latestVersion] = changeset;
+			RequestCache.Items[latestVersion] = changeset;
 			return changeset;
 		}
 

@@ -152,9 +152,9 @@ namespace SvnBridge.Infrastructure
             {
                 return Configuration.AppSettings(name);
             }
-            if (PerRequest.IsInitialized && PerRequest.Items.Contains(name))
+            if (RequestCache.IsInitialized && RequestCache.Items.Contains(name))
             {
-                return PerRequest.Items[name];
+                return RequestCache.Items[name];
             }
             return null;
         }

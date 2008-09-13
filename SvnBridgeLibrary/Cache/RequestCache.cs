@@ -4,10 +4,10 @@ using System.Web;
 
 namespace SvnBridge.Net
 {
-	public static class PerRequest
+	public static class RequestCache
 	{
 		[ThreadStatic] private static IDictionary currentItems;
-	    private static bool? runningOnWeb;
+	    private static bool? runningInIIS;
 
 	    public static void Init()
 		{
@@ -23,20 +23,22 @@ namespace SvnBridge.Net
 		{
 			get
 			{
-				EnsureInitialized();
-			    if (RunningOnWeb)
+			    if (RunningInIIS)
 					return HttpContext.Current.Items;
-				return currentItems;
+                
+                EnsureInitialized();
+                return currentItems;
 			}
 		}
 
-	    private static bool RunningOnWeb
+	    private static bool RunningInIIS
 	    {
 	        get
 	        {
-                if (runningOnWeb == null)
-                    runningOnWeb = HttpContext.Current != null;
-	            return runningOnWeb.Value;
+                if (runningInIIS == null)
+                    runningInIIS = HttpContext.Current != null;
+
+	            return runningInIIS.Value;
 	        }
 	    }
 
@@ -44,14 +46,14 @@ namespace SvnBridge.Net
 		{
 			get
 			{
-				return RunningOnWeb || currentItems != null;
+				return RunningInIIS || currentItems != null;
 			}
 		}
 
 		public static void EnsureInitialized()
 		{
-            if (RunningOnWeb == false && currentItems == null)
-				throw new InvalidOperationException("Cannot use PerRequest Items if it wasn't initialized");
+            if (!RunningInIIS && currentItems == null)
+				throw new InvalidOperationException("Cannot use RequestCache if it wasn't initialized");
 		}
 	}
 }
