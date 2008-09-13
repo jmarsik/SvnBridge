@@ -1,4 +1,4 @@
-using SvnBridge.Net;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Stubs
 {

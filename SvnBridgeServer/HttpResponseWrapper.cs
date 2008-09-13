@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Web;
-using SvnBridge.Net;
+using SvnBridge.Interfaces;
 
 namespace SvnBridgeServer
 {

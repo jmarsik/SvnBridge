@@ -2,7 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.IO;
 
-namespace SvnBridge.Net
+namespace SvnBridge.Interfaces
 {
     public interface IHttpRequest
     {

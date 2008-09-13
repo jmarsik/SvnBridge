@@ -130,9 +130,9 @@
     <Compile Include="Net\HttpContextDispatcher.cs" />
     <Compile Include="Net\ListenerRequest.cs" />
     <Compile Include="Net\ListenerResponse.cs" />
-    <Compile Include="Net\IHttpContext.cs" />
-    <Compile Include="Net\IHttpRequest.cs" />
-    <Compile Include="Net\IHttpResponse.cs" />
+    <Compile Include="Interfaces\IHttpContext.cs" />
+    <Compile Include="Interfaces\IHttpRequest.cs" />
+    <Compile Include="Interfaces\IHttpResponse.cs" />
     <Compile Include="Net\Listener.cs" />
     <Compile Include="Net\ListenerResponseStream.cs" />
     <Compile Include="Handlers\PropFindHandler\BcFileNode.cs" />

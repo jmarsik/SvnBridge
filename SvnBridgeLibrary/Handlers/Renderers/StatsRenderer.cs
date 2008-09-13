@@ -1,6 +1,6 @@
 using System.IO;
 using SvnBridge.Infrastructure.Statistics;
-using SvnBridge.Net;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Handlers.Renderers
 {

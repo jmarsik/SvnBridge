@@ -2,7 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text;
-using SvnBridge.Net;
+using SvnBridge.Interfaces;
 
 namespace SvnBridge.Stubs
 {

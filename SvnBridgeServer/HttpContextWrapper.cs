@@ -1,5 +1,5 @@
 using System.Web;
-using SvnBridge.Net;
+using SvnBridge.Interfaces;
 
 namespace SvnBridgeServer
 {

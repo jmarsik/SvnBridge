@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace SvnBridge.Net
+namespace SvnBridge.Interfaces
 {
     public interface IHttpResponse
     {
