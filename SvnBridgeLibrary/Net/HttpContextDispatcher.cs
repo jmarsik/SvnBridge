@@ -24,7 +24,7 @@ namespace SvnBridge.Net
             this.actionTracking = actionTracking;
         }
 
-        public virtual HandlerBase GetHandler(string httpMethod)
+        public virtual RequestHandlerBase GetHandler(string httpMethod)
         {
             switch (httpMethod.ToLowerInvariant())
             {
@@ -59,7 +59,7 @@ namespace SvnBridge.Net
 
         public void Dispatch(IHttpContext connection)
         {
-            HandlerBase handler = null;
+            RequestHandlerBase handler = null;
             try
             {
                 IHttpRequest request = connection.Request;

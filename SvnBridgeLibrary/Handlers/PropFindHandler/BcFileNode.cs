@@ -24,7 +24,7 @@ namespace SvnBridge.Nodes
 
         #region INode Members
 
-        public string Href(HandlerBase handler)
+        public string Href(RequestHandlerBase handler)
         {
             string path = item.Name;
 
@@ -43,7 +43,7 @@ namespace SvnBridge.Nodes
         	return handler.GetLocalPath(Helper.Encode(href));
         }
 
-        public string GetProperty(HandlerBase handler, XmlElement property)
+        public string GetProperty(RequestHandlerBase handler, XmlElement property)
         {
             return node.GetProperty(handler, property);
         }

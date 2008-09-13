@@ -10,7 +10,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-	public class MergeHandler : HandlerBase
+	public class MergeHandler : RequestHandlerBase
 	{
 		protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

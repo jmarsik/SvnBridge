@@ -24,7 +24,7 @@ namespace SvnBridge.Nodes
 
         #region INode Members
 
-        public string Href(HandlerBase handler)
+        public string Href(RequestHandlerBase handler)
         {
             if (label == null)
             {
@@ -36,7 +36,7 @@ namespace SvnBridge.Nodes
             }
         }
 
-        public string GetProperty(HandlerBase handler, XmlElement property)
+        public string GetProperty(RequestHandlerBase handler, XmlElement property)
         {
             switch (property.LocalName)
             {
@@ -55,13 +55,13 @@ namespace SvnBridge.Nodes
 
         #endregion
 
-        private string GetCheckedIn(HandlerBase handler)
+        private string GetCheckedIn(RequestHandlerBase handler)
         {
             int maxVersion = sourceControlProvider.GetLatestVersion();
             return "<lp1:checked-in><D:href>" + handler.GetLocalPath( "/!svn/bln/" + maxVersion) + "</D:href></lp1:checked-in>";
         }
 
-        private string GetBaselineCollection(HandlerBase handler)
+        private string GetBaselineCollection(RequestHandlerBase handler)
         {
             return "<lp1:baseline-collection><D:href>" + handler.GetLocalPath("/!svn/bc/" + label) + "/</D:href></lp1:baseline-collection>";
         }

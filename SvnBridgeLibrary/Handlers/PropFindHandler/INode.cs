@@ -5,7 +5,7 @@ namespace SvnBridge.Nodes
 {
     public interface INode
     {
-        string Href(HandlerBase handler);
-        string GetProperty(HandlerBase handler, XmlElement property);
+        string Href(RequestHandlerBase handler);
+        string GetProperty(RequestHandlerBase handler, XmlElement property);
     }
 }

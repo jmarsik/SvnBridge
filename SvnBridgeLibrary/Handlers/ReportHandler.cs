@@ -16,7 +16,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    public class ReportHandler : HandlerBase
+    public class ReportHandler : RequestHandlerBase
     {
         protected override void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider)
         {

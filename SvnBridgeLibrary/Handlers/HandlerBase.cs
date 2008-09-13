@@ -13,7 +13,7 @@ using System.Collections;
 
 namespace SvnBridge.Handlers
 {
-	public abstract class HandlerBase
+	public abstract class RequestHandlerBase
 	{
 		private IPathParser pathParser;
 		private IHttpContext httpContext;

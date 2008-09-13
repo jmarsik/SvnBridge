@@ -15,7 +15,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    public class PropFindHandler : HandlerBase
+    public class PropFindHandler : RequestHandlerBase
     {
         protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

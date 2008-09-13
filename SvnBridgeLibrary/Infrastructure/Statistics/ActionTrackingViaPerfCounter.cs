@@ -44,7 +44,7 @@ namespace SvnBridge.Infrastructure.Statistics
             var handlers = new List<Type>();
             foreach (Type type in typeof(ActionTrackingViaPerfCounter).Assembly.GetTypes())
             {
-                if (typeof(HandlerBase).IsAssignableFrom(type) == false
+                if (typeof(RequestHandlerBase).IsAssignableFrom(type) == false
                     || type.IsAbstract)
                     continue;
                 handlers.Add(type);
@@ -87,7 +87,7 @@ namespace SvnBridge.Infrastructure.Statistics
             }
         }
 
-        public virtual void Request(HandlerBase handler)
+        public virtual void Request(RequestHandlerBase handler)
         {
             if (!enabled)
                 return;

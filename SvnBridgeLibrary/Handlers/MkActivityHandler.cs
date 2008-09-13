@@ -5,7 +5,7 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    public class MkActivityHandler : HandlerBase
+    public class MkActivityHandler : RequestHandlerBase
     {
         protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

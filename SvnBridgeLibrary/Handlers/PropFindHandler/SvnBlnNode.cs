@@ -18,12 +18,12 @@ namespace SvnBridge.Nodes
 
 		#region INode Members
 
-		public string Href(HandlerBase handler)
+		public string Href(RequestHandlerBase handler)
 		{
 			return handler.GetLocalPath(path);
 		}
 
-		public string GetProperty(HandlerBase handler, XmlElement property)
+		public string GetProperty(RequestHandlerBase handler, XmlElement property)
 		{
 			switch (property.LocalName)
 			{
@@ -38,7 +38,7 @@ namespace SvnBridge.Nodes
 
 		#endregion
 
-		private string GetBaselineCollection(HandlerBase handler)
+		private string GetBaselineCollection(RequestHandlerBase handler)
         {
             return
                 "<lp1:baseline-collection><D:href>"+handler.GetLocalPath("/!svn/bc/" + version)+

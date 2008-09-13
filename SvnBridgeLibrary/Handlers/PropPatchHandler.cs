@@ -10,7 +10,7 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-	public class PropPatchHandler : HandlerBase
+	public class PropPatchHandler : RequestHandlerBase
 	{
 		protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

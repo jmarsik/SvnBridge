@@ -11,10 +11,9 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-	public class GetHandler : HandlerBase
+	public class GetHandler : RequestHandlerBase
 	{
-		protected override void Handle(IHttpContext context,
-                                       TFSSourceControlProvider sourceControlProvider)
+		protected override void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider)
 		{
 			IHttpRequest request = context.Request;
 			IHttpResponse response = context.Response;

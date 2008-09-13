@@ -13,10 +13,10 @@ namespace SvnBridge.Infrastructure
 {
 	public class UpdateReportService
 	{
-		private readonly HandlerBase handler;
+		private readonly RequestHandlerBase handler;
         private readonly TFSSourceControlProvider sourceControlProvider;
 
-        public UpdateReportService(HandlerBase handler, TFSSourceControlProvider sourceControlProvider)
+        public UpdateReportService(RequestHandlerBase handler, TFSSourceControlProvider sourceControlProvider)
 		{
 			this.handler = handler;
 			this.sourceControlProvider = sourceControlProvider;
