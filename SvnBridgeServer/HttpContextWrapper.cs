@@ -1,7 +1,7 @@
 using System.Web;
 using SvnBridge.Net;
 
-namespace SvnBridge.Web
+namespace SvnBridgeServer
 {
     public class HttpContextWrapper : IHttpContext
     {

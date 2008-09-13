@@ -6,12 +6,18 @@ using SvnBridge.Interfaces;
 using SvnBridge.Net;
 using SvnBridge.PathParsing;
 using SvnBridge.SourceControl;
+using SvnBridge;
 
-namespace SvnBridge.Web
+namespace SvnBridgeServer
 {
 	public class SvnBridgeHttpHandler : IHttpHandler
 	{
 		private readonly HttpContextDispatcher dispatcher;
+
+        static SvnBridgeHttpHandler()
+        {
+            new BootStrapper().Start();
+        }
 
 		public SvnBridgeHttpHandler()
 		{

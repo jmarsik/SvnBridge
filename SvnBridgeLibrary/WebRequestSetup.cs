@@ -8,16 +8,11 @@ namespace SvnBridge
 		public static void OnWebRequest(WebRequest request)
 		{
 			HttpWebRequest httpWebRequest = request as HttpWebRequest;
-			if(httpWebRequest!=null)
+			if (httpWebRequest!=null)
 			{
-				OnHttpWebRequest(httpWebRequest);
+                httpWebRequest.UnsafeAuthenticatedConnectionSharing = false;
+                httpWebRequest.ServicePoint.ConnectionLimit = 5000;
 			}
-		}
-
-		public static void OnHttpWebRequest(HttpWebRequest request)
-		{
-			request.UnsafeAuthenticatedConnectionSharing = false;
-			request.ServicePoint.ConnectionLimit = 5000;
 		}
 	}
 }

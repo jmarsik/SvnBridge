@@ -61,7 +61,7 @@
 	<Target Name="Merge">
 		<MakeDir Directories="Merge"/>
 		<Exec Command="$(CodePlex3rdParty)\ilmerge.exe /out:Merge\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnBridge.exe SvnBridge\bin\$(BuildType)\SvnBridge.Library.dll SvnBridge\bin\$(BuildType)\CodePlex.TfsLibrary.dll"/>
-		<Exec Command="$(CodePlex3rdParty)\ilmerge.exe /out:Merge\SvnBridge.dll SvnBridge\bin\$(BuildType)\SvnBridge.Library.dll SvnBridge\bin\$(BuildType)\CodePlex.TfsLibrary.dll"/>
+		<Exec Command="$(CodePlex3rdParty)\ilmerge.exe /out:Merge\SvnBridgeServer.dll SvnBridge\bin\$(BuildType)\SvnBridgeServer.dll SvnBridge\bin\$(BuildType)\SvnBridge.Library.dll SvnBridge\bin\$(BuildType)\CodePlex.TfsLibrary.dll"/>
 	</Target>
 
 </Project>

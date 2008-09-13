@@ -194,10 +194,6 @@
     <Compile Include="Utility\Helper.cs" />
     <Compile Include="Protocol\WebDav.cs" />
     <Compile Include="WebRequestSetup.cs" />
-    <Compile Include="Web\HttpContextWrapper.cs" />
-    <Compile Include="Web\HttpRequestWrapper.cs" />
-    <Compile Include="Web\HttpResponseWrapper.cs" />
-    <Compile Include="Web\SvnBridgeHttpHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Infrastructure\Messages\GetWorkItemInformationMessage.xml" />

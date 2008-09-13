@@ -4,7 +4,7 @@ using System.Text;
 using System.Web;
 using SvnBridge.Net;
 
-namespace SvnBridge.Web
+namespace SvnBridgeServer
 {
     public class HttpResponseWrapper : IHttpResponse
     {

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Web.UI;
 using SvnBridge.Handlers.Renderers;
 using SvnBridge.Infrastructure;
 using SvnBridge.Infrastructure.Statistics;
