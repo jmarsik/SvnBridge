@@ -6,7 +6,7 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    public class DeleteHandler : HttpContextHandlerBase
+    public class DeleteHandler : HandlerBase
     {
         protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

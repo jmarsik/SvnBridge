@@ -16,10 +16,9 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    public class ReportHandler : HttpContextHandlerBase
+    public class ReportHandler : HandlerBase
     {
-        protected override void Handle(IHttpContext context,
-                                       TFSSourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -102,8 +101,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void ReplayReport(IHttpRequest request, IHttpResponse response,
-                                  TFSSourceControlProvider sourceControlProvider, ReplayReportData replayReport)
+        private void ReplayReport(IHttpRequest request, IHttpResponse response, TFSSourceControlProvider sourceControlProvider, ReplayReportData replayReport)
         {
             if (replayReport.Revision == 0)
             {
@@ -162,12 +160,7 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void OutputEditorReport(
-            TFSSourceControlProvider sourceControlProvider,
-            FolderMetaData folder,
-            int revision,
-            bool isRoot,
-            TextWriter output)
+        private void OutputEditorReport(TFSSourceControlProvider sourceControlProvider, FolderMetaData folder, int revision, bool isRoot, TextWriter output)
         {
             if (isRoot)
             {
@@ -231,9 +224,7 @@ namespace SvnBridge.Handlers
             output.Write("<S:close-directory />\n");
         }
 
-        private void SendBlameResponse(IHttpRequest request, IHttpResponse response,
-                                       TFSSourceControlProvider sourceControlProvider, string serverPath,
-                                       FileRevsReportData data)
+        private void SendBlameResponse(IHttpRequest request, IHttpResponse response, TFSSourceControlProvider sourceControlProvider, string serverPath, FileRevsReportData data)
         {
             LogItem log = sourceControlProvider.GetLog(
                 serverPath,
@@ -311,8 +302,7 @@ namespace SvnBridge.Handlers
 </D:error>");
         }
 
-        private void GetDatedRevReport(TFSSourceControlProvider sourceControlProvider, DatedRevReportData data,
-                                       TextWriter output)
+        private void GetDatedRevReport(TFSSourceControlProvider sourceControlProvider, DatedRevReportData data, TextWriter output)
         {
             int targetRevision = sourceControlProvider.GetVersionForDate(data.CreationDate);
 
@@ -374,8 +364,7 @@ namespace SvnBridge.Handlers
             output.Write("</S:update-report>\n");
         }
 
-        private FolderMetaData GetMetadataForUpdate(IHttpRequest request, UpdateReportData updatereport,
-                                                    TFSSourceControlProvider sourceControlProvider, out int targetRevision)
+        private FolderMetaData GetMetadataForUpdate(IHttpRequest request, UpdateReportData updatereport, TFSSourceControlProvider sourceControlProvider, out int targetRevision)
         {
             string basePath = PathParser.GetLocalPath(request, updatereport.SrcPath);
             FolderMetaData metadata;
@@ -409,10 +398,7 @@ namespace SvnBridge.Handlers
             return metadata;
         }
 
-        private static void LogReport(TFSSourceControlProvider sourceControlProvider,
-                                      LogReportData logreport,
-                                      string path,
-                                      TextWriter output)
+        private static void LogReport(TFSSourceControlProvider sourceControlProvider, LogReportData logreport, string path, TextWriter output)
         {
             string serverPath = "/";
             if (path.IndexOf('/', 9) > -1)
@@ -422,15 +408,12 @@ namespace SvnBridge.Handlers
 
             int end = int.Parse(logreport.EndRevision);
             int start = int.Parse(logreport.StartRevision);
-            LogItem logItem = sourceControlProvider.GetLog(
-                serverPath,
-                Math.Min(start, end),
-                Math.Max(start, end),
-                Recursion.Full,
-                int.Parse(logreport.Limit ?? "1000000"));
+            LogItem logItem = sourceControlProvider.GetLog(serverPath, Math.Min(start, end), Math.Max(start, end), Recursion.Full, int.Parse(logreport.Limit ?? "1000000"));
 
             if (start < end)
+            {
                 Array.Reverse(logItem.History);
+            }
 
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             output.Write("<S:log-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
@@ -481,10 +464,8 @@ namespace SvnBridge.Handlers
                         throw new InvalidOperationException("Unrecognized change type " + change.ChangeType);
                     }
                 }
-
                 output.Write("</S:log-item>\n");
             }
-
             output.Write("</S:log-report>\n");
         }
     }

@@ -8,7 +8,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-	public class CheckOutHandler : HttpContextHandlerBase
+	public class CheckOutHandler : HandlerBase
 	{
 		protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

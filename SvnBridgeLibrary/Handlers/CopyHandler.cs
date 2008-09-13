@@ -6,7 +6,7 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    public class CopyHandler : HttpContextHandlerBase
+    public class CopyHandler : HandlerBase
     {
         protected override void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider)
         {

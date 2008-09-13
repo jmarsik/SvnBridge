@@ -103,7 +103,7 @@
     <Compile Include="Handlers\PropPatchHandler.cs" />
     <Compile Include="Handlers\PutHandler.cs" />
     <Compile Include="Handlers\ReportHandler.cs" />
-    <Compile Include="Handlers\HttpContextHandlerBase.cs" />
+    <Compile Include="Handlers\HandlerBase.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
     <Compile Include="Infrastructure\UpdateReportService.cs" />

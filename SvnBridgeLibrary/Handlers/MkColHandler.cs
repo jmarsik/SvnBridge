@@ -8,7 +8,7 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Handlers
 {
-    public class MkColHandler : HttpContextHandlerBase
+    public class MkColHandler : HandlerBase
     {
         protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

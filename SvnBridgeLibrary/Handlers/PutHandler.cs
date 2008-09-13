@@ -8,7 +8,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
-    public class PutHandler : HttpContextHandlerBase
+    public class PutHandler : HandlerBase
     {
         protected override void Handle(IHttpContext context,
                                        TFSSourceControlProvider sourceControlProvider)

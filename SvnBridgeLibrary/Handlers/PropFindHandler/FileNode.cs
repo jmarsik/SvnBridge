@@ -24,7 +24,7 @@ namespace SvnBridge.Nodes
 
         #region INode Members
 
-        public string Href(HttpContextHandlerBase handler)
+        public string Href(HandlerBase handler)
         {
             string href = item.Name;
 
@@ -41,7 +41,7 @@ namespace SvnBridge.Nodes
             return handler.GetLocalPath(Helper.Encode(href));
         }
 
-        public string GetProperty(HttpContextHandlerBase handler, XmlElement property)
+        public string GetProperty(HandlerBase handler, XmlElement property)
         {
             switch (property.LocalName)
             {
@@ -81,7 +81,7 @@ namespace SvnBridge.Nodes
             return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>";
         }
 
-        private static string GetVersionControlledConfiguration(HttpContextHandlerBase handler)
+        private static string GetVersionControlledConfiguration(HandlerBase handler)
         {
             return
                 "<lp1:version-controlled-configuration><D:href>" + handler.VccPath +
@@ -128,7 +128,7 @@ namespace SvnBridge.Nodes
             return "<lp2:repository-uuid>" + sourceControlProvider.GetRepositoryUuid() + "</lp2:repository-uuid>";
         }
 
-        private string GetCheckedIn(HttpContextHandlerBase handler)
+        private string GetCheckedIn(HandlerBase handler)
         {
         	string href = handler.GetLocalPath("/!svn/ver/" + handler.GetLatestVersion() + "/" + Helper.Encode(item.Name, true));
         	return

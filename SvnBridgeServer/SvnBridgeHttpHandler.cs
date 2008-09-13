@@ -53,7 +53,6 @@ namespace SvnBridgeServer
 			{
 				context.Response.OutputStream.Dispose();
 			}
-
 		}
 
 		#endregion

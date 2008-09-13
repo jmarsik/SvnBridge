@@ -53,7 +53,7 @@ namespace SvnBridge.Net
 
         public TestableHttpContextDispatcher() : base(new StubParser(), new StubActionTracking()) { }
 
-        public override HttpContextHandlerBase GetHandler(string httpMethod)
+        public override HandlerBase GetHandler(string httpMethod)
         {
             return Handler;
         }
@@ -61,7 +61,7 @@ namespace SvnBridge.Net
 
     public class StubActionTracking : ActionTrackingViaPerfCounter
     {
-        public override void Request(HttpContextHandlerBase handler) {}
+        public override void Request(HandlerBase handler) {}
         public override void Error() {}
         public override IDictionary<string, long> GetStatistics()
         {
@@ -117,7 +117,7 @@ namespace SvnBridge.Net
         }
     }
 
-    public class StubHandler : HttpContextHandlerBase
+    public class StubHandler : HandlerBase
     {
         public NetworkCredential Handle_credentials;
 
