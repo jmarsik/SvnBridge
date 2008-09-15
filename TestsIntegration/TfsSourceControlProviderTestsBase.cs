@@ -37,7 +37,7 @@ namespace IntegrationTests
 		{
             stubs = new MyMocks();
 			RequestCache.Init();
-			new BootStrapper().Start();
+            BootStrapper.Start();
             Container.Resolve<MemoryBasedPersistentCache>().Clear();
 
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();

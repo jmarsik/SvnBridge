@@ -90,9 +90,9 @@ namespace SvnBridge.Net
                     }
                     credential = new NetworkCredential(username, credential.Password, domain);
                 }
+                RequestCache.Items["credentials"] = credential;
 
                 handler = GetHandler(connection.Request.HttpMethod);
-
                 if (handler == null)
                 {
                     actionTracking.Error();

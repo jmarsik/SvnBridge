@@ -11,7 +11,7 @@ using SvnBridge.Utility;
 
 namespace SvnBridge.Infrastructure
 {
-	public class UpdateReportService
+	internal class UpdateReportService
 	{
 		private readonly RequestHandlerBase handler;
         private readonly TFSSourceControlProvider sourceControlProvider;

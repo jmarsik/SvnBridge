@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using SvnBridge.Interfaces;
 using System.Configuration;
+using SvnBridge.Net;
 
 namespace SvnBridge.Infrastructure
 {
@@ -41,6 +42,34 @@ namespace SvnBridge.Infrastructure
                 }
             }
             Log("Error", message, exception.ToString());
+        }
+
+        public virtual void ErrorFullDetails(Exception exception, IHttpContext context)
+        {
+            Guid errorId = Guid.NewGuid();
+            string logFile = Path.Combine(LogPath, "Error-" + errorId.ToString() + ".log");
+            StringBuilder output = new StringBuilder();
+            output.AppendFormat("Time     : {0}\r\n", DateTime.Now);
+            output.AppendFormat("Request  : {0} {1}\r\n", context.Request.HttpMethod, context.Request.Url);
+            NetworkCredential credential = (NetworkCredential)RequestCache.Items["credentials"];
+            if (credential != null)
+            {
+                output.AppendFormat("User     : {0}\r\n", credential.UserName);
+            }
+            output.AppendFormat("Message  : {0}\r\n", exception.Message);
+            output.AppendFormat("\r\nException:\r\n   {0}\r\n", exception);
+            output.AppendFormat("\r\nStack Trace:\r\n{0}\r\n", exception.StackTrace);
+            output.Append("\r\nHeaders:\r\n");
+            foreach (string name in context.Request.Headers)
+            {
+                output.Append("   ");
+                output.Append(name);
+                output.Append("=");
+                output.Append(context.Request.Headers[name]);
+                output.Append("\r\n");
+            }
+
+            File.WriteAllText(logFile, output.ToString());
         }
 
         public virtual void Info(string message, Exception exception)

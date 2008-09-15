@@ -384,12 +384,12 @@ namespace SvnBridge.SourceControl
 
 		public virtual void MakeActivity(string activityId)
 		{
-			ClearExistingTempWorkspaces(true);
+            ClearExistingTempWorkspaces(true);
 
-			SourceControlService.CreateWorkspace(serverUrl, credentials, activityId, Constants.WorkspaceComment);
-			string localPath = GetLocalPath(activityId, "");
-			SourceControlService.AddWorkspaceMapping(serverUrl, credentials, activityId, rootPath, localPath);
-			ActivityRepository.Create(activityId);
+            SourceControlService.CreateWorkspace(serverUrl, credentials, activityId, Constants.WorkspaceComment);
+            string localPath = GetLocalPath(activityId, "");
+            SourceControlService.AddWorkspaceMapping(serverUrl, credentials, activityId, rootPath, localPath);
+            ActivityRepository.Create(activityId);
 		}
 
 		private void ClearExistingTempWorkspaces(bool skipExistingActivities)
@@ -536,7 +536,7 @@ namespace SvnBridge.SourceControl
 					}
 					catch (Exception e)
 					{
-						// we can't realy raise an error here, because 
+						// we can't really raise an error here, because 
 						// we would fail the commit from the client side, while the changes
 						// were already committed to the source control provider.
 						// since we consider associating with work items nice but not essential,

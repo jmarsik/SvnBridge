@@ -38,7 +38,6 @@ namespace SvnBridge.Handlers
 
 	    public virtual void Handle(IHttpContext context, IPathParser pathParser, NetworkCredential credentials)
 		{
-            RequestCache.Items["credentials"] = credentials;
             this.credentials = credentials;
             Initialize(context, pathParser);
 			IHttpRequest request = context.Request;

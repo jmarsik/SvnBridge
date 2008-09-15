@@ -1,12 +1,12 @@
-using System.Reflection;
+using System;
 using System.Web;
-using SvnBridge.Infrastructure;
-using SvnBridge.Infrastructure.Statistics;
-using SvnBridge.Interfaces;
 using SvnBridge.Net;
-using SvnBridge.PathParsing;
-using SvnBridge.SourceControl;
 using SvnBridge;
+using SvnBridge.Infrastructure;
+using SvnBridge.SourceControl;
+using SvnBridge.Interfaces;
+using SvnBridge.PathParsing;
+using SvnBridge.Infrastructure.Statistics;
 
 namespace SvnBridgeServer
 {
@@ -16,7 +16,7 @@ namespace SvnBridgeServer
 
         static SvnBridgeHttpHandler()
         {
-            new BootStrapper().Start();
+            BootStrapper.Start();
         }
 
 		public SvnBridgeHttpHandler()
@@ -47,7 +47,16 @@ namespace SvnBridgeServer
 		{
 			try
 			{
-				dispatcher.Dispatch(new HttpContextWrapper(context));
+                try
+                {
+                    dispatcher.Dispatch(new HttpContextWrapper(context));
+                }
+                catch (Exception ex)
+                {
+                    DefaultLogger logger = Container.Resolve<DefaultLogger>();
+                    logger.ErrorFullDetails(ex, new HttpContextWrapper(context));
+                    throw;
+                }
 			}
 			finally
 			{

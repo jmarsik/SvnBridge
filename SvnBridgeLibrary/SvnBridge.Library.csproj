@@ -51,7 +51,7 @@
     <Compile Include="BootStrapper.cs" />
     <Compile Include="Cache\HashSet.cs" />
     <Compile Include="Cache\MemoryBasedPersistentCache.cs" />
-    <Compile Include="RequestHandlers\Renderers\StatsRenderer.cs" />
+    <Compile Include="Infrastructure\StatsRenderer.cs" />
     <Compile Include="Infrastructure\Configuration.cs" />
     <Compile Include="Infrastructure\FileRepository.cs" />
     <Compile Include="Infrastructure\MetaDataRepositoryNoCache.cs" />
@@ -63,7 +63,7 @@
     <Compile Include="RequestHandlers\CheckOutHandler.cs" />
     <Compile Include="RequestHandlers\CopyHandler.cs" />
     <Compile Include="RequestHandlers\DeleteHandler.cs" />
-    <Compile Include="RequestHandlers\Renderers\FolderRenderer.cs" />
+    <Compile Include="RequestHandlers\GetHandler\FolderRenderer.cs" />
     <Compile Include="RequestHandlers\GetHandler.cs" />
     <Compile Include="Infrastructure\Logging.cs" />
     <Compile Include="Infrastructure\MetaDataRepositoryFactory.cs" />
@@ -106,7 +106,7 @@
     <Compile Include="RequestHandlers\RequestHandlerBase.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
     <Compile Include="Exceptions\FolderAlreadyExistsException.cs" />
-    <Compile Include="Infrastructure\UpdateReportService.cs" />
+    <Compile Include="RequestHandlers\ReportHandler\UpdateReportService.cs" />
     <Compile Include="ListenErrorEventArgs.cs" />
     <Compile Include="Net\FinishedHandlingEventArgs.cs" />
     <Compile Include="Net\Proxy.cs" />

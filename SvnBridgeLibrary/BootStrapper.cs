@@ -1,29 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using CodePlex.TfsLibrary.ObjectModel;
+using SvnBridge.Infrastructure;
 using CodePlex.TfsLibrary.RegistrationWebSvc;
 using CodePlex.TfsLibrary.RepositoryWebSvc;
 using CodePlex.TfsLibrary.Utility;
-using SvnBridge.Infrastructure;
-using SvnBridge.Infrastructure.Statistics;
-using SvnBridge.Interfaces;
-using SvnBridge.Net;
-using SvnBridge.SourceControl;
-using SvnBridge.Cache;
 
 namespace SvnBridge
 {
-    public class BootStrapper
+    public static class BootStrapper
     {
-        public BootStrapper()  
-		{
-        	TfsUtil.OnSetupWebRequest = WebRequestSetup.OnWebRequest;
-        }
-
-        public void Start()
+        public static void Start()
         {
+            TfsUtil.OnSetupWebRequest = WebRequestSetup.OnWebRequest;
             Container.Register(typeof(IRegistrationService), typeof(RegistrationService));
             Container.Register(typeof(IWebTransferService), typeof(WebTransferService));
             Container.Register(typeof(IRegistrationWebSvcFactory), typeof(RegistrationWebSvcFactory));

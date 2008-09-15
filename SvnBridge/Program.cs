@@ -22,7 +22,7 @@ namespace SvnBridge
         	Logging.TraceEnabled = Settings.Default.TraceEnabled;
             Logging.MethodTraceEnabled = false;
 
-            new BootStrapper().Start();
+            BootStrapper.Start();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
