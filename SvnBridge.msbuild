@@ -12,15 +12,14 @@
 
 	<!-- CruiseControl targets -->
 
-	<Target Name="Cruise" DependsOnTargets="CruiseNoZip;Zip" />
-	<Target Name="CruiseNoZip" DependsOnTargets="Clean;SetVersionNumber;Test"/>
+	<Target Name="Cruise" DependsOnTargets="Clean;SetVersionNumber;Test;Zip" />
 
 	<!-- Meta-targets -->
 
 	<Target Name="Test" DependsOnTargets="UnitTest;ProtocolTest;IntegrationTest;EndToEndTest" />
 
 	<Target Name="Zip" DependsOnTargets="Merge">
-		<Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip Merge\SvnBridge.exe Merge\SvnBridge.dll"/>
+		<Exec Command="$(CodePlex3rdParty)\zip.exe -9 -q -j $(ZipStoragePath)\SvnBridge-build-$(Revision).zip Merge\SvnBridge.exe Merge\SvnBridgeServer.dll"/>
 	</Target>
 
 	<!-- Individiual targets -->
@@ -49,12 +48,11 @@
 		<xunit Assembly="TestsIntegration\bin\$(BuildType)\TestsIntegration.dll" Xml="TestsIntegration.results.xml"/>
 	</Target>
 
-	<Target Name="TestAll" DependsOnTargets="UnitTest;ProtocolTest;IntegrationTest;EndToEndTest">
-	</Target>
-	
 	<Target Name="SetVersionNumber">
-		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeLibrary\Properties\AssemblyInfo.cs"/>
 		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge\Properties\AssemblyInfo.cs"/>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridge.PerfCounter.Installer\Properties\AssemblyInfo.cs"/>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeLibrary\Properties\AssemblyInfo.cs"/>
+		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeServer\Properties\AssemblyInfo.cs"/>
 		<Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(Revision) SvnBridgeViaIis\Properties\AssemblyInfo.cs"/>
 	</Target>
 

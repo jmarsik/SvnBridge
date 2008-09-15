@@ -5,6 +5,6 @@ if NOT "%1" == "" goto :Build
 goto :End
 
 :Build
-%windir%\Microsoft.NET\Framework\v3.5\MSBuild.exe SvnBridge.msbuild /p:Configuration=Debug /p:CodePlex3rdParty=..\3rdParty /t:%*
+%windir%\Microsoft.NET\Framework\v3.5\MSBuild.exe SvnBridge.msbuild /p:Configuration=Debug /p:CodePlex3rdParty=..\3rdParty /t:%1
 
 :End
