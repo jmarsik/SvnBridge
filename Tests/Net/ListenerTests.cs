@@ -19,7 +19,7 @@ namespace SvnBridge.Net
         {
             Listener listener = new Listener(stubs.CreateObject<DefaultLogger>(), stubs.CreateObject<ActionTrackingViaPerfCounter>());
             listener.Port = 10011;
-            listener.Start(new PathParserSingleServerWithProjectInPath("http://foo", stubs.CreateProjectInformationRepositoryStub()));
+            listener.Start(new PathParserSingleServerWithProjectInPath("http://foo"));
 
             Assert.Throws<InvalidOperationException>(
                 delegate { listener.Port = 8082; });
@@ -33,7 +33,7 @@ namespace SvnBridge.Net
             Listener listener = new Listener(stubs.CreateObject<DefaultLogger>(), stubs.CreateObject<ActionTrackingViaPerfCounter>());
             
             Assert.Throws<InvalidOperationException>(
-				delegate { listener.Start(new PathParserSingleServerWithProjectInPath("http://foo", stubs.CreateProjectInformationRepositoryStub())); });
+				delegate { listener.Start(new PathParserSingleServerWithProjectInPath("http://foo")); });
         }
     }
 }

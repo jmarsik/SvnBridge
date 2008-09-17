@@ -28,7 +28,7 @@ namespace Tests
         {
             provider = stubs.CreateTFSSourceControlProviderStub();
             Container.Register(typeof(TFSSourceControlProvider), provider);
-            PathParserSingleServerWithProjectInPath pathParser = new PathParserSingleServerWithProjectInPath("http://foo", stubs.CreateProjectInformationRepositoryStub());
+            PathParserSingleServerWithProjectInPath pathParser = new PathParserSingleServerWithProjectInPath("http://foo");
             HttpDispatcher = new HttpContextDispatcher(pathParser, stubs.CreateObject<ActionTrackingViaPerfCounter>());
             RequestCache.Init();
         }

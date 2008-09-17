@@ -22,7 +22,7 @@ namespace SvnBridge.Handlers
             Results readFileResult = stubs.AttachReadFile(provider.ReadFile, Encoding.Default.GetBytes("asdf"));
             request.Path = "http://localhost:8082/!svn/bc/1234/Foo/Bar.txt";
 
-        	handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
+        	handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl), null);
 
             string expected = "asdf";
             Assert.Equal(expected, Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray()));

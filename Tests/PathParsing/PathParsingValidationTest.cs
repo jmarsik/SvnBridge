@@ -12,53 +12,56 @@ namespace SvnBridge.PathParsing
         protected MyMocks stubs = new MyMocks();
         
         [Fact]
-		public void StaticServerWithProjectNameInHostNamePathParser_DoesNotAcceptInvalidUrl()
+        public void PathParserProjectInDomain_DoesNotAcceptInvalidUrl()
 		{
-			ValidateParserWillNotAcceptInvalidTfsUrl<PathParserProjectInDomain>();
+            Exception result = Record.Exception(delegate {
+                new PathParserProjectInDomain("blah", stubs.CreateProjectInformationRepositoryStub());
+            });
+
+            Assert.NotNull(result);
 		}
 
 		[Fact]
 		public void StaticServerPathParser_DoesNotAcceptInvalidUrl()
 		{
-			ValidateParserWillNotAcceptInvalidTfsUrl<PathParserSingleServerWithProjectInPath>();
+            Exception result = Record.Exception(delegate {
+                new PathParserSingleServerWithProjectInPath("blah");
+            });
+
+            Assert.NotNull(result);
 		}
 
         [Fact]
-        public void StaticServerPathParser_AcceptValidUrl()
+        public void PathParserSingleServerWithProjectInPath_AcceptValidUrl()
         {
-            ValidateParserWillAcceptValidTfsUrl<PathParserSingleServerWithProjectInPath>("https://codeplex.com");
+            Exception result = Record.Exception(delegate
+            {
+                new PathParserSingleServerWithProjectInPath("https://codeplex.com");
+            });
+
+            Assert.Null(result);
         }
 
         [Fact]
-        public void StaticServerWithProjectNameInHostNamePathParser_AcceptValidUrl()
+        public void PathParserProjectInDomain_AcceptValidUrl()
         {
-            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInDomain>("https://codeplex.com");
+            Exception result = Record.Exception(delegate
+            {
+                new PathParserProjectInDomain("https://codeplex.com", stubs.CreateProjectInformationRepositoryStub());
+            });
+
+            Assert.Null(result);
         }
 
         [Fact]
         public void PathParserProjectInDomain_AcceptValidUrl_Muliple()
         {
-            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInDomain>("https://codeplex.com,https://www.codeplex.com");
-        }
+            Exception result = Record.Exception(delegate
+            {
+                new PathParserProjectInDomain("https://codeplex.com,https://www.codeplex.com", stubs.CreateProjectInformationRepositoryStub());
+            });
 
-		private void ValidateParserWillNotAcceptInvalidTfsUrl<T>()
-		{
-			Assert.Throws<InvalidOperationException>(delegate
-			{
-				try
-				{
-					Activator.CreateInstance(typeof (T), "blah", stubs.CreateProjectInformationRepositoryStub());
-				}
-				catch (TargetInvocationException e)
-				{
-					throw e.InnerException;
-				}
-			});
-		}
-
-        private void ValidateParserWillAcceptValidTfsUrl<T>(string url)
-        {
-            Activator.CreateInstance(typeof(T), url, stubs.CreateProjectInformationRepositoryStub());
+            Assert.Null(result);
         }
 	}
 }

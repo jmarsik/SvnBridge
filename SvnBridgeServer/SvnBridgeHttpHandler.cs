@@ -31,7 +31,7 @@ namespace SvnBridgeServer
 			}
 			else
 			{
-                pathParser = new PathParserSingleServerWithProjectInPath(tfsUrl, projectInformationRepository);
+                pathParser = new PathParserSingleServerWithProjectInPath(tfsUrl);
 			}
             dispatcher = new HttpContextDispatcher(pathParser, Container.Resolve<ActionTrackingViaPerfCounter>());
         }

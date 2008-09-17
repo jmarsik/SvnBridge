@@ -9,18 +9,16 @@ namespace SvnBridge.PathParsing
 	public class PathParserSingleServerWithProjectInPath : BasePathParser
 	{
 		protected string server;
-	    protected ProjectInformationRepository projectInformationRepository;
 
         protected PathParserSingleServerWithProjectInPath() { }
 
-        public PathParserSingleServerWithProjectInPath(string server, ProjectInformationRepository projectInformationRepository)
+        public PathParserSingleServerWithProjectInPath(string server)
         {
             Uri ignored;
             if (Uri.TryCreate(server, UriKind.Absolute, out ignored) == false)
                 throw new InvalidOperationException("The url '" + server + "' is not a valid url");
 
             this.server = server;
-            this.projectInformationRepository = projectInformationRepository;
         }
 
 	    public override string GetServerUrl(IHttpRequest request, ICredentials credentials)

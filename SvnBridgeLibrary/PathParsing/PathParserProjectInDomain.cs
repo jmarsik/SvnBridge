@@ -8,15 +8,17 @@ namespace SvnBridge.PathParsing
 {
 	public class PathParserProjectInDomain : PathParserSingleServerWithProjectInPath
 	{
-	    public PathParserProjectInDomain(string server, ProjectInformationRepository projectInformationRepository)
+        private ProjectInformationRepository projectInformationRepository;
+
+	    public PathParserProjectInDomain(string servers, ProjectInformationRepository projectInformationRepository)
 	    {
-            foreach (string singleServerUrl in server.Split(','))
+            foreach (string singleServerUrl in servers.Split(','))
             {
                 Uri ignored;
                 if (Uri.TryCreate(singleServerUrl, UriKind.Absolute, out ignored) == false)
-                    throw new InvalidOperationException("The url '" + server + "' is not a valid url");
+                    throw new InvalidOperationException("The url '" + servers + "' is not a valid url");
             }
-            this.server = server;
+            this.server = servers;
             this.projectInformationRepository = projectInformationRepository;
         }
 
