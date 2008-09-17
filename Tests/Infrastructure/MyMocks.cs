@@ -48,6 +48,11 @@ namespace Tests
             return stub;
         }
 
+        public ProjectInformationRepository CreateProjectInformationRepositoryStub()
+        {
+            return CreateObject<ProjectInformationRepository>(null, null, null);
+        }
+
         public delegate void Associate(int workItemId, int changeSetId);
         public delegate void SetWorkItemFixed(int workItemId);
         public delegate void CopyItem(string activityId, string path, string targetPath);

@@ -6,33 +6,26 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.PathParsing
 {
-	public class PathParserProjectInPath : BasePathParser
+	public class PathParserSingleServerWithProjectInPath : BasePathParser
 	{
-		private readonly string server;
-	    private readonly ProjectInformationRepository projectInformationRepository;
+		protected string server;
+	    protected ProjectInformationRepository projectInformationRepository;
 
-        public PathParserProjectInPath(string server, ProjectInformationRepository projectInformationRepository)
+        protected PathParserSingleServerWithProjectInPath() { }
+
+        public PathParserSingleServerWithProjectInPath(string server, ProjectInformationRepository projectInformationRepository)
         {
-            foreach (string singleServerUrl in server.Split(','))
-            {
-                Uri ignored;
-                if (Uri.TryCreate(singleServerUrl, UriKind.Absolute, out ignored) == false)
-                    throw new InvalidOperationException("The url '" + server + "' is not a valid url");
-
-            }
+            Uri ignored;
+            if (Uri.TryCreate(server, UriKind.Absolute, out ignored) == false)
+                throw new InvalidOperationException("The url '" + server + "' is not a valid url");
 
             this.server = server;
             this.projectInformationRepository = projectInformationRepository;
         }
 
-
 	    public override string GetServerUrl(IHttpRequest request, ICredentials credentials)
 		{
-	        string projectName = GetProjectName(request);
-            if (projectName == null)
-                return server.Split(',')[0];
-
-            return projectInformationRepository.GetProjectLocation(credentials, projectName).ServerUrl;
+            return server;
 		}
 
 		public override string GetLocalPath(IHttpRequest request)

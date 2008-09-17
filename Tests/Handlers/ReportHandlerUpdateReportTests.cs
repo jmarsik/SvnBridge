@@ -31,7 +31,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:delete-entry name=\"F !@#$%^&amp;()_-+={[}];',.~`.txt\"/>"));
@@ -53,7 +53,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:delete-entry name=\"B !@#$%^&amp;()_-+={[}];',.~`\"/>"));
@@ -81,7 +81,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084</S:src-path><S:target-revision>5734</S:target-revision><S:entry rev=\"5733\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:open-file name=\"G !@#$%^&amp;()_-+={[}];',.~`.txt\" rev=\"5733\">"));
@@ -108,7 +108,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(
@@ -137,7 +137,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(
@@ -166,7 +166,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(
@@ -195,7 +195,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8084/Test</S:src-path><S:target-revision>5722</S:target-revision><S:entry rev=\"5722\"  start-empty=\"true\"></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
             string output = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
 
             Assert.True(output.Contains("<S:add-file name=\"C !@#$%^&amp;()_-+={[}];',.~`..txt\">"));
@@ -222,7 +222,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5700</S:target-revision><S:entry rev=\"5699\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -278,7 +278,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8082</S:src-path><S:target-revision>5698</S:target-revision><S:entry rev=\"5697\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -326,7 +326,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<S:update-report send-all=\"true\" xmlns:S=\"svn:\"><S:src-path>http://localhost:8085</S:src-path><S:entry rev=\"5713\" ></S:entry></S:update-report>";
 
-            handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
 
             string expected =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +

@@ -60,6 +60,11 @@
     <Compile Include="Exceptions\CacheMissException.cs" />
     <Compile Include="Exceptions\EnvironmentValidationException.cs" />
     <Compile Include="Exceptions\RepositoryUnavailableException.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="RequestHandlers\CheckOutHandler.cs" />
     <Compile Include="RequestHandlers\CopyHandler.cs" />
     <Compile Include="RequestHandlers\DeleteHandler.cs" />
@@ -74,7 +79,7 @@
     <Compile Include="Infrastructure\TfsUrlValidator.cs" />
     <Compile Include="PathParsing\BasePathParser.cs" />
     <Compile Include="PathParsing\PathParserServerAndProjectInPath.cs" />
-    <Compile Include="PathParsing\PathParserProjectInPath.cs" />
+    <Compile Include="PathParsing\PathParserSingleServerWithProjectInPath.cs" />
     <Compile Include="PathParsing\PathParserProjectInDomain.cs" />
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />
     <Compile Include="Infrastructure\ExceptionHelper.cs" />
@@ -193,6 +198,11 @@
     <Compile Include="Utility\SvnDiffParser.cs" />
     <Compile Include="Utility\Helper.cs" />
     <Compile Include="Protocol\WebDav.cs" />
+    <Compile Include="Web References\CodePlexWebServices\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="WebRequestSetup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +213,38 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Infrastructure\Messages\SetWorkItemStatusToFixedMessage.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://www.codeplex.com/services/projectinfoservice.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\CodePlexWebServices\</RelPath>
+      <UpdateFromURL>http://www.codeplex.com/services/projectinfoservice.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>SvnBridge_Library_CodePlex_ProjectInfoService</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\CodePlexWebServices\projectinfoservice.disco" />
+    <None Include="Web References\CodePlexWebServices\projectinfoservice.wsdl" />
+    <None Include="Web References\CodePlexWebServices\ProjectTfsInfo1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\CodePlexWebServices\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

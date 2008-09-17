@@ -20,13 +20,13 @@ namespace SvnBridge.PathParsing
 		[Fact]
 		public void StaticServerPathParser_DoesNotAcceptInvalidUrl()
 		{
-			ValidateParserWillNotAcceptInvalidTfsUrl<PathParserProjectInPath>();
+			ValidateParserWillNotAcceptInvalidTfsUrl<PathParserSingleServerWithProjectInPath>();
 		}
 
         [Fact]
         public void StaticServerPathParser_AcceptValidUrl()
         {
-            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInPath>("https://codeplex.com");
+            ValidateParserWillAcceptValidTfsUrl<PathParserSingleServerWithProjectInPath>("https://codeplex.com");
         }
 
         [Fact]
@@ -36,17 +36,10 @@ namespace SvnBridge.PathParsing
         }
 
         [Fact]
-        public void StaticServerPathParser_AcceptValidUrl_Muliple()
-        {
-            ValidateParserWillAcceptValidTfsUrl<PathParserProjectInPath>("https://codeplex.com,https://www.codeplex.com");
-        }
-
-        [Fact]
-        public void StaticServerWithProjectNameInHostNamePathParser_AcceptValidUrl_Muliple()
+        public void PathParserProjectInDomain_AcceptValidUrl_Muliple()
         {
             ValidateParserWillAcceptValidTfsUrl<PathParserProjectInDomain>("https://codeplex.com,https://www.codeplex.com");
         }
-
 
 		private void ValidateParserWillNotAcceptInvalidTfsUrl<T>()
 		{
@@ -54,7 +47,7 @@ namespace SvnBridge.PathParsing
 			{
 				try
 				{
-					Activator.CreateInstance(typeof (T), "blah", stubs.CreateObject<ProjectInformationRepository>(null, null));
+					Activator.CreateInstance(typeof (T), "blah", stubs.CreateProjectInformationRepositoryStub());
 				}
 				catch (TargetInvocationException e)
 				{
@@ -65,7 +58,7 @@ namespace SvnBridge.PathParsing
 
         private void ValidateParserWillAcceptValidTfsUrl<T>(string url)
         {
-            Activator.CreateInstance(typeof(T), url, stubs.CreateObject<ProjectInformationRepository>(null, null));
+            Activator.CreateInstance(typeof(T), url, stubs.CreateProjectInformationRepositoryStub());
         }
 	}
 }

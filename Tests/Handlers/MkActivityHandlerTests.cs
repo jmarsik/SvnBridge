@@ -17,7 +17,7 @@ namespace SvnBridge.Handlers
             Results r = stubs.Attach(provider.MakeActivity);
             request.Path = "http://localhost:8080/!svn/act/c512ecbe-7577-ce46-939c-a9e81eb4d98e";
 
-        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
 
             Assert.Equal(1, r.CallCount);
             Assert.Equal("c512ecbe-7577-ce46-939c-a9e81eb4d98e", r.Parameters[0]);

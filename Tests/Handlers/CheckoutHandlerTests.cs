@@ -24,7 +24,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:activity-set></D:checkout>";
 
-        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
 
             string output = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
@@ -42,7 +42,7 @@ namespace SvnBridge.Handlers
             request.Input =
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?><D:checkout xmlns:D=\"DAV:\"><D:activity-set><D:href>/!svn/act/f86c2543-a3d3-d04f-b458-8924481e51c6</D:href></D:activity-set></D:checkout>";
 
-        	handler.Handle(context, new PathParserProjectInPath(tfsUrl, stubs.CreateObject<ProjectInformationRepository>(null, null)), null);
+        	handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl, stubs.CreateProjectInformationRepositoryStub()), null);
 
             Assert.True(
                 response.Headers.Contains(

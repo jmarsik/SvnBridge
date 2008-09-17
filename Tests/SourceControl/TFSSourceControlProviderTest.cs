@@ -32,7 +32,7 @@ namespace SvnBridge.SourceControl
             return new SourceControlServicesHub(
                 CredentialCache.DefaultCredentials,
                 new StubTFSSourceControlService(),
-                stubs.CreateObject<ProjectInformationRepository>(null, null),
+                stubs.CreateProjectInformationRepositoryStub(),
                 associateWorkItemWithChangeSet,
                 stubs.CreateObject<DefaultLogger>(),
                 stubs.CreateObject<WebCache>(),

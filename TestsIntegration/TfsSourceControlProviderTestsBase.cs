@@ -77,7 +77,7 @@ namespace IntegrationTests
 			WebTransferService webTransferService = new WebTransferService(system);
 			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service, factory1, webTransferService, system, stubs.CreateObject<DefaultLogger>());
             MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, Container.Resolve<MemoryBasedPersistentCache>(), Settings.Default.CacheEnabled);
-			ProjectInformationRepository repository = new ProjectInformationRepository(metaDataRepositoryFactory,ServerUrl);
+			ProjectInformationRepository repository = new ProjectInformationRepository(metaDataRepositoryFactory,ServerUrl,false);
             ICredentials credentials = GetCredentials();
             FileRepository fileRepository = new FileRepository(ServerUrl, credentials, webTransferService);
 			return new SourceControlServicesHub(
