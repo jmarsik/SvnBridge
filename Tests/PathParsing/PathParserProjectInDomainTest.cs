@@ -7,7 +7,7 @@ using Tests;
 
 namespace SvnBridge.PathParsing
 {
-	public class PathParsingValidationTest
+    public class PathParserProjectInDomainTest
 	{
         protected MyMocks stubs = new MyMocks();
         
@@ -20,27 +20,6 @@ namespace SvnBridge.PathParsing
 
             Assert.NotNull(result);
 		}
-
-		[Fact]
-		public void StaticServerPathParser_DoesNotAcceptInvalidUrl()
-		{
-            Exception result = Record.Exception(delegate {
-                new PathParserSingleServerWithProjectInPath("blah");
-            });
-
-            Assert.NotNull(result);
-		}
-
-        [Fact]
-        public void PathParserSingleServerWithProjectInPath_AcceptValidUrl()
-        {
-            Exception result = Record.Exception(delegate
-            {
-                new PathParserSingleServerWithProjectInPath("https://codeplex.com");
-            });
-
-            Assert.Null(result);
-        }
 
         [Fact]
         public void PathParserProjectInDomain_AcceptValidUrl()

@@ -10,9 +10,31 @@ using SvnBridge.Stubs;
 
 namespace SvnBridge.PathParsing
 {
-    public class StaticServerPathParserTest
+    public class PathParserSingleServerWithProjectInPathTest
     {
         protected MyMocks stubs = new MyMocks();
+
+        [Fact]
+        public void PathParserSingleServerWithProjectInPath_DoesNotAcceptInvalidUrl()
+        {
+            Exception result = Record.Exception(delegate
+            {
+                new PathParserSingleServerWithProjectInPath("blah");
+            });
+
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void PathParserSingleServerWithProjectInPath_AcceptValidUrl()
+        {
+            Exception result = Record.Exception(delegate
+            {
+                new PathParserSingleServerWithProjectInPath("https://codeplex.com");
+            });
+
+            Assert.Null(result);
+        }
 
         [Fact]
         public void VerifyGetLocalPathWhenPathIsRootReturnsRootPath()

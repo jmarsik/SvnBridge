@@ -99,9 +99,9 @@
     <Compile Include="Net\HttpContextDispatcherTests.cs" />
     <Compile Include="Net\HttpRequestTests.cs" />
     <Compile Include="Net\ListenerTests.cs" />
-    <Compile Include="PathParsing\PathParsingValidationTest.cs" />
+    <Compile Include="PathParsing\PathParserProjectInDomainTest.cs" />
     <Compile Include="PathParsing\RequestBasePathParserTest.cs" />
-    <Compile Include="PathParsing\StaticServerPathParserTest.cs" />
+    <Compile Include="PathParsing\PathParserSingleServerWithProjectInPathTest.cs" />
     <Compile Include="Presenters\SettingsViewPresenterTests.cs" />
     <Compile Include="Infrastructure\MyMocks.cs" />
     <Compile Include="Proxies\ProxyFactoryTest.cs" />
