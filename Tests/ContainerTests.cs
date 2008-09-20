@@ -30,12 +30,7 @@ namespace SvnBridge
         {
             public new T Resolve<T>()
             {
-                return (T)ResolveType(typeof(T), new Hashtable());
-            }
-
-            public new T Resolve<T>(IDictionary constructorParams)
-            {
-                return (T)ResolveType(typeof(T), constructorParams);
+                return (T)ResolveType(typeof(T));
             }
         }
 
@@ -67,17 +62,6 @@ namespace SvnBridge
         }
 
         [Fact]
-        public void Resolve_ConstructorParametersAreSpecified_ConstructorCalledWithCorrectValues()
-        {
-            Hashtable constructorParams = new Hashtable();
-            constructorParams["cacheEnabled"] = false;
-
-            StubContainerTest result = container.Resolve<StubContainerTest>(constructorParams);
-
-            Assert.Equal(false, result.Constructor_Param);
-        }
-
-        [Fact]
         public void Resolve_ConstructorParametersAreSpecifiedInConfig_ConstructorCalledWithValuesFromConfig()
         {
             StubContainerTest result = container.Resolve<StubContainerTest>();
@@ -104,7 +88,7 @@ namespace SvnBridge
         }
 
         [Fact]
-        public void Resolve_RequestCacheContainsParameterValueThatIsNull_ParamterIsPassedAsNull()
+        public void Resolve_RequestCacheContainsConstructorParameterValueThatIsNull_ParameterIsPassedAsNull()
         {
             RequestCache.Init();
             RequestCache.Items["parameter"] = null;

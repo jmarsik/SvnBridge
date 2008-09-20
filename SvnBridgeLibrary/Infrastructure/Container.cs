@@ -30,15 +30,10 @@ namespace SvnBridge.Infrastructure
 
         public static T Resolve<T>()
         {
-            return (T)container.ResolveType(typeof(T), new Hashtable());
+            return (T)container.ResolveType(typeof(T));
         }
 
-        public static T Resolve<T>(IDictionary constructorParams)
-        {
-            return (T)container.ResolveType(typeof(T), constructorParams);
-        }
-
-        private delegate object Creator(IDictionary constructorParams);
+        private delegate object Creator();
 
         private readonly Dictionary<Type, Creator> typeToCreator = new Dictionary<Type, Creator>();
         private readonly Dictionary<Type, bool> performedValidation = new Dictionary<Type, bool>();
@@ -61,10 +56,10 @@ namespace SvnBridge.Infrastructure
 
         public void RegisterType(Type service, object impl)
         {
-            typeToCreator.Add(service, delegate(IDictionary constructorParams) { return impl; });
+            typeToCreator.Add(service, delegate() { return impl; });
         }
 
-        public object ResolveType(Type type, IDictionary constructorParams)
+        public object ResolveType(Type type)
         {
             Creator creator;
             bool typeRegistered;
@@ -84,18 +79,18 @@ namespace SvnBridge.Infrastructure
                     creator = typeToCreator[type];
                 }
             }
-            return creator(constructorParams);
+            return creator();
         }
 
         private Creator GetAutoCreator(Type service, Type impl, List<Type> interceptorTypes)
         {
-            return delegate(IDictionary constructorParams)
+            return delegate()
             {
-                object instance = CreateInstance(impl, constructorParams);
+                object instance = CreateInstance(impl);
                 List<IInterceptor> interceptors = new List<IInterceptor>();
                 foreach (Type interceptorType in interceptorTypes)
                 {
-                    interceptors.Add((IInterceptor)ResolveType(interceptorType, constructorParams));
+                    interceptors.Add((IInterceptor)ResolveType(interceptorType));
                 }
                 if (interceptors.Count == 0)
                     return instance;
@@ -103,7 +98,7 @@ namespace SvnBridge.Infrastructure
             };
         }
 
-        private object CreateInstance(Type type, IDictionary constructorParams)
+        private object CreateInstance(Type type)
         {
             List<object> args = new List<object>();
             ConstructorInfo[] constructors = type.GetConstructors();
@@ -113,20 +108,18 @@ namespace SvnBridge.Infrastructure
                 {
                     try
                     {
-                        object arg;
-                        if (constructorParams.Contains(info.Name))
+                        if (Configuration.AppSettings(info.Name) != null)
                         {
-                            arg = constructorParams[info.Name];
+                            args.Add(Configuration.AppSettings(info.Name));
                         }
-                        else if (!(TryGetConfiguration(info.Name) is ConfigurationNotFound))
-                    	{
-                    		arg = TryGetConfiguration(info.Name);
-                    	}
+                        else if (RequestCache.IsInitialized && RequestCache.Items.Contains(info.Name))
+                        {
+                            args.Add(RequestCache.Items[info.Name]);
+                        }
                     	else
                     	{
-                    		arg = ResolveType(info.ParameterType, constructorParams);
+                    		args.Add(ResolveType(info.ParameterType));
                     	}
-                        args.Add(arg);
                     }
                     catch (Exception e)
                     {
@@ -143,21 +136,6 @@ namespace SvnBridge.Infrastructure
             {
                 return Activator.CreateInstance(type);
             }
-        }
-
-        private class ConfigurationNotFound { }
-
-        private object TryGetConfiguration(string name)
-        {
-            if (Configuration.AppSettings(name) != null)
-            {
-                return Configuration.AppSettings(name);
-            }
-            if (RequestCache.IsInitialized && RequestCache.Items.Contains(name))
-            {
-                return RequestCache.Items[name];
-            }
-            return new ConfigurationNotFound();
         }
 
         private List<Type> GetInterceptorTypes(Type impl)
