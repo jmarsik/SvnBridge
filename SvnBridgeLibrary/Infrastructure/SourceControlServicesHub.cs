@@ -9,19 +9,17 @@ namespace SvnBridge.Infrastructure
     {
         private readonly ICredentials credentials;
         private readonly TFSSourceControlService sourceControlService;
-        private readonly ProjectInformationRepository projectInformationRepository;
         private readonly AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet;
         private readonly DefaultLogger logger;
         private readonly WebCache cache;
 		private readonly MetaDataRepositoryFactory metaDataRepositoryFactory;
         private readonly FileRepository fileRepository;
 
-        public SourceControlServicesHub(ICredentials credentials, TFSSourceControlService sourceControlService, ProjectInformationRepository projectInformationRepository, AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, DefaultLogger logger, WebCache cache, MetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
+        public SourceControlServicesHub(ICredentials credentials, TFSSourceControlService sourceControlService, AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, DefaultLogger logger, WebCache cache, MetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
         {
             this.credentials = credentials;
     		this.metaDataRepositoryFactory = metaDataRepositoryFactory;
             this.sourceControlService = sourceControlService;
-            this.projectInformationRepository = projectInformationRepository;
             this.associateWorkItemWithChangeSet = associateWorkItemWithChangeSet;
             this.logger = logger;
             this.cache = cache;
@@ -36,11 +34,6 @@ namespace SvnBridge.Infrastructure
         public TFSSourceControlService SourceControlService
         {
             get { return sourceControlService; }
-        }
-
-        public ProjectInformationRepository ProjectInformationRepository
-        {
-            get { return projectInformationRepository; }
         }
 
         public AssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet

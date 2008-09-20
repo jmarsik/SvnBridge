@@ -12,8 +12,18 @@ using SvnBridge.SourceControl;
 
 namespace SvnBridge.Net
 {
-    public class HttpContextDispatcherTests
+    public class HttpContextDispatcherTests : IDisposable
     {
+        public HttpContextDispatcherTests()
+        {
+            RequestCache.Init();
+        }
+
+        public void Dispose()
+        {
+            RequestCache.Dispose();
+        }
+
         [Fact]
         public void Dispatch_WhenServerIsCodePlexAndUsernameIsMissingDomainAndSuffix_DomainAndSuffixIsAdded()
         {
@@ -88,7 +98,7 @@ namespace SvnBridge.Net
 
         public string GetProjectName(IHttpRequest request)
         {
-            throw new NotImplementedException();
+            return "testproject";
         }
 
         public string GetApplicationPath(IHttpRequest request)

@@ -21,6 +21,7 @@ namespace SvnBridge.Infrastructure
 
         public HandlerTestsBase()
         {
+            BootStrapper.Start();
             provider = stubs.CreateTFSSourceControlProviderStub();
             Container.Register(typeof(TFSSourceControlProvider), provider);
             context = new StubHttpContext();

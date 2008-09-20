@@ -72,7 +72,7 @@
     <Compile Include="Assert\SameException.cs" />
     <Compile Include="Assert\ThrowsException.cs" />
     <Compile Include="Assert\TrueException.cs" />
-    <Compile Include="ContainerTest.cs" />
+    <Compile Include="ContainerTests.cs" />
     <Compile Include="BrokenXmlTest.cs" />
     <Compile Include="CachePrePopulatorTest.cs" />
     <Compile Include="FileNodeTests.cs" />

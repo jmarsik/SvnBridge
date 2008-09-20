@@ -90,6 +90,8 @@ namespace SvnBridge.Net
                     }
                     credential = new NetworkCredential(username, credential.Password, domain);
                 }
+                RequestCache.Items["serverUrl"] = tfsUrl;
+                RequestCache.Items["projectName"] = parser.GetProjectName(request);
                 RequestCache.Items["credentials"] = credential;
 
                 handler = GetHandler(connection.Request.HttpMethod);

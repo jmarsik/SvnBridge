@@ -22,11 +22,10 @@ namespace SvnBridgeServer
 		public SvnBridgeHttpHandler()
 		{
 			string tfsUrl = Configuration.TfsUrl;
-		    RequestCache.Items["serverUrl"] = tfsUrl;
-		    ProjectInformationRepository projectInformationRepository = Container.Resolve<ProjectInformationRepository>();
             IPathParser pathParser;
 		    if (Configuration.UrlIncludesProjectName)
 			{
+                ProjectInformationRepository projectInformationRepository = new ProjectInformationRepository(Container.Resolve<MetaDataRepositoryFactory>(), tfsUrl, Configuration.UseCodePlexServers);
                 pathParser = new PathParserProjectInDomain(tfsUrl, projectInformationRepository);
 			}
 			else

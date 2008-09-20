@@ -10,6 +10,7 @@ using SvnBridge.SourceControl;
 using SvnBridge.Utility;
 using SvnBridge.Infrastructure;
 using System.Collections;
+using SvnBridge.Cache;
 
 namespace SvnBridge.Handlers
 {
@@ -40,15 +41,7 @@ namespace SvnBridge.Handlers
 		{
             this.credentials = credentials;
             Initialize(context, pathParser);
-			IHttpRequest request = context.Request;
-			string tfsUrl = pathParser.GetServerUrl(request, credentials);
-            string projectName = pathParser.GetProjectName(context.Request);
-
-            Hashtable constructorParams = new Hashtable();
-            constructorParams["serverUrl"] = tfsUrl;
-            constructorParams["projectName"] = projectName;
-            constructorParams["credentials"] = credentials;
-            sourceControlProvider = Container.Resolve<TFSSourceControlProvider>(constructorParams);
+            sourceControlProvider = Container.Resolve<TFSSourceControlProvider>();
 
             Handle(context, sourceControlProvider);
 		}

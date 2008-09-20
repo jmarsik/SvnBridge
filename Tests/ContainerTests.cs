@@ -7,14 +7,15 @@ using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using SvnBridge.Cache;
 using Tests;
+using SvnBridge.Net;
 
 namespace SvnBridge
 {
-	public class ContainerTest : IDisposable
+	public class ContainerTests : IDisposable
 	{
         private TestableContainer container;
 
-        public ContainerTest()
+        public ContainerTests()
         {
             container = new TestableContainer();
         }
@@ -22,6 +23,7 @@ namespace SvnBridge
         public void Dispose()
         {
             TestInterceptor.Invoke_WasCalled = false;
+            RequestCache.Dispose();
         }
 
         public class TestableContainer : Container
@@ -99,6 +101,27 @@ namespace SvnBridge
             result.Test();
 
             Assert.True(TestInterceptor.Invoke_WasCalled);
+        }
+
+        [Fact]
+        public void Resolve_RequestCacheContainsParameterValueThatIsNull_ParamterIsPassedAsNull()
+        {
+            RequestCache.Init();
+            RequestCache.Items["parameter"] = null;
+
+            ContainerTest3 result = container.Resolve<ContainerTest3>();
+
+            Assert.Null(result.Parameter);
+        }
+
+        public class ContainerTest3
+        {
+            public string Parameter;
+
+            public ContainerTest3(string parameter)
+            {
+                this.Parameter = parameter;
+            }
         }
 
         public class TestInterceptor : IInterceptor

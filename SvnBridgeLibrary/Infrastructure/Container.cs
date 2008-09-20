@@ -118,10 +118,9 @@ namespace SvnBridge.Infrastructure
                         {
                             arg = constructorParams[info.Name];
                         }
-                        else if (TryGetConfiguration(info.Name) != null)
+                        else if (!(TryGetConfiguration(info.Name) is ConfigurationNotFound))
                     	{
                     		arg = TryGetConfiguration(info.Name);
-                    		arg = Convert.ChangeType(arg, info.ParameterType);
                     	}
                     	else
                     	{
@@ -146,6 +145,8 @@ namespace SvnBridge.Infrastructure
             }
         }
 
+        private class ConfigurationNotFound { }
+
         private object TryGetConfiguration(string name)
         {
             if (Configuration.AppSettings(name) != null)
@@ -156,7 +157,7 @@ namespace SvnBridge.Infrastructure
             {
                 return RequestCache.Items[name];
             }
-            return null;
+            return new ConfigurationNotFound();
         }
 
         private List<Type> GetInterceptorTypes(Type impl)
