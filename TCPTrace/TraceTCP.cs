@@ -39,15 +39,15 @@ namespace Trace
 
             File.WriteAllText(@"Tests.txt", "");
             WriteTestLogLine("using System;");
-            WriteTestLogLine("using CodePlex.TfsLibrary;");
-            WriteTestLogLine("using Xunit;");
             WriteTestLogLine("using SvnBridge.SourceControl;");
+            WriteTestLogLine("using CodePlex.TfsLibrary;");
             WriteTestLogLine("using CodePlex.TfsLibrary.RepositoryWebSvc;");
+            WriteTestLogLine("using Xunit;");
+            WriteTestLogLine("using Attach;");
 
             WriteTestLogLine("");
             WriteTestLogLine("namespace Tests");
             WriteTestLogLine("{");
-            WriteTestLogLine("    [TestFixture]");
             WriteTestLogLine("    public class Tests : ProtocolTestsBase");
             WriteTestLogLine("    {");
 

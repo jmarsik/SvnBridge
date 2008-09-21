@@ -92,7 +92,7 @@ namespace IntegrationTests
         [Fact]
         public void GetVersionForDate_DateAndTimeBeforeProjectExistedButAfterRepositoryExisted_ReturnsZero()
         {
-            LogItem item = _provider.GetLog("", 1, _lastCommitRevision, Recursion.None, 100);
+            LogItem item = _provider.GetLog("", 1, _lastCommitRevision, Recursion.None, int.MaxValue);
             DateTime checkTime = item.History[item.History.Length - 1].CommitDateTime.AddDays(-1);
 
             int result = _provider.GetVersionForDate(checkTime);
