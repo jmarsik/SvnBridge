@@ -83,7 +83,6 @@
     <Compile Include="PathParsing\PathParserProjectInDomain.cs" />
     <Compile Include="Infrastructure\AsyncItemLoader.cs" />
     <Compile Include="Infrastructure\ExceptionHelper.cs" />
-    <Compile Include="Infrastructure\SourceControlServicesHub.cs" />
     <Compile Include="Cache\CachedResult.cs" />
     <Compile Include="Interfaces\IInterceptor.cs" />
     <Compile Include="Interfaces\IInvocation.cs" />

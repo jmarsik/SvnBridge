@@ -8,6 +8,7 @@ using SvnBridge.Protocol;
 using SvnBridge.SourceControl;
 using SvnBridge.Infrastructure;
 using SvnBridge.Utility;
+using SvnBridge.Interfaces;
 
 namespace Tests
 {
@@ -40,7 +41,9 @@ namespace Tests
     {
         public TFSSourceControlProvider CreateTFSSourceControlProviderStub()
         {
-            TFSSourceControlProvider stub = CreateObject<TFSSourceControlProvider>("http://www.codeplex.com", null, null, null, null, null, null, null, null);
+            MetaDataRepositoryFactory metaDataRepositoryFactoryStub = CreateObject<MetaDataRepositoryFactory>(null, null, null);
+            this.Attach(metaDataRepositoryFactoryStub.Create, Return.Value(null));
+            TFSSourceControlProvider stub = CreateObject<TFSSourceControlProvider>("http://www.codeplex.com", null, null, null, null, null, null, metaDataRepositoryFactoryStub, null);
             this.Attach(stub.GetRepositoryUuid, Return.Value(new Guid("81a5aebe-f34e-eb42-b435-ac1ecbb335f7")));
             this.Attach(stub.GetItemsWithoutProperties, Return.DelegateResult(
                 delegate(object[] parameters) { return stub.GetItems((int)parameters[0], (string)parameters[1], (Recursion)parameters[2]); }
@@ -75,6 +78,7 @@ namespace Tests
         public delegate bool WriteFile(string activityId, string path, byte[] fileData);
         public delegate Guid GetRepositoryUuid();
         public delegate bool IsValidTfsServerUrl(string url);
+        public delegate IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath);
 
         public Results Attach(DeleteItem method, bool returnValue)
         {
@@ -224,6 +228,11 @@ namespace Tests
         }
 
         public Results Attach(IsValidTfsServerUrl method, Return action)
+        {
+            return base.Attach((Delegate)method, action);
+        }
+
+        public Results Attach(Create method, Return action)
         {
             return base.Attach((Delegate)method, action);
         }
