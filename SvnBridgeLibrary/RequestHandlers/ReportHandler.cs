@@ -81,6 +81,7 @@ namespace SvnBridge.Handlers
                     {
                         data = Helper.DeserializeXml<DatedRevReportData>(reader);
                         SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                        response.SendChunked = true;
                         using (var output = new StreamWriter(response.OutputStream))
                         {
                             GetDatedRevReport(sourceControlProvider, (DatedRevReportData)data, output);

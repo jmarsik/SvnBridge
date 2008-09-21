@@ -6,6 +6,7 @@ using Xunit;
 using SvnBridge.Infrastructure;
 using SvnBridge.PathParsing;
 using SvnBridge.SourceControl;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Handlers
 {
@@ -78,7 +79,7 @@ namespace SvnBridge.Handlers
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
             Assert.True(
-                result.Contains("<lp1:creationdate>" + dt.ToUniversalTime().ToString("o") + "</lp1:creationdate>"));
+                result.Contains("<lp1:creationdate>" + Helper.FormatDate(dt) + "</lp1:creationdate>"));
         }
 
         [Fact]

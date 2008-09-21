@@ -80,6 +80,7 @@
     <Compile Include="Commit\CommitUpdatedFileWithConflictAfterCheckoutTest.cs" />
     <Compile Include="Commit\CommitUpdatedFileWithSpecialCharactersTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RepoBrowser\ListWithRevisionSpecifiedUsingCurrentDateTime.cs" />
     <Compile Include="ShowLog\ShowLogRenamedFile.cs" />
     <Compile Include="ShowLog\ShowLogSingleFolderWithAddEditDelete.cs" />
     <Compile Include="ShowLog\ShowLogSingleFolderWithOneFile.cs" />

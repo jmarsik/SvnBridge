@@ -17,8 +17,7 @@ namespace SvnBridge.Handlers
 {
     public class PropFindHandler : RequestHandlerBase
     {
-        protected override void Handle(IHttpContext context,
-                                       TFSSourceControlProvider sourceControlProvider)
+        protected override void Handle(IHttpContext context, TFSSourceControlProvider sourceControlProvider)
         {
             IHttpRequest request = context.Request;
             IHttpResponse response = context.Response;
@@ -142,9 +141,7 @@ namespace SvnBridge.Handlers
                 return sourceControlProvider.GetItemsWithoutProperties(version, Helper.Decode(path), recursion);
         }
 
-        private void HandleAllProp(TFSSourceControlProvider sourceControlProvider,
-                                   string requestPath,
-                                   Stream outputStream)
+        private void HandleAllProp(TFSSourceControlProvider sourceControlProvider, string requestPath, Stream outputStream)
         {
             string revision = requestPath.Split('/')[3];
             string path = requestPath.Substring("/!svn/vcc".Length + revision.Length);
@@ -169,34 +166,37 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private void WriteAllPropForFolder(TextWriter writer,
-                                           string requestPath,
-                                           ItemMetaData item,
-                                           TFSSourceControlProvider sourceControlProvider)
+        private void WriteAllPropForFolder(TextWriter writer, string requestPath, ItemMetaData item, TFSSourceControlProvider sourceControlProvider)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
-            writer.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n");
-            writer.Write("<D:href>" + Helper.UrlEncodeIfNeccesary(requestPath) + "</D:href>\n");
+            writer.Write("<D:response xmlns:S=\"http://subversion.tigris.org/xmlns/svn/\" xmlns:C=\"http://subversion.tigris.org/xmlns/custom/\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\">\n");
+            writer.Write("<D:href>" + Helper.UrlEncodeIfNeccesary(requestPath) + "/</D:href>\n");
             writer.Write("<D:propstat>\n");
             writer.Write("<D:prop>\n");
+            foreach (var prop in item.Properties)
+            {
+                writer.Write("<" + prop.Key + ">" + prop.Value + "</" + prop.Key + ">\n");
+            }
             writer.Write("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>\n");
             writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
-            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") +
-                         "</lp1:creationdate>\n");
-            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
-                         "</lp1:getlastmodified>\n");
-            string svrVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" +
-                                        Helper.Encode(item.Name));
-            writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svrVerLocalPath) +
-                         "</D:href></lp1:checked-in>\n");
-            writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
-                         "</D:href></lp1:version-controlled-configuration>\n");
+            writer.Write("<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate) + "</lp1:creationdate>\n");
+            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
+            string svrVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name));
+            writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svrVerLocalPath) + "</D:href></lp1:checked-in>\n");
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath + "</D:href></lp1:version-controlled-configuration>\n");
             writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
             writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
-            writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
+            if (item.Name != "")
+            {
+                writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
+            }
+            else
+            {
+                writer.Write("<lp2:baseline-relative-path/>\n");
+            }
             writer.Write("<lp2:repository-uuid>" + sourceControlProvider.GetRepositoryUuid() + "</lp2:repository-uuid>\n");
-            writer.Write("<lp2:deadprop-count>0</lp2:deadprop-count>\n");
+            writer.Write("<lp2:deadprop-count>" + item.Properties.Count + "</lp2:deadprop-count>\n");
             writer.Write("<lp1:resourcetype><D:collection/></lp1:resourcetype>\n");
             writer.Write("<D:lockdiscovery/>\n");
             writer.Write("</D:prop>\n");
@@ -329,7 +329,7 @@ namespace SvnBridge.Handlers
             {
                 writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 
-                WriteMultiStatusStart(writer, data.Properties.Count > 1);
+                WriteMultiStatusStart(writer, data.Properties);
 
 
                 if (depthHeader == "1")
@@ -368,7 +368,7 @@ namespace SvnBridge.Handlers
             {
                 writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 
-                WriteMultiStatusStart(writer, data.Properties.Count > 1);
+                WriteMultiStatusStart(writer, data.Properties);
 
                 foreach (ItemMetaData item in folderInfo.Items)
                 {
@@ -381,13 +381,12 @@ namespace SvnBridge.Handlers
             }
         }
 
-        private static void WriteMultiStatusStart(TextWriter writer,
-                                                  bool hasMultipleProperties)
+        private void WriteMultiStatusStart(TextWriter writer, List<XmlElement> properties)
         {
-            if (hasMultipleProperties)
+            if (properties.Count > 1 ||
+               (properties.Count == 1 && properties[0].LocalName == "deadprop-count"))
             {
-                writer.Write(
-                    "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n");
+                writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns1=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:ns0=\"DAV:\">\n");
             }
             else
             {
@@ -396,20 +395,24 @@ namespace SvnBridge.Handlers
         }
 
         private void WriteProperties(INode node,
-                                     IEnumerable<XmlElement> properties,
+                                     List<XmlElement> properties,
                                      TextWriter output)
         {
             WriteProperties(node, properties, output, false);
         }
 
         private void WriteProperties(INode node,
-                                     IEnumerable<XmlElement> properties,
+                                     List<XmlElement> properties,
                                      TextWriter output,
                                      bool isFolder)
         {
             bool writeGetContentLengthForFolder = isFolder && PropertiesContains(properties, "getcontentlength");
 
-            output.Write("<D:response xmlns:lp1=\"DAV:\" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\"");
+            output.Write("<D:response xmlns:lp1=\"DAV:\"");
+            if (!(properties.Count == 1 && properties[0].LocalName == "resourcetype"))
+            {
+                output.Write(" xmlns:lp2=\"http://subversion.tigris.org/xmlns/dav/\"");
+            }
             if (writeGetContentLengthForFolder)
             {
                 output.Write(" xmlns:g0=\"DAV:\"");

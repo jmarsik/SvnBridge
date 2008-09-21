@@ -15,8 +15,7 @@ namespace SvnBridge.Nodes
         private readonly ItemMetaData item;
         private readonly TFSSourceControlProvider sourceControlProvider;
 
-        public FileNode(ItemMetaData item,
-                        TFSSourceControlProvider sourceControlProvider)
+        public FileNode(ItemMetaData item, TFSSourceControlProvider sourceControlProvider)
         {
             this.item = item;
             this.sourceControlProvider = sourceControlProvider;
@@ -56,7 +55,7 @@ namespace SvnBridge.Nodes
                 case "checked-in":
                     return GetCheckedIn(handler);
                 case "deadprop-count":
-                    return "<lp2:deadprop-count>0</lp2:deadprop-count>";
+                    return GetDeadPropCount();
                 case "creator-displayname":
                     return GetCreatorDisplayName();
                 case "creationdate":
@@ -79,6 +78,11 @@ namespace SvnBridge.Nodes
         private string GetContentLength()
         {
             return "<lp1:getcontentlength>" + sourceControlProvider.ReadFile(item).Length + "</lp1:getcontentlength>";
+        }
+
+        private string GetDeadPropCount()
+        {
+            return "<lp2:deadprop-count>" + item.Properties.Count + "</lp2:deadprop-count>";
         }
 
         private static string GetVersionControlledConfiguration(RequestHandlerBase handler)

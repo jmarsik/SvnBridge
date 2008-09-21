@@ -79,6 +79,7 @@ namespace Tests
         public delegate Guid GetRepositoryUuid();
         public delegate bool IsValidTfsServerUrl(string url);
         public delegate IMetaDataRepository Create(ICredentials credentials, string serverUrl, string rootPath);
+        public delegate int GetVersionForDate(DateTime date);
 
         public Results Attach(DeleteItem method, bool returnValue)
         {
@@ -232,6 +233,11 @@ namespace Tests
         }
 
         public Results Attach(GetLog method, Return action)
+        {
+            return base.Attach((Delegate)method, action);
+        }
+
+        public Results Attach(GetVersionForDate method, Return action)
         {
             return base.Attach((Delegate)method, action);
         }
