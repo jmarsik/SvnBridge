@@ -7,12 +7,12 @@ using SvnBridge.Exceptions;
 using SvnBridge.Interfaces;
 using SvnBridge.SourceControl;
 using SvnBridge.Infrastructure;
+using IntegrationTests;
+using Xunit;
+using System;
 
 namespace IntegrationTests
 {
-	using IntegrationTests;
-	using Xunit;
-
 	public class TFSSourceControlProviderTests : TFSSourceControlProviderTestsBase
 	{
 		[Fact]
@@ -20,10 +20,9 @@ namespace IntegrationTests
 		{
 			CreateFolder(testPath + "/New Folder", true);
 
-			Assert.Throws(typeof(FolderAlreadyExistsException), delegate
-			{
-				_provider.MakeCollection(_activityId, testPath + "/New Folder");
-			});
+            Exception result = Record.Exception(delegate { _provider.MakeCollection(_activityId, testPath + "/New Folder"); });
+
+            Assert.IsType<FolderAlreadyExistsException>(result);
 		}
 
 		[Fact]
@@ -72,5 +71,13 @@ namespace IntegrationTests
 
 			Assert.True(result);
 		}
+
+        [Fact]
+        public void GetVersionForDate_CurrentDateAndTime_ReturnsLatestChangeSet()
+        {
+            int result = _provider.GetVersionForDate(DateTime.Now);
+
+            Assert.Equal(_provider.GetLatestVersion(), result);
+        }
 	}
 }

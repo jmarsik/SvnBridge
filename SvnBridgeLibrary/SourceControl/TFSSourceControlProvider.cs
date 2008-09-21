@@ -542,7 +542,15 @@ namespace SvnBridge.SourceControl
 			DateVersionSpec dateVersion = new DateVersionSpec();
 			dateVersion.date = date.ToUniversalTime();
 
-			DateVersionSpec dateSpecForFirstVersion = GetDateSpecForVersion(1);
+            LogItem earliestLog = sourceControlService.QueryLog(serverUrl, credentials, rootPath, VersionSpec.First, VersionSpec.Latest, RecursionType.None, int.MaxValue);
+            // Need to loop because QueryLog returns a max of 256 even if there are more
+            while (earliestLog.History.Length > 1)
+            {
+                int earliestChangeSet = earliestLog.History[earliestLog.History.Length - 1].ChangeSetID;
+                earliestLog = sourceControlService.QueryLog(serverUrl, credentials, rootPath, VersionSpec.First, VersionSpec.FromChangeset(earliestChangeSet), RecursionType.None, int.MaxValue);
+            };
+            DateVersionSpec dateSpecForFirstVersion = new DateVersionSpec();
+            dateSpecForFirstVersion.date = earliestLog.History[0].CommitDateTime;
 
 			if (dateVersion.date < dateSpecForFirstVersion.date)
 				return 0; // the date is before the repository has started
@@ -555,14 +563,7 @@ namespace SvnBridge.SourceControl
 			if (latestVersionDate.date < dateVersion.date)
 				return latestVersion;
 
-			LogItem logDateToLatest = sourceControlService.QueryLog(
-				serverUrl,
-				credentials,
-				rootPath,
-				dateVersion,
-				latestVersionDate,
-				RecursionType.Full,
-				1);
+			LogItem logDateToLatest = sourceControlService.QueryLog(serverUrl, credentials, rootPath, dateVersion, latestVersionDate, RecursionType.Full, 1);
 			// get the change set before that one, which is the nearest changeset
 			// to the requested date
 			return logDateToLatest.History[0].ChangeSetID - 1;
@@ -577,14 +578,7 @@ namespace SvnBridge.SourceControl
 			fromVersion.cs = latestVersion - 1;
 			ChangesetVersionSpec toVersion = new ChangesetVersionSpec();
 			toVersion.cs = latestVersion;
-			LogItem log = sourceControlService.QueryLog(
-				serverUrl,
-				credentials,
-				rootPath,
-				fromVersion,
-				toVersion,
-				RecursionType.Full,
-				1);
+			LogItem log = sourceControlService.QueryLog(serverUrl, credentials, rootPath, fromVersion, toVersion, RecursionType.Full, 1);
 			spec.date = log.History[0].CommitDateTime;
 			return spec;
 		}
