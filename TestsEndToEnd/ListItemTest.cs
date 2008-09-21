@@ -93,7 +93,7 @@ TestFolder2/text.txt
             DateTime commitDate = DateTime.Now;
 
             //SVN protocol is only accurate to the second
-            Thread.Sleep(TimeSpan.FromSeconds(2));
+            Thread.Sleep(TimeSpan.FromSeconds(3));
 
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
 

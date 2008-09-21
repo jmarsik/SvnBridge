@@ -82,5 +82,13 @@ namespace IntegrationTests
 			Assert.Equal(ItemType.Folder, logItem.History[0].Changes[0].Item.ItemType);
 			Assert.Equal(testPath.Substring(1) + "/TestFolder", logItem.History[0].Changes[0].Item.RemoteName);
 		}
-	}
+
+        [Fact]
+        public void GetLog_Root_ReturnsCorrectResult()
+        {
+            LogItem logItem = _provider.GetLog("", 1, _lastCommitRevision, Recursion.None, Int32.MaxValue);
+
+            Assert.Equal("", logItem.History[0].Changes[0].Item.RemoteName);
+        }
+    }
 }

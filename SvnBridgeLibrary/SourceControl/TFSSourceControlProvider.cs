@@ -239,7 +239,11 @@ namespace SvnBridge.SourceControl
 				List<SourceItem> renamedItems = new List<SourceItem>();
 				foreach (SourceItemChange change in history.Changes)
 				{
-					change.Item.RemoteName = change.Item.RemoteName.Substring(rootPath.Length);
+                    if (change.Item.RemoteName.Length > rootPath.Length)
+                        change.Item.RemoteName = change.Item.RemoteName.Substring(rootPath.Length);
+                    else
+                        change.Item.RemoteName = "";
+
 					if ((change.ChangeType & ChangeType.Rename) == ChangeType.Rename)
 					{
 						renamedItems.Add(change.Item);
@@ -539,48 +543,24 @@ namespace SvnBridge.SourceControl
 
 		public virtual int GetVersionForDate(DateTime date)
 		{
-			DateVersionSpec dateVersion = new DateVersionSpec();
-			dateVersion.date = date.ToUniversalTime();
-
-            LogItem earliestLog = sourceControlService.QueryLog(serverUrl, credentials, rootPath, VersionSpec.First, VersionSpec.Latest, RecursionType.None, int.MaxValue);
-            // Need to loop because QueryLog returns a max of 256 even if there are more
-            while (earliestLog.History.Length > 1)
+			date = date.ToUniversalTime();
+            try
             {
-                int earliestChangeSet = earliestLog.History[earliestLog.History.Length - 1].ChangeSetID;
-                earliestLog = sourceControlService.QueryLog(serverUrl, credentials, rootPath, VersionSpec.First, VersionSpec.FromChangeset(earliestChangeSet), RecursionType.None, int.MaxValue);
-            };
-            DateVersionSpec dateSpecForFirstVersion = new DateVersionSpec();
-            dateSpecForFirstVersion.date = earliestLog.History[0].CommitDateTime;
+                LogItem logDateToLatest = sourceControlService.QueryLog(serverUrl, credentials, rootPath, VersionSpec.First, VersionSpec.FromDate(date), RecursionType.Full, 1);
 
-			if (dateVersion.date < dateSpecForFirstVersion.date)
-				return 0; // the date is before the repository has started
+                // If no results then date is before project existed
+                if (logDateToLatest.History.Length == 0)
+                    return 0;
 
-			int latestVersion = GetLatestVersion();
-			DateVersionSpec latestVersionDate = GetDateSpecForVersion(latestVersion);
+                return logDateToLatest.History[0].ChangeSetID;
+            }
+            catch (Exception e)
+            {
+                if (e.Message.StartsWith("TF14021:")) // Date is before repository started
+                    return 0;
 
-			// if the required date is after the latest version, obviously 
-			// the latest version is the nearest to it.
-			if (latestVersionDate.date < dateVersion.date)
-				return latestVersion;
-
-			LogItem logDateToLatest = sourceControlService.QueryLog(serverUrl, credentials, rootPath, dateVersion, latestVersionDate, RecursionType.Full, 1);
-			// get the change set before that one, which is the nearest changeset
-			// to the requested date
-			return logDateToLatest.History[0].ChangeSetID - 1;
-		}
-
-		private DateVersionSpec GetDateSpecForVersion(int version)
-		{
-			DateVersionSpec spec = new DateVersionSpec();
-			int latestVersion = version;
-
-			ChangesetVersionSpec fromVersion = new ChangesetVersionSpec();
-			fromVersion.cs = latestVersion - 1;
-			ChangesetVersionSpec toVersion = new ChangesetVersionSpec();
-			toVersion.cs = latestVersion;
-			LogItem log = sourceControlService.QueryLog(serverUrl, credentials, rootPath, fromVersion, toVersion, RecursionType.Full, 1);
-			spec.date = log.History[0].CommitDateTime;
-			return spec;
+                throw;
+            }
 		}
 
 		public virtual void SetActivityComment(string activityId, string comment)

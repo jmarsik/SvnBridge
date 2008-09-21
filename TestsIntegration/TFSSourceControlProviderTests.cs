@@ -10,6 +10,7 @@ using SvnBridge.Infrastructure;
 using IntegrationTests;
 using Xunit;
 using System;
+using System.Threading;
 
 namespace IntegrationTests
 {
@@ -77,7 +78,39 @@ namespace IntegrationTests
         {
             int result = _provider.GetVersionForDate(DateTime.Now);
 
-            Assert.Equal(_provider.GetLatestVersion(), result);
+            Assert.Equal(_lastCommitRevision, result);
         }
-	}
+
+        [Fact]
+        public void GetVersionForDate_DateAndTimeBeforeRepositoryExisted_ReturnsZero()
+        {
+            int result = _provider.GetVersionForDate(DateTime.Parse("1900-01-01"));
+
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void GetVersionForDate_DateAndTimeBeforeProjectExistedButAfterRepositoryExisted_ReturnsZero()
+        {
+            LogItem item = _provider.GetLog("", 1, _lastCommitRevision, Recursion.None, 100);
+            DateTime checkTime = item.History[item.History.Length - 1].CommitDateTime.AddDays(-1);
+
+            int result = _provider.GetVersionForDate(checkTime);
+
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void GetVersionForDate_DateAndTimeBeforeLastCommit_ReturnsChangesetBeforeLastCommit()
+        {
+            int expected = _lastCommitRevision;
+            DateTime startDate = DateTime.Now;
+            Thread.Sleep(1000);
+            WriteFile(testPath + "/TestFile.txt", "Fun text", true);
+
+            int result = _provider.GetVersionForDate(startDate);
+
+            Assert.Equal(expected, result);
+        }
+    }
 }
