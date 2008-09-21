@@ -163,15 +163,9 @@ namespace SvnBridge.Net
                     username = username.Substring(username.IndexOf('\\') + 1);
                     return new NetworkCredential(username, password, domain);
                 }
-                else
-                {
-                    return new NetworkCredential(username, password);
-                }
+                return new NetworkCredential(username, password);
             }
-            else
-            {
-                return CredentialsHelper.NullCredentials;
-            }
+            return CredentialsHelper.NullCredentials;
         }
 
 

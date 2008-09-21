@@ -15,7 +15,6 @@ namespace IntegrationTests
 
         public AuthenticateAsLowPrivilegeUser() : this(Settings.Default.Username, Settings.Default.Password, Settings.Default.Domain)
         {
-
         }
 
         public AuthenticateAsLowPrivilegeUser(string user, string password, string domain)
@@ -23,8 +22,10 @@ namespace IntegrationTests
             oldCredentials = CredentialsHelper.DefaultCredentials;
             if (string.IsNullOrEmpty(user.Trim()))
                 return;
-            CredentialsHelper.NullCredentials = CredentialsHelper.DefaultCredentials =
-                new NetworkCredential(user, password,domain);
+
+            NetworkCredential newCredentials = new NetworkCredential(user, password, domain);
+            CredentialsHelper.NullCredentials = newCredentials;
+            CredentialsHelper.DefaultCredentials = newCredentials;
         }
 
         public void Dispose()
