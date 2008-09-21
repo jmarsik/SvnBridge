@@ -7,6 +7,7 @@ using System.Xml;
 using SvnBridge.Interfaces;
 using System.Configuration;
 using SvnBridge.Net;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Infrastructure
 {
@@ -50,13 +51,17 @@ namespace SvnBridge.Infrastructure
             string logFile = Path.Combine(LogPath, "Error-" + errorId.ToString() + ".log");
             StringBuilder output = new StringBuilder();
             output.AppendFormat("Time     : {0}\r\n", DateTime.Now);
-            output.AppendFormat("Request  : {0} {1}\r\n", context.Request.HttpMethod, context.Request.Url);
+            output.AppendFormat("Message  : {0}\r\n", exception.Message);
             NetworkCredential credential = (NetworkCredential)RequestCache.Items["credentials"];
             if (credential != null)
             {
                 output.AppendFormat("User     : {0}\r\n", credential.UserName);
             }
-            output.AppendFormat("Message  : {0}\r\n", exception.Message);
+            output.AppendFormat("Request  : {0} {1}\r\n", context.Request.HttpMethod, context.Request.Url);
+            if (RequestCache.Items["RequestBody"] != null)
+            {
+                output.AppendFormat("{0}\r\n", Helper.SerializeXmlString(RequestCache.Items["RequestBody"]));
+            }
             output.AppendFormat("\r\nException:\r\n   {0}\r\n", exception);
             output.AppendFormat("\r\nStack Trace:\r\n{0}\r\n", exception.StackTrace);
             output.Append("\r\nHeaders:\r\n");

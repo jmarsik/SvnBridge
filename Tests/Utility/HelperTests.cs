@@ -3,7 +3,7 @@ using SvnBridge.Utility;
 
 namespace Tests
 {
-    public class XmlEncodeTests
+    public class HelperTests
     {
         [Fact]
         public void VerifyDecodeBCorrectlyDecodesSpecialCharacters()
@@ -83,6 +83,14 @@ namespace Tests
             string result = Helper.Encode(" % %");
 
             Assert.Equal("%20%25%20%25", result);
+        }
+
+        [Fact]
+        public void SerializeXmlString_CorrectlyReturnsSerializedObject()
+        {
+            string result = Helper.SerializeXmlString("Hello");
+
+            Assert.Equal("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<string>Hello</string>", result);
         }
     }
 }

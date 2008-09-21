@@ -7,7 +7,7 @@
     <ProjectGuid>{A374829E-4BE3-4DF5-9CCF-6EE9794D34A7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SvnBridge</RootNamespace>
+    <RootNamespace>UnitTests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -92,6 +92,7 @@
     <Compile Include="Handlers\PropPatchHandlerTests.cs" />
     <Compile Include="Handlers\PutHandlerTests.cs" />
     <Compile Include="Handlers\ReportHandlerLogReportTests.cs" />
+    <Compile Include="Handlers\ReportHandlerTests.cs" />
     <Compile Include="Handlers\ReportHandlerUpdateReportTests.cs" />
     <Compile Include="Infrastructure\HandlerTestsBase.cs" />
     <Compile Include="Infrastructure\ReadWriteMemoryStream.cs" />

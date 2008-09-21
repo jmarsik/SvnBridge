@@ -6,6 +6,7 @@ using CodePlex.TfsLibrary.RepositoryWebSvc;
 using Xunit;
 using SvnBridge.SourceControl;
 using Tests;
+using Attach;
 
 namespace ProtocolTests
 {
@@ -675,7 +676,7 @@ namespace ProtocolTests
             history.Changes.Add(change3);
             histories.Add(history);
 
-            stubs.Attach(provider.GetLog, new LogItem(@"C:\", "Spikes/SvnFacade/trunk", histories.ToArray()));
+            stubs.Attach(provider.GetLog, Return.Value(new LogItem(@"C:\", "Spikes/SvnFacade/trunk", histories.ToArray())));
 
             string request =
                 "REPORT /!svn/bc/5465/Spikes/SvnFacade/trunk/New%20Folder HTTP/1.1\r\n" +

@@ -27,76 +27,85 @@ namespace SvnBridge.Handlers
             using (XmlReader reader = XmlReader.Create(request.InputStream, Helper.InitializeNewXmlReaderSettings()))
             {
                 reader.MoveToContent();
-                if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locks-report")
+                object data = null;
+                try
                 {
-                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-                    response.SendChunked = true;
-                    using (var writer = new StreamWriter(response.OutputStream))
+                    if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locks-report")
                     {
-                        GetLocksReport(writer);
+                        SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                        response.SendChunked = true;
+                        using (var writer = new StreamWriter(response.OutputStream))
+                        {
+                            GetLocksReport(writer);
+                        }
+                    }
+                    else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "update-report")
+                    {
+                        data = Helper.DeserializeXml<UpdateReportData>(reader);
+                        int targetRevision;
+                        FolderMetaData update = GetMetadataForUpdate(request, (UpdateReportData)data, sourceControlProvider, out targetRevision);
+                        SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                        response.SendChunked = true;
+                        using (var output = new StreamWriter(response.OutputStream))
+                        {
+                            UpdateReport(sourceControlProvider, (UpdateReportData)data, output, update, targetRevision);
+                        }
+                    }
+                    else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "replay-report")
+                    {
+                        var relayReport = Helper.DeserializeXml<ReplayReportData>(reader);
+                        ReplayReport(request, response, sourceControlProvider, relayReport);
+                    }
+                    else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "log-report")
+                    {
+                        data = Helper.DeserializeXml<LogReportData>(reader);
+                        SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                        response.SendChunked = true;
+                        response.BufferOutput = false;
+                        using (var output = new StreamWriter(response.OutputStream))
+                        {
+                            LogReport(sourceControlProvider, (LogReportData)data, path, output);
+                        }
+                    }
+                    else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locations")
+                    {
+                        data = Helper.DeserializeXml<GetLocationsReportData>(reader);
+                        SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                        response.SendChunked = true;
+                        using (var output = new StreamWriter(response.OutputStream))
+                        {
+                            GetLocationsReport(sourceControlProvider, (GetLocationsReportData)data, path, output);
+                        }
+                    }
+                    else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "dated-rev-report")
+                    {
+                        data = Helper.DeserializeXml<DatedRevReportData>(reader);
+                        SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
+                        using (var output = new StreamWriter(response.OutputStream))
+                        {
+                            GetDatedRevReport(sourceControlProvider, (DatedRevReportData)data, output);
+                        }
+                    }
+                    else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "file-revs-report")
+                    {
+                        data = Helper.DeserializeXml<FileRevsReportData>(reader);
+                        string serverPath = "/";
+                        if (path.IndexOf('/', 9) > -1)
+                        {
+                            serverPath = path.Substring(path.IndexOf('/', 9));
+                        }
+                        SendBlameResponse(request, response, sourceControlProvider, serverPath, (FileRevsReportData)data);
+                        return;
+                    }
+                    else
+                    {
+                        throw new Exception("Unrecognized report name: " + reader.LocalName);
                     }
                 }
-                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "update-report")
+                catch
                 {
-                    var data = Helper.DeserializeXml<UpdateReportData>(reader);
-                    int targetRevision;
-                    FolderMetaData update = GetMetadataForUpdate(request, data, sourceControlProvider, out targetRevision);
-                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-                    response.SendChunked = true;
-                    using (var output = new StreamWriter(response.OutputStream))
-                    {
-                       UpdateReport(sourceControlProvider, data, output, update, targetRevision);
-                    }
-                }
-                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "replay-report")
-                {
-                    var relayReport = Helper.DeserializeXml<ReplayReportData>(reader);
-                    ReplayReport(request, response, sourceControlProvider, relayReport);
-                }
-                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "log-report")
-                {
-                    var data = Helper.DeserializeXml<LogReportData>(reader);
-                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-                    response.SendChunked = true;
-                    response.BufferOutput = false;
-                    using (var output = new StreamWriter(response.OutputStream))
-                    {
-                        LogReport(sourceControlProvider, data, path, output);
-                    }
-                }
-                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "get-locations")
-                {
-                    var data = Helper.DeserializeXml<GetLocationsReportData>(reader);
-                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-                    response.SendChunked = true;
-                    using (var output = new StreamWriter(response.OutputStream))
-                    {
-                        GetLocationsReport(sourceControlProvider, data, path, output);
-                    }
-                }
-                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "dated-rev-report")
-                {
-                    var data = Helper.DeserializeXml<DatedRevReportData>(reader);
-                    SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, 200);
-                    using (var output = new StreamWriter(response.OutputStream))
-                    {
-                        GetDatedRevReport(sourceControlProvider, data, output);
-                    }
-                }
-                else if (reader.NamespaceURI == WebDav.Namespaces.SVN && reader.LocalName == "file-revs-report")
-                {
-                    var data = Helper.DeserializeXml<FileRevsReportData>(reader);
-                    string serverPath = "/";
-                    if (path.IndexOf('/', 9) > -1)
-                    {
-                        serverPath = path.Substring(path.IndexOf('/', 9));
-                    }
-                    SendBlameResponse(request, response, sourceControlProvider, serverPath, data);
-                    return;
-                }
-                else
-                {
-                    throw new Exception("Unrecognized report name: " + reader.LocalName);
+                    RequestCache.Items["RequestBody"] = data;
+                    throw;
                 }
             }
         }

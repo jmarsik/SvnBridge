@@ -155,7 +155,6 @@ namespace Tests
             return base.Attach((Delegate)method, (ItemMetaData)returnValue);
         }
 
-
         public Results AttachReadFile(ReadFile method, byte[] returnValue)
         {
             return base.Attach((Delegate)method, (byte[])returnValue);
@@ -178,11 +177,6 @@ namespace Tests
         }
 
         public Results Attach(WriteFile method, bool returnValue)
-        {
-            return base.Attach((Delegate)method, (object)returnValue);
-        }
-
-        public Results Attach(GetLog method, LogItem returnValue)
         {
             return base.Attach((Delegate)method, (object)returnValue);
         }
@@ -233,6 +227,11 @@ namespace Tests
         }
 
         public Results Attach(Create method, Return action)
+        {
+            return base.Attach((Delegate)method, action);
+        }
+
+        public Results Attach(GetLog method, Return action)
         {
             return base.Attach((Delegate)method, action);
         }
