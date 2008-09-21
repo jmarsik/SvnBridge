@@ -6,7 +6,7 @@
 
 	<PropertyGroup>
 		<ZipStoragePath>D:\Builds\Zips\SvnBridge</ZipStoragePath>
-		<BuildType>Release</BuildType>
+		<BuildType>Debug</BuildType>
 		<Revision>$(ccnetlabel)</Revision>
 	</PropertyGroup>
 
