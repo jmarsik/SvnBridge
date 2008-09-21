@@ -41,7 +41,7 @@ namespace SvnBridge.Handlers
 			if (folder != null)
 			{
 			    folder = (FolderMetaData) item;
-				new FolderRenderer(context, PathParser,Credentials).Render(folder);
+				new FolderRenderer(context, PathParser, Credentials).Render(folder);
 			}
 			else if (item == null)
 			{

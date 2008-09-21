@@ -26,7 +26,7 @@ namespace SvnBridge.Infrastructure
             }
             else
             {
-                return new MetaDataRepositoryNoCache(sourceControlService, credentials, persistentCache, serverUrl, rootPath);
+                return new MetaDataRepositoryNoCache(sourceControlService, credentials, serverUrl, rootPath);
             }
 		}
 

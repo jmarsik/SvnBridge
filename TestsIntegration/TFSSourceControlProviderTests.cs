@@ -27,25 +27,6 @@ namespace IntegrationTests
 		}
 
 		[Fact]
-		public void TestCreateProviderWithMultipleTFSUrlsSucceeds()
-		{
-			RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
-			FileSystem system = new FileSystem();
-			RegistrationService service = new RegistrationService(factory);
-			RepositoryWebSvcFactory factory1 = new RepositoryWebSvcFactory(factory);
-			WebTransferService webTransferService = new WebTransferService(system);
-			TFSSourceControlService tfsSourceControlService = new TFSSourceControlService(service,
-																						  factory1,
-																						  webTransferService,
-																						  system,
-                                                                                          stubs.CreateObject<DefaultLogger>());
-			TFSSourceControlProvider provider = new TFSSourceControlProvider(ServerUrl + "," + ServerUrl,
-																			 PROJECT_NAME,
-																			 null,
-																			 CreateSourceControlServicesHub());
-		}
-
-		[Fact]
 		public void TestDeleteItemReturnsFalseIfFileDoesNotExist()
 		{
 			bool result = _provider.DeleteItem(_activityId, testPath + "/NotHere.txt");

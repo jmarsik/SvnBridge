@@ -35,6 +35,20 @@ namespace SvnBridge.SourceControl
 		private readonly string rootPath;
 		private readonly string serverUrl;
 
+        public TFSSourceControlProvider(string serverUrl, string projectName, ICredentials credentials, TFSSourceControlService sourceControlService, AssociateWorkItemWithChangeSet associateWorkItemWithChangeSet, DefaultLogger logger, WebCache cache, MetaDataRepositoryFactory metaDataRepositoryFactory, FileRepository fileRepository)
+        {
+            this.sourceControlServicesHub = new SourceControlServicesHub(sourceControlService, associateWorkItemWithChangeSet, logger, cache, metaDataRepositoryFactory, fileRepository);
+            this.serverUrl = serverUrl;
+            this.projectName = projectName;
+            this.credentials = CredentialsHelper.GetCredentialsForServer(serverUrl, credentials);
+            rootPath = Constants.ServerRootPath;
+
+            if (!string.IsNullOrEmpty(projectName))
+            {
+                rootPath += projectName + "/";
+            }
+        }
+
         private DefaultLogger Logger
 		{
 			get { return sourceControlServicesHub.Logger; }
@@ -66,21 +80,6 @@ namespace SvnBridge.SourceControl
 		private AssociateWorkItemWithChangeSet AssociateWorkItemWithChangeSet
 		{
 			get { return sourceControlServicesHub.AssociateWorkItemWithChangeSet; }
-		}
-
-		public TFSSourceControlProvider(string serverUrl, string projectName, ICredentials credentials, SourceControlServicesHub sourceControlServicesHub)
-		{
-			this.sourceControlServicesHub = sourceControlServicesHub;
-			this.credentials = credentials;
-			this.serverUrl = serverUrl;
-			this.projectName = projectName;
-			this.credentials = CredentialsHelper.GetCredentialsForServer(this.serverUrl, sourceControlServicesHub.Credentials);
-            rootPath = Constants.ServerRootPath;
-
-            if (!string.IsNullOrEmpty(projectName))
-            {
-                rootPath += projectName + "/";
-            }
 		}
 
 		public virtual string ServerUrl

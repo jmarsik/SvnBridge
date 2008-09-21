@@ -19,20 +19,13 @@ namespace SvnBridge.Infrastructure
         private readonly string serverUrl;
         private readonly string rootPath;
         private readonly ICredentials credentials;
-        private readonly MemoryBasedPersistentCache persistentCache;
 
-        public MetaDataRepositoryNoCache(
-            TFSSourceControlService sourceControlService,
-            ICredentials credentials,
-            MemoryBasedPersistentCache persistentCache,
-            string serverUrl,
-            string rootPath)
+        public MetaDataRepositoryNoCache(TFSSourceControlService sourceControlService, ICredentials credentials, string serverUrl, string rootPath)
         {
             this.sourceControlService = sourceControlService;
             this.serverUrl = serverUrl;
             this.rootPath = rootPath;
             this.credentials = credentials;
-            this.persistentCache = persistentCache;
         }
 
 		public SourceItem[] QueryItems(int revision, int itemId, Recursion recursion)

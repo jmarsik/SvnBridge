@@ -21,16 +21,9 @@ namespace SvnBridge.SourceControl
             stubs = new MyMocks();
             associateWorkItemWithChangeSet = stubs.CreateObject<AssociateWorkItemWithChangeSet>("http://www.codeplex.com", null);
             provider = new TFSSourceControlProvider(
-                "blah",
+                "http://www.blah.com",
                 null,
 				null,
-                CreateSourceControlServicesHub());
-        }
-
-        public SourceControlServicesHub CreateSourceControlServicesHub()
-        {
-            return new SourceControlServicesHub(
-                CredentialCache.DefaultCredentials,
                 new StubTFSSourceControlService(),
                 associateWorkItemWithChangeSet,
                 stubs.CreateObject<DefaultLogger>(),

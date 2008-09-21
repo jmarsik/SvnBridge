@@ -41,18 +41,11 @@ namespace IntegrationTests
             Container.Resolve<MemoryBasedPersistentCache>().Clear();
 
 			authenticateAsLowPrivilegeUser = new AuthenticateAsLowPrivilegeUser();
-
 			_activityId = Guid.NewGuid().ToString();
-
 			associateWorkItemWithChangeSet = new AssociateWorkItemWithChangeSet(ServerUrl, GetCredentials());
-
-			_provider = new TFSSourceControlProvider(ServerUrl,
-													 PROJECT_NAME,
-													 null,
-													 CreateSourceControlServicesHub());
-
-			testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Environment.MachineName + "-" + Guid.NewGuid();
-			_provider.MakeActivity(_activityId);
+            _provider = CreateSourceControlProvider(PROJECT_NAME);
+            testPath = "/Test" + DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Environment.MachineName + "-" + Guid.NewGuid();
+            _provider.MakeActivity(_activityId);
 			_provider.MakeCollection(_activityId, testPath);
 
 			Commit();
@@ -61,14 +54,11 @@ namespace IntegrationTests
 		public void CreateRootProvider()
 		{
 			_activityIdRoot = Guid.NewGuid().ToString();
-			_providerRoot = new TFSSourceControlProvider(ServerUrl,
-														 PROJECT_NAME + testPath,
-														 null,
-														 CreateSourceControlServicesHub());
+            _providerRoot = CreateSourceControlProvider(PROJECT_NAME + testPath);
 			_providerRoot.MakeActivity(_activityIdRoot);
 		}
 
-		public SourceControlServicesHub CreateSourceControlServicesHub()
+        public TFSSourceControlProvider CreateSourceControlProvider(string projectName)
 		{
 			RegistrationWebSvcFactory factory = new RegistrationWebSvcFactory();
 			FileSystem system = new FileSystem();
@@ -79,9 +69,11 @@ namespace IntegrationTests
             MetaDataRepositoryFactory metaDataRepositoryFactory = new MetaDataRepositoryFactory(tfsSourceControlService, Container.Resolve<MemoryBasedPersistentCache>(), Settings.Default.CacheEnabled);
             ICredentials credentials = GetCredentials();
             FileRepository fileRepository = new FileRepository(ServerUrl, credentials, webTransferService);
-			return new SourceControlServicesHub(
-				credentials,
-				tfsSourceControlService,
+            return new TFSSourceControlProvider(
+                ServerUrl,
+                projectName,
+                null,
+                tfsSourceControlService,
 				associateWorkItemWithChangeSet,
                 stubs.CreateObject<DefaultLogger>(),
                 stubs.CreateObject<WebCache>(),
