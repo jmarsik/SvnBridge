@@ -437,11 +437,11 @@ namespace IntegrationTests
 		{
 			string ignore = "*.bad\n";
 
-			_provider.SetProperty(_activityId, testPath, "ignore", ignore);
+			_provider.SetProperty(_activityId, testPath, "svn:ignore", ignore);
 			MergeActivityResponse response = Commit();
 
 			FolderMetaData item = (FolderMetaData)_provider.GetItems(-1, testPath, Recursion.Full);
-			Assert.Equal(ignore, item.Properties["ignore"]);
+			Assert.Equal(ignore, item.Properties["svn:ignore"]);
 			Assert.Equal(_provider.GetLatestVersion(), response.Version);
 			Assert.Equal(1, response.Items.Count);
 			Assert.True(ResponseContains(response, testPath, ItemType.Folder));

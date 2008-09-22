@@ -20,12 +20,40 @@ namespace SvnBridge.Handlers
             item.Name = "Foo";
             item.ItemRevision = 1234;
             item.Author = "user_foo";
+            item.Properties.Add("bugtraq:message", "Work Item: %BUGID%");
+            item.Properties.Add("svn:ignore", "*.log\n");
             item.LastModifiedDate = DateTime.Now.ToUniversalTime();
             stubs.Attach(provider.GetItems, item);
         }
 
         private PropFindHandler handler;
         private FolderMetaData item;
+
+        [Fact]
+        public void TestAllPropCustomProperty()
+        {
+            request.Path = "http://localhost/!svn/bc/1234/Foo";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
+            request.Headers["Depth"] = "0";
+
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl), null);
+
+            string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
+            Assert.True(result.Contains("<C:bugtraq:message>Work Item: %BUGID%</C:bugtraq:message>"));
+        }
+
+        [Fact]
+        public void TestAllPropSvnProperty()
+        {
+            request.Path = "http://localhost/!svn/bc/1234/Foo";
+            request.Input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><allprop/></propfind>";
+            request.Headers["Depth"] = "0";
+
+            handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl), null);
+
+            string result = Encoding.Default.GetString(((MemoryStream)response.OutputStream).ToArray());
+            Assert.True(result.Contains("<S:ignore>*.log\n</S:ignore>"));
+        }
 
         [Fact]
         public void TestAllPropBaselineRelativePath()
@@ -105,7 +133,7 @@ namespace SvnBridge.Handlers
         	handler.Handle(context, new PathParserSingleServerWithProjectInPath(tfsUrl), null);
 
             string result = Encoding.Default.GetString(((MemoryStream) response.OutputStream).ToArray());
-            Assert.True(result.Contains("<lp2:deadprop-count>0</lp2:deadprop-count>"));
+            Assert.True(result.Contains("<lp2:deadprop-count>2</lp2:deadprop-count>"));
         }
 
         [Fact]

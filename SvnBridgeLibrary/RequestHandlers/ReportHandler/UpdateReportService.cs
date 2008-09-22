@@ -22,9 +22,7 @@ namespace SvnBridge.Infrastructure
 			this.sourceControlProvider = sourceControlProvider;
 		}
 
-		public void ProcessUpdateReportForFile(UpdateReportData updateReportRequest,
-											   ItemMetaData item,
-											   StreamWriter output)
+		public void ProcessUpdateReportForFile(UpdateReportData updateReportRequest, ItemMetaData item, StreamWriter output)
 		{
 			if (item is DeleteMetaData)
 			{
@@ -67,8 +65,7 @@ namespace SvnBridge.Infrastructure
 				output.Write("<S:set-prop name=\"svn:entry:uuid\">" + sourceControlProvider.GetRepositoryUuid() + "</S:set-prop>\n");
 				foreach (KeyValuePair<string, string> property in item.Properties)
 				{
-					output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" + property.Value +
-								 "</S:set-prop>\n");
+					output.Write("<S:set-prop name=\"" + property.Key + "\">" + property.Value + "</S:set-prop>\n");
 				}
 
 				while (item.DataLoaded == false)
@@ -111,10 +108,7 @@ namespace SvnBridge.Infrastructure
 			return url;
 		}
 
-		public void ProcessUpdateReportForDirectory(UpdateReportData updateReportRequest,
-													FolderMetaData folder,
-													StreamWriter output,
-													bool rootFolder)
+		public void ProcessUpdateReportForDirectory(UpdateReportData updateReportRequest, FolderMetaData folder, StreamWriter output, bool rootFolder)
 		{
 			if (folder is DeleteFolderMetaData)
 			{
@@ -167,9 +161,7 @@ namespace SvnBridge.Infrastructure
 					output.Write("<S:set-prop name=\"svn:entry:uuid\">" + sourceControlProvider.GetRepositoryUuid() + "</S:set-prop>\n");
 					foreach (KeyValuePair<string, string> property in folder.Properties)
 					{
-						output.Write("<S:set-prop name=\"" + property.Key.Replace("__COLON__", ":") + "\">" +
-									 property.Value +
-									 "</S:set-prop>\n");
+						output.Write("<S:set-prop name=\"" + property.Key + "\">" + property.Value + "</S:set-prop>\n");
 					}
 				}
 

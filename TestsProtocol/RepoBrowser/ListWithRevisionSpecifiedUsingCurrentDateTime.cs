@@ -402,8 +402,8 @@ namespace ProtocolTests
             item.ItemRevision = 5767;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2008-09-21T10:03:51.235865Z");
-            item.Properties.Add("C:bugtraq:message", "Work Item: %BUGID%");
-            item.Properties.Add("S:ignore", "*.ig1\n*.ig2\n*.ig3\n");
+            item.Properties.Add("bugtraq:message", "Work Item: %BUGID%");
+            item.Properties.Add("svn:ignore", "*.ig1\n*.ig2\n*.ig3\n");
             stubs.Attach(provider.GetItems, item);
 
             string request =

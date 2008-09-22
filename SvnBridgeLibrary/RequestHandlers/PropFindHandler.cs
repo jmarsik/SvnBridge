@@ -48,12 +48,7 @@ namespace SvnBridge.Handlers
                 }
                 else if (propfind.Prop != null)
                 {
-                    HandleProp(sourceControlProvider,
-                               requestPath,
-                               depthHeader,
-                               labelHeader,
-                               propfind.Prop,
-                               response.OutputStream);
+                    HandleProp(sourceControlProvider, requestPath, depthHeader, labelHeader, propfind.Prop, response.OutputStream);
                 }
                 else
                 {
@@ -176,7 +171,14 @@ namespace SvnBridge.Handlers
             writer.Write("<D:prop>\n");
             foreach (var prop in item.Properties)
             {
-                writer.Write("<" + prop.Key + ">" + prop.Value + "</" + prop.Key + ">\n");
+                if (prop.Key.StartsWith("svn:"))
+                {
+                    writer.Write("<S:" + prop.Key.Substring(4) + ">" + prop.Value + "</S:" + prop.Key.Substring(4) + ">\n");
+                }
+                else
+                {
+                    writer.Write("<C:" + prop.Key + ">" + prop.Value + "</C:" + prop.Key + ">\n");
+                }
             }
             writer.Write("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>\n");
             writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
@@ -206,11 +208,7 @@ namespace SvnBridge.Handlers
             writer.Write("</D:multistatus>\n");
         }
 
-        private void WriteAllPropForItem(TextWriter writer,
-                                         string requestPath,
-                                         ItemMetaData item,
-                                         byte[] itemData,
-                                         TFSSourceControlProvider sourceControlProvider)
+        private void WriteAllPropForItem(TextWriter writer, string requestPath, ItemMetaData item, byte[] itemData, TFSSourceControlProvider sourceControlProvider)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             writer.Write("<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"DAV:\">\n");
@@ -220,16 +218,11 @@ namespace SvnBridge.Handlers
             writer.Write("<D:prop>\n");
             writer.Write("<lp1:getcontenttype>text/plain</lp1:getcontenttype>\n");
             writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
-            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") +
-                         "</lp1:creationdate>\n");
-            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") +
-                         "</lp1:getlastmodified>\n");
-            string svnVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" +
-                                        Helper.Encode(item.Name));
-			writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svnVerLocalPath) +
-                         "</D:href></lp1:checked-in>\n");
-            writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath +
-                         "</D:href></lp1:version-controlled-configuration>\n");
+            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") + "</lp1:creationdate>\n");
+            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
+            string svnVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name));
+			writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svnVerLocalPath) + "</D:href></lp1:checked-in>\n");
+            writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath + "</D:href></lp1:version-controlled-configuration>\n");
             writer.Write("<lp1:version-name>" + item.Revision + "</lp1:version-name>\n");
             writer.Write("<lp1:creator-displayname>" + item.Author + "</lp1:creator-displayname>\n");
             writer.Write("<lp2:baseline-relative-path>" + item.Name + "</lp2:baseline-relative-path>\n");
@@ -251,13 +244,7 @@ namespace SvnBridge.Handlers
             writer.Write("</D:multistatus>\n");
         }
 
-        private void HandleProp(
-            TFSSourceControlProvider sourceControlProvider,
-            string requestPath,
-            string depthHeader,
-            string labelHeader,
-            PropData data,
-            Stream outputStream)
+        private void HandleProp(TFSSourceControlProvider sourceControlProvider, string requestPath, string depthHeader, string labelHeader, PropData data, Stream outputStream)
         {
             if (requestPath == Constants.SvnVccPath)
             {

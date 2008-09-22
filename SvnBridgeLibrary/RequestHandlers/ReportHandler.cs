@@ -187,8 +187,7 @@ namespace SvnBridge.Handlers
 
             foreach (var property in folder.Properties)
             {
-                output.Write("<S:change-dir-prop name=\"{0}\">{1}\n", property.Key.Replace("__COLON__", ":"),
-                             property.Value);
+                output.Write("<S:change-dir-prop name=\"{0}\">{1}\n", property.Key, property.Value);
                 output.Write("</S:change-dir-prop>\n");
             }
 
@@ -330,10 +329,7 @@ namespace SvnBridge.Handlers
             writer.Write("</S:get-locks-report>\n");
         }
 
-        private void GetLocationsReport(TFSSourceControlProvider sourceControlProvider,
-                                        GetLocationsReportData getLocationsReport,
-                                        string path,
-                                        StreamWriter output)
+        private void GetLocationsReport(TFSSourceControlProvider sourceControlProvider, GetLocationsReportData getLocationsReport, string path, StreamWriter output)
         {
             if (path.IndexOf('/', 9) > -1)
             {
@@ -353,9 +349,7 @@ namespace SvnBridge.Handlers
             output.Write("<S:get-locations-report xmlns:S=\"svn:\" xmlns:D=\"DAV:\">\n");
             if (item != null)
             {
-                output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" +
-                             path +
-                             "\"/>\n");
+                output.Write("<S:location rev=\"" + getLocationsReport.LocationRevision + "\" path=\"" + path + "\"/>\n");
             }
             output.Write("</S:get-locations-report>\n");
         }
@@ -363,12 +357,10 @@ namespace SvnBridge.Handlers
         private void UpdateReport(TFSSourceControlProvider sourceControlProvider, UpdateReportData updatereport, StreamWriter output, FolderMetaData metadata, int targetRevision)
         {
             output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-            output.Write(
-                "<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
+            output.Write("<S:update-report xmlns:S=\"svn:\" xmlns:V=\"http://subversion.tigris.org/xmlns/dav/\" xmlns:D=\"DAV:\" send-all=\"true\">\n");
+            output.Write("<S:target-revision rev=\"" + targetRevision + "\"/>\n");
 
             UpdateReportService updateReportService = new UpdateReportService(this, sourceControlProvider);
-
-            output.Write("<S:target-revision rev=\"" + targetRevision + "\"/>\n");
             updateReportService.ProcessUpdateReportForDirectory(updatereport, metadata, output, true);
 
             output.Write("</S:update-report>\n");

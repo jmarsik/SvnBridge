@@ -62,6 +62,7 @@
     <Compile Include="Checkout\CheckoutOldRevisionTest.cs" />
     <Compile Include="Checkout\CheckoutRootFolderTest.cs" />
     <Compile Include="Commit\CommitAddFolderThatAlreadyExistsTest.cs" />
+    <Compile Include="Commit\CommitAddVariousPropertiesToFolder.cs" />
     <Compile Include="Commit\CommitDeleteFileTest.cs" />
     <Compile Include="Commit\CommitDeleteFolderTest.cs" />
     <Compile Include="Commit\CommitDeleteOfAlreadyDeletedFileTest.cs" />

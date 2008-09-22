@@ -795,8 +795,8 @@ namespace Tests
             item.ItemRevision = 5767;
             item.Author = "jwanagel";
             item.LastModifiedDate = DateTime.Parse("2008-09-21T10:03:51.235865Z");
-            item.Properties.Add("C:bugtraq:message", "Work Item: %BUGID%");
-            item.Properties.Add("S:ignore", "*.ig1\n*.ig2\n*.ig3\n");
+            item.Properties.Add("bugtraq:message", "Work Item: %BUGID%");
+            item.Properties.Add("svn:ignore", "*.ig1\n*.ig2\n*.ig3\n");
             stubs.Attach(provider.GetItems, item);
 
             string request =
@@ -1000,7 +1000,7 @@ namespace Tests
             ItemMetaData item = new FolderMetaData();
             item.Name = "";
             item.Properties.Add("C:bugtraq:message", "Work Item: %BUGID%");
-            item.Properties.Add("S:ignore", "*.ig1\r\n*.ig2\r\n*.ig3");
+            item.Properties.Add("svn:ignore", "*.ig1\r\n*.ig2\r\n*.ig3");
             stubs.Attach(provider.GetItems, item);
 
             string request =
@@ -1053,7 +1053,7 @@ namespace Tests
             result.Author = "jwanagel";
             result.LastModifiedDate = DateTime.Parse("2008-09-21T10:03:51.235865Z");
             result.Properties.Add("C:bugtraq:message", "Work Item: %BUGID%");
-            result.Properties.Add("S:ignore", "*.ig1\r\n*.ig2\r\n*.ig3");
+            result.Properties.Add("svn:ignore", "*.ig1\r\n*.ig2\r\n*.ig3");
             ItemMetaData item = new FolderMetaData();
             item.Name = "A !@#$%^&()_-+={[}];',.~`";
             item.ItemRevision = 5734;
