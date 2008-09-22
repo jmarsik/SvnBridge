@@ -90,17 +90,15 @@ TestFolder2/text.txt
         public void CanListPreviousVersionUsingDate()
         {
             CreateFolder(testPath + "/TestFolder1", true);
-            DateTime commitDate = DateTime.Now;
+            DateTime commitDate = DateTime.Now.AddSeconds(1); // Add a second in case server time is slightly off
 
             //SVN protocol is only accurate to the second
             Thread.Sleep(TimeSpan.FromSeconds(3));
 
             WriteFile(testPath + "/test.txt", "blah", true); // here we create a new version
 
-            string actual =
-                Svn("list " + testUrl + " --revision {" + commitDate.ToString("yyyyMMddTHHmmss") + "}");
-            string expected = @"TestFolder1/
-";
+            string actual = Svn("list " + testUrl + " --revision {" + commitDate.ToString("yyyyMMddTHHmmss") + "}");
+            string expected = "TestFolder1/\r\n";
             Assert.Equal(expected, actual);
         }
 
