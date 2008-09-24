@@ -10,7 +10,7 @@ namespace SvnBridge.Stubs
     {
         private NameValueCollection headers;
         private string httpMethod;
-        private Stream inputStream;
+        private Stream inputStream = new MemoryStream();
         private Uri url;
 
         public string Input

@@ -65,6 +65,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Protocol\OptionsData.cs" />
     <Compile Include="RequestHandlers\CheckOutHandler.cs" />
     <Compile Include="RequestHandlers\CopyHandler.cs" />
     <Compile Include="RequestHandlers\DeleteHandler.cs" />

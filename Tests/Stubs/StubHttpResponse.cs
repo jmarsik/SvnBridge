@@ -46,6 +46,11 @@ namespace SvnBridge.Stubs
             set { outputStream = value; }
         }
 
+        public string Output
+        {
+            get { return Encoding.Default.GetString(((MemoryStream)OutputStream).ToArray()); }
+        }
+
         public bool SendChunked
         {
             get { return sendChunked; }
