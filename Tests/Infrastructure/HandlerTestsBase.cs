@@ -37,6 +37,7 @@ namespace SvnBridge.Infrastructure
 
         public void Dispose()
         {
+            Clock.FrozenCurrentTime = null;
             Container.Reset();
         }
     }

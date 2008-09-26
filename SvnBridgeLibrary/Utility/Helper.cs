@@ -19,13 +19,9 @@ namespace SvnBridge.Utility
 		private static readonly string[] DECODED_B = new string[] { "&", "<", ">" };
 		private static readonly string[] DECODED_C = new string[] { "%", "#", " ", "^", "{", "[", "}", "]", ";", "`" };
 
-		private static readonly string[] ENCODED =
-			new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;" };
-
+		private static readonly string[] ENCODED = new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60", "&amp;" };
 		private static readonly string[] ENCODED_B = new string[] { "&amp;", "&lt;", "&gt;" };
-
-		private static readonly string[] ENCODED_C =
-			new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60" };
+		private static readonly string[] ENCODED_C = new string[] { "%25", "%23", "%20", "%5e", "%7b", "%5b", "%7d", "%5d", "%3b", "%60" };
 
 		public static XmlReaderSettings InitializeNewXmlReaderSettings()
 		{
@@ -179,10 +175,7 @@ namespace SvnBridge.Utility
 			return sb.ToString();
 		}
 
-		private static string Encode(string[] encoded,
-									 string[] decoded,
-									 string value,
-									 bool capitalize)
+		private static string Encode(string[] encoded, string[] decoded, string value, bool capitalize)
 		{
 			if (value == null)
 			{
@@ -204,8 +197,7 @@ namespace SvnBridge.Utility
 			return value;
 		}
 
-		private static string Decode(string value,
-									 bool capitalize)
+		private static string Decode(string value, bool capitalize)
 		{
 			if (value == null)
 			{
@@ -268,6 +260,11 @@ namespace SvnBridge.Utility
 			string result = date.ToUniversalTime().ToString("o");
 			return result.Remove(result.Length - 2, 1);
 		}
+
+        public static string FormatDateB(DateTime date)
+        {
+            return date.ToUniversalTime().ToString("R");
+        }
 
 		public static IWebProxy CreateProxy(ProxyInformation proxyInformation)
 		{

@@ -252,17 +252,13 @@ namespace ProtocolTests
         public void Test14()
         {
             List<SourceItemHistory> histories = new List<SourceItemHistory>();
-            SourceItemHistory history1 =
-                new SourceItemHistory(5531, "jwanagel", DateTime.Parse("2007-07-24T07:46:20.635845Z"), "Renamed file");
-            history1.Changes.Add(
-                MakeChange(ChangeType.Rename, "newFolder3/NewFileRename.txt", "newFolder3/NewFile.txt", 5530));
-            SourceItemHistory history2 =
-                new SourceItemHistory(5530, "jwanagel", DateTime.Parse("2007-07-24T07:45:44.995448Z"), "1234");
+            SourceItemHistory history1 = new SourceItemHistory(5531, "jwanagel", DateTime.Parse("2007-07-24T07:46:20.635845Z"), "Renamed file");
+            history1.Changes.Add(MakeChange(ChangeType.Rename, "newFolder3/NewFileRename.txt", "newFolder3/NewFile.txt", 5530));
+            SourceItemHistory history2 = new SourceItemHistory(5530, "jwanagel", DateTime.Parse("2007-07-24T07:45:44.995448Z"), "1234");
             history2.Changes.Add(MakeChange(ChangeType.Add, "newFolder3"));
             history2.Changes.Add(MakeChange(ChangeType.Add, "newFolder3/NewFile.txt"));
             histories.Add(history1);
             histories.Add(history2);
-
             stubs.Attach(provider.GetLog, Return.Value(new LogItem(@"C:\", "newFolder2", histories.ToArray())));
 
             string request =

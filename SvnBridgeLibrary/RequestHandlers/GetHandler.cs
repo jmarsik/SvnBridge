@@ -54,7 +54,10 @@ namespace SvnBridge.Handlers
 			else
 			{
 				SetResponseSettings(response, "text/plain", Encoding.Default, 200);
-				string itemData = Encoding.UTF8.GetString(sourceControlProvider.ReadFile(item));
+                response.AppendHeader("Last-Modified", Helper.FormatDateB(item.LastModifiedDate));
+                response.AppendHeader("ETag", "\"" + item.ItemRevision + "//" + Helper.EncodeB(item.Name) + "\"");
+                response.AppendHeader("Accept-Ranges", "bytes");
+                string itemData = Encoding.UTF8.GetString(sourceControlProvider.ReadFile(item));
 
 				using (StreamWriter writer = new StreamWriter(response.OutputStream))
 				{

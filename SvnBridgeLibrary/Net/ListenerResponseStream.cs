@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using SvnBridge.Utility;
 
 namespace SvnBridge.Net
 {
@@ -151,7 +152,7 @@ namespace SvnBridge.Net
 
                 writer.WriteLine("HTTP/1.1 {0} {1}", response.StatusCode, statusCodeDescription);
 
-                writer.WriteLine("Date: {0}", DateTime.Now.ToUniversalTime().ToString("R"));
+                writer.WriteLine("Date: {0}", Helper.FormatDateB(DateTime.Now));
                 writer.WriteLine("Server: Apache/2.0.59 (Win32) SVN/1.4.2 DAV/2");
 
                 List<KeyValuePair<string, string>> headers = response.Headers;

@@ -77,7 +77,7 @@ namespace SvnBridge.Handlers
 <S:date>" + Helper.FormatDate(firstVersion.LastModifiedDate) + @"</S:date>
 <lp1:getetag/>
 <lp1:creationdate>" + Helper.FormatDate(firstVersion.LastModifiedDate) + @"</lp1:creationdate>
-<lp1:getlastmodified>" + firstVersion.LastModifiedDate.ToUniversalTime().ToString("R") + @"</lp1:getlastmodified>
+<lp1:getlastmodified>" + Helper.FormatDateB(firstVersion.LastModifiedDate) + @"</lp1:getlastmodified>
 <lp1:baseline-collection><D:href>" + GetLocalPath("/!svn/bc/0/") + @"</D:href></lp1:baseline-collection>
 <lp1:version-name>0</lp1:version-name>
 <lp2:repository-uuid>" + sourceControlProvider.GetRepositoryUuid() + @"</lp2:repository-uuid>
@@ -183,7 +183,7 @@ namespace SvnBridge.Handlers
             writer.Write("<lp1:getcontenttype>text/html; charset=UTF-8</lp1:getcontenttype>\n");
             writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
             writer.Write("<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate) + "</lp1:creationdate>\n");
-            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
+            writer.Write("<lp1:getlastmodified>" + Helper.FormatDateB(item.LastModifiedDate) + "</lp1:getlastmodified>\n");
             string svrVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name));
             writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svrVerLocalPath) + "</D:href></lp1:checked-in>\n");
             writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath + "</D:href></lp1:version-controlled-configuration>\n");
@@ -218,8 +218,8 @@ namespace SvnBridge.Handlers
             writer.Write("<D:prop>\n");
             writer.Write("<lp1:getcontenttype>text/plain</lp1:getcontenttype>\n");
             writer.Write("<lp1:getetag>W/\"" + item.Revision + "//" + item.Name + "\"</lp1:getetag>\n");
-            writer.Write("<lp1:creationdate>" + item.LastModifiedDate.ToUniversalTime().ToString("o") + "</lp1:creationdate>\n");
-            writer.Write("<lp1:getlastmodified>" + item.LastModifiedDate.ToUniversalTime().ToString("R") + "</lp1:getlastmodified>\n");
+            writer.Write("<lp1:creationdate>" + Helper.FormatDate(item.LastModifiedDate) + "</lp1:creationdate>\n");
+            writer.Write("<lp1:getlastmodified>" + Helper.FormatDateB(item.LastModifiedDate) + "</lp1:getlastmodified>\n");
             string svnVerLocalPath = GetLocalPath("/!svn/ver/" + item.Revision + "/" + Helper.Encode(item.Name));
 			writer.Write("<lp1:checked-in><D:href>" + Helper.UrlEncodeIfNeccesary(svnVerLocalPath) + "</D:href></lp1:checked-in>\n");
             writer.Write("<lp1:version-controlled-configuration><D:href>" + VccPath + "</D:href></lp1:version-controlled-configuration>\n");
