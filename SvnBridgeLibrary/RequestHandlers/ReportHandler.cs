@@ -100,7 +100,7 @@ namespace SvnBridge.Handlers
                     }
                     else
                     {
-                        throw new Exception("Unrecognized report name: " + reader.LocalName);
+                        SendUnknownReportResponse(response);
                     }
                 }
                 catch
@@ -108,6 +108,24 @@ namespace SvnBridge.Handlers
                     RequestCache.Items["RequestBody"] = data;
                     throw;
                 }
+            }
+        }
+
+        private void SendUnknownReportResponse(IHttpResponse response)
+        {
+            SetResponseSettings(response, "text/xml; charset=\"utf-8\"", Encoding.UTF8, (int)HttpStatusCode.NotImplemented);
+            response.AppendHeader("Connection", "close");
+
+            using (var output = new StreamWriter(response.OutputStream))
+            {
+                output.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+                output.Write("<D:error xmlns:D=\"DAV:\" xmlns:m=\"http://apache.org/dav/xmlns\" xmlns:C=\"svn:\">\n");
+                output.Write("<C:error/>\n");
+                output.Write("<m:human-readable errcode=\"200007\">\n");
+                output.Write("The requested report is unknown.\n");
+                output.Write("</m:human-readable>\n");
+                output.Write("</D:error>\n");
+                return;
             }
         }
 

@@ -26,6 +26,15 @@ namespace SvnBridge.Stubs
             get { return headers; }
         }
 
+        internal string GetHeader(string header)
+        {
+            foreach (var hdr in headers)
+                if (hdr.Key == header)
+                    return hdr.Value;
+
+            return null;
+        }
+
         #region IHttpResponse Members
 
         public Encoding ContentEncoding
@@ -63,8 +72,7 @@ namespace SvnBridge.Stubs
             set { statusCode = value; }
         }
 
-        public void AppendHeader(string name,
-                                 string value)
+        public void AppendHeader(string name, string value)
         {
             headers.Add(new KeyValuePair<string, string>(name, value));
         }

@@ -138,6 +138,9 @@ namespace SvnBridge.Net
                     case 405:
                         statusCodeDescription = "Method Not Allowed";
                         break;
+                    case 501:
+                        statusCodeDescription = "Method Not Implemented";
+                        break;
                     default:
                         statusCodeDescription = ((HttpStatusCode) response.StatusCode).ToString();
                         break;
@@ -154,12 +157,18 @@ namespace SvnBridge.Net
                 List<KeyValuePair<string, string>> headers = response.Headers;
 
                 string xPadHeader = null;
+                string connection = null;
 
                 foreach (KeyValuePair<string, string> header in headers)
                 {
                     if (header.Key == "X-Pad")
                     {
                         xPadHeader = header.Value;
+                        continue;
+                    }
+                    else if (header.Key == "Connection")
+                    {
+                        connection = header.Value;
                         continue;
                     }
                     else
@@ -175,6 +184,11 @@ namespace SvnBridge.Net
                 else
                 {
                     writer.WriteLine("Transfer-Encoding: chunked");
+                }
+
+                if (connection != null)
+                {
+                    writer.WriteLine("Connection: {0}", connection);
                 }
 
                 string[] connectionHeaderParts = request.Headers["Connection"].Split(',');
